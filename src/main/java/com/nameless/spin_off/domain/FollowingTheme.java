@@ -5,15 +5,17 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingThema {
+public class FollowingTheme {
+
+    @Id
+    @GeneratedValue
+    @Column(name="followingthema_id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
@@ -23,5 +25,5 @@ public class FollowingThema {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thema_id")
     @NotNull
-    private Thema thema;
+    private Theme theme;
 }

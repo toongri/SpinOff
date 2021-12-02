@@ -1,14 +1,20 @@
 package com.nameless.spin_off.domain;
 
 import com.sun.istack.NotNull;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-public class Thema {
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Theme {
 
     @Id @GeneratedValue
-    @Column(name="thema_id")
+    @Column(name="theme_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
