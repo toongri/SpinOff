@@ -10,20 +10,17 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingTheme {
+public class PostedHashTag {
 
     @Id
     @GeneratedValue
-    @Column(name="followingtheme_id")
+    @Column(name="postedhashtag_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
-    private Member member;
+    private String tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "post_id")
     @NotNull
-    private Theme theme;
+    private Post post;
 }
