@@ -10,11 +10,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Following {
+public class MemberAuthority {
 
     @Id
     @GeneratedValue
-    @Column(name="following_id")
+    @Column(name="memberauthority_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,8 +22,7 @@ public class Following {
     @NotNull
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
-    private Member followedMember;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "authority_status")
+    private MemberAuthorityStatus authorityStatus;
 }

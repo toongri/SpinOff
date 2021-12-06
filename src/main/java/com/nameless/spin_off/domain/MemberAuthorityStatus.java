@@ -1,5 +1,5 @@
 package com.nameless.spin_off.domain;
 
-public enum PostAuthorityStatus {
+public enum MemberAuthorityStatus {
     ADMIN, SELLER, DOCENT
 }

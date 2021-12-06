@@ -10,11 +10,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Following {
+public class Alarm {
 
     @Id
     @GeneratedValue
-    @Column(name="following_id")
+    @Column(name="alarm_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,8 +22,8 @@ public class Following {
     @NotNull
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
     @NotNull
-    private Member followedMember;
+    private String url;
+
+    private String content;
 }
