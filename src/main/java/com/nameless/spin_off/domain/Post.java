@@ -35,10 +35,6 @@ public class Post {
     private LocalDateTime modifiedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "authority_status")
-    private postAuthorityStatus authorityStatus;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "public_status")
-    private postPublicStatus publicStatus;
+    @Column(name = "publicstatus")
+    private PostPublicStatus publicStatus;
 }

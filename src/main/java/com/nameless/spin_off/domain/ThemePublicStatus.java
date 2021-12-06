@@ -1,5 +1,5 @@
 package com.nameless.spin_off.domain;
 
-public enum themaPublicStatus {
+public enum ThemePublicStatus {
     PUBLIC, PRIVATED, FOLLWER
 }

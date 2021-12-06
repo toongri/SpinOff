@@ -11,10 +11,11 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Theme {
+public class Search {
 
-    @Id @GeneratedValue
-    @Column(name="theme_id")
+    @Id
+    @GeneratedValue
+    @Column(name="search_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -22,22 +23,9 @@ public class Theme {
     @NotNull
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    @NotNull
-    private Post post;
-
-    private String title;
-
     private String content;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "publicstatus")
-    private ThemePublicStatus publicStatus;
 }
