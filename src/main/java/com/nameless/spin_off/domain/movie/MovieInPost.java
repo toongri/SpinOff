@@ -1,5 +1,6 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.movie;
 
+import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,17 +11,19 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostedHashTag {
+public class MovieInPost {
 
     @Id
-    @GeneratedValue
-    @Column(name="postedhashtag_id")
+    @Column(name="movie_id")
     private Long id;
-
-    private String tag;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @NotNull
     private Post post;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id")
+    @NotNull
+    private Movie movie;
 }

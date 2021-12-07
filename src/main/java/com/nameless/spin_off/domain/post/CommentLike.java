@@ -1,5 +1,7 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.member.Member;
+import com.nameless.spin_off.domain.post.Comment;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,11 +12,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Following {
+public class CommentLike {
 
     @Id
     @GeneratedValue
-    @Column(name="following_id")
+    @Column(name="commentlike_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -23,7 +25,8 @@ public class Following {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "comment_id")
     @NotNull
-    private Member followedMember;
+    private Comment comment;
+
 }

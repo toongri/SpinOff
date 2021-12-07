@@ -1,20 +1,22 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.member.Member;
+import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Theme {
+public class PostLike {
 
-    @Id @GeneratedValue
-    @Column(name="theme_id")
+    @Id
+    @GeneratedValue
+    @Column(name="postlike_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,17 +29,4 @@ public class Theme {
     @NotNull
     private Post post;
 
-    private String title;
-
-    private String content;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "publicstatus")
-    private ThemePublicStatus publicStatus;
 }

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain;
 
+import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;

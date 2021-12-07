@@ -1,4 +1,4 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.member;
 
 import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
@@ -12,11 +12,11 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Alarm {
+public class MemberSearch {
 
     @Id
     @GeneratedValue
-    @Column(name="alarm_id")
+    @Column(name="membersearch_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,12 +24,7 @@ public class Alarm {
     @NotNull
     private Member member;
 
-    @NotNull
-    private String url;
-
     private String content;
-
-    private Boolean isCheck;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

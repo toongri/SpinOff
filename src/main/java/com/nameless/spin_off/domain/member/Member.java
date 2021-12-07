@@ -1,4 +1,4 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.member;
 
 import lombok.AccessLevel;
 import lombok.Getter;

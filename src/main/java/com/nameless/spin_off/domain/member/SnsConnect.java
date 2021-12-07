@@ -1,37 +1,31 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.member;
 
-import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Alarm {
+public class SnsConnect {
 
     @Id
     @GeneratedValue
-    @Column(name="alarm_id")
+    @Column(name="snsconnect_id")
     private Long id;
+
+    @Column(name="sns_id")
+    private String snsId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @NotNull
     private Member member;
 
-    @NotNull
-    private String url;
-
-    private String content;
-
-    private Boolean isCheck;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "snsconnect_status")
+    private SnsConnectStatus status;
 }

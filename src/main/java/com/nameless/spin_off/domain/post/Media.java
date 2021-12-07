@@ -1,4 +1,4 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.post;
 
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -10,20 +10,19 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostBlock {
+public class Media {
 
     @Id
     @GeneratedValue
-    @Column(name="postblock_id")
+    @Column(name="media_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "post_id")
     @NotNull
-    private Member member;
+    private Post post;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
     @NotNull
-    private Member postBlockedMember;
+    private String url;
+
 }

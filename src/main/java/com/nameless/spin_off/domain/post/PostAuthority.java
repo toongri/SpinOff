@@ -1,4 +1,4 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.post;
 
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
