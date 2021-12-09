@@ -25,9 +25,9 @@ public class DirectMessage {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "receivemember_id")
     @NotNull
-    private Member recievedMember;
+    private Member receivedMember;
 
     private String content;
 

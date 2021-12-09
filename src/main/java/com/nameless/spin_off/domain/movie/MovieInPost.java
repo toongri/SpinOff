@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class MovieInPost {
 
     @Id
-    @Column(name="movie_id")
+    @Column(name="movieinpost_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

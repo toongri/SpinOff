@@ -24,7 +24,7 @@ public class DmBlock {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "dmblockedmember_id")
     @NotNull
     private Member dmBlockedMember;
 }
