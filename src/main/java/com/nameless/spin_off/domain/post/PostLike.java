@@ -29,4 +29,7 @@ public class PostLike {
     @NotNull
     private Post post;
 
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

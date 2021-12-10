@@ -25,4 +25,7 @@ public class Media {
     @NotNull
     private String url;
 
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

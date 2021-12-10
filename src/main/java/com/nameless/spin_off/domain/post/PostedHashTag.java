@@ -24,4 +24,8 @@ public class PostedHashTag {
     @JoinColumn(name = "post_id")
     @NotNull
     private Post post;
+
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }

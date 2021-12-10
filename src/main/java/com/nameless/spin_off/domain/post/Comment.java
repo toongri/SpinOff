@@ -35,4 +35,7 @@ public class Comment {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 }
