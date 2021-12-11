@@ -85,12 +85,49 @@ public class Post {
         post.updateContent(content);
         post.updatePostedHashTag(postedHashTags);
         post.updateMedia(medias);
-        post.updateCreateAt(LocalDateTime.now());
-        post.updateModifiedAt(LocalDateTime.now());
-        post.updateView(0);
-        post.updatePublicStatus(postPublicStatus)
+        post.updateCreateAtNow();
+        post.updateModifiedAtNow();
+        post.updateViewZero();
+        post.updatePublicStatus(postPublicStatus);
 
         return post;
+    }
+
+    //==update 함수==//
+    private void updatePublicStatus(PostPublicStatus publicStatus) {
+        this.publicStatus = publicStatus;
+    }
+
+    private void updateViewZero() {
+        this.view = 0L;
+    }
+
+    private void updateModifiedAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private void updateCreateAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private void updateMedia(List<Media> medias) {
+        this.medias.addAll(medias);
+    }
+
+    private void updatePostedHashTag(List<PostedHashTag> postedHashTags) {
+        this.postedHashTags.addAll(postedHashTags);
+    }
+
+    private void updateContent(String content) {
+        this.content = content;
+    }
+
+    private void updateTitle(String title) {
+        this.title = title;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
     }
 }
 
