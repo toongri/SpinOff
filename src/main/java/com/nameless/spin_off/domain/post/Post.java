@@ -75,7 +75,7 @@ public class Post {
         media.updatePost(this);
     }
 
-    //==생성 로직==//
+    //==생성 메소드==//
     public static Post createPost(Member member, String title, String content
             , List<PostedHashTag> postedHashTags, List<Media> medias
             , PostPublicStatus postPublicStatus) {
@@ -93,7 +93,7 @@ public class Post {
         return post;
     }
 
-    //==update 함수==//
+    //==수정 메소드==//
     private void updatePublicStatus(PostPublicStatus publicStatus) {
         this.publicStatus = publicStatus;
     }
@@ -129,6 +129,8 @@ public class Post {
     private void updateMember(Member member) {
         this.member = member;
     }
+
+    //==비즈니스 로직==//
+
+    //==조회 로직==//
 }
-
-

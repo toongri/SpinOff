@@ -28,4 +28,15 @@ public class SnsConnect {
     @Enumerated(EnumType.STRING)
     @Column(name = "snsconnect_status")
     private SnsConnectStatus status;
+
+    //==연관관계 메소드==//
+
+    //==생성 메소드==//
+
+    //==수정 메소드==//
+
+    //==비즈니스 로직==//
+
+    //==조회 로직==//
+
 }
