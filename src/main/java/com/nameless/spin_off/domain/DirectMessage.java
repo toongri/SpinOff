@@ -37,8 +37,34 @@ public class DirectMessage {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static DirectMessage createDirectMessage(Member member, Member receivedMember, String content) {
+
+        DirectMessage directMessage = new DirectMessage();
+        directMessage.updateMember(member);
+        directMessage.updateReceivedMember(member);
+        directMessage.updateContent(content);
+        directMessage.updateCreatedAtNow();
+
+        return directMessage;
+
+    }
 
     //==수정 메소드==//
+    private void updateCreatedAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private void updateContent(String content) {
+        this.content = content;
+    }
+
+    private void updateReceivedMember(Member member) {
+        this.receivedMember = member;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

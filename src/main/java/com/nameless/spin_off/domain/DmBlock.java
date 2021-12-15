@@ -31,8 +31,24 @@ public class DmBlock {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static DmBlock createDmBlock(Member member, Member dmBlockedMember) {
+
+        DmBlock dmBlock = new DmBlock();
+        dmBlock.updateMember(member);
+        dmBlock.updateDmBlockedMember(dmBlockedMember);
+
+        return dmBlock;
+
+    }
 
     //==수정 메소드==//
+    private void updateDmBlockedMember(Member dmBlockedMember) {
+        this.dmBlockedMember = dmBlockedMember;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

@@ -25,15 +25,27 @@ public class Media {
     @NotNull
     private String url;
 
+    //==연관관계 메소드==//
+
+    //==생성 메소드==//
+    public static Media createMedia(Post post, String url) {
+
+        Media media = new Media();
+        media.updatePost(post);
+        media.updateUrl(url);
+
+        return media;
+
+    }
+
+    //==수정 메소드==//
     public void updatePost(Post post) {
         this.post = post;
     }
 
-    //==연관관계 메소드==//
-
-    //==생성 메소드==//
-
-    //==수정 메소드==//
+    private void updateUrl(String url) {
+        this.url = url;
+    }
 
     //==비즈니스 로직==//
 

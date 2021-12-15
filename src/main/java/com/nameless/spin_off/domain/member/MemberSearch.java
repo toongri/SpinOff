@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.tomcat.jni.Local;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -32,8 +33,29 @@ public class MemberSearch {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static MemberSearch createMemberSearch(Member member, String content) {
+
+        MemberSearch memberSearch = new MemberSearch();
+        memberSearch.updateMember(member);
+        memberSearch.updateContent(content);
+        memberSearch.updateCreatedAtNow();
+
+        return memberSearch;
+
+    }
 
     //==수정 메소드==//
+    private void updateCreatedAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private void updateContent(String content) {
+        this.content = content;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

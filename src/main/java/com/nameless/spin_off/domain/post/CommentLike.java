@@ -31,8 +31,9 @@ public class CommentLike {
     @NotNull
     private Comment comment;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    public void updateComment(Comment comment) {
+        this.comment = comment;
+    }
 
 
     //==연관관계 메소드==//

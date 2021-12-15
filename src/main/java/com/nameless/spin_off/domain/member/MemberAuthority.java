@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -23,14 +24,30 @@ public class MemberAuthority {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "authority_status")
-    private MemberAuthorityStatus authorityStatus;
+    @Column(name = "memberauthority_status")
+    private MemberAuthorityStatus memberAuthorityStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static MemberAuthority createMemberAuthority(Member member, MemberAuthorityStatus memberAuthorityStatus) {
+
+        MemberAuthority memberAuthority = new MemberAuthority();
+        memberAuthority.updateMember(member);
+        memberAuthority.updateMemberAuthorityStatus(memberAuthorityStatus);
+
+        return memberAuthority;
+
+    }
 
     //==수정 메소드==//
+    private void updateMemberAuthorityStatus(MemberAuthorityStatus memberAuthorityStatus) {
+        this.memberAuthorityStatus = memberAuthorityStatus;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

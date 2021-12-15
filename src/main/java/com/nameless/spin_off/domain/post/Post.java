@@ -50,8 +50,8 @@ public class Post {
     private LocalDateTime modifiedAt;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "publicstatus")
-    private PostPublicStatus publicStatus;
+    @Column(name = "postpublic_status")
+    private PostPublicStatus postPublicStatus;
 
     //==연관관계 메소드==//
 
@@ -91,11 +91,12 @@ public class Post {
         post.updatePublicStatus(postPublicStatus);
 
         return post;
+
     }
 
     //==수정 메소드==//
     private void updatePublicStatus(PostPublicStatus publicStatus) {
-        this.publicStatus = publicStatus;
+        this.postPublicStatus = publicStatus;
     }
 
     private void updateViewZero() {

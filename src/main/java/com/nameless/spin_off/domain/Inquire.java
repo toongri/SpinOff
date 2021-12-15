@@ -29,8 +29,8 @@ public class Inquire {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "publicstatus")
-    private InquirePublicStatus publicStatus;
+    @Column(name = "inquirepublic_status")
+    private InquirePublicStatus inquirePublicStatus;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
@@ -38,6 +38,34 @@ public class Inquire {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static Inquire createInquire(Member member, String title, String content,
+                                        InquirePublicStatus inquirePublicStatus) {
+
+        Inquire inquire = new Inquire();
+        inquire.updateMember(member);
+        inquire.updateTitle(title);
+        inquire.updateContent(content);
+        inquire.updateInquirePublicStatus(inquirePublicStatus);
+
+        return inquire;
+
+    }
+
+    private void updateInquirePublicStatus(InquirePublicStatus inquirePublicStatus) {
+        this.inquirePublicStatus = inquirePublicStatus;
+    }
+
+    private void updateContent(String content) {
+        this.content = content;
+    }
+
+    private void updateTitle(String title) {
+        this.title = title;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==수정 메소드==//
 

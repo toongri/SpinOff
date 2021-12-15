@@ -25,14 +25,35 @@ public class MemberPreference {
     private int score;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status")
-    private MemberPreferenceStatus status;
+    @Column(name = "memberpreference_status")
+    private MemberPreferenceStatus memberPreferenceStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static MemberPreference createMemberPreference(Member member, int score, MemberPreferenceStatus memberPreferenceStatus) {
+
+        MemberPreference memberPreference = new MemberPreference();
+        memberPreference.updateMember(member);
+        memberPreference.updateScore(score);
+        memberPreference.updateMemberPreferenceStatus(memberPreferenceStatus);
+
+        return memberPreference;
+
+    }
 
     //==수정 메소드==//
+    private void updateScore(int score) {
+        this.score = score;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
+
+    private void updateMemberPreferenceStatus(MemberPreferenceStatus memberPreferenceStatus) {
+        this.memberPreferenceStatus = memberPreferenceStatus;
+    }
 
     //==비즈니스 로직==//
 

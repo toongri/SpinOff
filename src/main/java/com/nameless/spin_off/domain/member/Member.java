@@ -38,9 +38,9 @@ public class Member {
 
     //==연관관계 메소드==//
 
-    //==생성 로직==//
-    public static Member createPost(String name, LocalDateTime birth, String phoneNumber
-            , String email) {
+    //==생성 메소드==//
+    public static Member createMember(String name, LocalDateTime birth, String phoneNumber, String email) {
+
         Member member = new Member();
         member.updateName(name);
         member.updateCreatedAtNow();
@@ -49,9 +49,9 @@ public class Member {
         member.updateEmail(email);
 
         return member;
-    }
 
-    //==수정 로직==//
+    }
+    //==수정 메소드==//
     private void updateEmail(String email) {
         this.email = email;
     }
@@ -71,12 +71,6 @@ public class Member {
     private void updateName(String name) {
         this.name = name;
     }
-
-    //==연관관계 메소드==//
-
-    //==생성 메소드==//
-
-    //==수정 메소드==//
 
     //==비즈니스 로직==//
 

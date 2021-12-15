@@ -26,8 +26,29 @@ public class Movie {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static Movie createMovie(Long id, String title, String imageUrl) {
+
+        Movie movie = new Movie();
+        movie.updateId(id);
+        movie.updateTitle(title);
+        movie.updateImageUrl(imageUrl);
+
+        return movie;
+
+    }
 
     //==수정 메소드==//
+    private void updateImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
+    }
+
+    private void updateTitle(String title) {
+        this.title = title;
+    }
+
+    private void updateId(Long id) {
+        this.id = id;
+    }
 
     //==비즈니스 로직==//
 

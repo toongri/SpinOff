@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.apache.el.parser.AstFalse;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -37,8 +38,39 @@ public class Alarm {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static Alarm createAlarm(Member member, String url, String content) {
+
+        Alarm alarm = new Alarm();
+        alarm.updateMember(member);
+        alarm.updateUrl(url);
+        alarm.updateContent(content);
+        alarm.updateIsCheck(false);
+        alarm.updateCreateAtNow();
+
+        return alarm;
+
+    }
 
     //==수정 메소드==//
+    private void updateCreateAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
+
+    private void updateIsCheck(boolean bool) {
+        this.isCheck = bool;
+    }
+
+    private void updateContent(String content) {
+        this.content = content;
+    }
+
+    private void updateUrl(String url) {
+        this.url = url;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

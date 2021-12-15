@@ -31,8 +31,23 @@ public class PostBlock {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static PostBlock createPostBlock(Member member, Member postBlockedMember) {
+        PostBlock postBlock = new PostBlock();
+        postBlock.updateMember(member);
+        postBlock.updatePostBlockedMember(postBlockedMember);
+
+        return postBlock;
+
+    }
 
     //==수정 메소드==//
+    private void updatePostBlockedMember(Member postBlockedMember) {
+        this.postBlockedMember = postBlockedMember;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

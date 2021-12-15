@@ -31,8 +31,24 @@ public class FollowingTheme {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static FollowingTheme createFollowingTheme(Member member, Theme theme) {
+
+        FollowingTheme followingTheme = new FollowingTheme();
+        followingTheme.updateMember(member);
+        followingTheme.updateTheme(theme);
+
+        return followingTheme;
+
+    }
 
     //==수정 메소드==//
+    private void updateTheme(Theme theme) {
+        this.theme = theme;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

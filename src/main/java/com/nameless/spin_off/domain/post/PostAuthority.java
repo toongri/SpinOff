@@ -23,14 +23,29 @@ public class PostAuthority {
     private Post post;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "authority_status")
-    private PostAuthorityStatus authorityStatus;
+    @Column(name = "postauthority_status")
+    private PostAuthorityStatus postAuthorityStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static PostAuthority createPostAuthority(Post post, PostAuthorityStatus postAuthorityStatus) {
 
+        PostAuthority postAuthority = new PostAuthority();
+        postAuthority.updatePost(post);
+        postAuthority.updatePostAuthorityStatus(postAuthorityStatus);
+
+        return postAuthority;
+
+    }
     //==수정 메소드==//
+    private void updatePostAuthorityStatus(PostAuthorityStatus postAuthorityStatus) {
+        this.postAuthorityStatus = postAuthorityStatus;
+    }
+
+    private void updatePost(Post post) {
+        this.post = post;
+    }
 
     //==비즈니스 로직==//
 

@@ -9,6 +9,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,15 +37,45 @@ public class Comment {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
+    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<CommentLike> commentLikes = new ArrayList<>();
+
+    //==연관관계 메소드==//
+
+    public void addCommentLike(CommentLike commentLike) {
+        this.commentLikes.add(commentLike);
+        commentLike.updateComment(this);
+    }
+
+    //==생성 메소드==//
+    public static Comment createComment(Post post, Member member, String content) {
+
+        Comment comment = new Comment();
+        comment.updatePost(post);
+        comment.updateMember(member);
+        comment.updateContent(content);
+        comment.updateCreatedAtNow();
+
+        return comment;
+
+    }
+
+    //==수정 메소드==//
     public void updatePost(Post post) {
         this.post = post;
     }
 
-    //==연관관계 메소드==//
+    private void updateCreatedAtNow() {
+        this.createdAt = LocalDateTime.now();
+    }
 
-    //==생성 메소드==//
+    private void updateContent(String content) {
+        this.content = content;
+    }
 
-    //==수정 메소드==//
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 

@@ -27,13 +27,34 @@ public class SnsConnect {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "snsconnect_status")
-    private SnsConnectStatus status;
+    private SnsConnectStatus snsConnectStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static SnsConnect createSnsConnect(String snsId, Member member, SnsConnectStatus snsConnectStatus) {
+
+        SnsConnect snsConnect = new SnsConnect();
+        snsConnect.updateSnsId(snsId);
+        snsConnect.updateMember(member);
+        snsConnect.updateSnsConnectStatus(snsConnectStatus);
+
+        return snsConnect;
+
+    }
 
     //==수정 메소드==//
+    private void updateSnsConnectStatus(SnsConnectStatus snsConnectStatus) {
+        this.snsConnectStatus = snsConnectStatus;
+    }
+
+    private void updateMember(Member member) {
+        this.member = member;
+    }
+
+    private void updateSnsId(String snsId) {
+        this.snsId = snsId;
+    }
 
     //==비즈니스 로직==//
 

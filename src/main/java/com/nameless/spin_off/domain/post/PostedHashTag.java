@@ -25,15 +25,27 @@ public class PostedHashTag {
     @NotNull
     private Post post;
 
-    public void updatePost(Post post) {
-        this.post = post;
-    }
-
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static PostedHashTag createPostedHashTag(String tag, Post post) {
+
+        PostedHashTag postedHashTag = new PostedHashTag();
+        postedHashTag.updateTag(tag);
+        postedHashTag.updatePost(post);
+
+        return postedHashTag;
+
+    }
 
     //==수정 메소드==//
+    private void updateTag(String tag) {
+        this.tag = tag;
+    }
+
+    public void updatePost(Post post) {
+        this.post = post;
+    }
 
     //==비즈니스 로직==//
 

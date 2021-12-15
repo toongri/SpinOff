@@ -29,15 +29,26 @@ public class PostLike {
     @NotNull
     private Post post;
 
+    //==연관관계 메소드==//
+
+    //==생성 메소드==//
+    public static PostLike createPostLike(Member member, Post post) {
+        PostLike postLike = new PostLike();
+        postLike.updatePost(post);
+        postLike.updateMember(member);
+
+        return postLike;
+
+    }
+
+    //==수정 메소드==//
     public void updatePost(Post post) {
         this.post = post;
     }
 
-    //==연관관계 메소드==//
-
-    //==생성 메소드==//
-
-    //==수정 메소드==//
+    private void updateMember(Member member) {
+        this.member = member;
+    }
 
     //==비즈니스 로직==//
 
