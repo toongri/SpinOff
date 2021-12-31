@@ -15,38 +15,4 @@ public class MemberRepositoryImpl implements MemberRepositoryCustom {
     private final EntityManager em;
     private final JPAQueryFactory jpaQueryFactory;
 
-
-    @Override
-    public void save(Member member) {
-        em.persist(member);
-    }
-
-    @Override
-    public Member findOne(Long id) {
-        return em.find(Member.class, id);
-    }
-
-    @Override
-    public List<Member> findAll() {
-
-        List<Member> members = jpaQueryFactory
-                .select(member)
-                .from(member)
-                .fetch();
-
-        return members;
-
-    }
-
-    @Override
-    public List<Member> findByName(String name) {
-
-        List<Member> members = jpaQueryFactory
-                .select(member)
-                .from(member)
-                .where(member.name.eq(name))
-                .fetch();
-
-        return members;
-    }
 }

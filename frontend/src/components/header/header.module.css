@@ -1,0 +1,66 @@
+/*header*/
+:root {
+  --background-color: #f5f6fa;
+}
+
+header{
+  position: fixed;
+  width : 100%;
+  height: 60px;
+  font-family: 'Open Sans', sans-serif;
+ background-color: var(--background-color);
+ z-index: 1;
+}
+
+
+header nav{
+  position: relative;
+  height: 100%;
+  width: 100%;
+  display: flex; 
+  justify-content: space-between;
+  align-items: center;
+}
+
+header .logoContainer{
+  position: relative;
+  height: 100%;
+  margin-left: 6%;
+  letter-spacing: 0.5px;
+  width: 5%;
+}
+
+header .logoContainer .logo {
+  text-decoration: none;
+  height: 1.2rem;
+  font-size: 1.2rem;
+  width: 40%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  margin: auto;
+  color:#000;
+}
+/*header common*/
+header nav ul li{
+  margin-right: 35px;
+}
+
+/*sub_choice*/
+header nav .sub_choice{
+  position: relative;
+  margin-right: 15%;
+  font-size: 0.9rem;
+}
+
+header nav .sub_choice{
+  display:flex;  
+  flex-wrap: nowrap;
+  list-style: none;
+}
+
+header nav .sub_choice span{
+  margin-right: 15px;
+}
