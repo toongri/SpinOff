@@ -1,7 +1,6 @@
 package com.nameless.spin_off;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

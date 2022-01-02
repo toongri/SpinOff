@@ -1,6 +1,14 @@
+buildscript {
+	ext {
+		queryDslVersion = "5.0.0"
+	}
+}
+
 plugins {
 	id 'org.springframework.boot' version '2.6.1'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+	//querydsl 추가
+	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
 	id 'java'
 }
 
@@ -18,13 +26,10 @@ repositories {
 	mavenCentral()
 }
 
-apply plugin: "io.spring.dependency-management"
 dependencies {
-	implementation 'com.querydsl:querydsl-core' // querydsl
-	implementation 'com.querydsl:querydsl-jpa' // querydsl
-	annotationProcessor "com.querydsl:querydsl-apt:${dependencyManagement.importedProperties['querydsl.version']}:jpa" // querydsl JPAAnnotationProcessor 사용 지정
-	annotationProcessor("jakarta.persistence:jakarta.persistence-api")
-	annotationProcessor("jakarta.annotation:jakarta.annotation-api")
+	//querydsl 추가
+	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -36,24 +41,32 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.7.1")//개발용 코드 서비스시엔 성능비교 후 사용 필수
 }
+//querydsl 추가 시작
+def querydslDir = "$buildDir/generated/querydsl"
 
-def generated='src/main/generated'
+querydsl {
+	jpa = true
+	querydslSourcesDir = querydslDir
+}
 sourceSets {
-	main.java.srcDirs += [ generated ]
+	main.java.srcDir querydslDir
 }
-
-tasks.withType(JavaCompile) {
-	options.annotationProcessorGeneratedSourcesDirectory = file(generated)
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+	querydsl.extendsFrom compileClasspath
 }
-
-clean.doLast {
-	file(generated).deleteDir()
+compileQuerydsl {
+	options.annotationProcessorPath = configurations.querydsl
 }
+//querydsl 추가 끝
 
 test {
 	useJUnitPlatform()
 }
 
+//front병합
 def frontendDir = "$projectDir/frontend"
 
 sourceSets {
