@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostedHashTag {
+public class PostedHashTag extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

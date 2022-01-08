@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.theme;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Theme {
+public class Theme extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name="theme_id")
@@ -33,12 +34,6 @@ public class Theme {
 
     private String content;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "themepublic_status")
     private ThemePublicStatus themePublicStatus;
@@ -55,21 +50,12 @@ public class Theme {
         theme.updateTitle(title);
         theme.updateContent(content);
         theme.updateThemePublicStatus(themePublicStatus);
-        theme.updateCreateAtNow();
-        theme.updateModifiedAtNow();
 
         return theme;
 
     }
 
     //==수정 메소드==//
-    private void updateModifiedAtNow() {
-        this.modifiedAt = LocalDateTime.now();
-    }
-
-    private void updateCreateAtNow() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     private void updateThemePublicStatus(ThemePublicStatus themePublicStatus) {
         this.themePublicStatus = themePublicStatus;

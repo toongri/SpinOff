@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.member;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberAuthority {
+public class MemberAuthority extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.theme;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingTheme {
+public class FollowingTheme extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-	id 'org.springframework.boot' version '2.6.1'
+	id 'org.springframework.boot' version '2.5.8'
 	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
 	//querydsl 추가
 	id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
@@ -28,8 +28,10 @@ repositories {
 
 dependencies {
 	//querydsl 추가
-	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
-	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+//	implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
+//	implementation "com.querydsl:querydsl-apt:${queryDslVersion}"
+	implementation "com.querydsl:querydsl-jpa"
+	implementation "com.querydsl:querydsl-apt"
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
@@ -39,6 +41,11 @@ dependencies {
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	//swagger 추가
+	implementation 'io.springfox:springfox-swagger2:2.9.2'
+	implementation 'io.springfox:springfox-swagger-ui:2.9.2'
+
 	implementation("com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.7.1")//개발용 코드 서비스시엔 성능비교 후 사용 필수
 }
 //querydsl 추가 시작

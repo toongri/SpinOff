@@ -1,11 +1,11 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.member;
 
-import com.nameless.spin_off.domain.member.Member;
+import com.nameless.spin_off.domain.BaseEntity;
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.apache.el.parser.AstFalse;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Alarm {
+public class Alarm extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -32,9 +32,6 @@ public class Alarm {
 
     private Boolean isCheck;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     //==연관관계 메소드==//
 
     //==생성 메소드==//
@@ -45,16 +42,12 @@ public class Alarm {
         alarm.updateUrl(url);
         alarm.updateContent(content);
         alarm.updateIsCheck(false);
-        alarm.updateCreateAtNow();
 
         return alarm;
 
     }
 
     //==수정 메소드==//
-    private void updateCreateAtNow() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     private void updateIsCheck(boolean bool) {
         this.isCheck = bool;

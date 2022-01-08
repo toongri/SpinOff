@@ -1,22 +1,17 @@
 package com.nameless.spin_off.domain.member;
 
-import com.nameless.spin_off.domain.post.Media;
-import com.nameless.spin_off.domain.post.Post;
-import com.nameless.spin_off.domain.post.PostPublicStatus;
-import com.nameless.spin_off.domain.post.PostedHashTag;
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingMember {
+public class FollowingMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

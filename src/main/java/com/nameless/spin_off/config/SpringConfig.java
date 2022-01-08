@@ -1,4 +1,4 @@
-package com.nameless.spin_off;
+package com.nameless.spin_off.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

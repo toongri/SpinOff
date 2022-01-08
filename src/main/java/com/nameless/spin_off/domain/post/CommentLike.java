@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.nameless.spin_off.domain.post.Comment;
 import com.sun.istack.NotNull;
@@ -14,7 +15,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentLike {
+public class CommentLike extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

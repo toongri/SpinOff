@@ -1,10 +1,12 @@
 package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,8 +15,9 @@ import java.util.List;
 
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post {
+public class Post extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name="post_id")
@@ -42,12 +45,6 @@ public class Post {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Media> medias = new ArrayList<>();
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
-    @Column(name = "modified_at")
-    private LocalDateTime modifiedAt;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "postpublic_status")
@@ -85,8 +82,6 @@ public class Post {
         post.updateContent(content);
         post.updatePostedHashTag(postedHashTags);
         post.updateMedia(medias);
-        post.updateCreateAtNow();
-        post.updateModifiedAtNow();
         post.updateViewZero();
         post.updatePublicStatus(postPublicStatus);
 
@@ -101,14 +96,6 @@ public class Post {
 
     private void updateViewZero() {
         this.view = 0L;
-    }
-
-    private void updateModifiedAtNow() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    private void updateCreateAtNow() {
-        this.createdAt = LocalDateTime.now();
     }
 
     private void updateMedia(List<Media> medias) {

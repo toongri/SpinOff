@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.movie;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +13,7 @@ import javax.persistence.Id;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Movie {
+public class Movie extends BaseTimeEntity {
 
     @Id
     @Column(name="movie_id")

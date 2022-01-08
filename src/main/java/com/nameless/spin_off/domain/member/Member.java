@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.member;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.post.Media;
 import com.nameless.spin_off.domain.post.Post;
 import com.nameless.spin_off.domain.post.PostPublicStatus;
@@ -7,6 +8,7 @@ import com.nameless.spin_off.domain.post.PostedHashTag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,17 +19,18 @@ import java.util.List;
 
 @Entity
 @Getter
+@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue
     @Column(name="member_id")
     private Long id;
 
-    private String name;
+    private String accountId;
+    private String accountPw;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
+    private String name;
 
     private LocalDateTime birth;
 
@@ -39,11 +42,13 @@ public class Member {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Member createMember(String name, LocalDateTime birth, String phoneNumber, String email) {
+    public static Member createMember(String accountId, String accountPw,
+                                      String name, LocalDateTime birth, String phoneNumber, String email) {
 
         Member member = new Member();
+        member.updateAccountId(accountId);
+        member.updateAccountPw(accountPw);
         member.updateName(name);
-        member.updateCreatedAtNow();
         member.updateBirth(birth);
         member.updatePhoneNumber(phoneNumber);
         member.updateEmail(email);
@@ -52,6 +57,14 @@ public class Member {
 
     }
     //==수정 메소드==//
+    private void updateAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
+    private void updateAccountPw(String accountPw) {
+        this.accountPw = accountPw;
+    }
+
     private void updateEmail(String email) {
         this.email = email;
     }
@@ -61,11 +74,7 @@ public class Member {
     }
 
     private void updateBirth(LocalDateTime birth) {
-        this.birth = LocalDateTime.now();
-    }
-
-    private void updateCreatedAtNow() {
-        this.createdAt = LocalDateTime.now();
+        this.birth = birth;
     }
 
     private void updateName(String name) {

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.member;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberPreference {
+public class MemberPreference extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

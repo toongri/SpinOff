@@ -1,6 +1,6 @@
-package com.nameless.spin_off.domain;
+package com.nameless.spin_off.domain.member;
 
-import com.nameless.spin_off.domain.member.Member;
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Inquire {
+public class Inquire extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -31,9 +31,6 @@ public class Inquire {
     @Enumerated(EnumType.STRING)
     @Column(name = "inquirepublic_status")
     private InquirePublicStatus inquirePublicStatus;
-
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
 
     //==연관관계 메소드==//
 

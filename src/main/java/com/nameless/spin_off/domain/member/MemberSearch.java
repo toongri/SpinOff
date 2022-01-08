@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.member;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberSearch {
+public class MemberSearch extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -27,9 +28,6 @@ public class MemberSearch {
 
     private String content;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     //==연관관계 메소드==//
 
     //==생성 메소드==//
@@ -38,16 +36,12 @@ public class MemberSearch {
         MemberSearch memberSearch = new MemberSearch();
         memberSearch.updateMember(member);
         memberSearch.updateContent(content);
-        memberSearch.updateCreatedAtNow();
 
         return memberSearch;
 
     }
 
     //==수정 메소드==//
-    private void updateCreatedAtNow() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     private void updateContent(String content) {
         this.content = content;

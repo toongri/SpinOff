@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
@@ -12,7 +13,7 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostLike {
+public class PostLike extends BaseTimeEntity {
 
     @Id
     @GeneratedValue

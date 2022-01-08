@@ -1,5 +1,6 @@
 package com.nameless.spin_off.domain.post;
 
+import com.nameless.spin_off.domain.BaseTimeEntity;
 import com.nameless.spin_off.domain.member.Member;
 import com.nameless.spin_off.domain.post.Post;
 import com.sun.istack.NotNull;
@@ -15,7 +16,7 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment {
+public class Comment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
@@ -34,9 +35,6 @@ public class Comment {
 
     private String content;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CommentLike> commentLikes = new ArrayList<>();
 
@@ -54,7 +52,6 @@ public class Comment {
         comment.updatePost(post);
         comment.updateMember(member);
         comment.updateContent(content);
-        comment.updateCreatedAtNow();
 
         return comment;
 
@@ -63,10 +60,6 @@ public class Comment {
     //==수정 메소드==//
     public void updatePost(Post post) {
         this.post = post;
-    }
-
-    private void updateCreatedAtNow() {
-        this.createdAt = LocalDateTime.now();
     }
 
     private void updateContent(String content) {
