@@ -1,0 +1,36 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+:root {
+  --item-width: 250px; /* 아이템 너비 */
+  --column-count : 5; /* 컬럼 개수 */
+}
+/*container*/
+.container{
+  height: 300vh;
+  width: 100%;
+  .masonry_grid{
+    position: relative;
+    top: 130px;
+    margin: 0 auto;
+    column-count: var(--column-count);
+    column-gap: 20px;
+    width:calc(var(--item-width)*var(--column-count));
+  }
+}
+
+@media screen and (max-width: 1023px){
+  :root {
+      --column-count: 4;
+  }
+}
+
+@media screen and (max-width: 720px){
+  :root{
+    --column-count: 3;
+  }
+}
+
+@media screen and (max-width: 480px){
+  :root{
+    --column-count: 2;
+  }
+}

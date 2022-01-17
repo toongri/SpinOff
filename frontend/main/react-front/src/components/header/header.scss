@@ -1,0 +1,30 @@
+$background-color: #f5f6fa;
+
+.nav_container {
+  display: flex;
+  nav {
+    height: 50px;
+    width: 100%;
+    background-color: $background-color;
+    position: relative;
+    display: flex;
+    .nav-header {
+      display: inline;
+      .nav-title {
+        display: inline-block;
+        font-size: 22px;
+        padding: 10px 10px 10px 20px;
+        margin: auto 50%;
+      }
+    }
+
+    /*nav-links*/
+    .nav-links {
+      margin: auto 10%;
+      & .span {
+        font-size: 0.9rem;
+        margin: auto 10px;
+      }
+    }
+  }
+}
