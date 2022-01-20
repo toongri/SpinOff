@@ -1,5 +1,9 @@
 import React, {useRef, useEffect, useState} from 'react';
 import './search.scss';
+import Button from 'react-bootstrap/Button'
+import InputGroup from 'react-bootstrap/InputGroup'
+import FormControl from 'react-bootstrap/FormControl'
+import {FiSearch} from'react-icons/fi';
 
 const Search = ({ onSearch, items }) => {
   const inputRef = useRef();
@@ -36,41 +40,50 @@ const Search = ({ onSearch, items }) => {
 
   return (
     <>
-     <div className = 'search_container'>
-    <div className = 'input_container'>
-      <div className = 'input_buttonn' type = "submit">
-        <i className="fas fa-search fa-1x"></i>
-      </div>
-
-      <div 
-      className = 'submitContainer'
-      >
-        <input
-          className = 'input' 
-          type = "search" 
-          placeholder = "Search"
-          ref = {inputRef}
-          onFocus = {activePopup}
-          onBlur = {nonactivePopup}
-          onKeyPress = {onKeyPress}
-        /> 
-       
-       <select className='select_type'>
-          <option defaultValue>all</option>
-          <option value="1">큐레이터</option>
-          <option value="2">테마</option>
-        </select>
+    <div style = {
+      {
+        display: 'flex',
+        justifyContent: 'center'
+      }
+    }>
+    <InputGroup
+     className="mb-3"
+     style={{
+       border: '0',
+      borderRadius:'20px',
+      position:'fixed',
+      top: '180px',
+      width: "55%",
+      height: "45px",
+      zIndex: '1',
+      
+    }}
+     >
+    <Button
+     id="button-addon1"
+     style={{
+       border: 0,
+       backgroundColor: '#f1f2f6',
+       color: "black",
+       borderRadius: "20px 0 0 20px",
+       paddingLeft:'30px'
+     }
+    }
+     > 
+     <FiSearch></FiSearch>
+    </Button>
+    <FormControl
+        className='input'
+        style={{
+          border: '0', 
+          backgroundColor: '#f1f2f6',
+          borderRadius:'0 20px 20px 0'
+        }}
+      aria-label="Example text with button addon"
+      aria-describedby="basic-addon1"
+    />
+  </InputGroup>
   </div>
-  
-        <div 
-          className = 'popup'
-          ref = {popupRef}
-        >
-        </div>
-    </div>
-    </div>
-
-   
     </>
   );
 };

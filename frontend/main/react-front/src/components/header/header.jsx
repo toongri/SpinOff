@@ -1,60 +1,72 @@
-import React from 'react';
-import './header.scss';
-import NotificationsNoneIcon from '@mui/icons-material/NotificationsNone';
-import IconButton from '@mui/material/IconButton';
-import SendIcon from '@mui/icons-material/Send';
-import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
-import MenuIcon from '@mui/icons-material/Menu';
-import ButtonGroups from '@mui/material/ButtonGroup';
-import { makeStyles } from '@mui/styles';
-import Button from '@mui/material/Button';
-
-const useStyles = makeStyles({
-  btngroups: {
-    backgroundColor: '#f5f6fa',
-    paddingRight: '20px'
-  },
-  navBtn:{
-    color: 'grey',
-  }
-});
+import React from "react";
+import "./header.scss";
+import Navbar from "react-bootstrap/Navbar";
+import Nav from "react-bootstrap/Nav";
+import Button from "react-bootstrap/Button";
+import Form from 'react-bootstrap/Form'
+import {IoPersonCircleOutline} from'react-icons/io5'
 
 const Header = () => {
-  const classes = useStyles();
-
   return (
-    <div className = "nav_container">
-      <nav>     
-        <header className ="nav-header">
-            <div className ="nav-title">
-                LOGO
-             </div>
-        </header>
-        <div className='nav-links'>
-          <ButtonGroups>
-            <Button className={classes.navBtn} variant = "text">도슨트</Button>
-            <Button className={classes.navBtn} variant = "text">소셜링</Button>
-           </ButtonGroups>
-           </div>
-      </nav>
-            <ButtonGroups  className={classes.btngroups}>
-         <IconButton >
-            <NotificationsNoneIcon/>
-         </IconButton>
-         <IconButton>
-           <SendIcon/>
-        </IconButton>
-        
-        <IconButton>
-          <PersonOutlineIcon />
-        </IconButton>
-
-        <IconButton>
-          <MenuIcon />
-        </IconButton>
-        </ButtonGroups>
-    </div>
-  )
-}
+    <>
+      <div className="navbarContainer">
+        <Navbar
+          bg="dark"
+          variant="light"
+          expand="lg"
+          style={{
+            width: "100%",
+          }}
+        >
+          <Nav
+            className="me-auto"
+            style={{
+              height: "120px",
+            }}
+          >
+            <div className="navLink_container">
+              <Nav.Link
+                href="#home"
+                style={{
+                  color: "white",
+                  marginRight: "20px",
+                  marginTop: "60px",
+                }}
+              >
+                도슨트
+              </Nav.Link>
+              <Nav.Link
+                href="#features"
+                style={{
+                  color: "white",
+                  marginTop: "60px",
+                }}
+              >
+                소셜링
+              </Nav.Link>
+            </div>
+          </Nav>
+          <Button
+            onClick={() =>{
+            
+            }}
+            variant="dark"
+            bg=""
+            active
+            style={{
+              position: "relative",
+              right: "3%",
+              outline: "none",
+              borderRadius: "20px",
+              padding: '0'
+            }}
+          >
+            <IoPersonCircleOutline size="35"></IoPersonCircleOutline>
+          </Button>
+        </Navbar>
+      </div>
+    </>
+  );
+};
 
 export default Header;

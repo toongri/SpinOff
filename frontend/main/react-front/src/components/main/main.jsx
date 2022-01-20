@@ -1,11 +1,11 @@
 import React, {useEffect} from 'react';
-import Search from '../search/search.jsx';
 import ItemsDetail from '../itemsDetail/itemsDetail';
-import Button from '@mui/material/Button';
-import AddIcon from '@mui/icons-material/Add'
-import Box from '@mui/material/Box';
+import { Button } from 'react-bootstrap';
 import './main.scss';
 import { makeStyles } from '@mui/styles';
+import {BsPencilFill} from 'react-icons/bs';
+import { useNavigate } from 'react-router-dom';
+import Masonry from 'react-masonry-css';
 
 const useStyle = makeStyles({
   btn:{
@@ -13,9 +13,18 @@ const useStyle = makeStyles({
   }
 })
 
+const breakpointColumnsObj = {
+  default: 5,
+  1500: 4,
+  1100: 3,
+  700: 2,
+  500: 1,
+};
+
 
 const Main = ({ onSearch, items }) => {
   const classes = useStyle();
+  let navigate = useNavigate();
 
   const sample = [ 'https://cdn.pixabay.com/photo/2020/09/02/20/52/dock-5539524__340.jpg', 
   'https://cdn.pixabay.com/photo/2021/02/03/13/54/cupcake-5978060__340.jpg', 
@@ -34,29 +43,36 @@ const Main = ({ onSearch, items }) => {
 
   return (
     <>
-        <div className = 'container'>           
-          <Search onSearch = {onSearch} items = {items}/>
-          <div className = "masonry_grid">
-          {sample.map((item, index) => {
-            return  <ItemsDetail key = {index} item = {item}/>
-          })
+        <div className = 'container'>  
+        <div>
+          <Masonry
+           breakpointCols={breakpointColumnsObj}
+           className="my-masonry-grid"
+           columnClassName="my-masonry-grid_column"
+          >
            
-          }
-        </div>
-        <Box
-        component = "span"
-          sx = {{
-            p:2,
-           color: 'text.secondary',
-           position: 'relative',
-          }}
-        >
+              {sample.map((item, index) => {
+                  return  <ItemsDetail key = {index} item = {item}/>
+              })}
+          
+          </Masonry>
+          </div>  
+        <div className='buttonBox'>
           <Button 
-            variant="text"
-            size = "large"
-            startIcon = {<AddIcon/>}
-          />
-        </Box>
+            onClick={() => {
+            navigate("/pin-build")
+            }}
+            variant = "secondary"
+            style = {{
+              color: "#000",
+              backgroundColor: "#fff",
+              borderRadius: "50%",
+              height: "50px",
+              border: "none",
+              boxShadow:" 0px 0px 18px -10px #404040"
+            }}
+          ><BsPencilFill size = "30"></BsPencilFill></Button>
+        </div>
         </div>   
     </>
   );

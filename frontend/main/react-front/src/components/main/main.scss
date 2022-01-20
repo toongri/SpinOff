@@ -1,36 +1,34 @@
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 :root {
   --item-width: 250px; /* 아이템 너비 */
-  --column-count : 5; /* 컬럼 개수 */
+  --column-count : 7; /* 컬럼 개수 */
 }
 /*container*/
 .container{
   height: 300vh;
   width: 100%;
-  .masonry_grid{
-    position: relative;
-    top: 130px;
-    margin: 0 auto;
-    column-count: var(--column-count);
-    column-gap: 20px;
-    width:calc(var(--item-width)*var(--column-count));
-  }
-}
+  position: relative;
+  top: 910px;
 
-@media screen and (max-width: 1023px){
-  :root {
-      --column-count: 4;
+  .my-masonry-grid {
+    display: -webkit-box; /* Not needed if autoprefixing */
+    display: -ms-flexbox; /* Not needed if autoprefixing */
+    display: flex;
+    margin-left: -30px; /* gutter size offset */
+    width: auto;
   }
-}
 
-@media screen and (max-width: 720px){
-  :root{
-    --column-count: 3;
+  .my-masonry-grid_column {
+    padding-left: 30px; /* gutter size */
+    background-clip: padding-box;
   }
-}
-
-@media screen and (max-width: 480px){
-  :root{
-    --column-count: 2;
+  .my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
+    background: grey;
+    margin-bottom: 30px;
+  }
+  .buttonBox{
+    position: fixed;
+    right: 2%;
+    bottom: 8%;
   }
 }

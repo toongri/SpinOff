@@ -3,14 +3,13 @@
 .item{
   margin: 0 0 20px 0;
   break-inside: avoid; // 컬럼 넘어가는 방지 코드
-  width: 100%;
+  width: 236px;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 8px 20px -15px #000;
   background-color: #ccc;
   line-height: 0;
   .item img{
-    width: 100%;
   }
   &:hover{
     cursor: pointer;

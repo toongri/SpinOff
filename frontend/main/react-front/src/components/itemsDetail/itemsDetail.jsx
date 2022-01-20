@@ -3,7 +3,8 @@ import './itemsDetail.scss';
 const ItemsDetail = ({item, key}) => {
  return (
    <div className = "item">
-    <img src = {item} />
+    <img 
+    src = {item} />
    </div>
  )
 }
