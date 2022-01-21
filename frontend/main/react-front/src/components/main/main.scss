@@ -4,10 +4,24 @@
   --column-count : 7; /* 컬럼 개수 */
 }
 /*container*/
+.main-container{
+    position: relative;
+    width: 100%;
+  .img-container{
+    width: 100%;
+    position: fixed;
+    top: 135px;
+    height: 860px;
+    width: 100%;
+    & img{
+      height: 910px;
+      width: 100%;
+    }
+  }
 .container{
   height: 300vh;
   width: 100%;
-  position: relative;
+  position: absolute;
   top: 910px;
 
   .my-masonry-grid {
@@ -26,9 +40,16 @@
     background: grey;
     margin-bottom: 30px;
   }
-  .buttonBox{
+  .buttonBox1{
     position: fixed;
     right: 2%;
-    bottom: 8%;
+    bottom: 12%;
+    
   }
+  .buttonBox2{
+    position: fixed;
+    right: 2%;
+    bottom: 7%;
+  }
+}
 }

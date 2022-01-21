@@ -3,8 +3,19 @@ import "./header.scss";
 import Navbar from "react-bootstrap/Navbar";
 import Nav from "react-bootstrap/Nav";
 import Button from "react-bootstrap/Button";
-import Form from 'react-bootstrap/Form'
-import {IoPersonCircleOutline} from'react-icons/io5'
+import { FiSend } from "react-icons/fi";
+import { IoPersonCircleOutline } from "react-icons/io5";
+import { AiOutlineBell } from "react-icons/ai";
+import {ButtonGroup} from "react-bootstrap";
+
+const buttonStyle = {
+  position: "relative",
+  right: "3%",
+  outline: "none",
+  borderRadius: "20px",
+  padding: "0",
+  marginRight: '10px'
+};
 
 const Header = () => {
   return (
@@ -46,23 +57,37 @@ const Header = () => {
               </Nav.Link>
             </div>
           </Nav>
-          <Button
-            onClick={() =>{
-            
-            }}
-            variant="dark"
-            bg=""
-            active
-            style={{
-              position: "relative",
-              right: "3%",
-              outline: "none",
-              borderRadius: "20px",
-              padding: '0'
-            }}
-          >
-            <IoPersonCircleOutline size="35"></IoPersonCircleOutline>
-          </Button>
+          <ButtonGroup style = {{
+            marginRight: '20px'
+          }}>
+            <Button
+              onClick={() => {}}
+              variant="dark"
+              bg=""
+              active
+              style={buttonStyle}
+            >
+              <AiOutlineBell size="30"></AiOutlineBell>
+            </Button>
+            <Button
+              onClick={() => {}}
+              variant="dark"
+              bg=""
+              active
+              style={buttonStyle}
+            >
+              <FiSend size="30"></FiSend>
+            </Button>
+            <Button
+              onClick={() => {}}
+              variant="dark"
+              bg=""
+              active
+              style={buttonStyle}
+            >
+              <IoPersonCircleOutline size="30"></IoPersonCircleOutline>
+            </Button>
+          </ButtonGroup>
         </Navbar>
       </div>
     </>
