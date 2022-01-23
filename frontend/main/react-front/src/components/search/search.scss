@@ -1,0 +1,12 @@
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Roboto:wght@400;700&display=swap");
+
+:root {
+  --background-color: #f5f6fa;
+  --hover-background: #bdc3c7;
+}
+.input{
+  outline: none;
+  &:focus, &:hover{
+    outline: none !important;
+  }
+}

@@ -1,0 +1,55 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
+:root {
+  --item-width: 250px; /* 아이템 너비 */
+  --column-count : 7; /* 컬럼 개수 */
+}
+/*container*/
+.main-container{
+    position: relative;
+    width: 100%;
+  .img-container{
+    width: 100%;
+    position: fixed;
+    top: 135px;
+    height: 860px;
+    width: 100%;
+    & img{
+      height: 910px;
+      width: 100%;
+    }
+  }
+.container{
+  height: 300vh;
+  width: 100%;
+  position: absolute;
+  top: 910px;
+
+  .my-masonry-grid {
+    display: -webkit-box; /* Not needed if autoprefixing */
+    display: -ms-flexbox; /* Not needed if autoprefixing */
+    display: flex;
+    margin-left: -30px; /* gutter size offset */
+    width: auto;
+  }
+
+  .my-masonry-grid_column {
+    padding-left: 30px; /* gutter size */
+    background-clip: padding-box;
+  }
+  .my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
+    background: grey;
+    margin-bottom: 30px;
+  }
+  .buttonBox1{
+    position: fixed;
+    right: 2%;
+    bottom: 12%;
+    
+  }
+  .buttonBox2{
+    position: fixed;
+    right: 2%;
+    bottom: 7%;
+  }
+}
+}

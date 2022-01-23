@@ -1,0 +1,106 @@
+:root{
+    --reusable-color: rgba(0, 0, 0, 0.3);
+}
+
+.pin_container{
+    margin-top: 394px;
+    display: flex;
+    height: 660px;
+       .file-upload-container{
+           width: 480px;
+           background-color: rgba(209, 204, 204, 0.3);
+           position: relative;
+           border-radius: 30px 0 0 30px;
+           #file{
+                cursor: pointer;
+                height: 100%;
+                opacity: 0;
+                position:relative;
+                left: 0px;
+                top: 0px;
+                width: 100%;
+                left:0;
+                font-size: 0px;
+           }
+           .drag-text{
+               position: absolute;
+                top: 40%;
+                width: 100%;
+                text-align: center;
+                font-size: 1.2rem;
+                & p{
+                    margin-top: 20px;
+                }
+           }
+       }
+    .writing-info-container{
+        margin-left: 25px;
+        width: 430px;
+        .form-title{
+            font-size: 1.3rem;
+            height: 70px;
+            border: 0;
+            border-bottom: 0.5px solid grey; 
+            margin-bottom: 20px;
+            &:focus{
+                outline: 0;
+            }
+        }
+        .form-text{
+            height: 350px;
+            margin-bottom: 30px;
+            border: 0;
+            &:focus{
+                outline: 0;
+            }
+        }
+       
+        .function-container{
+            
+            .function{
+                display: flex;
+                justify-content: space-between;
+                padding: 10px 0;
+                .pinterest-link{
+                    text-decoration: none;
+                    color: black ;
+                    padding: 4px 10px;
+                    background-color: rgba(0, 0, 0, 0.192);
+                    border-radius: 20px;
+                    font-size: 0.9rem;
+                }
+                .function-buttons{
+                   .button{
+                       background-color: white;
+                       border: 0;
+                       color:rgba(78, 70, 70, 0.7);
+                        &:active{
+                            outline: none
+                        }
+                    }
+
+                }
+            }
+        }
+        .movie-container{
+            display:flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top : 0.2px solid  var(--reusable-color);
+            border-bottom : 0.2px solid  var(--reusable-color);
+            padding: 10px 0;
+            .img-container{
+                padding: 5px 0;
+                width: 68px;
+                height: 85px;
+            }
+            .movie-info{
+                list-style: none;
+                .director-info{
+                    margin-top: 3px;
+                    font-size: .8rem;
+                }
+            }
+        }
+    }
+}
