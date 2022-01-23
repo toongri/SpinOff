@@ -1,14 +1,10 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.domain.ApiResult;
-import com.nameless.spin_off.domain.member.Member;
-import com.nameless.spin_off.domain.post.Post;
+import com.nameless.spin_off.entity.ApiResult;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
-import io.swagger.annotations.Api;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,7 +12,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Transactional

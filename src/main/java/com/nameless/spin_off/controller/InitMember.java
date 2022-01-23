@@ -1,7 +1,7 @@
 package com.nameless.spin_off.controller;
 
-import com.nameless.spin_off.domain.member.Member;
-import com.nameless.spin_off.domain.post.*;
+import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

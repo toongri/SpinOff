@@ -1,19 +1,18 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.domain.member.QMember;
-import com.nameless.spin_off.domain.post.*;
+import com.nameless.spin_off.entity.post.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.nameless.spin_off.domain.member.QMember.member;
-import static com.nameless.spin_off.domain.post.QComment.comment;
-import static com.nameless.spin_off.domain.post.QMedia.media;
-import static com.nameless.spin_off.domain.post.QPost.post;
-import static com.nameless.spin_off.domain.post.QPostLike.postLike;
-import static com.nameless.spin_off.domain.post.QPostedHashTag.postedHashTag;
+import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QComment.comment;
+import static com.nameless.spin_off.entity.post.QMedia.media;
+import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.entity.post.QPostLike.postLike;
+import static com.nameless.spin_off.entity.post.QPostedHashTag.postedHashTag;
 
 @Repository
 @RequiredArgsConstructor
