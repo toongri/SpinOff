@@ -1,6 +1,6 @@
-package com.nameless.spin_off.entity.theme;
+package com.nameless.spin_off.entity.postcollection;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
@@ -13,10 +13,10 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Theme extends BaseTimeEntity {
+public class PostCollection extends BaseTimeEntity {
 
     @Id @GeneratedValue
-    @Column(name="theme_id")
+    @Column(name="post_collection_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -34,30 +34,30 @@ public class Theme extends BaseTimeEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "themepublic_status")
-    private ThemePublicStatus themePublicStatus;
+    @Column(name = "post_collection_public_status")
+    private PostCollectionPublicStatus postCollectionPublicStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Theme createTheme(Member member, Post post, String title,
-                                    String content, ThemePublicStatus themePublicStatus) {
+    public static PostCollection createTheme(Member member, Post post, String title,
+                                             String content, PostCollectionPublicStatus postCollectionPublicStatus) {
 
-        Theme theme = new Theme();
-        theme.updateMember(member);
-        theme.updatePost(post);
-        theme.updateTitle(title);
-        theme.updateContent(content);
-        theme.updateThemePublicStatus(themePublicStatus);
+        PostCollection postCollection = new PostCollection();
+        postCollection.updateMember(member);
+        postCollection.updatePost(post);
+        postCollection.updateTitle(title);
+        postCollection.updateContent(content);
+        postCollection.updateThemePublicStatus(postCollectionPublicStatus);
 
-        return theme;
+        return postCollection;
 
     }
 
     //==수정 메소드==//
 
-    private void updateThemePublicStatus(ThemePublicStatus themePublicStatus) {
-        this.themePublicStatus = themePublicStatus;
+    private void updateThemePublicStatus(PostCollectionPublicStatus postCollectionPublicStatus) {
+        this.postCollectionPublicStatus = postCollectionPublicStatus;
     }
 
     private void updateContent(String content) {

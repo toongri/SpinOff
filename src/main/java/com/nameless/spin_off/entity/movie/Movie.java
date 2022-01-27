@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.movie;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

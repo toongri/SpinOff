@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,20 +25,17 @@ public class Member extends BaseTimeEntity {
 
     private String accountId;
     private String accountPw;
-
     private String name;
-
+    private String nickname;
     private LocalDateTime birth;
-
-    @Column(name = "phone_number")
     private String phoneNumber;
-
     private String email;
+    private String profileImg;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Member createMember(String accountId, String accountPw,
+    public static Member createMember(String accountId, String accountPw, String nickname, String profileImg,
                                       String name, LocalDateTime birth, String phoneNumber, String email) {
 
         Member member = new Member();
@@ -47,11 +45,27 @@ public class Member extends BaseTimeEntity {
         member.updateBirth(birth);
         member.updatePhoneNumber(phoneNumber);
         member.updateEmail(email);
+        member.updateNickname(nickname);
+        member.updateProfileImg(profileImg);
 
         return member;
 
     }
+
+    public static MemberDto.MemberBuilder buildMember() {
+        return new MemberDto.MemberBuilder();
+    }
+
     //==수정 메소드==//
+
+    private void updateNickname(String nickname) {
+        this.nickname = nickname;
+    }
+
+    private void updateProfileImg(String profileImg) {
+        this.profileImg = profileImg;
+    }
+
     private void updateAccountId(String accountId) {
         this.accountId = accountId;
     }

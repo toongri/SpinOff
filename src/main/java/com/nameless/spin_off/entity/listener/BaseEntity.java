@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity;
+package com.nameless.spin_off.entity.listener;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedBy;

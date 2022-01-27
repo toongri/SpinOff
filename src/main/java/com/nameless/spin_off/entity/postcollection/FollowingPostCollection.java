@@ -1,6 +1,6 @@
-package com.nameless.spin_off.entity.theme;
+package com.nameless.spin_off.entity.postcollection;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -12,11 +12,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingTheme extends BaseTimeEntity {
+public class FollowingPostCollection extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="followingtheme_id")
+    @Column(name="following_post_collection_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,24 +27,24 @@ public class FollowingTheme extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id")
     @NotNull
-    private Theme theme;
+    private PostCollection postCollection;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowingTheme createFollowingTheme(Member member, Theme theme) {
+    public static FollowingPostCollection createFollowingPostCollection(Member member, PostCollection postCollection) {
 
-        FollowingTheme followingTheme = new FollowingTheme();
-        followingTheme.updateMember(member);
-        followingTheme.updateTheme(theme);
+        FollowingPostCollection followingPostCollection = new FollowingPostCollection();
+        followingPostCollection.updateMember(member);
+        followingPostCollection.updatePostCollection(postCollection);
 
-        return followingTheme;
+        return followingPostCollection;
 
     }
 
     //==수정 메소드==//
-    private void updateTheme(Theme theme) {
-        this.theme = theme;
+    private void updatePostCollection(PostCollection postCollection) {
+        this.postCollection = postCollection;
     }
 
     private void updateMember(Member member) {

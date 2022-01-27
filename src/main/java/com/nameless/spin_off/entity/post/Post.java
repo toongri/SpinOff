@@ -1,12 +1,11 @@
 package com.nameless.spin_off.entity.post;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.movie.MovieInPost;
 import com.sun.istack.NotNull;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -31,7 +30,9 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
-    private Long view;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "post_public_status")
+    private PostPublicStatus postPublicStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
@@ -40,14 +41,13 @@ public class Post extends BaseTimeEntity {
     private List<PostLike> postLikes = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<PostedHashTag> postedHashTags = new ArrayList<>();
+    private List<PostedHashtag> postedHashtags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Media> medias = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "postpublic_status")
-    private PostPublicStatus postPublicStatus;
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<MovieInPost> movieInPosts = new ArrayList<>();
 
     //==연관관계 메소드==//
 
@@ -61,8 +61,8 @@ public class Post extends BaseTimeEntity {
         postLike.updatePost(this);
     }
 
-    public void addPostedHashTag(PostedHashTag postedHashTag) {
-        this.postedHashTags.add(postedHashTag);
+    public void addPostedHashTag(PostedHashtag postedHashTag) {
+        this.postedHashtags.add(postedHashTag);
         postedHashTag.updatePost(this);
     }
 
@@ -71,49 +71,63 @@ public class Post extends BaseTimeEntity {
         media.updatePost(this);
     }
 
+    public void addMovieInPost(MovieInPost movieInPost) {
+        this.movieInPosts.add(movieInPost);
+        movieInPost.updatePost(this);
+    }
+
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content
-            , List<PostedHashTag> postedHashTags, List<Media> medias
+            , List<PostedHashtag> postedHashtags, List<Media> medias, List<MovieInPost> movieInPosts
             , PostPublicStatus postPublicStatus) {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
         post.updateContent(content);
-        post.updatePostedHashTag(postedHashTags);
+        post.updatePostedHashtag(postedHashtags);
         post.updateMedia(medias);
-        post.updateViewZero();
         post.updatePublicStatus(postPublicStatus);
+        post.updateMovieInPost(movieInPosts);
 
         return post;
+    }
 
+    public static PostDto.PostBuilder buildPost() {
+        return new PostDto.PostBuilder();
     }
 
     //==수정 메소드==//
-    private void updatePublicStatus(PostPublicStatus publicStatus) {
+    public void updatePublicStatus(PostPublicStatus publicStatus) {
         this.postPublicStatus = publicStatus;
     }
 
-    private void updateViewZero() {
-        this.view = 0L;
+    public void updateMedia(List<Media> medias) {
+        for (Media media : medias) {
+            this.addMedia(media);
+        }
     }
 
-    private void updateMedia(List<Media> medias) {
-        this.medias.addAll(medias);
+    public void updatePostedHashtag(List<PostedHashtag> postedHashtags) {
+        for (PostedHashtag postedHashTag : postedHashtags) {
+            this.addPostedHashTag(postedHashTag);
+        }
     }
 
-    private void updatePostedHashTag(List<PostedHashTag> postedHashTags) {
-        this.postedHashTags.addAll(postedHashTags);
+    public void updateMovieInPost(List<MovieInPost> movieInPosts) {
+        for (MovieInPost movieInPost : movieInPosts) {
+            this.addMovieInPost(movieInPost);
+        }
     }
 
-    private void updateContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 
-    private void updateTitle(String title) {
+    public void updateTitle(String title) {
         this.title = title;
     }
 
-    private void updateMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 

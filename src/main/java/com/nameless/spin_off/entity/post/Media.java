@@ -1,12 +1,15 @@
 package com.nameless.spin_off.entity.post;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -49,6 +52,9 @@ public class Media extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
+    public static List<Media> createMedias(List<String> urls) {
+        return urls.stream().map(url -> Media.createMedia(null, url)).collect(Collectors.toList());
+    }
 
     //==조회 로직==//
 

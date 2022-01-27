@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.post;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -15,7 +15,7 @@ public class PostAuthority extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="postauthority_id")
+    @Column(name="post_authority_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +24,7 @@ public class PostAuthority extends BaseTimeEntity {
     private Post post;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "postauthority_status")
+    @Column(name = "post_authority_status")
     private PostAuthorityStatus postAuthorityStatus;
 
     //==연관관계 메소드==//

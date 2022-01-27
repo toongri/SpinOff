@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.movie;
 
-import com.nameless.spin_off.entity.BaseTimeEntity;
+import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -16,7 +16,7 @@ public class MovieInPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="movieinpost_id")
+    @Column(name="movie_in_post_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,11 +43,11 @@ public class MovieInPost extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-    private void updateMovie(Movie movie) {
+    public void updateMovie(Movie movie) {
         this.movie = movie;
     }
 
-    private void updatePost(Post post) {
+    public void updatePost(Post post) {
         this.post = post;
     }
 
