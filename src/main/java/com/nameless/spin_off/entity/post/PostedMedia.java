@@ -1,43 +1,43 @@
 package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostLike extends BaseTimeEntity {
+public class PostedMedia extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="post_like_id")
+    @Column(name="posted_media_id")
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
-    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @NotNull
     private Post post;
 
+    @NotNull
+    private String url;
+
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostLike createPostLike(Member member, Post post) {
-        PostLike postLike = new PostLike();
-        postLike.updatePost(post);
-        postLike.updateMember(member);
+    public static PostedMedia createPostedMedia(Post post, String url) {
 
-        return postLike;
+        PostedMedia postedMedia = new PostedMedia();
+        postedMedia.updatePost(post);
+        postedMedia.updateUrl(url);
+
+        return postedMedia;
 
     }
 
@@ -46,11 +46,14 @@ public class PostLike extends BaseTimeEntity {
         this.post = post;
     }
 
-    private void updateMember(Member member) {
-        this.member = member;
+    private void updateUrl(String url) {
+        this.url = url;
     }
 
     //==비즈니스 로직==//
+    public static List<PostedMedia> createPostedMedias(List<String> urls) {
+        return urls.stream().map(url -> PostedMedia.createPostedMedia(null, url)).collect(Collectors.toList());
+    }
 
     //==조회 로직==//
 

@@ -1,9 +1,10 @@
 package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.MovieInPost;
+import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.sun.istack.NotNull;
 import lombok.*;
 
@@ -31,34 +32,50 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "post_public_status")
-    private PostPublicStatus postPublicStatus;
+    @Column(name = "public_of_post_status")
+    private PublicOfPostStatus publicOfPostStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Comment> comments = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<PostLike> postLikes = new ArrayList<>();
+    private List<LikedPost> likedPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostedHashtag> postedHashtags = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Media> medias = new ArrayList<>();
+    private List<PostedMedia> postedMedias = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<MovieInPost> movieInPosts = new ArrayList<>();
+    private List<PostedMovie> postedMovies = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<ViewedPostByIp> viewedPostByIps = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<VisitedPostByMember> visitedPostByMembers = new ArrayList<>();
 
     //==연관관계 메소드==//
+
+    public void addViewedPostByIp(ViewedPostByIp viewedPostByIp) {
+        this.viewedPostByIps.add(viewedPostByIp);
+        viewedPostByIp.updatePost(this);
+    }
+
+    public void addVisitedPostByMember(VisitedPostByMember visitedPostByMember) {
+        this.visitedPostByMembers.add(visitedPostByMember);
+        visitedPostByMember.updatePost(this);
+    }
 
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.updatePost(this);
     }
 
-    public void addPostLike(PostLike postLike) {
-        this.postLikes.add(postLike);
-        postLike.updatePost(this);
+    public void addPostLike(LikedPost likedPost) {
+        this.likedPosts.add(likedPost);
+        likedPost.updatePost(this);
     }
 
     public void addPostedHashTag(PostedHashtag postedHashTag) {
@@ -66,28 +83,28 @@ public class Post extends BaseTimeEntity {
         postedHashTag.updatePost(this);
     }
 
-    public void addMedia(Media media) {
-        this.medias.add(media);
-        media.updatePost(this);
+    public void addMedia(PostedMedia postedMedia) {
+        this.postedMedias.add(postedMedia);
+        postedMedia.updatePost(this);
     }
 
-    public void addMovieInPost(MovieInPost movieInPost) {
-        this.movieInPosts.add(movieInPost);
-        movieInPost.updatePost(this);
+    public void addMovieInPost(PostedMovie postedMovie) {
+        this.postedMovies.add(postedMovie);
+        postedMovie.updatePost(this);
     }
 
     //==생성 메소드==//
-    public static Post createPost(Member member, String title, String content
-            , List<PostedHashtag> postedHashtags, List<Media> medias, List<MovieInPost> movieInPosts
-            , PostPublicStatus postPublicStatus) {
+    public static Post createPost(Member member, String title, String content,
+                                  List<PostedHashtag> postedHashtags, List<PostedMedia> postedMedia,
+                                  List<PostedMovie> postedMovies, PublicOfPostStatus publicOfPostStatus) {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
         post.updateContent(content);
         post.updatePostedHashtag(postedHashtags);
-        post.updateMedia(medias);
-        post.updatePublicStatus(postPublicStatus);
-        post.updateMovieInPost(movieInPosts);
+        post.updateMedia(postedMedia);
+        post.updatePublicOfPostStatus(publicOfPostStatus);
+        post.updateMovieInPost(postedMovies);
 
         return post;
     }
@@ -97,13 +114,13 @@ public class Post extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-    public void updatePublicStatus(PostPublicStatus publicStatus) {
-        this.postPublicStatus = publicStatus;
+    public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
+        this.publicOfPostStatus = publicStatus;
     }
 
-    public void updateMedia(List<Media> medias) {
-        for (Media media : medias) {
-            this.addMedia(media);
+    public void updateMedia(List<PostedMedia> postedMedias) {
+        for (PostedMedia postedMedia : postedMedias) {
+            this.addMedia(postedMedia);
         }
     }
 
@@ -113,9 +130,9 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    public void updateMovieInPost(List<MovieInPost> movieInPosts) {
-        for (MovieInPost movieInPost : movieInPosts) {
-            this.addMovieInPost(movieInPost);
+    public void updateMovieInPost(List<PostedMovie> postedMovies) {
+        for (PostedMovie postedMovie : postedMovies) {
+            this.addMovieInPost(postedMovie);
         }
     }
 

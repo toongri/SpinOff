@@ -2,16 +2,14 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PostViewByIp;
 import com.nameless.spin_off.exception.member.NoSuchMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.query.PostQueryRepository;
+import com.nameless.spin_off.repository.post.query.PostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Test;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 

@@ -7,38 +7,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Media extends BaseTimeEntity {
+public class ViewedPostByIp extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="media_id")
+    @Column(name="viewed_post_by_id")
     private Long id;
+
+    private String ip;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     @NotNull
     private Post post;
 
-    @NotNull
-    private String url;
-
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Media createMedia(Post post, String url) {
+    public static ViewedPostByIp createViewedPostByIp(String ip, Post post) {
+        ViewedPostByIp viewedPostByIp = new ViewedPostByIp();
+        viewedPostByIp.updatePost(post);
+        viewedPostByIp.updateIp(ip);
 
-        Media media = new Media();
-        media.updatePost(post);
-        media.updateUrl(url);
-
-        return media;
+        return viewedPostByIp;
 
     }
 
@@ -47,15 +42,11 @@ public class Media extends BaseTimeEntity {
         this.post = post;
     }
 
-    private void updateUrl(String url) {
-        this.url = url;
+    private void updateIp(String ip) {
+        this.ip = ip;
     }
 
     //==비즈니스 로직==//
-    public static List<Media> createMedias(List<String> urls) {
-        return urls.stream().map(url -> Media.createMedia(null, url)).collect(Collectors.toList());
-    }
 
     //==조회 로직==//
-
 }

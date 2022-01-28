@@ -1,7 +1,8 @@
 package com.nameless.spin_off.dto;
 
+import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.MovieInPost;
+import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.nameless.spin_off.entity.post.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,10 +23,11 @@ public class PostDto {
         private Long memberId;
         private String title;
         private String content;
-        private PostPublicStatus postPublicStatus;
+        private PublicOfPostStatus publicOfPostStatus;
         private List<String> hashtagContents;
         private List<String> mediaUrls;
         private List<Long> movieIds;
+        private List<Long> collectionIds;
     }
 
     public static class PostBuilder {
@@ -33,10 +35,10 @@ public class PostDto {
         private Member member;
         private String title;
         private String content;
-        private PostPublicStatus postPublicStatus = PostPublicStatus.PRIVATED;
+        private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
         private List<PostedHashtag> postedHashtags = new ArrayList<>();
-        private List<Media> medias = new ArrayList<>();
-        private List<MovieInPost> movieInPosts = new ArrayList<>();
+        private List<PostedMedia> postedMedias = new ArrayList<>();
+        private List<PostedMovie> postedMovies = new ArrayList<>();
 
         public PostBuilder setMember(Member member) {
             this.member = member;
@@ -53,8 +55,8 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setPostPublicStatus(PostPublicStatus postPublicStatus) {
-            this.postPublicStatus = postPublicStatus;
+        public PostBuilder setPostPublicStatus(PublicOfPostStatus publicOfPostStatus) {
+            this.publicOfPostStatus = publicOfPostStatus;
             return this;
         }
 
@@ -63,18 +65,18 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setMedias(List<Media> medias) {
-            this.medias.addAll(medias);
+        public PostBuilder setPostedMedias(List<PostedMedia> postedMedia) {
+            this.postedMedias.addAll(postedMedia);
             return this;
         }
 
-        public PostBuilder setMovieInPosts(List<MovieInPost> movieInPosts) {
-            this.movieInPosts.addAll(movieInPosts);
+        public PostBuilder setPostedMovies(List<PostedMovie> postedMovies) {
+            this.postedMovies.addAll(postedMovies);
             return this;
         }
 
         public Post build() {
-            return Post.createPost(member, title, content, postedHashtags, medias, movieInPosts, postPublicStatus);
+            return Post.createPost(member, title, content, postedHashtags, postedMedias, postedMovies, publicOfPostStatus);
         }
     }
 }

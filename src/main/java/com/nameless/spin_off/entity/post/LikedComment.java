@@ -12,11 +12,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CommentLike extends BaseTimeEntity {
+public class LikedComment extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="commentlike_id")
+    @Column(name="liked_comment_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,9 +29,6 @@ public class CommentLike extends BaseTimeEntity {
     @NotNull
     private Comment comment;
 
-    public void updateComment(Comment comment) {
-        this.comment = comment;
-    }
 
 
     //==연관관계 메소드==//
@@ -39,7 +36,9 @@ public class CommentLike extends BaseTimeEntity {
     //==생성 메소드==//
 
     //==수정 메소드==//
-
+    public void updateComment(Comment comment) {
+        this.comment = comment;
+    }
     //==비즈니스 로직==//
 
     //==조회 로직==//

@@ -1,5 +1,5 @@
 package com.nameless.spin_off.entity.member;
 
-public enum MemberAuthorityStatus {
+public enum AuthorityOfMemberStatus {
     ADMIN, SELLER, DOCENT
 }

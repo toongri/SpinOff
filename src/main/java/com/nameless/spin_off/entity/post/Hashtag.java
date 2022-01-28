@@ -22,14 +22,7 @@ public class Hashtag extends BaseTimeEntity {
 
     private String content;
 
-    @OneToMany(mappedBy = "hashtag", fetch = FetchType.LAZY)
-    private List<PostedHashtag> postedHashtags = new ArrayList<>();
-
     //==연관관계 메소드==//
-    public void addPostedHashtag(PostedHashtag postedHashtag) {
-        this.postedHashtags.add(postedHashtag);
-        postedHashtag.updateHashTag(this);
-    }
 
     //==생성 메소드==//
     public static Hashtag createHashtag(String content) {
@@ -43,12 +36,6 @@ public class Hashtag extends BaseTimeEntity {
     //==수정 메소드==//
     private void updateContent(String content) {
         this.content = content;
-    }
-
-    public void updatePostedHashtag(List<PostedHashtag> postedHashtags) {
-        for (PostedHashtag postedHashTag : postedHashtags) {
-            this.addPostedHashtag(postedHashTag);
-        }
     }
 
     //==비즈니스 로직==//

@@ -34,13 +34,13 @@ public class Comment extends BaseTimeEntity {
     private String content;
 
     @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<CommentLike> commentLikes = new ArrayList<>();
+    private List<LikedComment> likedComments = new ArrayList<>();
 
     //==연관관계 메소드==//
 
-    public void addCommentLike(CommentLike commentLike) {
-        this.commentLikes.add(commentLike);
-        commentLike.updateComment(this);
+    public void addCommentLike(LikedComment likedComment) {
+        this.likedComments.add(likedComment);
+        likedComment.updateComment(this);
     }
 
     //==생성 메소드==//

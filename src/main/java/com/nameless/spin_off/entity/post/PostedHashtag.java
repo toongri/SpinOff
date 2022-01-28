@@ -33,11 +33,10 @@ public class PostedHashtag extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostedHashtag createPostedHashtag(Hashtag hashtag, Post post) {
+    public static PostedHashtag createPostedHashtag(Hashtag hashtag) {
 
         PostedHashtag postedHashTag = new PostedHashtag();
         postedHashTag.updateHashTag(hashtag);
-        postedHashTag.updatePost(post);
 
         return postedHashTag;
 

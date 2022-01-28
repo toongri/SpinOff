@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.post;
+package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
@@ -12,11 +12,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostBlock extends BaseTimeEntity {
+public class FollowedCollection extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="post_block_id")
+    @Column(name="followed_collection_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,28 +25,29 @@ public class PostBlock extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_blocked_member_id")
+    @JoinColumn(name = "collection_id")
     @NotNull
-    private Member postBlockedMember;
+    private Collection collection;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostBlock createPostBlock(Member member, Member postBlockedMember) {
-        PostBlock postBlock = new PostBlock();
-        postBlock.updateMember(member);
-        postBlock.updatePostBlockedMember(postBlockedMember);
+    public static FollowedCollection createFollowedCollections(Member member, Collection collection) {
 
-        return postBlock;
+        FollowedCollection followedCollection = new FollowedCollection();
+        followedCollection.updateMember(member);
+        followedCollection.updateCollections(collection);
+
+        return followedCollection;
 
     }
 
     //==수정 메소드==//
-    private void updatePostBlockedMember(Member postBlockedMember) {
-        this.postBlockedMember = postBlockedMember;
+    public void updateCollections(Collection collection) {
+        this.collection = collection;
     }
 
-    private void updateMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 

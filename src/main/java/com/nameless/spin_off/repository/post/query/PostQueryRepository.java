@@ -1,4 +1,4 @@
-package com.nameless.spin_off.repository.query;
+package com.nameless.spin_off.repository.post.query;
 
 import com.nameless.spin_off.entity.post.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -8,11 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.nameless.spin_off.entity.member.QMember.member;
-import static com.nameless.spin_off.entity.post.QComment.comment;
-import static com.nameless.spin_off.entity.post.QMedia.media;
 import static com.nameless.spin_off.entity.post.QPost.post;
-import static com.nameless.spin_off.entity.post.QPostLike.postLike;
-import static com.nameless.spin_off.entity.post.QPostedHashtag.postedHashtag;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,10 +21,6 @@ public class PostQueryRepository {
                 .select(post)
                 .from(post)
                 .leftJoin(post.member, member).fetchJoin()
-                .leftJoin(post.comments, comment)
-                .leftJoin(post.postLikes, postLike)
-                .leftJoin(post.postedHashtags, postedHashtag)
-                .leftJoin(post.medias, media)
                 .where(post.id.eq(id))
                 .fetchOne();
     }
@@ -38,10 +30,6 @@ public class PostQueryRepository {
                 .select(post)
                 .from(post)
                 .leftJoin(post.member, member).fetchJoin()
-                .leftJoin(post.comments, comment)
-                .leftJoin(post.postLikes, postLike)
-                .leftJoin(post.postedHashtags, postedHashtag)
-                .leftJoin(post.medias, media)
                 .fetch();
     }
 }

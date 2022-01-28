@@ -15,7 +15,7 @@ public class FollowingMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "followingmember_id")
+    @Column(name = "following_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +24,7 @@ public class FollowingMember extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followedmember_id")
+    @JoinColumn(name = "followed_member_id")
     @NotNull
     private Member followedMember;
 

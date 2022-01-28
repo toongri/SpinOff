@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberAuthority extends BaseTimeEntity {
+public class AuthorityOfMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="memberauthority_id")
+    @Column(name="authority_of_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,25 +24,25 @@ public class MemberAuthority extends BaseTimeEntity {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "memberauthority_status")
-    private MemberAuthorityStatus memberAuthorityStatus;
+    @Column(name = "authority_of_member_status")
+    private AuthorityOfMemberStatus authorityOfMemberStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static MemberAuthority createMemberAuthority(Member member, MemberAuthorityStatus memberAuthorityStatus) {
+    public static AuthorityOfMember createAuthorityOfMember(Member member, AuthorityOfMemberStatus authorityOfMemberStatus) {
 
-        MemberAuthority memberAuthority = new MemberAuthority();
-        memberAuthority.updateMember(member);
-        memberAuthority.updateMemberAuthorityStatus(memberAuthorityStatus);
+        AuthorityOfMember authorityOfMember = new AuthorityOfMember();
+        authorityOfMember.updateMember(member);
+        authorityOfMember.updateAuthorityOfMemberStatus(authorityOfMemberStatus);
 
-        return memberAuthority;
+        return authorityOfMember;
 
     }
 
     //==수정 메소드==//
-    private void updateMemberAuthorityStatus(MemberAuthorityStatus memberAuthorityStatus) {
-        this.memberAuthorityStatus = memberAuthorityStatus;
+    private void updateAuthorityOfMemberStatus(AuthorityOfMemberStatus authorityOfMemberStatus) {
+        this.authorityOfMemberStatus = authorityOfMemberStatus;
     }
 
     private void updateMember(Member member) {

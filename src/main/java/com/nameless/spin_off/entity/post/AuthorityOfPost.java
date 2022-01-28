@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostAuthority extends BaseTimeEntity {
+public class AuthorityOfPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="post_authority_id")
+    @Column(name="authority_of_post_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,24 +24,24 @@ public class PostAuthority extends BaseTimeEntity {
     private Post post;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "post_authority_status")
-    private PostAuthorityStatus postAuthorityStatus;
+    @Column(name = "authority_of_post_status")
+    private AuthorityOfPostStatus authorityOfPostStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostAuthority createPostAuthority(Post post, PostAuthorityStatus postAuthorityStatus) {
+    public static AuthorityOfPost createAuthorityOfPost(Post post, AuthorityOfPostStatus authorityOfPostStatus) {
 
-        PostAuthority postAuthority = new PostAuthority();
-        postAuthority.updatePost(post);
-        postAuthority.updatePostAuthorityStatus(postAuthorityStatus);
+        AuthorityOfPost authorityOfPost = new AuthorityOfPost();
+        authorityOfPost.updatePost(post);
+        authorityOfPost.updateAuthorityOfPostStatus(authorityOfPostStatus);
 
-        return postAuthority;
+        return authorityOfPost;
 
     }
     //==수정 메소드==//
-    private void updatePostAuthorityStatus(PostAuthorityStatus postAuthorityStatus) {
-        this.postAuthorityStatus = postAuthorityStatus;
+    private void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
+        this.authorityOfPostStatus = authorityOfPostStatus;
     }
 
     private void updatePost(Post post) {

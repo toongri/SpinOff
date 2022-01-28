@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.postcollection;
+package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
@@ -12,11 +12,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowingPostCollection extends BaseTimeEntity {
+public class LikedCollection extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="following_post_collection_id")
+    @Column(name="liked_collection_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,26 +25,25 @@ public class FollowingPostCollection extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theme_id")
+    @JoinColumn(name = "collection_id")
     @NotNull
-    private PostCollection postCollection;
+    private Collection collection;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowingPostCollection createFollowingPostCollection(Member member, PostCollection postCollection) {
+    public static LikedCollection createLikedCollections(Member member, Collection collection) {
+        LikedCollection likedCollection = new LikedCollection();
+        likedCollection.updateMember(member);
+        likedCollection.updateCollections(collection);
 
-        FollowingPostCollection followingPostCollection = new FollowingPostCollection();
-        followingPostCollection.updateMember(member);
-        followingPostCollection.updatePostCollection(postCollection);
-
-        return followingPostCollection;
+        return likedCollection;
 
     }
 
     //==수정 메소드==//
-    private void updatePostCollection(PostCollection postCollection) {
-        this.postCollection = postCollection;
+    public void updateCollections(Collection collection) {
+        this.collection = collection;
     }
 
     private void updateMember(Member member) {

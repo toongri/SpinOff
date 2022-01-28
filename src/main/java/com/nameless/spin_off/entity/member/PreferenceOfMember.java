@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MemberPreference extends BaseTimeEntity {
+public class PreferenceOfMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="memberpreference_id")
+    @Column(name="preference_of_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -26,20 +26,20 @@ public class MemberPreference extends BaseTimeEntity {
     private int score;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "memberpreference_status")
-    private MemberPreferenceStatus memberPreferenceStatus;
+    @Column(name = "preference_of_member__status")
+    private PreferenceOfMemberStatus preferenceOfMemberStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static MemberPreference createMemberPreference(Member member, int score, MemberPreferenceStatus memberPreferenceStatus) {
+    public static PreferenceOfMember createPreferenceOfMember(Member member, int score, PreferenceOfMemberStatus preferenceOfMemberStatus) {
 
-        MemberPreference memberPreference = new MemberPreference();
-        memberPreference.updateMember(member);
-        memberPreference.updateScore(score);
-        memberPreference.updateMemberPreferenceStatus(memberPreferenceStatus);
+        PreferenceOfMember preferenceOfMember = new PreferenceOfMember();
+        preferenceOfMember.updateMember(member);
+        preferenceOfMember.updateScore(score);
+        preferenceOfMember.updatePreferenceOfMemberStatus(preferenceOfMemberStatus);
 
-        return memberPreference;
+        return preferenceOfMember;
 
     }
 
@@ -52,8 +52,8 @@ public class MemberPreference extends BaseTimeEntity {
         this.member = member;
     }
 
-    private void updateMemberPreferenceStatus(MemberPreferenceStatus memberPreferenceStatus) {
-        this.memberPreferenceStatus = memberPreferenceStatus;
+    private void updatePreferenceOfMemberStatus(PreferenceOfMemberStatus preferenceOfMemberStatus) {
+        this.preferenceOfMemberStatus = preferenceOfMemberStatus;
     }
 
     //==비즈니스 로직==//
