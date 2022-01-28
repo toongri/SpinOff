@@ -7,6 +7,7 @@ import { BsPencilFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
 import ControlledCarousel from "../controlledCarousel/controlledCarousel";
+import Slider from '../slider/Slider.jsx';
 
 const useStyle = makeStyles({
   btn: {
@@ -23,7 +24,7 @@ const breakpointColumnsObj = {
 };
 
 const Main = ({ onSearch, items }) => {
-  const classes = useStyle();
+  
   let navigate = useNavigate();
 
   const sample = [
@@ -45,31 +46,34 @@ const Main = ({ onSearch, items }) => {
   return (
     <>
       <div className="main-container">
+      
         <div className="img-container">
-          <ControlledCarousel></ControlledCarousel>
-        </div>
-        {/** */}
+          <div className = "controlledCarousel-container">
+            <ControlledCarousel></ControlledCarousel>
+          </div>
 
+          {/* <div className = "metion-box-container">
+              
+          </div> */}
+        </div>
+      
+        
         <div className="container">
-          <div>
-            <Masonry
-              breakpointCols={breakpointColumnsObj}
-              className="my-masonry-grid"
-              columnClassName="my-masonry-grid_column"
-            >
-              {sample.map((item, index) => {
-                return (
-                  <ItemsDetail
-                    style={{
-                      width: "236px",
-                    }}
-                    key={index}
-                    item={item}
-                  />
+          <div className="masonry-container">
+              {
+                sample.map((item, index) => {
+                  return (
+                    <ItemsDetail
+                      style={{
+                        width: "278px",
+                      }}
+                      key={index}
+                      item={item}
+                    />
                 );
               })}
-            </Masonry>
           </div>
+          <div className="buttonGroup">
           <div className="buttonBox1">
               <Button
                 onClick={() => {
@@ -114,7 +118,7 @@ const Main = ({ onSearch, items }) => {
               >
                 HELP
               </Button>
-           
+              </div>
           </div>
         </div>
       </div>

@@ -5,51 +5,43 @@
 }
 /*container*/
 .main-container{
-    position: relative;
     width: 100%;
   .img-container{
     width: 100%;
-    position: fixed;
-    top: 135px;
-    height: 860px;
+    position: relative;
+    top: 10vh;
+    max-height: 910px;
     width: 100%;
-    & img{
-      height: 910px;
+    background-color: #000;
+    img{
+      height: 60vh;
       width: 100%;
     }
   }
+
 .container{
-  height: 300vh;
+  height: 100vh;
   width: 100%;
   position: absolute;
-  top: 910px;
-
-  .my-masonry-grid {
-    display: -webkit-box; /* Not needed if autoprefixing */
-    display: -ms-flexbox; /* Not needed if autoprefixing */
-    display: flex;
-    margin-left: -30px; /* gutter size offset */
-    width: auto;
+  left: 2.6%;
+  right: 2.6%;
+  width: 100%;
+  .masonry-container{
+    width: 100%;
+    position: absolute;
+    top: 0vh;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+    grid-template-rows: masonry;
   }
-
-  .my-masonry-grid_column {
-    padding-left: 30px; /* gutter size */
-    background-clip: padding-box;
-  }
-  .my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
-    background: grey;
-    margin-bottom: 30px;
-  }
-  .buttonBox1{
+  .buttonGroup{
     position: fixed;
     right: 2%;
     bottom: 12%;
-    
-  }
-  .buttonBox2{
-    position: fixed;
-    right: 2%;
-    bottom: 7%;
+    .buttonBox1{
+      margin-bottom: 8px;
+    }
   }
 }
 }
