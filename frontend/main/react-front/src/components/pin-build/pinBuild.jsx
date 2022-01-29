@@ -8,28 +8,46 @@ import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineBook } from "react-icons/ai";
 import { BsFillArrowUpCircleFill } from "react-icons/bs";
 import axios from "axios";
+import FileUpload from './fileUpload.jsx';
+import {AiFillFolderAdd} from 'react-icons/ai'
+import {useNavigate} from 'react-router-dom'
+import PageReload from './pageReload';
 
 const PinBuild = () => {
+  let navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState("");
   const [files, setFiles] = useState("");
+  const [fileImages, setFileImages] = useState([]);
+  const [formpage, setFormpage] = useState(false);
+  const inputRef = useRef();
 
  const submit = () =>{
-    axios.post('http://localhost:8080/api/posts',{
+    axios.post('http://localhost:8080/api/posts', {
       // imgUrl: files,
       content: content,
       title: title
     })
-    .then((res) =>{})
+    .then((res) =>{
+      
+    })
     .catch((err) =>{})
-    
+      
+      setTitle('');
+      setContent('');
+      setFileImages([]);
+      setFiles('');  
+      console.log(inputRef.current.value)
     console.log('content: ', content, 'title', title ,'files',files)
   }
 
-  // 파일 저장
-  const saveFileImage = (e) => {
-    console.log(e.target.files)
-    setFiles(URL.createObjectURL(e.target.files[0]));
+    // 파일 저장
+  const saveFileImage = (file) => {
+    const item = file[0].name;
+    console.log(item)
+    fileImages.push(item)
+    setFiles(URL.createObjectURL(file[0]));
+    console.log(files)
   };
 
   // 파일 삭제
@@ -39,61 +57,46 @@ const PinBuild = () => {
   };
 
   const onChangeTitle = (e) => {
-    console.log(e.target.value)
     setTitle(e.target.value);
   }
+
   const onChangeContent = (e) => {
     console.log(e.target.value)
     console.log(files)
     setContent(e.target.value);
   }
 
+  const renderCondition = formpage ? <PageReload setFormpage = {setFormpage} files = {files} saveFileImage = {saveFileImage}/> : <FileUpload saveFileImage = {saveFileImage} files = {files}/>;
+
+  useEffect(() =>{
+    console.log(renderCondition);
+  }, [renderCondition])
+
   return (
     <div className="navbarContainer">
       <Header></Header>
-      <div className="pin_container">
-        <div className="file-upload-container">
-          <input
-            onChange={saveFileImage}
-            type="file"
-            id="file"
-            accept="image/*"
-            name="file"
-            multiple
-          />
-          {files && (   
-            <div className="file-img-container">
-              <img src={files} alt="sample" />
-            </div>
-          )
-            }
-          {
-            !files&&(
-              <div class="drag-text">
-                <BsFillArrowUpCircleFill size="30"></BsFillArrowUpCircleFill>
-                <p>드래그하거나 클릭하여 업로드</p>
-             </div>
-          )
-          }
-        </div>
-
-        <div className="writing-info-container">
-          <form className="form">
-            <div className="form-group">
-              <input
-                type="text"
-                className="form-control form-title"
-                placeholder="제목"
-                onChange={onChangeTitle}
-              />
-              <textarea
-                className="form-control form-text"
-                placeholder="내용을 입력하세요"
-                onChange={onChangeContent}
-              ></textarea>
-            </div>
-          </form>
-
+        <div className="pin_container">
+          <div className="file-upload-container">
+           {renderCondition}
+          </div>
+          
+          <div className="writing-info-container">
+            <form className="form">
+              <div className="form-group">
+                <input
+                  type="text"
+                  className="form-control form-title"
+                  placeholder="제목"
+                  ref = {inputRef}
+                  onChange={onChangeTitle}
+                />
+                <textarea
+                  className="form-control form-text"
+                  placeholder="내용을 입력하세요"
+                  onChange={onChangeContent}
+                ></textarea>
+              </div>
+            </form>
           <div className="function-container">
             {/**function*/}
             <div className="function">
@@ -131,6 +134,29 @@ const PinBuild = () => {
             </div>
           </div>
         </div>
+        {/* plus screen */}
+      {
+        fileImages && (
+        <div className = "fileImages-container">
+        {
+          files && (
+          <div className = "imageAdd-container">
+            <div 
+            className = "imageAdd-btn" 
+            onClick = {() => setFormpage(true)}>
+                <AiFillFolderAdd size = "24"></AiFillFolderAdd>
+            </div>
+          </div>
+          )
+        } 
+          {fileImages.map((data) => (
+            <div className = "data-container">
+              <img src = {data} />
+            </div>
+          ))}
+        </div>
+        )
+      }
         <div className = "complete-btn-container">
         <button 
           onClick={submit}

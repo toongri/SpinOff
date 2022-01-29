@@ -87,7 +87,7 @@ const Main = ({ onSearch, items }) => {
                   height: "50px",
                   border: "none",
                   boxShadow: " 0px 0px 18px -10px #404040",
-                  padding: "10px 12px",
+                  padding: "10px 10px",
                 }}
               >
                 <BsPencilFill
