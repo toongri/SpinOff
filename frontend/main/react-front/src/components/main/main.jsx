@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
 import ControlledCarousel from "../controlledCarousel/controlledCarousel";
 import Slider from '../slider/Slider.jsx';
+import ToggleButton from './toggleButton'
 
 const useStyle = makeStyles({
   btn: {
@@ -52,9 +53,12 @@ const Main = ({ onSearch, items }) => {
             <ControlledCarousel></ControlledCarousel>
           </div>
 
-          {/* <div className = "metion-box-container">
-              
-          </div> */}
+          <div className="toggle-switch-container">
+            <span className = "following-container">팔로잉</span>
+            <ToggleButton />
+            <span className = "found-container">발견</span>
+          </div>
+
         </div>
       
         

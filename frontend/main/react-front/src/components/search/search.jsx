@@ -71,9 +71,9 @@ const Search = ({ onSearch, items }) => {
     }
      > 
      <FiSearch 
-     size = {24}
+     size = {22}
      style = {{
-       color: '#24860'
+       color: '#f24860'
      }}></FiSearch>
     </Button>
     <FormControl

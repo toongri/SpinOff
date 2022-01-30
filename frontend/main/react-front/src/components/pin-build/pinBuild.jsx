@@ -14,40 +14,62 @@ import {useNavigate} from 'react-router-dom'
 import PageReload from './pageReload';
 
 const PinBuild = () => {
+
   let navigate = useNavigate();
   const [title, setTitle] = useState('');
   const [content, setContent] = useState("");
-  const [files, setFiles] = useState("");
+  const [files, setFiles] = useState('');
   const [fileImages, setFileImages] = useState([]);
   const [formpage, setFormpage] = useState(false);
-  const inputRef = useRef();
+  
+  const titleRef = useRef();
+  const contentRef = useRef();
 
  const submit = () =>{
-    axios.post('http://localhost:8080/api/posts', {
-      // imgUrl: files,
-      content: content,
-      title: title
+   titleRef.current.value = "";
+   contentRef.current.value = "";
+
+    axios.post(`http://localhost:8080/api/test/9/post`, {
+      "collectionIds": [
+      0
+      ],
+      "content": content,
+      "hashtagContents": [
+        "fdasf"
+      ],
+      "mediaUrls": [
+        "fasdf"
+      ],
+      "memberId": 9,
+      "movieIds": [
+        0
+      ],
+      "publicOfPostStatus": "PUBLIC",
+      "title": title
     })
     .then((res) =>{
-      
+     console.log(res.data)
     })
-    .catch((err) =>{})
+    .catch((err) =>{
+      console.log('error')
+    })
       
       setTitle('');
       setContent('');
       setFileImages([]);
       setFiles('');  
-      console.log(inputRef.current.value)
+      
     console.log('content: ', content, 'title', title ,'files',files)
   }
 
     // 파일 저장
   const saveFileImage = (file) => {
     const item = file[0].name;
-    console.log(item)
-    fileImages.push(item)
+   
     setFiles(URL.createObjectURL(file[0]));
-    console.log(files)
+      const imgUrl = JSON.stringify(URL.createObjectURL(file[0]))
+      fileImages.push(imgUrl)
+      console.log(fileImages)
   };
 
   // 파일 삭제
@@ -69,7 +91,7 @@ const PinBuild = () => {
   const renderCondition = formpage ? <PageReload setFormpage = {setFormpage} files = {files} saveFileImage = {saveFileImage}/> : <FileUpload saveFileImage = {saveFileImage} files = {files}/>;
 
   useEffect(() =>{
-    console.log(renderCondition);
+    
   }, [renderCondition])
 
   return (
@@ -83,17 +105,23 @@ const PinBuild = () => {
           <div className="writing-info-container">
             <form className="form">
               <div className="form-group">
+                <div>
+                  <select>
+                    <option>테마이름</option>
+                  </select>
+                </div>
                 <input
                   type="text"
                   className="form-control form-title"
                   placeholder="제목"
-                  ref = {inputRef}
+                  ref = {titleRef}
                   onChange={onChangeTitle}
                 />
                 <textarea
                   className="form-control form-text"
                   placeholder="내용을 입력하세요"
                   onChange={onChangeContent}
+                  ref= {contentRef}
                 ></textarea>
               </div>
             </form>
@@ -101,7 +129,7 @@ const PinBuild = () => {
             {/**function*/}
             <div className="function">
               <a className="pinterest-link" href="https://www.pinterest.co.kr/">
-                www.pinterest.co.kr
+               링크추가하기
               </a>
               {/*function-buttons*/}
               <div className="function-buttons">

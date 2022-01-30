@@ -53,7 +53,6 @@ const Header = () => {
               }}
                 variant= "#000"
               bg="#000"
-              active
               style={buttonStyle}
               value = {false}
             >

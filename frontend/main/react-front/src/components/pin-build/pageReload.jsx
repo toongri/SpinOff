@@ -21,8 +21,7 @@ const PageReload = ({ formpage, setFormpage,files, saveFileImage }) => {
             name="file" 
             multiple
           />
-
-              <div class="drag-text">
+            <div className="drag-text">
                 <BsFillArrowUpCircleFill size="30"></BsFillArrowUpCircleFill>
                 <p>드래그하거나 클릭하여 업로드</p>
              </div>

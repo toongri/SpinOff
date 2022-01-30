@@ -13,9 +13,25 @@
     max-height: 910px;
     width: 100%;
     background-color: #000;
+    
     img{
       height: 60vh;
       width: 100%;
+    }
+    .toggle-switch-container{
+      padding: 20px 50px 10px;
+      font-size: 0.8rem;
+      color: #fff;
+      position:absolute;
+      bottom: 60px;
+      left: 7.5%;
+      .following-container{
+        margin-right: 10px;
+      }
+
+      .found-container{
+        margin-left: 10px;
+      }
     }
   }
 
@@ -31,7 +47,7 @@
     position: absolute;
     top: 0vh;
     display: grid;
-    gap: 10px;
+    gap: 5px;
     grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
     grid-template-rows: masonry;
   }
