@@ -11,11 +11,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DmBlock extends BaseTimeEntity {
+public class BlockedMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="dmblock_id")
+    @Column(name="blocked_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,26 +24,31 @@ public class DmBlock extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "dmblockedmember_id")
+    @JoinColumn(name = "blocked_members_id")
     @NotNull
-    private Member dmBlockedMember;
+    private Member BlockedMember;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "blocked_member_status")
+    private BlockedMemberStatus blockedMemberStatus;
+
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static DmBlock createDmBlock(Member member, Member dmBlockedMember) {
+    public static BlockedMember createBlockedMember(Member member, Member blockedMember) {
 
-        DmBlock dmBlock = new DmBlock();
-        dmBlock.updateMember(member);
-        dmBlock.updateDmBlockedMember(dmBlockedMember);
+        BlockedMember blockedMember1 = new BlockedMember();
+        blockedMember1.updateMember(member);
+        blockedMember1.updateDmBlockedMember(blockedMember);
 
-        return dmBlock;
+        return blockedMember1;
 
     }
 
     //==수정 메소드==//
     private void updateDmBlockedMember(Member dmBlockedMember) {
-        this.dmBlockedMember = dmBlockedMember;
+        this.BlockedMember = dmBlockedMember;
     }
 
     private void updateMember(Member member) {

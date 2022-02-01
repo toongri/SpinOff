@@ -29,6 +29,8 @@ public class Collection extends BaseTimeEntity {
 
     private String content;
 
+    private Long view;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
     private PublicOfCollectionStatus publicOfCollectionStatus;
@@ -82,7 +84,7 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(title);
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
-
+        collection.updateViewToZero();
         return collection;
 
     }
@@ -97,6 +99,7 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DEFAULT_COLLECTION_TITLE);
         collection.updateContent(DEFAULT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DEFAULT_COLLECTION_PUBLIC_STATUS);
+        collection.updateViewToZero();
 
         return collection;
 
@@ -112,12 +115,21 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DOCENT_COLLECTION_TITLE);
         collection.updateContent(DOCENT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DOCENT_COLLECTION_PUBLIC_STATUS);
+        collection.updateViewToZero();
 
         return collection;
 
     }
 
     //==수정 메소드==//
+
+    public void updateViewToZero() {
+        this.view = 0L;
+    }
+
+    public void updateView() {
+        this.view = this.view + 1;
+    }
 
     private void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
         this.publicOfCollectionStatus = publicOfCollectionStatus;

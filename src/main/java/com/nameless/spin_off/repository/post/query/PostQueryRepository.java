@@ -16,7 +16,7 @@ public class PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Post findOne(Long id) {
+    public Post testFindOne(Long id) {
         return jpaQueryFactory
                 .select(post)
                 .from(post)
@@ -25,7 +25,7 @@ public class PostQueryRepository {
                 .fetchOne();
     }
 
-    public List<Post> findAll() {
+    public List<Post> testFindAll() {
         return jpaQueryFactory
                 .select(post)
                 .from(post)

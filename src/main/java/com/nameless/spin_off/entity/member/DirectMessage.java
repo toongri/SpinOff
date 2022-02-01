@@ -15,7 +15,7 @@ public class DirectMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="directmessage_id")
+    @Column(name="direct_message_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -24,7 +24,7 @@ public class DirectMessage extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "receivemember_id")
+    @JoinColumn(name = "received_member_id")
     @NotNull
     private Member receivedMember;
 

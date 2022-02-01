@@ -23,6 +23,11 @@ public class Alarm extends BaseTimeEntity {
     @NotNull
     private Member member;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "about_member_id")
+    @NotNull
+    private Member aboutMember;
+
     @NotNull
     private String url;
 
@@ -33,9 +38,10 @@ public class Alarm extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Alarm createAlarm(Member member, String url, String content) {
+    public static Alarm createAlarm(Member member, Member aboutMember, String url, String content) {
 
         Alarm alarm = new Alarm();
+        alarm.updateAboutMember(aboutMember);
         alarm.updateMember(member);
         alarm.updateUrl(url);
         alarm.updateContent(content);
@@ -61,6 +67,10 @@ public class Alarm extends BaseTimeEntity {
 
     private void updateMember(Member member) {
         this.member = member;
+    }
+
+    private void updateAboutMember(Member aboutMember) {
+        this.aboutMember = aboutMember;
     }
 
     //==비즈니스 로직==//

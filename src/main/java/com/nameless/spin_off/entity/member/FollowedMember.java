@@ -1,7 +1,6 @@
-package com.nameless.spin_off.entity.post;
+package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,11 +11,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class BlockedPost extends BaseTimeEntity {
+public class FollowedMember extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="blocked_post_id")
+    @Column(name = "followed_member_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,30 +24,32 @@ public class BlockedPost extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_blocked_member_id")
+    @JoinColumn(name = "followed_members_id")
     @NotNull
-    private Member postBlockedMember;
+    private Member followedMember;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static BlockedPost createPostBlock(Member member, Member postBlockedMember) {
-        BlockedPost blockedPost = new BlockedPost();
-        blockedPost.updateMember(member);
-        blockedPost.updatePostBlockedMember(postBlockedMember);
+    public static FollowedMember createFollowedMember(Member member, Member followedMember) {
 
-        return blockedPost;
+        FollowedMember followedMember1 = new FollowedMember();
+        followedMember1.updateMember(member);
+        followedMember1.updateFollowedMember(followedMember);
+
+        return followedMember1;
 
     }
 
     //==수정 메소드==//
-    private void updatePostBlockedMember(Member postBlockedMember) {
-        this.postBlockedMember = postBlockedMember;
-    }
-
     private void updateMember(Member member) {
         this.member = member;
     }
+
+    private void updateFollowedMember(Member followedMember) {
+        this.followedMember = followedMember;
+    }
+
 
     //==비즈니스 로직==//
 

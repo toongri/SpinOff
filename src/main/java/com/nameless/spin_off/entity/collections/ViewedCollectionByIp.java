@@ -15,7 +15,7 @@ public class ViewedCollectionByIp extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="viewed_collection_by_id")
+    @Column(name="viewed_collection_by_ip_id")
     private Long id;
 
     private String ip;

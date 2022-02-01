@@ -31,6 +31,8 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
+    private Long view;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_post_status")
     private PublicOfPostStatus publicOfPostStatus;
@@ -105,6 +107,7 @@ public class Post extends BaseTimeEntity {
         post.updateMedia(postedMedia);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateMovieInPost(postedMovies);
+        post.updateViewToZero();
 
         return post;
     }
@@ -116,6 +119,14 @@ public class Post extends BaseTimeEntity {
     //==수정 메소드==//
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
         this.publicOfPostStatus = publicStatus;
+    }
+
+    public void updateViewToZero() {
+        this.view = 0L;
+    }
+
+    public void updateView() {
+        this.view = this.view + 1;
     }
 
     public void updateMedia(List<PostedMedia> postedMedias) {

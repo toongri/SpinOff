@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.movie;
 
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -12,17 +12,17 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PostedMovie extends BaseTimeEntity {
+public class FollowedMovie {
 
     @Id
     @GeneratedValue
-    @Column(name="posted_movie_id")
+    @Column(name="followed_movie_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "member_id")
     @NotNull
-    private Post post;
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
@@ -32,12 +32,12 @@ public class PostedMovie extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostedMovie createPostedMovie(Movie movie) {
+    public static FollowedMovie createFollowedMovie(Movie movie) {
 
-        PostedMovie postedMovie = new PostedMovie();
-        postedMovie.updateMovie(movie);
+        FollowedMovie followedMovie = new FollowedMovie();
+        followedMovie.updateMovie(movie);
 
-        return postedMovie;
+        return followedMovie;
 
     }
 
@@ -46,8 +46,8 @@ public class PostedMovie extends BaseTimeEntity {
         this.movie = movie;
     }
 
-    public void updatePost(Post post) {
-        this.post = post;
+    public void updateMember(Member member) {
+        this.member = member;
     }
 
     //==비즈니스 로직==//

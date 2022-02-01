@@ -33,7 +33,7 @@ public class TestApiController {
 
     @GetMapping("/post")
     public TestApiResult post() {
-        List<Post> all = postQueryRepository.findAll();
+        List<Post> all = postQueryRepository.testFindAll();
         for (Post post : all) {
             System.out.println("post = " + post);
         }
@@ -42,7 +42,7 @@ public class TestApiController {
 
     @GetMapping("/post/{id}")
     public TestApiResult postOne(@PathVariable(value = "id") Long id) {
-        Post post = postQueryRepository.findOne(id);
+        Post post = postQueryRepository.testFindOne(id);
         System.out.println("post = " + post);
         return new TestApiResult(post);
     }

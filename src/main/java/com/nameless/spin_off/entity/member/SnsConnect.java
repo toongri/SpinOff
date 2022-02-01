@@ -15,10 +15,9 @@ public class SnsConnect extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="snsconnect_id")
+    @Column(name="sns_connect_id")
     private Long id;
 
-    @Column(name="sns_id")
     private String snsId;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -27,7 +26,7 @@ public class SnsConnect extends BaseTimeEntity {
     private Member member;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "snsconnect_status")
+    @Column(name = "sns_connect_status")
     private SnsConnectStatus snsConnectStatus;
 
     //==연관관계 메소드==//

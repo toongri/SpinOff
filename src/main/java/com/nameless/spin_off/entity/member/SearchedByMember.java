@@ -25,14 +25,20 @@ public class SearchedByMember extends BaseTimeEntity {
 
     private String content;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "searched_by_member_status")
+    private SearchedByMemberStatus searchedByMemberStatus;
+
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static SearchedByMember createMemberSearch(Member member, String content) {
+    public static SearchedByMember createMemberSearch(Member member, String content,
+                                                      SearchedByMemberStatus searchedByMemberStatus) {
 
         SearchedByMember searchedByMember = new SearchedByMember();
         searchedByMember.updateMember(member);
         searchedByMember.updateContent(content);
+        searchedByMember.updateSearchedByMemberStatus(searchedByMemberStatus);
 
         return searchedByMember;
 
@@ -48,6 +54,9 @@ public class SearchedByMember extends BaseTimeEntity {
         this.member = member;
     }
 
+    private void updateSearchedByMemberStatus(SearchedByMemberStatus searchedByMemberStatus) {
+        this.searchedByMemberStatus = searchedByMemberStatus;
+    }
     //==비즈니스 로직==//
 
     //==조회 로직==//
