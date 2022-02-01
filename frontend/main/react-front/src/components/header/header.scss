@@ -1,50 +1,61 @@
 $background-color: #f5f6fa;
 
-
 .navbarContainer{
   position: fixed;
   z-index: 1;
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.nav_container {
-  display: flex;
-  nav {
-    height: 50px;
-    width: 100%;
-    background-color: $background-color;
-    position: relative;
-    display: flex;
-
-    .nav-header {
-      display: inline;
-      .nav-title {
-        display: inline-block;
-        font-size: 22px;
-        padding: 10px 10px 10px 20px;
-        margin: auto 50%;
-      }
+  height: 11vh;
+  background-color: #000;
+    .popup{
+      position:absolute;
+      left: 63.3%;
+      width: 22.7vh;
+      background-color: #fff;
     }
 
-    /*nav-links*/
-    .nav-links {
-      margin: auto 10%;
-      & .span {
-        font-size: 0.9rem;
-        margin: auto 10px;
-      }
-    }
+    nav{
+      position: relative;
+      display: flex;
+      width: 100%;
+      height: 100%;
+      justify-content: space-between;
+
+        .navLink_container{
+          list-style: none;
+          display: flex;
+          color: #fff;
+          top: 5vh;
+          position: relative;
+          .document-container{
+            margin-right: 50px;
+          }
+        }
+
+        .logo-container{
+          max-width: 325px;
+          height: 65.3%;
+
+          img{
+            position:relative;
+            cursor: pointer;
+            width: 100%;
+            top: 30%;
+            height: 100%;
+          }
+          
+          // .mention-box-container{
+          //   background-color: white;
+          //   color: white;
+          //   position: relative;
+          //   top: 550%;
+          // }
+        }
+
+        .buttonGroup-box{
+          position: relative;
+          margin-right: 1.2%;
+          top: 3.5vh;
+        }
+      
   }
-}
-
-header{
-  height: 100px;
-}
-.navLink_container{
-  display: flex;
-  position:relative;
-  left: 60%;
 }

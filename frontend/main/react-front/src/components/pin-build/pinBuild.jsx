@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../header/header";
 import "./pin-build.scss";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
@@ -6,40 +6,130 @@ import Button from "react-bootstrap/Button";
 import { FiSend } from "react-icons/fi";
 import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineBook } from "react-icons/ai";
-import {BsFillArrowUpCircleFill} from 'react-icons/bs'
+import { BsFillArrowUpCircleFill } from "react-icons/bs";
+import axios from "axios";
+import FileUpload from './fileUpload.jsx';
+import {AiFillFolderAdd} from 'react-icons/ai'
+import {useNavigate} from 'react-router-dom'
+import PageReload from './pageReload';
 
 const PinBuild = () => {
+
+  let navigate = useNavigate();
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState("");
+  const [files, setFiles] = useState('');
+  const [fileImages, setFileImages] = useState([]);
+  const [formpage, setFormpage] = useState(false);
+  
+  const titleRef = useRef();
+  const contentRef = useRef();
+
+ const submit = () =>{
+   titleRef.current.value = "";
+   contentRef.current.value = "";
+
+    axios.post(`http://localhost:8080/api/test/9/post`, {
+      "collectionIds": [
+      0
+      ],
+      "content": content,
+      "hashtagContents": [
+        "fdasf"
+      ],
+      "mediaUrls": [
+        "fasdf"
+      ],
+      "memberId": 9,
+      "movieIds": [
+        0
+      ],
+      "publicOfPostStatus": "PUBLIC",
+      "title": title
+    })
+    .then((res) =>{
+     console.log(res.data)
+    })
+    .catch((err) =>{
+      console.log('error')
+    })
+      
+      setTitle('');
+      setContent('');
+      setFileImages([]);
+      setFiles('');  
+      
+    console.log('content: ', content, 'title', title ,'files',files)
+  }
+
+    // 파일 저장
+  const saveFileImage = (file) => {
+    const item = file[0].name;
+   
+    setFiles(URL.createObjectURL(file[0]));
+      const imgUrl = JSON.stringify(URL.createObjectURL(file[0]))
+      fileImages.push(imgUrl)
+      console.log(fileImages)
+  };
+
+  // 파일 삭제
+  const deleteFileImage = () => {
+    URL.revokeObjectURL(files);
+    setFiles("");
+  };
+
+  const onChangeTitle = (e) => {
+    setTitle(e.target.value);
+  }
+
+  const onChangeContent = (e) => {
+    console.log(e.target.value)
+    console.log(files)
+    setContent(e.target.value);
+  }
+
+  const renderCondition = formpage ? <PageReload setFormpage = {setFormpage} files = {files} saveFileImage = {saveFileImage}/> : <FileUpload saveFileImage = {saveFileImage} files = {files}/>;
+
+  useEffect(() =>{
+    
+  }, [renderCondition])
+
   return (
     <div className="navbarContainer">
       <Header></Header>
-      <div className="pin_container">
-        <div className="file-upload-container">
-          <input type="file" id="file" name="file" multiple />
-          <div class="drag-text">
-              <div><BsFillArrowUpCircleFill size = "30"></BsFillArrowUpCircleFill></div>
-            <p>드래그하거나 클릭하여 업로드</p>
+        <div className="pin_container">
+          <div className="file-upload-container">
+           {renderCondition}
           </div>
-        </div>
-        <div className="writing-info-container">
-          <form className="form">
-            <div className="form-group">
-              <input
-                type="text"
-                className="form-control form-title"
-                placeholder="제목"
-              />
-              <textarea
-                className="form-control form-text"
-                placeholder="내용을 입력하세요"
-              ></textarea>
-            </div>
-          </form>
           
+          <div className="writing-info-container">
+            <form className="form">
+              <div className="form-group">
+                <div>
+                  <select>
+                    <option>테마이름</option>
+                  </select>
+                </div>
+                <input
+                  type="text"
+                  className="form-control form-title"
+                  placeholder="제목"
+                  ref = {titleRef}
+                  onChange={onChangeTitle}
+                />
+                <textarea
+                  className="form-control form-text"
+                  placeholder="내용을 입력하세요"
+                  onChange={onChangeContent}
+                  ref= {contentRef}
+                ></textarea>
+              </div>
+            </form>
           <div className="function-container">
             {/**function*/}
             <div className="function">
               <a className="pinterest-link" href="https://www.pinterest.co.kr/">
-                www.pinterest.co.kr
+               링크추가하기
               </a>
               {/*function-buttons*/}
               <div className="function-buttons">
@@ -72,6 +162,34 @@ const PinBuild = () => {
             </div>
           </div>
         </div>
+        {/* plus screen */}
+      {
+        fileImages && (
+        <div className = "fileImages-container">
+        {
+          files && (
+          <div className = "imageAdd-container">
+            <div 
+            className = "imageAdd-btn" 
+            onClick = {() => setFormpage(true)}>
+                <AiFillFolderAdd size = "24"></AiFillFolderAdd>
+            </div>
+          </div>
+          )
+        } 
+          {fileImages.map((data) => (
+            <div className = "data-container">
+              <img src = {data} />
+            </div>
+          ))}
+        </div>
+        )
+      }
+        <div className = "complete-btn-container">
+        <button 
+          onClick={submit}
+        className="complete-btn">작성 완료</button>
+      </div>
       </div>
     </div>
   );

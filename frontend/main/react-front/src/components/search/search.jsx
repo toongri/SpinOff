@@ -52,9 +52,9 @@ const Search = ({ onSearch, items }) => {
        border: '0',
       borderRadius:'20px',
       position:'fixed',
-      top: '180px',
-      width: "55%",
-      height: "45px",
+      top: '12vh',
+      width: "52.5%",
+      height: "5vh",
       zIndex: '1',
       
     }}
@@ -70,7 +70,11 @@ const Search = ({ onSearch, items }) => {
      }
     }
      > 
-     <FiSearch></FiSearch>
+     <FiSearch 
+     size = {22}
+     style = {{
+       color: '#f24860'
+     }}></FiSearch>
     </Button>
     <FormControl
         className='input'
