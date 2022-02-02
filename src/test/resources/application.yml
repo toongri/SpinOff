@@ -14,8 +14,10 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 1000
+  thymeleaf:
+    cache: false #서버 배포시 true
 
 decorator:
   datasource:
     p6spy:
-      enable-logging: true
+      enable-logging: true #서버 배포시 false

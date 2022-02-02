@@ -15,24 +15,24 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Profile("local")
 @Component
 @RequiredArgsConstructor
-public class InitMember {
+public class InitLocal {
 
-    private final InitMemberService initMemberService;
+    private final InitLocalService initLocalService;
 
     @PostConstruct
     public void init() {
-        initMemberService.init();
+        initLocalService.init();
     }
 
     @Component
-    static class InitMemberService {
+    static class InitLocalService {
 
         @PersistenceContext
         EntityManager em;
@@ -45,7 +45,7 @@ public class InitMember {
                     .setAccountPw("1")
                     .setNickname("SooAh")
                     .setName("a")
-                    .setBirth(LocalDateTime.now())
+                    .setBirth(LocalDate.now())
                     .setPhoneNumber("010-3959-3232")
                     .setEmail("@google.com")
                     .build();
@@ -55,7 +55,7 @@ public class InitMember {
                     .setAccountPw("2")
                     .setNickname("HyeongYoon")
                     .setName("b")
-                    .setBirth(LocalDateTime.now())
+                    .setBirth(LocalDate.now())
                     .setPhoneNumber("010-3959-2522")
                     .setEmail("@naver.com")
                     .build();
@@ -65,7 +65,7 @@ public class InitMember {
                     .setAccountPw("3")
                     .setNickname("GoldSky")
                     .setName("c")
-                    .setBirth(LocalDateTime.now())
+                    .setBirth(LocalDate.now())
                     .setPhoneNumber("010-3959-7676")
                     .setEmail("@kakao.com")
                     .build();
@@ -74,7 +74,7 @@ public class InitMember {
                     .setAccountPw("4")
                     .setNickname("Toongri")
                     .setName("d")
-                    .setBirth(LocalDateTime.now())
+                    .setBirth(LocalDate.now())
                     .setPhoneNumber("010-3959-5195")
                     .setEmail("@hotmail.com")
                     .build();
@@ -82,7 +82,7 @@ public class InitMember {
                     .setAccountId("5")
                     .setAccountPw("5")
                     .setName("e")
-                    .setBirth(LocalDateTime.now())
+                    .setBirth(LocalDate.now())
                     .setPhoneNumber("010-r334-ng")
                     .setEmail("@nethian.com")
                     .build();

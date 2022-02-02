@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.post;
 
-import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
@@ -16,7 +16,6 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.PostedHashtagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PostService {
+public class PostJpaService implements PostService{
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -38,9 +37,9 @@ public class PostService {
     private final CollectionRepository collectionRepository;
 
     @Transactional(readOnly = false)
-    public Long savePostByPostVO(PostDto.CreatePostVO postVO) throws NoSuchMemberException {
+    public Long savePostByPostVO(CreatePostVO postVO) throws NoSuchMemberException {
 
-        Member member = getMember(postVO.getMemberId());
+        Member member = getMemberById(postVO.getMemberId());
 
         List<PostedMedia> postedMedia = PostedMedia.createPostedMedias(postVO.getMediaUrls());
 
@@ -98,7 +97,7 @@ public class PostService {
         return hashtags;
     }
 
-    private Member getMember(Long memberId) throws NoSuchMemberException {
+    private Member getMemberById(Long memberId) throws NoSuchMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
         return optionalMember.orElseThrow(NoSuchMemberException::new);
