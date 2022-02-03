@@ -44,58 +44,44 @@ public class JpaPostService implements PostService{
 
         List<PostedMedia> postedMedia = PostedMedia.createPostedMedias(postVO.getMediaUrls());
 
-        List<PostedHashtag> postedHashtags = getPostedHashtags(postVO.getHashtagContents());
+        List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
-        List<PostedMovie> postedMovies = getPostedMovies(postVO.getMovieIds());
+        List<Movie> movies = movieRepository.findTagsByIdIn(postVO.getMovieIds());
 
         Post post =  Post.buildPost()
                 .setMember(member)
                 .setPostPublicStatus(postVO.getPublicOfPostStatus())
                 .setPostedMedias(postedMedia)
-                .setPostedHashTags(postedHashtags)
+                .setHashTags(hashtags)
+                .setMovies(movies)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
-                .setPostedMovies(postedMovies)
                 .build();
 
         List<Collection> collections = collectionRepository.findCollectionsByIdIn(postVO.getCollectionIds());
-        collections.forEach(collection -> collection.addCollectedPost(CollectedPost.createCollectedPosts(post)));
+        collections.forEach(collection -> collection.addCollectedPostByPost(post));
 
         return postRepository.save(post).getId();
     }
 
-    private List<PostedMovie> getPostedMovies(List<Long> movieIds) {
-        List<Movie> movies = movieRepository.findTagsByIdIn(movieIds);
+    private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) {
+        List<Hashtag> alreadySavedHashtags = hashtagRepository.findTagsByContentIn(hashtagContents);
+        List<String> contentsAboutAlreadySavedHashtags =
+                alreadySavedHashtags.stream().map(Hashtag::getContent).collect(Collectors.toList());
 
-        return movies.stream()
-                .map(PostedMovie::createPostedMovie)
-                .collect(Collectors.toList());
+        List<Hashtag> anotherTags = getHashtagsAboutNotSaved(hashtagContents, contentsAboutAlreadySavedHashtags);
+        hashtagRepository.saveAll(anotherTags);
+
+        alreadySavedHashtags.addAll(anotherTags);
+
+        return alreadySavedHashtags;
     }
 
-    private List<PostedHashtag> getPostedHashtags(List<String> hashtagContents) {
-
-        List<Hashtag> hashtags = getHashtags(hashtagContents);
-
-        List<PostedHashtag> postedHashtags = new ArrayList<>();
-
-        for (Hashtag hashtag : hashtags) {
-            PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag);
-            if (hashtag.getId() == null) {
-                hashtagRepository.save(hashtag);
-            }
-            postedHashtags.add(postedHashtag);
-        }
-        return postedHashtags;
-    }
-
-    private List<Hashtag> getHashtags(List<String> hashtagContents) {
-        List<Hashtag> hashtags = hashtagRepository.findTagsByContentIn(hashtagContents);
-        List<String> contentsByTag = hashtags.stream().map(Hashtag::getContent).collect(Collectors.toList());
-        List<Hashtag> anotherTags = hashtagContents.stream().filter(tag -> !contentsByTag.contains(tag))
+    private List<Hashtag> getHashtagsAboutNotSaved(List<String> hashtagContents, List<String> contentsAboutAlreadySavedHashtags) {
+        return hashtagContents.stream()
+                .filter(tag -> !contentsAboutAlreadySavedHashtags.contains(tag))
                 .map(Hashtag::createHashtag)
                 .collect(Collectors.toList());
-        hashtags.addAll(anotherTags);
-        return hashtags;
     }
 
     private Member getMemberById(Long memberId) throws NoSuchMemberException {

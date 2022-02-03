@@ -32,11 +32,10 @@ public class FollowedCollection extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedCollection createFollowedCollections(Member member, Collection collection) {
+    public static FollowedCollection createFollowedCollections(Member member) {
 
         FollowedCollection followedCollection = new FollowedCollection();
         followedCollection.updateMember(member);
-        followedCollection.updateCollections(collection);
 
         return followedCollection;
 

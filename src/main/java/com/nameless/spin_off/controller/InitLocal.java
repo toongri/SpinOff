@@ -103,8 +103,6 @@ public class InitLocal {
             em.persist(member5);
             em.persist(collection5);
 
-            List<PostedMovie> postedMovies = new ArrayList<>();
-
             for (int i = 0; i < 100; i++) {
                 Member selectedMember;
                 Collection selectedCollection;
@@ -132,23 +130,11 @@ public class InitLocal {
                 Movie movie = Movie.createMovie((long) i, "" + i, "" + i);
                 em.persist(movie);
 
-                PostedMovie movieInPost = PostedMovie.createPostedMovie(movie);
+                PostedMovie postedMovie = PostedMovie.createPostedMovie(movie);
 
-                if (i % 2 == 0) {
-                    postBuilder.setPostedMovies(postedMovies);
-                }
-                if (i % 3 == 0) {
-                    postedMovies.add(movieInPost);
-                }
-                if (i % 7 == 0) {
-                    postedMovies.add(movieInPost);
-                }
-                if (i % 13 == 0) {
-                    postedMovies = new ArrayList<>();
-                }
                 Post post = postBuilder.build();
                 if (i % 4 == 0) {
-                    selectedCollection.addCollectedPost(CollectedPost.createCollectedPosts(post));
+                    selectedCollection.addCollectedPostByPost(post);
                 }
                 em.persist(selectedCollection);
                 em.persist(post);

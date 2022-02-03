@@ -11,6 +11,7 @@ import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.post.query.PostQueryRepository;
 import com.nameless.spin_off.repository.post.query.QuerydslPostQueryRepository;
 import com.nameless.spin_off.service.post.JpaPostService;
 import com.nameless.spin_off.service.post.PostService;
@@ -30,8 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class PostRepositoryTest {
 
-    @Autowired
-    QuerydslPostQueryRepository querydslPostQueryRepository;
+    @Autowired PostQueryRepository postQueryRepository;
     @Autowired PostRepository postRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
@@ -53,7 +53,7 @@ public class PostRepositoryTest {
                 int i = (int) (Math.random() * 10);
 
                 if (i % 3 == 0) {
-                    collection.addCollectedPost(CollectedPost.createCollectedPosts(post));
+                    collection.addCollectedPostByPost(post);
                 }
             }
         }
@@ -65,6 +65,4 @@ public class PostRepositoryTest {
 
         }
     }
-
-
 }

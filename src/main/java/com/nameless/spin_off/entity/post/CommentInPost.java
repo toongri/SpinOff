@@ -44,10 +44,9 @@ public class Comment extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Comment createComment(Post post, Member member, String content) {
+    public static Comment createComment(Member member, String content) {
 
         Comment comment = new Comment();
-        comment.updatePost(post);
         comment.updateMember(member);
         comment.updateContent(content);
 

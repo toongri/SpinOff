@@ -2,6 +2,7 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.nameless.spin_off.entity.post.*;
 import com.querydsl.core.annotations.QueryProjection;
@@ -48,9 +49,9 @@ public class PostDto {
         private String title;
         private String content;
         private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
-        private List<PostedHashtag> postedHashtags = new ArrayList<>();
         private List<PostedMedia> postedMedias = new ArrayList<>();
-        private List<PostedMovie> postedMovies = new ArrayList<>();
+        private List<Hashtag> hashtags = new ArrayList<>();
+        private List<Movie> movies = new ArrayList<>();
 
         public PostBuilder setMember(Member member) {
             this.member = member;
@@ -72,8 +73,8 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setPostedHashTags(List<PostedHashtag> postedHashtags) {
-            this.postedHashtags.addAll(postedHashtags);
+        public PostBuilder setHashTags(List<Hashtag> hashtags) {
+            this.hashtags.addAll(hashtags);
             return this;
         }
 
@@ -82,13 +83,13 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setPostedMovies(List<PostedMovie> postedMovies) {
-            this.postedMovies.addAll(postedMovies);
+        public PostBuilder setMovies(List<Movie> movies) {
+            this.movies.addAll(movies);
             return this;
         }
 
         public Post build() {
-            return Post.createPost(member, title, content, postedHashtags, postedMedias, postedMovies, publicOfPostStatus);
+            return Post.createPost(member, title, content, hashtags, postedMedias, movies, publicOfPostStatus);
         }
     }
 }

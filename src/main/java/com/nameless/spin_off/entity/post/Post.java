@@ -3,6 +3,7 @@ package com.nameless.spin_off.entity.post;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -35,7 +36,7 @@ public class Post extends BaseTimeEntity {
     private PublicOfPostStatus publicOfPostStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Comment> comments = new ArrayList<>();
+    private List<CommentInPost> commentInPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<LikedPost> likedPosts = new ArrayList<>();
@@ -62,56 +63,68 @@ public class Post extends BaseTimeEntity {
 
     //==연관관계 메소드==//
 
-    public void addViewedPostByIp(ViewedPostByIp viewedPostByIp) {
+    public void addPostedMedia(PostedMedia postedMedia) {
+        this.postedMedias.add(postedMedia);
+        postedMedia.updatePost(this);
+    }
+
+    public void addViewedPostByIp(String ip) {
+        ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip);
+
         this.viewedPostByIps.add(viewedPostByIp);
         viewedPostByIp.updatePost(this);
         this.updateViewCount();
     }
 
-    public void addVisitedPostByMember(VisitedPostByMember visitedPostByMember) {
+    public void addVisitedPostByMember(Member member) {
+        VisitedPostByMember visitedPostByMember = VisitedPostByMember.createVisitedPostByMember(member);
+
         this.visitedPostByMembers.add(visitedPostByMember);
         visitedPostByMember.updatePost(this);
     }
 
-    public void addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.updatePost(this);
+    public void addCommentByMemberAndContent(Member member, String content) {
+        CommentInPost commentInPost = CommentInPost.createCommentInPost(member, content);
+
+        this.commentInPosts.add(commentInPost);
+        commentInPost.updatePost(this);
         this.updateCommentCount();
     }
 
-    public void addPostLike(LikedPost likedPost) {
+    public void addLikedPostByMember(Member member) {
+        LikedPost likedPost = LikedPost.createLikedPost(member);
+
         this.likedPosts.add(likedPost);
         likedPost.updatePost(this);
         this.updateLikeCount();
     }
 
-    public void addPostedHashTag(PostedHashtag postedHashTag) {
-        this.postedHashtags.add(postedHashTag);
-        postedHashTag.updatePost(this);
+    public void addPostedHashtagByHashtag(Hashtag hashtag) {
+        PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag);
+
+        this.postedHashtags.add(postedHashtag);
+        postedHashtag.updatePost(this);
     }
 
-    public void addMedia(PostedMedia postedMedia) {
-        this.postedMedias.add(postedMedia);
-        postedMedia.updatePost(this);
-    }
+    public void addPostedMovieByMovie(Movie movie) {
+        PostedMovie postedMovie = PostedMovie.createPostedMovie(movie);
 
-    public void addMovieInPost(PostedMovie postedMovie) {
         this.postedMovies.add(postedMovie);
         postedMovie.updatePost(this);
     }
 
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content,
-                                  List<PostedHashtag> postedHashtags, List<PostedMedia> postedMedia,
-                                  List<PostedMovie> postedMovies, PublicOfPostStatus publicOfPostStatus) {
+                                  List<Hashtag> hashtags, List<PostedMedia> postedMedias,
+                                  List<Movie> movies, PublicOfPostStatus publicOfPostStatus) {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
         post.updateContent(content);
-        post.updatePostedHashtag(postedHashtags);
-        post.updateMedia(postedMedia);
+        post.updatePostedHashtagsByHashtags(hashtags);
+        post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
-        post.updateMovieInPost(postedMovies);
+        post.updatePostedMoviesByMovies(movies);
         post.updateViewCountToZero();
         post.updateCollectionCountToZero();
         post.updateCommentCountToZero();
@@ -161,21 +174,21 @@ public class Post extends BaseTimeEntity {
         this.collectionCount = this.collectionCount + 1;
     }
 
-    public void updateMedia(List<PostedMedia> postedMedias) {
+    public void updatePostedMedias(List<PostedMedia> postedMedias) {
         for (PostedMedia postedMedia : postedMedias) {
-            this.addMedia(postedMedia);
+            this.addPostedMedia(postedMedia);
         }
     }
 
-    public void updatePostedHashtag(List<PostedHashtag> postedHashtags) {
-        for (PostedHashtag postedHashTag : postedHashtags) {
-            this.addPostedHashTag(postedHashTag);
+    public void updatePostedHashtagsByHashtags(List<Hashtag> hashtags) {
+        for (Hashtag hashtag : hashtags) {
+            this.addPostedHashtagByHashtag(hashtag);
         }
     }
 
-    public void updateMovieInPost(List<PostedMovie> postedMovies) {
-        for (PostedMovie postedMovie : postedMovies) {
-            this.addMovieInPost(postedMovie);
+    public void updatePostedMoviesByMovies(List<Movie> movies) {
+        for (Movie movie : movies) {
+            this.addPostedMovieByMovie(movie);
         }
     }
 

@@ -155,13 +155,13 @@ public class InitTest {
 
             for (int i = members.size(); i < collections.size(); i++) {
                 for (int j : lists.get(i - members.size())) {
-                    collections.get(i).addCollectedPost(CollectedPost.createCollectedPosts(posts.get(j)));
+                    collections.get(i).addCollectedPostByPost(posts.get(j));
                 }
             }
         }
 
-        private List<PostedHashtag> otoTstMeth(List<String> strings, List<Hashtag> hashtags) {
-            return hashtags.stream().filter(hashtag -> strings.contains(hashtag.getContent())).map(PostedHashtag::createPostedHashtag).collect(Collectors.toList());
+        private List<Hashtag> otoTstMeth(List<String> strings, List<Hashtag> hashtags) {
+            return hashtags.stream().filter(hashtag -> strings.contains(hashtag.getContent())).collect(Collectors.toList());
         }
     }
 }

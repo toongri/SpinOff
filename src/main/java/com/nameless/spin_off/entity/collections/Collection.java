@@ -2,6 +2,7 @@ package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -29,8 +30,6 @@ public class Collection extends BaseTimeEntity {
 
     private String content;
 
-    private Long view;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
     private PublicOfCollectionStatus publicOfCollectionStatus;
@@ -50,6 +49,9 @@ public class Collection extends BaseTimeEntity {
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
+    private Long viewCount;
+    private Long likeCount;
+
     //==연관관계 메소드==//
     public void addViewedCollectionByIp(ViewedCollectionByIp viewedCollectionByIp) {
         this.viewedCollectionByIps.add(viewedCollectionByIp);
@@ -61,19 +63,26 @@ public class Collection extends BaseTimeEntity {
         visitedCollectionByMember.updateCollections(this);
     }
 
-    public void addLikedCollection(LikedCollection likedCollection) {
+    public void addLikedCollectionByMember(Member member) {
+        LikedCollection likedCollection = LikedCollection.createLikedCollections(member);
+
         this.likedCollections.add(likedCollection);
         likedCollection.updateCollections(this);
     }
 
-    public void addFollowedCollection(FollowedCollection followedCollection) {
+    public void addFollowedCollectionByMember(Member member) {
+        FollowedCollection followedCollection = FollowedCollection.createFollowedCollections(member);
+
         this.followedCollections.add(followedCollection);
         followedCollection.updateCollections(this);
     }
-    public void addCollectedPost(CollectedPost collectedPost) {
+
+    public void addCollectedPostByPost(Post post) {
+        CollectedPost collectedPost = CollectedPost.createCollectedPosts(post);
+
         this.collectedPosts.add(collectedPost);
         collectedPost.updateCollections(this);
-        collectedPost.getPost().updateCollectionCount();
+        post.updateCollectionCount();
     }
 
     //==생성 메소드==//
@@ -85,7 +94,7 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(title);
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
-        collection.updateViewToZero();
+        collection.updateViewCountToZero();
         return collection;
 
     }
@@ -100,7 +109,7 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DEFAULT_COLLECTION_TITLE);
         collection.updateContent(DEFAULT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DEFAULT_COLLECTION_PUBLIC_STATUS);
-        collection.updateViewToZero();
+        collection.updateViewCountToZero();
 
         return collection;
 
@@ -116,7 +125,7 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DOCENT_COLLECTION_TITLE);
         collection.updateContent(DOCENT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DOCENT_COLLECTION_PUBLIC_STATUS);
-        collection.updateViewToZero();
+        collection.updateViewCountToZero();
 
         return collection;
 
@@ -124,12 +133,12 @@ public class Collection extends BaseTimeEntity {
 
     //==수정 메소드==//
 
-    public void updateViewToZero() {
-        this.view = 0L;
+    public void updateViewCountToZero() {
+        this.viewCount = 0L;
     }
 
-    public void updateView() {
-        this.view = this.view + 1;
+    public void updateViewCount() {
+        this.viewCount = this.viewCount + 1;
     }
 
     private void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
