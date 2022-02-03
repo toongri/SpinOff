@@ -4,7 +4,6 @@
   width: 236px;
   border-radius: 20px;
   overflow: hidden;
-  
   background-color: #fff;
   line-height: 0;
   width: 236px;
@@ -13,6 +12,8 @@
 
   .content {
     border-radius: 20px;
+    top: 0;
+    position: relative;
     .content-details {
       position: absolute;
       text-align: center;
@@ -47,6 +48,7 @@
 
     img{
       border-radius: 20px;
+     
     }
 
     &:hover{

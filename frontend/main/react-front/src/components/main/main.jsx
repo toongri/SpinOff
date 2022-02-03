@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import ItemsDetail from "../itemsDetail/itemsDetail";
 import { Button } from "react-bootstrap";
 import "./main.scss";
@@ -8,64 +8,70 @@ import { useNavigate } from "react-router-dom";
 import Masonry from "react-masonry-css";
 import ControlledCarousel from "../controlledCarousel/controlledCarousel";
 import Slider from '../slider/Slider.jsx';
-import ToggleButton from './toggleButton'
+import ToggleButton from './toggleButton';
+import {useSelector, useDispatch} from 'react-redux';
 
-const useStyle = makeStyles({
-  btn: {
-    color: "black",
-  },
-});
-
-const breakpointColumnsObj = {
-  default: 5,
-  1500: 4,
-  1100: 3,
-  700: 2,
-  500: 1,
-};
-
-const Main = ({ onSearch, items }) => {
-  
+const Main = () => {
   let navigate = useNavigate();
+  const hasMore = useSelector(state => state.hasMore);  
+  const pageNumber = useSelector(state => state.pageNumber);
+  const dispatch = useDispatch();
+  const loading = useSelector(state => state.loading);
 
-  const sample = [
-    "https://cdn.pixabay.com/photo/2020/09/02/20/52/dock-5539524__340.jpg",
-    "https://cdn.pixabay.com/photo/2021/02/03/13/54/cupcake-5978060__340.jpg",
-    "https://cdn.pixabay.com/photo/2020/05/25/20/14/holland-iris-5220407__340.jpg",
-    "https://cdn.pixabay.com/photo/2020/10/08/17/39/waves-5638587__340.jpg",
-    "https://cdn.pixabay.com/photo/2019/01/30/11/17/zebra-3964360__340.jpg",
-    "https://cdn.pixabay.com/photo/2021/02/01/13/37/cars-5970663__340.png",
-    "https://cdn.pixabay.com/photo/2019/06/05/10/34/mimosa-4253396__340.jpg",
-    "https://cdn.pixabay.com/photo/2020/08/04/14/42/sky-5463015__340.jpg",
-    "https://cdn.pixabay.com/photo/2021/02/03/13/54/cupcake-5978060__340.jpg",
-    "https://cdn.pixabay.com/photo/2020/01/09/01/00/the-eye-on-the-greek-4751572__340.png",
-    "https://cdn.pixabay.com/photo/2021/01/30/12/19/couple-5963678__340.png",
-    "https://cdn.pixabay.com/photo/2021/01/23/07/53/dogs-5941898__340.jpg",
-    "https://cdn.pixabay.com/photo/2020/06/15/01/06/sunset-5299957__340.jpg",
-  ];
+  const observer = useRef();
+  const lastItemElement = useCallback(node =>{
+    if(loading) return
+    if(observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver(entries =>{
+      if(entries[0].isIntersecting && hasMore){
+        dispatch({
+         type: "UPDATE",
+         pageNumber: pageNumber + 1
+        })
+      }
+    }, [hasMore])=-
+    if(node) observer.current.observe(node);
+  })
+
+  const query = useSelector(state => state.query)
+
+  const items = useSelector((state) => {
+      console.log(state.items)
+      return state.items
+  })
 
   return (
     <>
+    
       <div className="main-container">
-      
         <div className="img-container">
           <div className = "controlledCarousel-container">
             <ControlledCarousel></ControlledCarousel>
           </div>
-
+       
           <div className="toggle-switch-container">
             <span className = "following-container">팔로잉</span>
             <ToggleButton />
             <span className = "found-container">발견</span>
           </div>
-
         </div>
       
-        
         <div className="container">
           <div className="masonry-container">
               {
-                sample.map((item, index) => {
+                
+                items.map((item, index) => {
+                  if(items.length === index + 1){
+                    return <ItemsDetail
+                      style={{
+                        width: "278px",
+                      }}
+                      key={index}
+                      item={item}
+                      ref = {lastItemElement}
+                    />
+                  }else{
                   return (
                     <ItemsDetail
                       style={{
@@ -75,7 +81,10 @@ const Main = ({ onSearch, items }) => {
                       item={item}
                     />
                 );
-              })}
+                  }
+              })
+              
+              }
           </div>
           <div className="buttonGroup">
           <div className="buttonBox1">
@@ -126,6 +135,7 @@ const Main = ({ onSearch, items }) => {
           </div>
         </div>
       </div>
+     
     </>
   );
 };

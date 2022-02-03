@@ -1,12 +1,55 @@
 @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Roboto:wght@400;700&display=swap");
 
 :root {
-  --background-color: #f5f6fa;
+  --background-color: #f1f2f6;
   --hover-background: #bdc3c7;
 }
+
+
+.input-container{
+  border: 0;
+  border-radius: 20px;
+  position: fixed;
+  top: 12vh;
+  width: 52.5%;
+  height: 5vh;
+  z-Index: 1;
+.data-container{
+  width: 100%;
+  display: flex;
+  position: relative;
+  border-radius: 20px;
+  .input-select-container{
+    width: 100%;
+    position: relative;
 .input{
   outline: none;
+  border: 0;
+  width: 100%;
+  position: absolute;
+  height: 100%;
+  background-color: #f1f2f6;
+  border-radius: 0 20px 20px 0;
   &:focus, &:hover{
     outline: none !important;
   }
+}
+
+.select{
+  position: absolute;
+  right:0;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 0.9rem;
+  background-color: var(--background-color);
+  outline: none;
+  border: 0;
+  height: 100%;
+  &:focus{
+    border: 1px solid pink;
+    outline: none;
+  }
+}
+}
+}
 }
