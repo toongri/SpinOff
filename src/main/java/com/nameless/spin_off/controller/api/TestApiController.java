@@ -6,6 +6,7 @@ import com.nameless.spin_off.exception.member.NoSuchMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.query.PostQueryRepository;
+import com.nameless.spin_off.repository.post.query.QuerydslPostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;

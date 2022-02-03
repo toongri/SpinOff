@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class PostJpaService implements PostService{
+public class JpaPostService implements PostService{
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -37,6 +37,7 @@ public class PostJpaService implements PostService{
     private final CollectionRepository collectionRepository;
 
     @Transactional(readOnly = false)
+    @Override
     public Long savePostByPostVO(CreatePostVO postVO) throws NoSuchMemberException {
 
         Member member = getMemberById(postVO.getMemberId());

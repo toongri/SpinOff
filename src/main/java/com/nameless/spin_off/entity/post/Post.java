@@ -1,7 +1,6 @@
 package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.PostedMovie;
@@ -31,8 +30,6 @@ public class Post extends BaseTimeEntity {
 
     private String content;
 
-    private Long view;
-
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_post_status")
     private PublicOfPostStatus publicOfPostStatus;
@@ -58,11 +55,17 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<VisitedPostByMember> visitedPostByMembers = new ArrayList<>();
 
+    private Long viewCount;
+    private Long likeCount;
+    private Long commentCount;
+    private Long collectionCount;
+
     //==연관관계 메소드==//
 
     public void addViewedPostByIp(ViewedPostByIp viewedPostByIp) {
         this.viewedPostByIps.add(viewedPostByIp);
         viewedPostByIp.updatePost(this);
+        this.updateViewCount();
     }
 
     public void addVisitedPostByMember(VisitedPostByMember visitedPostByMember) {
@@ -73,11 +76,13 @@ public class Post extends BaseTimeEntity {
     public void addComment(Comment comment) {
         this.comments.add(comment);
         comment.updatePost(this);
+        this.updateCommentCount();
     }
 
     public void addPostLike(LikedPost likedPost) {
         this.likedPosts.add(likedPost);
         likedPost.updatePost(this);
+        this.updateLikeCount();
     }
 
     public void addPostedHashTag(PostedHashtag postedHashTag) {
@@ -107,7 +112,10 @@ public class Post extends BaseTimeEntity {
         post.updateMedia(postedMedia);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateMovieInPost(postedMovies);
-        post.updateViewToZero();
+        post.updateViewCountToZero();
+        post.updateCollectionCountToZero();
+        post.updateCommentCountToZero();
+        post.updateLikeCountToZero();
 
         return post;
     }
@@ -121,12 +129,36 @@ public class Post extends BaseTimeEntity {
         this.publicOfPostStatus = publicStatus;
     }
 
-    public void updateViewToZero() {
-        this.view = 0L;
+    public void updateViewCountToZero() {
+        this.viewCount = 0L;
     }
 
-    public void updateView() {
-        this.view = this.view + 1;
+    public void updateViewCount() {
+        this.viewCount = this.viewCount + 1;
+    }
+
+    public void updateLikeCountToZero() {
+        this.likeCount = 0L;
+    }
+
+    public void updateLikeCount() {
+        this.likeCount = this.likeCount + 1;
+    }
+
+    public void updateCommentCountToZero() {
+        this.commentCount = 0L;
+    }
+
+    public void updateCommentCount() {
+        this.commentCount = this.commentCount + 1;
+    }
+
+    public void updateCollectionCountToZero() {
+        this.collectionCount = 0L;
+    }
+
+    public void updateCollectionCount() {
+        this.collectionCount = this.collectionCount + 1;
     }
 
     public void updateMedia(List<PostedMedia> postedMedias) {

@@ -11,6 +11,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -27,7 +28,7 @@ public class Member extends BaseTimeEntity {
     private String accountPw;
     private String name;
     private String nickname;
-    private LocalDateTime birth;
+    private LocalDate birth;
     private String phoneNumber;
     private String email;
     private String profileImg;
@@ -36,7 +37,7 @@ public class Member extends BaseTimeEntity {
 
     //==생성 메소드==//
     public static Member createMember(String accountId, String accountPw, String nickname, String profileImg,
-                                      String name, LocalDateTime birth, String phoneNumber, String email) {
+                                      String name, LocalDate birth, String phoneNumber, String email) {
 
         Member member = new Member();
         member.updateAccountId(accountId);
@@ -82,7 +83,7 @@ public class Member extends BaseTimeEntity {
         this.phoneNumber = phoneNumber;
     }
 
-    private void updateBirth(LocalDateTime birth) {
+    private void updateBirth(LocalDate birth) {
         this.birth = birth;
     }
 

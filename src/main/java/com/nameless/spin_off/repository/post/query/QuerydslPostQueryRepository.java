@@ -23,12 +23,12 @@ import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 @RequiredArgsConstructor
-public class PostQueryRepository {
+public class QuerydslPostQueryRepository implements PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Slice<MainPagePost> findPostsOrderByCreatedDateBySlicing(
-            Pageable pageable) {
+    @Override
+    public Slice<MainPagePost> findPostsOrderByCreatedDateBySlicing(Pageable pageable) {
 
         List<MainPagePost> content = jpaQueryFactory
                 .select(new QPostDto_MainPagePost(
@@ -57,6 +57,7 @@ public class PostQueryRepository {
 //        return PageableExecutionUtils.getPage(posts, pageable, () -> countQuery.fetch().size());
     }
 
+    @Override
     public Slice<MainPagePost> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 

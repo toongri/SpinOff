@@ -4,6 +4,7 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MemberDto {
@@ -14,7 +15,7 @@ public class MemberDto {
         private String accountPw;
         private String name;
         private String nickname = null;
-        private LocalDateTime birth;
+        private LocalDate birth;
         private String phoneNumber;
         private String email;
         private String profileImg = null;
@@ -39,7 +40,7 @@ public class MemberDto {
             return this;
         }
 
-        public MemberBuilder setBirth(LocalDateTime birth) {
+        public MemberBuilder setBirth(LocalDate birth) {
             this.birth = birth;
             return this;
         }

@@ -73,6 +73,7 @@ public class Collection extends BaseTimeEntity {
     public void addCollectedPost(CollectedPost collectedPost) {
         this.collectedPosts.add(collectedPost);
         collectedPost.updateCollections(this);
+        collectedPost.getPost().updateCollectionCount();
     }
 
     //==생성 메소드==//

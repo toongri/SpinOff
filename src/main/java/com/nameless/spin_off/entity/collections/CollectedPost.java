@@ -35,7 +35,6 @@ public class CollectedPost extends BaseTimeEntity {
     public static CollectedPost createCollectedPosts(Post post) {
         CollectedPost collectedPost = new CollectedPost();
         collectedPost.updatePost(post);
-
         return collectedPost;
 
     }

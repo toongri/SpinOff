@@ -4,18 +4,30 @@ import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.nameless.spin_off.entity.post.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.querydsl.core.annotations.QueryProjection;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
 
-    @Getter
-    @Setter
+    @Data
+    @NoArgsConstructor
+    public static class MainPagePost {
+        private String imgUrl;
+        private String title;
+        private String memberProfileImg;
+
+        @QueryProjection
+        public MainPagePost(String imgUrl, String title, String memberProfileImg) {
+            this.imgUrl = imgUrl;
+            this.title = title;
+            this.memberProfileImg = memberProfileImg;
+        }
+    }
+
+    @Data
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreatePostVO {
