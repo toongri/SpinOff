@@ -14,11 +14,11 @@ import java.util.List;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Comment extends BaseTimeEntity {
+public class CommentInPost extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="comment_id")
+    @Column(name="comment_in_post_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,24 +33,24 @@ public class Comment extends BaseTimeEntity {
 
     private String content;
 
-    @OneToMany(mappedBy = "comment", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<LikedComment> likedComments = new ArrayList<>();
+    @OneToMany(mappedBy = "commentInPost", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<LikedCommentInPost> likedCommentInPosts = new ArrayList<>();
 
     //==연관관계 메소드==//
 
-    public void addCommentLike(LikedComment likedComment) {
-        this.likedComments.add(likedComment);
-        likedComment.updateComment(this);
+    public void addCommentLike(LikedCommentInPost likedCommentInPost) {
+        this.likedCommentInPosts.add(likedCommentInPost);
+        likedCommentInPost.updateCommentInPost(this);
     }
 
     //==생성 메소드==//
-    public static Comment createComment(Member member, String content) {
+    public static CommentInPost createCommentInPost(Member member, String content) {
 
-        Comment comment = new Comment();
-        comment.updateMember(member);
-        comment.updateContent(content);
+        CommentInPost commentInPost = new CommentInPost();
+        commentInPost.updateMember(member);
+        commentInPost.updateContent(content);
 
-        return comment;
+        return commentInPost;
 
     }
 

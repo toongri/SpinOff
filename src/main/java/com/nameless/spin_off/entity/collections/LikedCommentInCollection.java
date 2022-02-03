@@ -1,7 +1,8 @@
-package com.nameless.spin_off.entity.post;
+package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.CommentInPost;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,11 +13,11 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LikedPost extends BaseTimeEntity {
+public class LikedCommentInCollection extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="liked_post_id")
+    @Column(name="liked_comment_in_collection_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,30 +26,19 @@ public class LikedPost extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "comment_in_collection_id")
     @NotNull
-    private Post post;
+    private CommentInCollection commentInCollection;
+
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static LikedPost createLikedPost(Member member) {
-        LikedPost likedPost = new LikedPost();
-        likedPost.updateMember(member);
-
-        return likedPost;
-
-    }
 
     //==수정 메소드==//
-    public void updatePost(Post post) {
-        this.post = post;
+    public void updateCommentInCollection(CommentInCollection commentInCollection) {
+        this.commentInCollection = commentInCollection;
     }
-
-    private void updateMember(Member member) {
-        this.member = member;
-    }
-
     //==비즈니스 로직==//
 
     //==조회 로직==//
