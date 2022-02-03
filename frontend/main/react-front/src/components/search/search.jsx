@@ -1,42 +1,85 @@
 import React, {useRef, useEffect, useState} from 'react';
 import './search.scss';
 import Button from 'react-bootstrap/Button'
-import InputGroup from 'react-bootstrap/InputGroup'
-import FormControl from 'react-bootstrap/FormControl'
 import {FiSearch} from'react-icons/fi';
+import {useDispatch} from 'react-redux';
+import axios from 'axios';
 
-const Search = ({ onSearch, items }) => {
-  const inputRef = useRef();
-  const popupRef = useRef('null');
-  const [value, setValue] = useState('');
+const Search = () => {
+  const inputRef = useRef('');
+  const [query, setQuery] = useState('');
+  const [hasMore, setHasMore] = useState(false);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
 
+  const dispatch = useDispatch();
 
-  const handleSearch = () => {
-    const value = inputRef.current.value;
-    console.log(value);
-    setValue(value);
-    onSearch(value);
+  const handleSearch = (e) => {
+    const query = inputRef.current.value;
+    console.log(query)
+    setQuery(query);
+    inputRef.current.value = "";
   }
 
-  const activePopup = () =>{
-    popupRef.current.style.display = 'flex';
-  }
+  useEffect(() =>{
+    setData([])
+  }, [query]);
 
-  const nonactivePopup = () =>{
-    popupRef.current.style.display = 'none';
-  }
+  useEffect(() =>{
+    let cancel;
+   setLoading(true);
 
-  const onKeyPress = (e) => {
-   if(e.key === 'Enter'){
-    handleSearch();
-   }
-  }
+    axios.get(`url${query}`,{
+      cancelToken: axios.CancelToken((c) => cancel = c)
+    })
+    .then((res) =>{
+      setData(prevItems =>{
+        return [...new Set([...prevItems, res.data])]
+      })
+      
+      setHasMore(res.data > 0);
+      setLoading(false);
+
+         dispatch({
+         type: "SEARCH",
+         query: query,
+         items: data,
+         hasMore: hasMore,
+         loading: loading
+      })
+    })
+    .catch((e) =>{
+      // dispatch({
+      //    type: "SEARCH",
+      //    query: query,
+      //    items: ['Hello World', 'adfa'],
+      // })
+     
+      if(axios.isCancel(e)) return
+    })
+
+    return () => cancel();
+
+  }, [query])
+  // const activePopup = () =>{
+  //   // popupRef.current.style.display = 'flex';
+  // }
+
+  // const nonactivePopup = () =>{
+  //   // popupRef.current.style.display = 'none';
+  // }
+
+  // const onKeyPress = (e) => {
+  //  if(e.key === 'Enter'){
+  //   handleSearch();
+  //  }
+  // }
 
 
-  const handleSubmit = () =>{
-    console.log(value);
-    handleSearch();
-  }
+  // const handleSubmit = () =>{
+  //   console.log(value);
+  //   handleSearch();
+  // }
 
   return (
     <>
@@ -46,19 +89,11 @@ const Search = ({ onSearch, items }) => {
         justifyContent: 'center'
       }
     }>
-    <InputGroup
-     className="mb-3"
-     style={{
-       border: '0',
-      borderRadius:'20px',
-      position:'fixed',
-      top: '12vh',
-      width: "52.5%",
-      height: "5vh",
-      zIndex: '1',
-      
-    }}
+    
+    <div
+     className="input-container"
      >
+     <div class = 'data-container'>
     <Button
      id="button-addon1"
      style={{
@@ -66,27 +101,41 @@ const Search = ({ onSearch, items }) => {
        backgroundColor: '#f1f2f6',
        color: "black",
        borderRadius: "20px 0 0 20px",
-       paddingLeft:'30px'
+       padding:'6px 10px 6px 13px'
      }
     }
+     onClick = {handleSearch}
      > 
      <FiSearch 
      size = {22}
      style = {{
        color: '#f24860'
-     }}></FiSearch>
+     }}
+      onClick = {handleSearch}
+     ></FiSearch>
     </Button>
-    <FormControl
-        className='input'
-        style={{
-          border: '0', 
-          backgroundColor: '#f1f2f6',
-          borderRadius:'0 20px 20px 0'
-        }}
+    <div className = "input-select-container">
+    <input
+      ref = {inputRef}
+      className='input'
       aria-label="Example text with button addon"
       aria-describedby="basic-addon1"
+      onKeyPress = {(e) => {
+        if(e.key === 'Enter'){
+          handleSearch();
+        }
+        }}
     />
-  </InputGroup>
+    <select className = "select">
+      <option>ALL</option>
+      <option>컬렉션</option>
+      <option>큐레이터</option>
+      <option>도슨트</option>
+      <option>영화</option>
+    </select>
+    </div>
+  </div>
+  </div>
   </div>
     </>
   );

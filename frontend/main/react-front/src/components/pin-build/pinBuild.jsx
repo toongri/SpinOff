@@ -49,6 +49,7 @@ const PinBuild = () => {
     })
     .then((res) =>{
      console.log(res.data)
+     console.log('success')
     })
     .catch((err) =>{
       console.log('error')

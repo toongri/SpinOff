@@ -44,6 +44,7 @@ const ItemsDetail = ({ item, key }) => {
         </div>
 
       </div>
+     
     </div>
   );
 };
