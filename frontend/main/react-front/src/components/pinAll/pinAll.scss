@@ -1,0 +1,46 @@
+.container {
+    width: 100%;
+    top: 23vh;
+    position: absolute;
+    .tags-container{
+      margin: 0 6.3%;
+      position: relative;
+     
+        span{
+            padding: 10px;
+            border: 1px solid;
+            margin: 0 7px;
+            border-radius: 22px;
+            border: 1px solid #f24860;
+        }
+    }
+
+  .slider slider-nav {
+    h3 {
+      background: #fff;
+      color: #3498db;
+      font-size: 36px;
+      line-height: 100px;
+      margin: 10px;
+      padding: 2%;
+      position: relative;
+      text-align: center;
+    }
+    .action {
+      display: block;
+      margin: 100px auto;
+      width: 100%;
+      text-align: center;
+      & a {
+        display: inline-block;
+        padding: 5px 10px;
+        background: #f30;
+        color: #fff;
+        text-decoration: none;
+      }
+      & a:hover {
+        background: #000;
+      }
+    }
+  }
+}
