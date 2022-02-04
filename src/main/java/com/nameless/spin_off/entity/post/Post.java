@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -83,12 +84,10 @@ public class Post extends BaseTimeEntity {
         visitedPostByMember.updatePost(this);
     }
 
-    public void addCommentByMemberAndContent(Member member, String content) {
-        CommentInPost commentInPost = CommentInPost.createCommentInPost(member, content);
-
+    public void addCommentInPost(CommentInPost commentInPost) {
         this.commentInPosts.add(commentInPost);
         commentInPost.updatePost(this);
-        this.updateCommentCount();
+        this.updateCommentInPostCount();
     }
 
     public void addLikedPostByMember(Member member) {
@@ -125,10 +124,7 @@ public class Post extends BaseTimeEntity {
         post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updatePostedMoviesByMovies(movies);
-        post.updateViewCountToZero();
-        post.updateCollectionCountToZero();
-        post.updateCommentCountToZero();
-        post.updateLikeCountToZero();
+        post.updateCountToZero();
 
         return post;
     }
@@ -138,36 +134,28 @@ public class Post extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-    public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
-        this.publicOfPostStatus = publicStatus;
+
+    public void updateCountToZero() {
+        this.viewCount = 0L;
+        this.likeCount = 0L;
+        this.commentCount = 0L;
+        this.collectionCount = 0L;
     }
 
-    public void updateViewCountToZero() {
-        this.viewCount = 0L;
+    public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
+        this.publicOfPostStatus = publicStatus;
     }
 
     public void updateViewCount() {
         this.viewCount = this.viewCount + 1;
     }
 
-    public void updateLikeCountToZero() {
-        this.likeCount = 0L;
-    }
-
     public void updateLikeCount() {
         this.likeCount = this.likeCount + 1;
     }
 
-    public void updateCommentCountToZero() {
-        this.commentCount = 0L;
-    }
-
-    public void updateCommentCount() {
+    public void updateCommentInPostCount() {
         this.commentCount = this.commentCount + 1;
-    }
-
-    public void updateCollectionCountToZero() {
-        this.collectionCount = 0L;
     }
 
     public void updateCollectionCount() {

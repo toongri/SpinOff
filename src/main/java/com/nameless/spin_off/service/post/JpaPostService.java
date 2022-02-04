@@ -11,6 +11,7 @@ import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PostedHashtag;
 import com.nameless.spin_off.exception.member.NoSuchMemberException;
+import com.nameless.spin_off.exception.post.NoSuchPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -64,6 +65,16 @@ public class JpaPostService implements PostService{
         return postRepository.save(post).getId();
     }
 
+    @Transactional(readOnly = false)
+    @Override
+    public Post saveLikedPostByMemberIdAndPostId(Long memberId, Long postId) throws NoSuchMemberException, NoSuchPostException {
+        Member member = getMemberById(memberId);
+        Post post = getPostById(postId);
+        post.addLikedPostByMember(member);
+
+        return post;
+    }
+
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) {
         List<Hashtag> alreadySavedHashtags = hashtagRepository.findTagsByContentIn(hashtagContents);
         List<String> contentsAboutAlreadySavedHashtags =
@@ -88,5 +99,11 @@ public class JpaPostService implements PostService{
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
         return optionalMember.orElseThrow(NoSuchMemberException::new);
+    }
+
+    private Post getPostById(Long postId) throws NoSuchPostException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+
+        return optionalPost.orElseThrow(NoSuchPostException::new);
     }
 }
