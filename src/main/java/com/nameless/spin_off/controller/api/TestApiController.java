@@ -17,14 +17,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Transactional
-@CrossOrigin("*")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/test")
 public class TestApiController {
 
     private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final PostQueryRepository postQueryRepository;
     private final PostService postService;
 
