@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.CommentDto.CreateCommentVO;
+import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -23,7 +22,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaCommentInPostService implements CommentInPostService{
+public class JpaCommentInPostService implements CommentInPostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -34,7 +33,7 @@ public class JpaCommentInPostService implements CommentInPostService{
 
     @Override
     @Transactional(readOnly = false)
-    public CommentInPost saveCommentInPostByCommentVO(CreateCommentVO commentVO) throws NoSuchMemberException, NoSuchPostException, NoSuchCommentInPostException {
+    public CommentInPost saveCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NoSuchMemberException, NoSuchPostException, NoSuchCommentInPostException {
 
         Member member = getMemberById(commentVO.getMemberId());
         Post post = getPostById(commentVO.getPostId());

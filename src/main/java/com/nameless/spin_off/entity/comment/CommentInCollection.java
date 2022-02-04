@@ -40,7 +40,6 @@ public class CommentInCollection extends BaseTimeEntity {
     private List<CommentInCollection> children = new ArrayList<>();
 
     private Boolean isDeleted;
-
     private String content;
 
     @OneToMany(mappedBy = "commentInCollection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -64,8 +63,11 @@ public class CommentInCollection extends BaseTimeEntity {
         CommentInCollection commentInCollection = new CommentInCollection();
         commentInCollection.updateMember(member);
         commentInCollection.updateContent(content);
-        commentInCollection.updateParent(parent);
         commentInCollection.updateIsDeletedToFalse();
+
+        if ( parent != null) {
+            parent.addChildren(commentInCollection);
+        }
 
         return commentInCollection;
 
@@ -95,6 +97,7 @@ public class CommentInCollection extends BaseTimeEntity {
     private void updateIsDeletedToTrue() {
         isDeleted = Boolean.TRUE;
     }
+
     //==비즈니스 로직==//
 
     //==조회 로직==//

@@ -1,9 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.CommentDto.CreateCommentVO;
+import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.NoSuchCommentInPostException;
 import com.nameless.spin_off.exception.member.NoSuchMemberException;
 import com.nameless.spin_off.exception.post.NoSuchPostException;
@@ -23,7 +21,7 @@ public class CommentApiController {
     private final CommentInPostService commentInPostService;
 
     @PostMapping("/post")
-    public PostApiResult createLikeOne(@RequestBody CreateCommentVO commentVO) throws NoSuchMemberException, NoSuchPostException, NoSuchCommentInPostException {
+    public PostApiResult createLikeOne(@RequestBody CreateCommentInPostVO commentVO) throws NoSuchMemberException, NoSuchPostException, NoSuchCommentInPostException {
         CommentInPost commentInPost = commentInPostService.saveCommentInPostByCommentVO(commentVO);
         return new PostApiResult(commentInPost);
     }

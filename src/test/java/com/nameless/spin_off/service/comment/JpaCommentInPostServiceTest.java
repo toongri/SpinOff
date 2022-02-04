@@ -16,7 +16,6 @@ import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -46,7 +45,7 @@ class JpaCommentInPostServiceTest {
         postRepository.save(post);
 
         //when
-        CommentInPost comment = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentVO(member.getId(), post.getId(), null, "야스히로 라할살"));
+        CommentInPost comment = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), null, "야스히로 라할살"));
         //then
         assertThat(post.getCommentCount()).isEqualTo(post.getCommentInPosts().size());
         assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(comment);
@@ -64,8 +63,8 @@ class JpaCommentInPostServiceTest {
         commentInPostRepository.save(parentComment);
         //when
 
-        CommentInPost childComment1 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentVO(member.getId(), post.getId(), parentComment.getId(), "요지스타 라할살"));
-        CommentInPost childComment2 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentVO(member.getId(), post.getId(), parentComment.getId(), "슈퍼스타검흰 라할살"));
+        CommentInPost childComment1 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), parentComment.getId(), "요지스타 라할살"));
+        CommentInPost childComment2 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), parentComment.getId(), "슈퍼스타검흰 라할살"));
 
         //then
 

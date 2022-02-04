@@ -11,10 +11,21 @@ public class CommentDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateCommentVO {
+    public static class CreateCommentInPostVO {
 
         private Long memberId;
         private Long postId;
+        private Long parentId;
+        private String content;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateCommentInCollectionVO {
+
+        private Long memberId;
+        private Long collectionId;
         private Long parentId;
         private String content;
     }
