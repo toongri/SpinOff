@@ -1,10 +1,12 @@
 package com.nameless.spin_off.repository.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -19,6 +21,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,4 +64,5 @@ class CommentInCollectionRepositoryTest {
         assertThat(comments.getChildren().get(0).getClass()).isEqualTo(CommentInCollection.class);
 
     }
+
 }

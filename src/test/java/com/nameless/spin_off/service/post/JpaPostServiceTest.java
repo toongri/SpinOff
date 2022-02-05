@@ -1,11 +1,9 @@
 package com.nameless.spin_off.service.post;
 
-import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
@@ -15,19 +13,19 @@ import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
 import com.nameless.spin_off.service.comment.CommentInPostService;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import javax.swing.text.html.parser.Entity;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -42,6 +40,7 @@ class JpaPostServiceTest {
     @Autowired CollectionRepository collectionRepository;
     @Autowired LikedPostRepository likedPostRepository;
     @Autowired MemberRepository memberRepository;
+    @Autowired EntityManager em;
 
     @Test
     public void 포스트_생성_테스트() throws Exception{
@@ -53,7 +52,7 @@ class JpaPostServiceTest {
         collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.PUBLIC));
         collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.PUBLIC));
 
-        List<Collection> collectionsByMember = collectionRepository.findCollectionsByMember(member);
+        List<Collection> collectionsByMember = collectionRepository.findAllByMember(member);
 
         List<Long> collectionIds = collectionsByMember.stream().map(Collection::getId).collect(Collectors.toList());
 
@@ -121,9 +120,10 @@ class JpaPostServiceTest {
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
+        em.flush();
 
         //when
-        postService.saveLikedPostByMemberIdAndPostId(member.getId(), post.getId());
+        postService.updateLikedPostByMemberId(member.getId(), post.getId());
         //then
 
         List<LikedPost> likedPosts = post.getLikedPosts();
@@ -131,6 +131,29 @@ class JpaPostServiceTest {
         assertThat(likeCount).isEqualTo(1);
         assertThat(likedPosts.size()).isEqualTo(1);
         assertThat(likedPosts.get(0).getMember()).isEqualTo(member);
+
+    }
+    
+    @Test
+    public void 글_조회수_체크() throws Exception{
+        //given
+        LocalDateTime now;
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(post);
+        System.out.println(post.getId());
+        now = LocalDateTime.now();
+        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        em.flush();
+
+        //when
+        now = LocalDateTime.now();
+        Post post2 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        
+        //then
+        assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
+        assertThat(post2.getViewCount()).isEqualTo(1);
 
     }
 

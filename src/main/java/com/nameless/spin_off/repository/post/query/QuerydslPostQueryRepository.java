@@ -1,18 +1,13 @@
 package com.nameless.spin_off.repository.post.query;
 
-import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.dto.PostDto.MainPagePost;
+import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.QPostDto_MainPagePost;
-import com.nameless.spin_off.entity.member.QMember;
 import com.nameless.spin_off.entity.post.*;
-import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
-import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -28,9 +23,9 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<MainPagePost> findPostsOrderByCreatedDateBySlicing(Pageable pageable) {
+    public Slice<MainPagePostDto> findPostsOrderByCreatedDateBySlicing(Pageable pageable) {
 
-        List<MainPagePost> content = jpaQueryFactory
+        List<MainPagePostDto> content = jpaQueryFactory
                 .select(new QPostDto_MainPagePost(
                         member.nickname,
                         post.title,
@@ -58,10 +53,10 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
     }
 
     @Override
-    public Slice<MainPagePost> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
+    public Slice<MainPagePostDto> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
-        List<MainPagePost> content = jpaQueryFactory
+        List<MainPagePostDto> content = jpaQueryFactory
                 .select(new QPostDto_MainPagePost(
                         member.nickname,
                         post.title,

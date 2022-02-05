@@ -32,7 +32,7 @@ public class LikedCollection extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static LikedCollection createLikedCollections(Member member) {
+    public static LikedCollection createLikedCollection(Member member) {
         LikedCollection likedCollection = new LikedCollection();
         likedCollection.updateMember(member);
 

@@ -15,13 +15,13 @@ public class PostDto {
 
     @Data
     @NoArgsConstructor
-    public static class MainPagePost {
+    public static class MainPagePostDto {
         private String imgUrl;
         private String title;
         private String memberProfileImg;
 
         @QueryProjection
-        public MainPagePost(String imgUrl, String title, String memberProfileImg) {
+        public MainPagePostDto(String imgUrl, String title, String memberProfileImg) {
             this.imgUrl = imgUrl;
             this.title = title;
             this.memberProfileImg = memberProfileImg;

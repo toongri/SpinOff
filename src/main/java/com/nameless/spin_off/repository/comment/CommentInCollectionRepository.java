@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface CommentInCollectionRepository extends JpaRepository<CommentInCollection, Long> {
 
-    @Query("SELECT parent FROM CommentInCollection parent JOIN FETCH parent.children " +
+    @Query("SELECT DISTINCT parent FROM CommentInCollection parent  LEFT JOIN FETCH parent.children " +
             "WHERE parent.parent IS NULL AND parent.collection = :collection ORDER BY parent.createdDate DESC")
     List<CommentInCollection> findParentByCollectionIncludeChildrenOrderByDesc(
             @Param("collection") Collection collection);

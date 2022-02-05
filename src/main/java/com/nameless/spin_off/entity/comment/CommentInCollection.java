@@ -42,7 +42,7 @@ public class CommentInCollection extends BaseTimeEntity {
     private Boolean isDeleted;
     private String content;
 
-    @OneToMany(mappedBy = "commentInCollection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "commentInCollection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<LikedCommentInCollection> likedCommentInCollections = new ArrayList<>();
 
     //==연관관계 메소드==//

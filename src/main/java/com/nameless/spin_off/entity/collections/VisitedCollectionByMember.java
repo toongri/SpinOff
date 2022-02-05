@@ -32,9 +32,8 @@ public class VisitedCollectionByMember extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static VisitedCollectionByMember createVisitedCollectionsByMember(Member member, Collection collection) {
+    public static VisitedCollectionByMember createVisitedCollectionByMember(Member member) {
         VisitedCollectionByMember visitedCollectionByMember = new VisitedCollectionByMember();
-        visitedCollectionByMember.updateCollections(collection);
         visitedCollectionByMember.updateMember(member);
 
         return visitedCollectionByMember;

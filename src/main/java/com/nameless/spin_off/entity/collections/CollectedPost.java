@@ -32,7 +32,7 @@ public class CollectedPost extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static CollectedPost createCollectedPosts(Post post) {
+    public static CollectedPost createCollectedPost(Post post) {
         CollectedPost collectedPost = new CollectedPost();
         collectedPost.updatePost(post);
         return collectedPost;

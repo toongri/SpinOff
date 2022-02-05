@@ -35,22 +35,22 @@ public class Collection extends BaseTimeEntity {
     @Column(name = "public_of_collection_status")
     private PublicOfCollectionStatus publicOfCollectionStatus;
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedCollectionByIp> viewedCollectionByIps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<VisitedCollectionByMember> visitedCollectionByMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<LikedCollection> likedCollections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<FollowedCollection> followedCollections = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CommentInCollection> commentInCollections = new ArrayList<>();
 
     private Long viewCount;
@@ -59,32 +59,40 @@ public class Collection extends BaseTimeEntity {
     private Long followCount;
 
     //==연관관계 메소드==//
-    public void addViewedCollectionByIp(ViewedCollectionByIp viewedCollectionByIp) {
+
+    public void addViewedCollectionByIp(String ip) {
+        ViewedCollectionByIp viewedCollectionByIp = ViewedCollectionByIp.createViewedCollectionByIp(ip);
+
         this.viewedCollectionByIps.add(viewedCollectionByIp);
         viewedCollectionByIp.updateCollections(this);
+        this.updateViewCount();
     }
 
-    public void addVisitedCollectionByMember(VisitedCollectionByMember visitedCollectionByMember) {
+    public void addVisitedCollectionByMember(Member member) {
+        VisitedCollectionByMember visitedCollectionByMember = VisitedCollectionByMember.createVisitedCollectionByMember(member);
+
         this.visitedCollectionByMembers.add(visitedCollectionByMember);
         visitedCollectionByMember.updateCollections(this);
     }
 
     public void addLikedCollectionByMember(Member member) {
-        LikedCollection likedCollection = LikedCollection.createLikedCollections(member);
+        LikedCollection likedCollection = LikedCollection.createLikedCollection(member);
 
         this.likedCollections.add(likedCollection);
         likedCollection.updateCollections(this);
+        this.updateLikeCount();
     }
 
     public void addFollowedCollectionByMember(Member member) {
-        FollowedCollection followedCollection = FollowedCollection.createFollowedCollections(member);
+        FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member);
 
         this.followedCollections.add(followedCollection);
         followedCollection.updateCollections(this);
+        this.updateFollowCount();
     }
 
     public void addCollectedPostByPost(Post post) {
-        CollectedPost collectedPost = CollectedPost.createCollectedPosts(post);
+        CollectedPost collectedPost = CollectedPost.createCollectedPost(post);
 
         this.collectedPosts.add(collectedPost);
         collectedPost.updateCollections(this);

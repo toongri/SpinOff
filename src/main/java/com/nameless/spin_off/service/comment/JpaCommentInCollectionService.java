@@ -39,6 +39,7 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
         return commentInCollection;
     }
+
     private CommentInCollection getCommentInCollectionById(Long commentInCollectionId) throws NoSuchCommentInCollectionException {
         if (commentInCollectionId == null)
             return null;

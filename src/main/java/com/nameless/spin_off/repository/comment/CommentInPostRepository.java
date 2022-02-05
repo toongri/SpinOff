@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface CommentInPostRepository extends JpaRepository<CommentInPost, Long> {
 
-    @Query("SELECT parent FROM CommentInPost parent JOIN FETCH parent.children " +
+    @Query("SELECT DISTINCT parent FROM CommentInPost parent LEFT JOIN FETCH parent.children " +
             "WHERE parent.parent IS NULL AND parent.post = :post ORDER BY parent.createdDate DESC")
     List<CommentInPost> findParentByPostIncludeChildrenOrderByDesc(@Param("post") Post post);
 }

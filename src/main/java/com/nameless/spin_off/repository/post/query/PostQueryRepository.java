@@ -9,8 +9,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface PostQueryRepository {
-    Slice<PostDto.MainPagePost> findPostsOrderByCreatedDateBySlicing(Pageable pageable);
-    Slice<PostDto.MainPagePost> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
+    Slice<PostDto.MainPagePostDto> findPostsOrderByCreatedDateBySlicing(Pageable pageable);
+    Slice<PostDto.MainPagePostDto> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime);
     Post testFindOne(Long id);
     public List<Post> testFindAll();

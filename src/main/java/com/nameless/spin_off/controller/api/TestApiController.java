@@ -3,6 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.NoSuchMemberException;
+import com.nameless.spin_off.exception.movie.NoSuchMovieException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.query.PostQueryRepository;
@@ -48,7 +49,7 @@ public class TestApiController {
     }
 
     @PostMapping("/{id}/post")
-    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NoSuchMemberException {
+    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NoSuchMemberException, NoSuchMovieException {
 
         Long postId = postService.savePostByPostVO(createPost);
 

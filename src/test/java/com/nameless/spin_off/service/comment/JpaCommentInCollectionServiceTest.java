@@ -25,6 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 class JpaCommentInCollectionServiceTest {
+
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
     @Autowired HashtagRepository hashtagRepository;

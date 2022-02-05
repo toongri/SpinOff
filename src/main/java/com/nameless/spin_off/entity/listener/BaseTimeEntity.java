@@ -18,10 +18,8 @@ public class BaseTimeEntity {
 
     @CreatedDate
     @Column(updatable = false)
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 
     @LastModifiedDate
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastModifiedDate;
 }

@@ -24,7 +24,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@Rollback(value = false)
+//@Rollback(value = false)
 @SpringBootTest
 @Transactional
 class JpaCommentInPostServiceTest {
