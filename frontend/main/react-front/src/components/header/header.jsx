@@ -91,7 +91,7 @@ const Header = () => {
           </ButtonGroup>
           </div>    
           </nav>
-            {
+            {/* {
               showPopup ? (
                 <div className="popup">
                 <div className="popup_inner">
@@ -107,7 +107,7 @@ const Header = () => {
                 </div>
               </div>
               ): null
-            }
+            } */}
       </div>
     </>
   );

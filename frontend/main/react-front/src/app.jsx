@@ -4,6 +4,7 @@ import Home from './components/home/home';
 import PinBuild from './components/pin-build/pinBuild';
 import Pin from './components/pin/pin';
 import FileUpload from './components/pin-build/pinBuild.jsx';
+import PinAll from './components/pinAll/pinAll.jsx'
 
 function App({network}) {
 
@@ -14,6 +15,7 @@ function App({network}) {
         <Route path = '/pin-build' element = {<PinBuild />}></Route>
         <Route path = '/pin' element = {<Pin />}></Route>
           <Route path = '/fileUpload' element = {<FileUpload />}></Route>
+         <Route path = '/pinAll' element = {<PinAll />}></Route>
       </Routes>
     </Router>
   );

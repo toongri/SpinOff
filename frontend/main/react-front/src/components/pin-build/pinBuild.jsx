@@ -14,8 +14,8 @@ import {useNavigate} from 'react-router-dom'
 import PageReload from './pageReload';
 
 const PinBuild = () => {
-
   let navigate = useNavigate();
+
   const [title, setTitle] = useState('');
   const [content, setContent] = useState("");
   const [files, setFiles] = useState('');
@@ -54,7 +54,6 @@ const PinBuild = () => {
     .catch((err) =>{
       console.log('error')
     })
-      
       setTitle('');
       setContent('');
       setFileImages([]);
@@ -65,12 +64,10 @@ const PinBuild = () => {
 
     // 파일 저장
   const saveFileImage = (file) => {
-    const item = file[0].name;
-   
     setFiles(URL.createObjectURL(file[0]));
-      const imgUrl = JSON.stringify(URL.createObjectURL(file[0]))
-      fileImages.push(imgUrl)
-      console.log(fileImages)
+    const imgUrl = JSON.stringify(URL.createObjectURL(file[0]))
+    fileImages.push(imgUrl)
+    console.log(fileImages)
   };
 
   // 파일 삭제
