@@ -18,23 +18,28 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 
     @Query("SELECT DISTINCT collection FROM Collection collection LEFT JOIN FETCH collection.collectedPosts collectedposts " +
             "JOIN FETCH collectedposts.post post ORDER BY collection.id ASC, post.id ASC")
-    List<Collection> findAllFetchJoinPostOrderByCollectionIdAndPostId();
+    List<Collection> findAllIncludePostOrderByCollectionIdAndPostId();
 
     @Query("SELECT DISTINCT collection FROM Collection collection LEFT JOIN FETCH collection.likedCollections WHERE collection.id = :id")
-    Optional<Collection> findOneByIdFetchJoinLikedCollection(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludeLikedCollection(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection LEFT JOIN FETCH collection.followedCollections " +
             "WHERE collection.id = :id")
-    Optional<Collection> findOneByIdFetchJoinFollowedCollection(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludeFollowedCollection(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
-            "JOIN FETCH collection.viewedCollectionByIps viewedCollectionByIp WHERE collection.id = :id " +
+            "LEFT JOIN FETCH collection.viewedCollectionByIps viewedCollectionByIp WHERE collection.id = :id " +
             "ORDER BY viewedCollectionByIp.id DESC")
-    Optional<Collection> findOneByIdFetchJoinViewedCollectionByIpOrderByViewedIpId(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludeViewedCollectionByIpOrderByViewedIpId(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
-            "JOIN FETCH collection.collectedPosts collectedposts JOIN FETCH collectedposts.post post " +
+            "LEFT JOIN FETCH collection.collectedPosts collectedposts JOIN FETCH collectedposts.post post " +
             "WHERE collection.id = :id")
-    Optional<Collection> findOneByIdFetchJoinPost(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludePost(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT collection FROM Collection collection " +
+            "LEFT JOIN FETCH collection.commentInCollections comment " +
+            "WHERE collection.id = :id")
+    Optional<Collection> findOneByIdIncludeCommentInCollection(@Param("id") Long id);
 
 }

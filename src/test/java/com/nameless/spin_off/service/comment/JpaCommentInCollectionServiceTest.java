@@ -19,6 +19,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@Rollback(value = false)
@@ -35,37 +39,57 @@ class JpaCommentInCollectionServiceTest {
     @Autowired MemberRepository memberRepository;
     @Autowired CommentInCollectionRepository commentInCollectionRepository;
     @Autowired CommentInCollectionService commentInCollectionService;
+    @Autowired EntityManager em;
 
     @Test
-    public void 컬렉션_댓글_체크() throws Exception{
+    public void saveCommentInCollectionByCommentVO() throws Exception{
         //given
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         Collection collection = Collection.createDefaultCollection(member);
         collectionRepository.save(collection);
 
+        em.flush();
+        em.clear();
+
         //when
+        System.out.println("서비스함수");
         CommentInCollection comment = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살"));
 
+        System.out.println("컬렉션업로드");
+        Collection newCollection = collectionRepository.getById(collection.getId());
+
         //then
-        assertThat(collection.getCommentCount()).isEqualTo(collection.getCommentInCollections().size());
-        assertThat(collection.getCommentInCollections().get(collection.getCommentInCollections().size() - 1)).isEqualTo(comment);
+        assertThat(newCollection.getCommentCount()).isEqualTo(newCollection.getCommentInCollections().size());
+        assertThat(newCollection.getCommentInCollections().get(newCollection.getCommentInCollections().size() - 1)).isEqualTo(comment);
     }
 
     @Test
-    public void 컬렉션_대댓글_체크() throws Exception{
+    public void 대댓글_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        Collection collection = Collection.createDefaultCollection(member);
-        collectionRepository.save(collection);
-        CommentInCollection parentComment = CommentInCollection.createCommentInCollection(member, "야스히로 라할살", null);
-        collection.addCommentInCollection(parentComment);
-        commentInCollectionRepository.save(parentComment);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Collection col = Collection.createDefaultCollection(mem);
+        collectionRepository.save(col);
+        CommentInCollection parent = CommentInCollection.createCommentInCollection(mem, "야스히로 라할살", null);
+        col.addCommentInCollection(parent);
+        commentInCollectionRepository.save(parent);
+
+        em.flush();
+        em.clear();
 
         //when
-        CommentInCollection childComment1 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), parentComment.getId(), "요지스타 라할살"));
-        CommentInCollection childComment2 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), parentComment.getId(), "슈퍼스타검흰 라할살"));
+        System.out.println("서비스함수1");
+        CommentInCollection childComment1 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살"));
+
+        System.out.println("서비스함수2");
+        CommentInCollection childComment2 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+
+        System.out.println("부모댓글업로드");
+        CommentInCollection parentComment = commentInCollectionRepository.findById(parent.getId()).get();
+
+        System.out.println("컬렉션업로드");
+        Collection collection = collectionRepository.getById(col.getId());
 
         //then
         assertThat(collection.getCommentCount()).isEqualTo(collection.getCommentInCollections().size());

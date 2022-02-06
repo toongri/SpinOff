@@ -1,5 +1,6 @@
 package com.nameless.spin_off.repository.comment;
 
+import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -36,7 +37,7 @@ class CommentInPostRepositoryTest {
     @Autowired EntityManager em;
 
     @Test
-    public void 대댓글_지연로딩_테스트() throws Exception{
+    public void findParentByPostIncludeChildrenOrderByDesc() throws Exception{
         //given
         Member member = Member.buildMember().build();
         memberRepository.save(member);
@@ -49,11 +50,21 @@ class CommentInPostRepositoryTest {
         post.addCommentInPost(childComment1);
         post.addCommentInPost(childComment2);
         //when
-        em.flush();
-        em.clear();
-        CommentInPost comments = commentInPostRepository.findParentByPostIncludeChildrenOrderByDesc(post).get(0);
+        List<CommentInPost> comments = commentInPostRepository.findParentByPostIncludeChildrenOrderByDesc(post);
 
         //then
-        assertThat(comments.getChildren().get(0).getClass()).isEqualTo(CommentInPost.class);
+        for (CommentInPost comment : comments) {
+            assertThat(comment.getParent()).isNull();
+            assertThat(comment.getPost()).isEqualTo(post);
+            assertThat(comment.getMember()).isEqualTo(member);
+            assertThat(comment.getChildren().size()).isEqualTo(2);
+
+            for (CommentInPost child : comment.getChildren()) {
+                assertThat(child.getParent()).isEqualTo(comment);
+                assertThat(child.getPost()).isEqualTo(post);
+                assertThat(child.getMember()).isEqualTo(member);
+
+            }
+        }
     }
 }

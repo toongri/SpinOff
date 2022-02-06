@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.comment.NoSuchCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NoSuchCommentInPostException;
 import com.nameless.spin_off.exception.member.NoSuchMemberException;
 import com.nameless.spin_off.exception.post.NoSuchPostException;
@@ -17,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,20 +40,28 @@ public class JpaCommentInPostService implements CommentInPostService {
 
         Member member = getMemberById(commentVO.getMemberId());
         Post post = getPostById(commentVO.getPostId());
-        CommentInPost parent = getCommentInPostById(commentVO.getParentId());
+        CommentInPost parent = getCommentInPostById(post, commentVO.getParentId());
+
         CommentInPost commentInPost = CommentInPost.createCommentInPost(member, commentVO.getContent(), parent);
         post.addCommentInPost(commentInPost);
 
         return commentInPost;
     }
 
-    private CommentInPost getCommentInPostById(Long commentInPostId) throws NoSuchCommentInPostException {
+    private CommentInPost getCommentInPostById(Post post, Long commentInPostId)
+            throws NoSuchCommentInPostException {
+
         if (commentInPostId == null)
             return null;
 
-        Optional<CommentInPost> optionalCommentInPost = commentInPostRepository.findById(commentInPostId);
+        List<CommentInPost> commentInPost = post.getCommentInPosts()
+                .stream().filter(comment -> comment.getId().equals(commentInPostId)).collect(Collectors.toList());
 
-        return optionalCommentInPost.orElseThrow(NoSuchCommentInPostException::new);
+        if (commentInPost.isEmpty()) {
+            throw new NoSuchCommentInPostException();
+        } else {
+            return commentInPost.get(0);
+        }
     }
 
     private Member getMemberById(Long memberId) throws NoSuchMemberException {
@@ -60,7 +71,7 @@ public class JpaCommentInPostService implements CommentInPostService {
     }
 
     private Post getPostById(Long postId) throws NoSuchPostException {
-        Optional<Post> optionalPost = postRepository.findById(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdIncludeCommentInPost(postId);
 
         return optionalPost.orElseThrow(NoSuchPostException::new);
     }

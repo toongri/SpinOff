@@ -14,6 +14,6 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
 
     @Query("SELECT DISTINCT parent FROM CommentInCollection parent  LEFT JOIN FETCH parent.children " +
             "WHERE parent.parent IS NULL AND parent.collection = :collection ORDER BY parent.createdDate DESC")
-    List<CommentInCollection> findParentByCollectionIncludeChildrenOrderByDesc(
+    List<CommentInCollection> findParentsByCollectionIncludeChildrenOrderByDesc(
             @Param("collection") Collection collection);
 }

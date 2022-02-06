@@ -121,6 +121,7 @@ class JpaPostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         em.flush();
+        em.clear();
 
         //when
         postService.updateLikedPostByMemberId(member.getId(), post.getId());

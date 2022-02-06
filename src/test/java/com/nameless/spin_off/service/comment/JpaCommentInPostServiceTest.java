@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -42,34 +43,54 @@ class JpaCommentInPostServiceTest {
 
 
     @Test
-    public void 글_댓글_체크() throws Exception{
+    public void saveCommentInPostByCommentVO() throws Exception{
         //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        postRepository.save(post);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+
+        em.flush();
+        em.clear();
 
         //when
-        CommentInPost comment = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), null, "야스히로 라할살"));
+        System.out.println("서비스함수");
+        CommentInPost comment = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
+
+        System.out.println("포스트업로드");
+        Post post = postRepository.findById(po.getId()).get();
+
         //then
         assertThat(post.getCommentCount()).isEqualTo(post.getCommentInPosts().size());
         assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(comment);
     }
 
     @Test
-    public void 대댓글_체크() throws Exception{
+    public void 대댓글_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        postRepository.save(post);
-        CommentInPost parentComment = CommentInPost.createCommentInPost(member, "야스히로 라할살", null);
-        post.addCommentInPost(parentComment);
-        commentInPostRepository.save(parentComment);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
+        po.addCommentInPost(parent);
+        commentInPostRepository.save(parent);
+
+        em.flush();
+        em.clear();
         //when
 
-        CommentInPost childComment1 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), parentComment.getId(), "요지스타 라할살"));
-        CommentInPost childComment2 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(), post.getId(), parentComment.getId(), "슈퍼스타검흰 라할살"));
+        System.out.println("서비스함수1");
+        CommentInPost childComment1 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살"));
+
+        System.out.println("서비스함수2");
+        CommentInPost childComment2 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+
+        System.out.println("부모댓글업로드");
+        CommentInPost parentComment = commentInPostRepository.findById(parent.getId()).get();
+
+        System.out.println("포스트업로드");
+        Post post = postRepository.findById(po.getId()).get();
 
         //then
 

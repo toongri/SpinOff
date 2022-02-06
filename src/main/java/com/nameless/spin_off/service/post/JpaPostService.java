@@ -36,8 +36,6 @@ public class JpaPostService implements PostService{
     private final MovieRepository movieRepository;
     private final HashtagRepository hashtagRepository;
     private final CollectionRepository collectionRepository;
-    private final ViewedPostByIpRepository viewedPostByIpRepository;
-    private final VisitedCollectionByMemberRepository visitedCollectionByMemberRepository;
 
     @Transactional(readOnly = false)
     @Override

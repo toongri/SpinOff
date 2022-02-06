@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +26,6 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
     private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;
-    private final CommentInCollectionRepository commentInCollectionRepository;
 
     @Override
     @Transactional(readOnly = false)
@@ -32,7 +33,7 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
         Member member = getMemberById(commentVO.getMemberId());
         Collection collection = getCollectionById(commentVO.getCollectionId());
-        CommentInCollection parent = getCommentInCollectionById(commentVO.getParentId());
+        CommentInCollection parent = getCommentInCollectionById(collection, commentVO.getParentId());
 
         CommentInCollection commentInCollection = CommentInCollection.createCommentInCollection(member, commentVO.getContent(), parent);
         collection.addCommentInCollection(commentInCollection);
@@ -40,13 +41,20 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
         return commentInCollection;
     }
 
-    private CommentInCollection getCommentInCollectionById(Long commentInCollectionId) throws NoSuchCommentInCollectionException {
+    private CommentInCollection getCommentInCollectionById(Collection collection, Long commentInCollectionId)
+            throws NoSuchCommentInCollectionException {
+
         if (commentInCollectionId == null)
             return null;
 
-        Optional<CommentInCollection> optionalCommentInCollection = commentInCollectionRepository.findById(commentInCollectionId);
+        List<CommentInCollection> commentInCollection = collection.getCommentInCollections().stream().filter(comment -> comment.getId().equals(commentInCollectionId))
+                .collect(Collectors.toList());
 
-        return optionalCommentInCollection.orElseThrow(NoSuchCommentInCollectionException::new);
+        if (commentInCollection.isEmpty()) {
+            throw new NoSuchCommentInCollectionException();
+        } else {
+            return commentInCollection.get(0);
+        }
     }
 
     private Member getMemberById(Long memberId) throws NoSuchMemberException {
@@ -56,7 +64,7 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
     }
 
     private Collection getCollectionById(Long collectionId) throws NoSuchCollectionException {
-        Optional<Collection> optionalCollection = collectionRepository.findById(collectionId);
+        Optional<Collection> optionalCollection = collectionRepository.findOneByIdIncludeCommentInCollection(collectionId);
 
         return optionalCollection.orElseThrow(NoSuchCollectionException::new);
     }
