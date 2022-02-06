@@ -1,9 +1,7 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.nameless.spin_off.entity.post.*;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
@@ -36,10 +34,10 @@ public class PostDto {
         private Long memberId;
         private String title;
         private String content;
+        private Long movieId;
         private PublicOfPostStatus publicOfPostStatus;
         private List<String> hashtagContents;
         private List<String> mediaUrls;
-        private List<Long> movieIds;
         private List<Long> collectionIds;
     }
 
@@ -48,10 +46,10 @@ public class PostDto {
         private Member member;
         private String title;
         private String content;
+        private Movie movie;
         private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
         private List<PostedMedia> postedMedias = new ArrayList<>();
         private List<Hashtag> hashtags = new ArrayList<>();
-        private List<Movie> movies = new ArrayList<>();
 
         public PostBuilder setMember(Member member) {
             this.member = member;
@@ -83,13 +81,13 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setMovies(List<Movie> movies) {
-            this.movies.addAll(movies);
+        public PostBuilder setMovie(Movie movie) {
+            this.movie = movie;
             return this;
         }
 
         public Post build() {
-            return Post.createPost(member, title, content, hashtags, postedMedias, movies, publicOfPostStatus);
+            return Post.createPost(member, title, content, hashtags, postedMedias, movie, publicOfPostStatus);
         }
     }
 }

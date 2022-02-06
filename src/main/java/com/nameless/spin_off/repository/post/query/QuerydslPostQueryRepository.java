@@ -1,7 +1,7 @@
 package com.nameless.spin_off.repository.post.query;
 
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.dto.QPostDto_MainPagePost;
+import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
 import com.nameless.spin_off.entity.post.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +26,7 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
     public Slice<MainPagePostDto> findPostsOrderByCreatedDateBySlicing(Pageable pageable) {
 
         List<MainPagePostDto> content = jpaQueryFactory
-                .select(new QPostDto_MainPagePost(
+                .select(new QPostDto_MainPagePostDto(
                         member.nickname,
                         post.title,
                         member.profileImg))
@@ -57,7 +57,7 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         List<MainPagePostDto> content = jpaQueryFactory
-                .select(new QPostDto_MainPagePost(
+                .select(new QPostDto_MainPagePostDto(
                         member.nickname,
                         post.title,
                         member.profileImg))

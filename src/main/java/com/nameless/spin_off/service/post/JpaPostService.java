@@ -47,14 +47,14 @@ public class JpaPostService implements PostService{
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
-        List<Movie> movies = getMoviesByIds(postVO.getMovieIds());
+        Movie movie = getMoviesById(postVO.getMovieId());
 
         Post post =  Post.buildPost()
                 .setMember(member)
                 .setPostPublicStatus(postVO.getPublicOfPostStatus())
                 .setPostedMedias(postedMedia)
                 .setHashTags(hashtags)
-                .setMovies(movies)
+                .setMovie(movie)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
                 .build();
@@ -144,13 +144,10 @@ public class JpaPostService implements PostService{
         return optionalMember.orElseThrow(NoSuchMemberException::new);
     }
 
-    private List<Movie> getMoviesByIds(List<Long> movieIds) throws NoSuchMovieException {
-        List<Movie> movies = movieRepository.findTagsByIdIn(movieIds);
-        if (movies.size() == movieIds.size()) {
-            return movies;
-        } else {
-            throw new NoSuchMovieException();
-        }
+    private Movie getMoviesById(Long movieId) throws NoSuchMovieException {
+        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
+
+        return optionalMovie.orElseThrow(NoSuchMovieException::new);
     }
 
     private Post getPostByIdWithViewedIp(Long postId) throws NoSuchPostException {

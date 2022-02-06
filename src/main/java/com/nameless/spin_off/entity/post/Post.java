@@ -5,7 +5,6 @@ import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.sun.istack.NotNull;
 import lombok.*;
 
@@ -28,8 +27,12 @@ public class Post extends BaseTimeEntity {
     @NotNull
     private Member member;
 
-    private String title;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "movie_id")
+    @NotNull
+    private Movie movie;
 
+    private String title;
     private String content;
 
     @Enumerated(EnumType.STRING)
@@ -47,9 +50,6 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<PostedMedia> postedMedias = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<PostedMovie> postedMovies = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedPostByIp> viewedPostByIps = new ArrayList<>();
@@ -105,17 +105,10 @@ public class Post extends BaseTimeEntity {
         postedHashtag.updatePost(this);
     }
 
-    public void addPostedMovieByMovie(Movie movie) {
-        PostedMovie postedMovie = PostedMovie.createPostedMovie(movie);
-
-        this.postedMovies.add(postedMovie);
-        postedMovie.updatePost(this);
-    }
-
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content,
                                   List<Hashtag> hashtags, List<PostedMedia> postedMedias,
-                                  List<Movie> movies, PublicOfPostStatus publicOfPostStatus) {
+                                  Movie movie, PublicOfPostStatus publicOfPostStatus) {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
@@ -123,7 +116,7 @@ public class Post extends BaseTimeEntity {
         post.updatePostedHashtagsByHashtags(hashtags);
         post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
-        post.updatePostedMoviesByMovies(movies);
+        post.updateMovie(movie);
         post.updateCountToZero();
 
         return post;
@@ -174,10 +167,8 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    public void updatePostedMoviesByMovies(List<Movie> movies) {
-        for (Movie movie : movies) {
-            this.addPostedMovieByMovie(movie);
-        }
+    public void updateMovie(Movie movie) {
+        this.movie = movie;
     }
 
     public void updateContent(String content) {

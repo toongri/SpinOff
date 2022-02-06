@@ -2,10 +2,8 @@ package com.nameless.spin_off.controller;
 
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.movie.PostedMovie;
 import com.nameless.spin_off.entity.post.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -16,8 +14,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 
 @Profile("local")
 @Component
@@ -129,8 +125,6 @@ public class InitLocal {
 
                 Movie movie = Movie.createMovie((long) i, "" + i, "" + i);
                 em.persist(movie);
-
-                PostedMovie postedMovie = PostedMovie.createPostedMovie(movie);
 
                 Post post = postBuilder.build();
                 if (i % 4 == 0) {
