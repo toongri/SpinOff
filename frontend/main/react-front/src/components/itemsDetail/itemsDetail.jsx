@@ -1,17 +1,15 @@
 import React from "react";
 import "./itemsDetail.scss";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import {AiOutlineUser} from 'react-icons/ai';
 
 const ItemsDetail = ({ item, key }) => {
   let navigate = useNavigate();
 
   return (
+    <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
     <div 
-      className="item"
-      onClick={() => {
-        navigate('/pin');
-      }}
+      className="item" 
     >
       <div className="content">
         <div className="content-overay">
@@ -35,6 +33,8 @@ const ItemsDetail = ({ item, key }) => {
 
         <img src={item} className="content-image"/>
         
+        </div>
+        
         <div className = "movie-info-container">
           <p>파니 핑크와 아멜리에</p>
           <div className = "user-info-container">
@@ -42,10 +42,9 @@ const ItemsDetail = ({ item, key }) => {
             <span className = "user-name-container">일금천</span>
           </div>
         </div>
-
-      </div>
      
     </div>
+    </Link>
   );
 };
 

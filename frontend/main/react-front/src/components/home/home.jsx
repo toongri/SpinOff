@@ -42,13 +42,13 @@ const Home = () => {
    }, [store])
 
     return (
-        <div>
+        <>
             <Header />
             <Provider store = {store}>
-              <Search/>
-              <Main/>
+              <Search/>  
+              <Main/>    
             </Provider>
-        </div>
+        </>
     );
 };
 

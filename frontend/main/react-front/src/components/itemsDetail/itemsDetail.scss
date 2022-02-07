@@ -52,7 +52,6 @@
     }
 
     &:hover{
-      
       cursor: pointer;
       & .content-overay {
         opacity: 1;
@@ -107,14 +106,16 @@
   .movie-info-container{
     background-color: #fff;
     position: relative;
-   
     padding: 12px 10px;
     p{
       font-size: 0.8rem;
       font-weight: 700;
+      color: #3c3c3c;
+     
     }
     .user-name-container{
-      font-size: 0.8rem;
+      font-size: 0.7rem;
+      color: #3c3c3c;
     }
 
     .user-info-container{

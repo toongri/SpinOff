@@ -4,8 +4,9 @@ import Header from "../header/header";
 import Search from "../search/search";
 import { createStore } from "redux";
 import "./pinAll.scss";
-import {BsFillArrowLeftCircleFill} from 'react-icons/bs'
-import  {BsFillArrowRightCircleFill} from 'react-icons/bs';
+import {BsFillArrowLeftCircleFill} from 'react-icons/bs';
+import{AiFillCaretLeft, AiFillCaretRight} from 'react-icons/ai'
+import Masonry from '../masonry/masonry';
 
 const reducer = (currentState, action) => {
   if (currentState === undefined) {
@@ -15,6 +16,8 @@ const reducer = (currentState, action) => {
       pageNumber: 1,
       hasMore: false,
       loading: true,
+      pinAllOn: false,
+      pinOn: false
     };
   }
 
@@ -24,6 +27,8 @@ const reducer = (currentState, action) => {
     newState.items = action.items;
     newState.query = action.query;
     newState.loading = action.loading;
+    newState.pinAllOn = action.pinAllOn
+    newState.pinOn = action.pinOn;
   }
 
   if (action.type === "UPDATE") {
@@ -40,6 +45,7 @@ const PinAll = () => {
   const SLIDE_GAP = 14; //각 슬라이드 사이 간격
   const SLIDE_MOVING_UNIT = 500; //슬라이드 버튼 클릭 시 움직일 길이
   const IMG_WIDTH = 400; //이미지 가로 길이
+   const [pinAllOn, setPinAllOn] = useState(true);
 
   const images = [
     "https://i.picsum.photos/id/237/200/300.jpg?hmac=TmmQSbShHz9CdQm0NkEjx1Dyh_Y984R9LpNrpvH2D_U",
@@ -64,7 +70,6 @@ const PinAll = () => {
       setSlideSpot(0);
     } else {
       //그 외의 경우
-
       slideSpot(slideSpot + SLIDE_MOVING_UNIT);
     }
   };
@@ -81,11 +86,13 @@ const PinAll = () => {
 
   return (
     <>
+    
       <Header></Header>
       <Provider store={store}>
         <Search></Search>
       </Provider>
-      <div className="container">
+      
+      <div className="pinAll-container">
         <div className="tags-container">
             <span>sdaf</span>
             <span>Hell World</span>
@@ -97,32 +104,80 @@ const PinAll = () => {
             <span>sdaf</span>
         </div>
 
-        {!!slideSpot && (
-          <button onClick={handlePrevBtn} className="slideArrow arrowLeft">
-           <BsFillArrowLeftCircleFill />
-          </button>
-        )}
-        <ul className="storeImgUl">
-          <div
-            style={{ transform: `translateX(${slideSpot}px)` }}
-            className="slideInner"
-          >
-            {images.map((img, i) => (
-              <li key={i} className="storeImgLi">   
-                <img src={img} />
-              </li>
-            ))}
-            {slideSpot !== slideEnd && (
-              <button
-                onClick={handleNextBtn}
-                className="slideArrow arrowRight"
-              >
-                <BsFillArrowRightCircleFill></BsFillArrowRightCircleFill>
-              </button>
-            )}
+        <div className = "box-container">
+          <div className = "left-btn-arrow arrow-btn">
+            <button>
+            <div>
+              <AiFillCaretLeft size = "47"></AiFillCaretLeft>
+            </div>
+            </button>
           </div>
-        </ul>
+          <div className = "img-container">
+            <img src = "https://movie-phinf.pstatic.net/20120329_250/1332987174058pwlne_JPEG/movie_image.jpg"/>
+            
+            <div className = "bottomScreen-container">  
+              <div className = "description-box">
+                <ul>
+                  <li>마블링님이 팔로우</li>
+                   <li>마블 시리즈</li>
+                    <li>@Alfredo Vaccarro</li>
+                </ul>
+              </div>
+
+              <div className = "follow-box">
+                <button>
+                  팔로우
+                </button>
+              </div>
+            </div>
+          </div>
+       
+
+        <div className = "img-container">
+            <img src = "https://movie-phinf.pstatic.net/20130311_165/13629835475487aDfz_JPEG/movie_image.jpg"/>
+            <div className = "bottomScreen-container">
+               <div className = "description-box">
+                <ul>
+                  <li>마블링님이 팔로우</li>
+                   <li>마블 시리즈</li>
+                    <li>@Alfredo Vaccarro</li>
+                </ul>
+              </div>
+
+              <div className = "follow-box">
+                <button>
+                  팔로우
+                </button>
+              </div>
+            </div>
+        </div>
+         <div className = "img-container">
+            <img src = "https://movie-phinf.pstatic.net/20211215_297/1639556766975z0641_JPEG/movie_image.jpg"/>
+            <div className = "bottomScreen-container">
+               <div className = "description-box">
+                <ul>
+                  <li>마블링님이 팔로우</li>
+                   <li>마블 시리즈</li>
+                    <li>@Alfredo Vaccarro</li>
+                </ul>
+              </div>
+
+              <div className = "follow-box">
+                <button>
+                  팔로우
+                </button>
+              </div>
+            </div>
+        </div>
+         <div className = "right-btn-arrow arrow-btn">
+            <button>
+              <AiFillCaretRight size = "47"></AiFillCaretRight>
+            </button>
+          </div> 
       </div>
+     
+       
+       </div>
     </>
   );
 };

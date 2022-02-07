@@ -14,7 +14,7 @@ const Masonry = ({lastItemElement}) => {
     })
 
     return (
-        <div className="container">
+       <>
         <div className="masonry-container">
             {
               
@@ -90,7 +90,7 @@ const Masonry = ({lastItemElement}) => {
             </Button>
             </div>
         </div>
-      </div>
+        </>
     );
 };
 

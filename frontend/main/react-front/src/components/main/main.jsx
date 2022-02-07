@@ -5,11 +5,10 @@ import "./main.scss";
 import { makeStyles } from "@mui/styles";
 import { BsPencilFill } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
-import Masonry from "react-masonry-css";
 import ControlledCarousel from "../controlledCarousel/controlledCarousel";
-import Slider from '../slider/Slider.jsx';
 import ToggleButton from './toggleButton';
 import {useSelector, useDispatch} from 'react-redux';
+import Masonry from '../masonry/masonry'
 
 const Main = () => {
   let navigate = useNavigate();
@@ -30,7 +29,7 @@ const Main = () => {
          pageNumber: pageNumber + 1
         })
       }
-    }, [hasMore])=-
+    }, [hasMore])
     if(node) observer.current.observe(node);
   })
 
@@ -57,7 +56,8 @@ const Main = () => {
           </div>
         </div>
       
-        <div className="container">
+      {/* <Masonry /> */}
+        {/* <div className="container">
           <div className="masonry-container">
               {
                 
@@ -133,7 +133,7 @@ const Main = () => {
               </Button>
               </div>
           </div>
-        </div>
+        </div> */}
       </div>
      
     </>
