@@ -3,5 +3,5 @@ package com.nameless.spin_off.exception.post;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NoSuchPostException extends Exception {
+public class OverSearchLikedPostException extends Exception{
 }

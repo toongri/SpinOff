@@ -1,17 +1,28 @@
 package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.ViewedPostByIp;
+import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -192,6 +203,75 @@ public class Collection extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
+    public CommentInCollection getParentCommentById(Long commentInCollectionId)
+            throws NotSearchCommentInCollectionException {
+
+        if (commentInCollectionId == null)
+            return null;
+
+        List<CommentInCollection> commentInCollection = commentInCollections.stream()
+                .filter(comment -> comment.getId().equals(commentInCollectionId))
+                .collect(Collectors.toList());
+
+        if (commentInCollection.isEmpty()) {
+            throw new NotSearchCommentInCollectionException();
+        } else {
+            return commentInCollection.get(0);
+        }
+    }
     //==조회 로직==//
+
+    public Boolean isNotIpAlreadyView(String ip, LocalDateTime timeNow, Long minuteDuration )
+            throws OverSearchViewedCollectionByIpException {
+
+        List<ViewedCollectionByIp> viewed = viewedCollectionByIps.stream()
+                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
+                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), timeNow) < minuteDuration)
+                .collect(Collectors.toList());
+
+        int size = viewed.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchViewedCollectionByIpException();
+
+    }
+
+    public Boolean isNotMemberAlreadyLikeCollection(Member member)
+            throws OverSearchViewedCollectionByIpException {
+
+        List<LikedCollection> likedCollections = this.likedCollections
+                .stream().filter(likedCollection -> likedCollection.getMember().equals(member))
+                .collect(Collectors.toList());
+
+        int size = likedCollections.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchViewedCollectionByIpException();
+    }
+
+    public Boolean isNotMemberAlreadyFollowCollection(Member member)
+            throws OverSearchFollowedCollectionException {
+
+        List<FollowedCollection> followedCollections = this.followedCollections
+                .stream().filter(followedCollection -> followedCollection.getMember().equals(member))
+                .collect(Collectors.toList());
+
+        int size = followedCollections.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchFollowedCollectionException();
+    }
 
 }

@@ -5,23 +5,21 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
-import com.nameless.spin_off.exception.member.NoSuchMemberException;
-import com.nameless.spin_off.exception.movie.NoSuchMovieException;
-import com.nameless.spin_off.exception.post.NoSuchPostException;
-import com.nameless.spin_off.exception.post.OverSuchViewedPostByIpException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.movie.NotSearchMovieException;
+import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
-import com.nameless.spin_off.repository.collections.VisitedCollectionByMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +37,7 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Long savePostByPostVO(CreatePostVO postVO) throws NoSuchMemberException, NoSuchMovieException {
+    public Long savePostByPostVO(CreatePostVO postVO) throws NotSearchMemberException, NotSearchMovieException {
 
         Member member = getMemberById(postVO.getMemberId());
 
@@ -47,7 +45,7 @@ public class JpaPostService implements PostService{
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
-        Movie movie = getMoviesById(postVO.getMovieId());
+        Movie movie = getMovieById(postVO.getMovieId());
 
         Post post =  Post.buildPost()
                 .setMember(member)
@@ -67,12 +65,18 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Post updateLikedPostByMemberId(Long memberId, Long postId) throws NoSuchMemberException, NoSuchPostException {
+    public Post updateLikedPostByMemberId(Long memberId, Long postId)
+            throws NotSearchMemberException, NotSearchPostException,
+            OverSearchViewedPostByIpException, AlreadyLikedPostException {
+
         Member member = getMemberById(memberId);
         Post post = getPostByIdWithLikedPost(postId);
 
-
-        post.addLikedPostByMember(member);
+        if (post.isNotMemberAlreadyLikePost(member)) {
+            post.addLikedPostByMember(member);
+        } else {
+            throw new AlreadyLikedPostException();
+        }
 
         return post;
     }
@@ -80,50 +84,29 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Post updateViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
-            throws NoSuchPostException, OverSuchViewedPostByIpException {
+            throws NotSearchPostException, OverSearchViewedPostByIpException {
 
         Post post = getPostByIdWithViewedIp(postId);
 
-        Optional<ViewedPostByIp> optionalViewedPostByIp = getCollectByIpAndTime(ip, post, timeNow, minuteDuration);
-
-        if (optionalViewedPostByIp.isEmpty()) {
+        if (post.isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
             post.addViewedPostByIp(ip);
         }
 
         return post;
     }
 
-    private List<LikedPost> getCollectByLikedPostAndMember(Member member, LocalDateTime timeNow, Long minuteDuration, Post post) {
-        return post.getLikedPosts().stream()
-                .filter(likedPost -> likedPost.getMember() == member)
-                .collect(Collectors.toList());
-    }
-
-    private Optional<ViewedPostByIp> getCollectByIpAndTime(String ip, Post post, LocalDateTime timeNow, Long minuteDuration)
-            throws OverSuchViewedPostByIpException {
-        List<ViewedPostByIp> collect = post.getViewedPostByIps().stream()
-                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
-                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), timeNow) < minuteDuration)
-                .collect(Collectors.toList());
-
-        int size = collect.size();
-
-        if (size == 0) {
-            return Optional.empty();
-        } else if (size == 1) {
-            return Optional.of(collect.get(0));
-        } else {
-            throw new OverSuchViewedPostByIpException();
-        }
-
-    }
-
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) {
+
         List<Hashtag> alreadySavedHashtags = hashtagRepository.findAllByContentIn(hashtagContents);
+
         List<String> contentsAboutAlreadySavedHashtags =
                 alreadySavedHashtags.stream().map(Hashtag::getContent).collect(Collectors.toList());
 
-        List<Hashtag> anotherTags = getHashtagsAboutNotSaved(hashtagContents, contentsAboutAlreadySavedHashtags);
+        List<Hashtag> anotherTags = hashtagContents.stream()
+                .filter(tag -> !contentsAboutAlreadySavedHashtags.contains(tag))
+                .map(Hashtag::createHashtag)
+                .collect(Collectors.toList());
+
         hashtagRepository.saveAll(anotherTags);
 
         alreadySavedHashtags.addAll(anotherTags);
@@ -131,34 +114,30 @@ public class JpaPostService implements PostService{
         return alreadySavedHashtags;
     }
 
-    private List<Hashtag> getHashtagsAboutNotSaved(List<String> hashtagContents, List<String> contentsAboutAlreadySavedHashtags) {
-        return hashtagContents.stream()
-                .filter(tag -> !contentsAboutAlreadySavedHashtags.contains(tag))
-                .map(Hashtag::createHashtag)
-                .collect(Collectors.toList());
-    }
-
-    private Member getMemberById(Long memberId) throws NoSuchMemberException {
+    private Member getMemberById(Long memberId) throws NotSearchMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
-        return optionalMember.orElseThrow(NoSuchMemberException::new);
+        return optionalMember.orElseThrow(NotSearchMemberException::new);
     }
 
-    private Movie getMoviesById(Long movieId) throws NoSuchMovieException {
+    private Movie getMovieById(Long movieId) throws NotSearchMovieException {
+        if (movieId == null) {
+            return null;
+        }
         Optional<Movie> optionalMovie = movieRepository.findById(movieId);
 
-        return optionalMovie.orElseThrow(NoSuchMovieException::new);
+        return optionalMovie.orElseThrow(NotSearchMovieException::new);
     }
 
-    private Post getPostByIdWithViewedIp(Long postId) throws NoSuchPostException {
+    private Post getPostByIdWithViewedIp(Long postId) throws NotSearchPostException {
         Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinViewedPostByIpOrderByViewedIpId(postId);
 
-        return optionalPost.orElseThrow(NoSuchPostException::new);
+        return optionalPost.orElseThrow(NotSearchPostException::new);
     }
 
-    private Post getPostByIdWithLikedPost(Long postId) throws NoSuchPostException {
+    private Post getPostByIdWithLikedPost(Long postId) throws NotSearchPostException {
         Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinLikedPost(postId);
 
-        return optionalPost.orElseThrow(NoSuchPostException::new);
+        return optionalPost.orElseThrow(NotSearchPostException::new);
     }
 }

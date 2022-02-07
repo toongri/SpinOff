@@ -1,23 +1,25 @@
 package com.nameless.spin_off.service.collection;
 
-import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
-import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.NoSuchCollectionException;
-import com.nameless.spin_off.exception.member.NoSuchMemberException;
-import com.nameless.spin_off.exception.post.NoSuchPostException;
+import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
 
 import java.time.LocalDateTime;
 
 public interface CollectionService {
-    Long saveCollectionByCollectionVO(CreateCollectionVO postVO) throws NoSuchMemberException;
+    Long saveCollectionByCollectionVO(CreateCollectionVO postVO) throws NotSearchMemberException;
+
     Collection updateLikedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NoSuchMemberException, NoSuchCollectionException;
+            throws NotSearchMemberException, NotSearchCollectionException, OverSearchViewedCollectionByIpException, AlreadyLikedCollectionException;
+
     Collection updateViewedCollectionByIp(
-            String ip, Long collectionId, LocalDateTime startTime, LocalDateTime endTime)
-            throws NoSuchCollectionException;
+            String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
+            throws NotSearchCollectionException, OverSearchViewedCollectionByIpException;
+
     Collection updateFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NoSuchMemberException, NoSuchCollectionException;
+            throws NotSearchMemberException, NotSearchCollectionException, OverSearchFollowedCollectionException, AlreadyLikedCollectionException;
 }

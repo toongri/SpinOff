@@ -1,12 +1,10 @@
 package com.nameless.spin_off.controller;
 
-import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PostedHashtag;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
@@ -20,27 +18,26 @@ import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
-import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Profile("test")
+@Profile("dummy")
 @Component
 @RequiredArgsConstructor
-public class InitTest {
+public class InitDummy {
 
-    private final InitTestService initTestService;
+    private final InitDummyService initDummyService;
 
     @PostConstruct
     public void init() {
-        initTestService.init();
+        initDummyService.init();
     }
 
     @Component
     @RequiredArgsConstructor
-    static class InitTestService {
+    static class InitDummyService {
 
         private final PostRepository postRepository;
         private final MemberRepository memberRepository;

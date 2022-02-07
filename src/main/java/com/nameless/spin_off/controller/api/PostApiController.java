@@ -2,9 +2,11 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.member.NoSuchMemberException;
-import com.nameless.spin_off.exception.movie.NoSuchMovieException;
-import com.nameless.spin_off.exception.post.NoSuchPostException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.movie.NotSearchMovieException;
+import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,14 +27,14 @@ public class PostApiController {
 
 
     @PostMapping("")
-    public PostApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NoSuchMemberException, NoSuchMovieException {
+    public PostApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotSearchMemberException, NotSearchMovieException {
         Long postId = postService.savePostByPostVO(createPost);
 
         return new PostApiResult(postId);
     }
 
     @PostMapping("/like")
-    public PostApiResult createLikeOne(@RequestBody Long memberId, @RequestBody Long postId) throws NoSuchMemberException, NoSuchPostException {
+    public PostApiResult createLikeOne(@RequestBody Long memberId, @RequestBody Long postId) throws NotSearchMemberException, NotSearchPostException, OverSearchViewedPostByIpException, AlreadyLikedPostException {
         Post post = postService.updateLikedPostByMemberId(memberId, postId);
 
         return new PostApiResult(post);

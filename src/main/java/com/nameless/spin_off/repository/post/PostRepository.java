@@ -10,10 +10,13 @@ import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("SELECT DISTINCT post FROM Post post LEFT JOIN FETCH post.likedPosts WHERE post.id = :id")
+    @Query("SELECT DISTINCT post FROM Post post " +
+            "LEFT JOIN FETCH post.likedPosts likedPost " +
+            "WHERE post.id = :id")
     Optional<Post> findOneByIdFetchJoinLikedPost(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT post FROM Post post LEFT JOIN FETCH post.viewedPostByIps viewdPostByIp " +
+    @Query("SELECT DISTINCT post FROM Post post " +
+            "LEFT JOIN FETCH post.viewedPostByIps viewdPostByIp " +
             "WHERE post.id = :id " +
             "ORDER BY viewdPostByIp.id DESC")
     Optional<Post> findOneByIdFetchJoinViewedPostByIpOrderByViewedIpId(@Param("id") Long id);

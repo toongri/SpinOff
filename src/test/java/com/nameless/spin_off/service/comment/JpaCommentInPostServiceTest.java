@@ -1,10 +1,17 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -24,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -101,5 +109,58 @@ class JpaCommentInPostServiceTest {
         assertThat(parentComment.getChildren().get(1)).isEqualTo(childComment2);
         assertThat(childComment1.getParent()).isEqualTo(parentComment);
         assertThat(childComment2.getParent()).isEqualTo(parentComment);
+    }
+
+    @Test
+    public void 댓글_저장시_멤버미스_예외처리() throws Exception{
+
+        //given
+        CommentDto.CreateCommentInPostVO commentInPostVO =
+                new CommentDto.CreateCommentInPostVO(0L, 0L, 0L, "");
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
+                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 댓글_저장시_컬렉션미스_예외처리() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        CommentDto.CreateCommentInPostVO commentInPostVO =
+                new CommentDto.CreateCommentInPostVO(mem.getId(), 0L, 0L, "");
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
+                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 댓글_저장시_부모댓글미스_예외처리() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(post);
+
+        CommentDto.CreateCommentInPostVO commentInPostVO =
+                new CommentDto.CreateCommentInPostVO(mem.getId(), post.getId(), 0L, "");
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
+                .isInstanceOf(NotSearchCommentInPostException.class);//.hasMessageContaining("")
+
+
     }
 }

@@ -1,23 +1,20 @@
 package com.nameless.spin_off.service.collection;
 
-import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
-import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.ViewedCollectionByIp;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.NoSuchCollectionException;
-import com.nameless.spin_off.exception.member.NoSuchMemberException;
-import com.nameless.spin_off.exception.post.NoSuchPostException;
+import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.collections.ViewedCollectionByIpRepository;
 import com.nameless.spin_off.repository.collections.VisitedCollectionByMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +36,7 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Long saveCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NoSuchMemberException {
+    public Long saveCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotSearchMemberException {
 
         Member member = getMemberById(collectionVO.getMemberId());
         Collection collection = Collection.createCollection(member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
@@ -49,55 +46,78 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateLikedCollectionByMemberId(Long memberId, Long collectionId) throws NoSuchMemberException, NoSuchCollectionException {
+    public Collection updateLikedCollectionByMemberId(Long memberId, Long collectionId)
+            throws NotSearchMemberException, NotSearchCollectionException,
+            OverSearchViewedCollectionByIpException, AlreadyLikedCollectionException {
+
         Member member = getMemberById(memberId);
-        Collection collection = getCollectionById(collectionId);
-        collection.addLikedCollectionByMember(member);
+        Collection collection = getCollectionByIdWithLikedCollection(collectionId);
+
+        if (collection.isNotMemberAlreadyLikeCollection(member)) {
+            collection.addLikedCollectionByMember(member);
+        } else {
+            throw new AlreadyLikedCollectionException();
+        }
 
         return collection;
     }
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateViewedCollectionByIp(String ip, Long collectionId, LocalDateTime startTime, LocalDateTime endTime) throws NoSuchCollectionException {
+    public Collection updateViewedCollectionByIp(String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
+            throws NotSearchCollectionException, OverSearchViewedCollectionByIpException {
 
-        Collection collection = getCollectionById(collectionId);
+        Collection collection = getCollectionByIdWithViewedIp(collectionId);
 
-        Optional<ViewedCollectionByIp> optionalCollection = viewedCollectionByIpRepository
-                .findOneByCreatedDateBetweenAndIpAndCollection(startTime, endTime, ip, collection);
-
-        if (optionalCollection.isEmpty()) {
+        if (collection.isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
             collection.addViewedCollectionByIp(ip);
         }
+
         return collection;
     }
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateFollowedCollectionByMemberId(Long memberId, Long collectionId) throws NoSuchMemberException, NoSuchCollectionException {
+    public Collection updateFollowedCollectionByMemberId(Long memberId, Long collectionId)
+            throws NotSearchMemberException, NotSearchCollectionException,
+            OverSearchFollowedCollectionException, AlreadyLikedCollectionException {
 
         Member member = getMemberById(memberId);
-        Collection collection = getCollectionById(collectionId);
-        collection.addFollowedCollectionByMember(member);
+        Collection collection = getCollectionByIdWithFollowedCollection(collectionId);
+
+        if (collection.isNotMemberAlreadyFollowCollection(member)) {
+            collection.addFollowedCollectionByMember(member);
+        } else {
+            throw new AlreadyLikedCollectionException();
+        }
 
         return collection;
     }
 
-    private Member getMemberById(Long memberId) throws NoSuchMemberException {
+    private Member getMemberById(Long memberId) throws NotSearchMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
-        return optionalMember.orElseThrow(NoSuchMemberException::new);
+        return optionalMember.orElseThrow(NotSearchMemberException::new);
     }
 
-    private Post getPostById(Long postId) throws NoSuchPostException {
-        Optional<Post> optionalPost = postRepository.findById(postId);
+    private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotSearchCollectionException {
+        Optional<Collection> optionalCollection =
+                collectionRepository.findOneByIdIncludeViewedCollectionByIpOrderByViewedIpId(collectionId);
 
-        return optionalPost.orElseThrow(NoSuchPostException::new);
+        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
     }
 
-    private Collection getCollectionById(Long collectionId) throws NoSuchCollectionException {
-        Optional<Collection> optionalCollection = collectionRepository.findById(collectionId);
+    private Collection getCollectionByIdWithLikedCollection(Long collectionId) throws NotSearchCollectionException {
+        Optional<Collection> optionalCollection =
+                collectionRepository.findOneByIdIncludeLikedCollection(collectionId);
 
-        return optionalCollection.orElseThrow(NoSuchCollectionException::new);
+        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
+    }
+
+    private Collection getCollectionByIdWithFollowedCollection(Long collectionId) throws NotSearchCollectionException {
+        Optional<Collection> optionalCollection =
+                collectionRepository.findOneByIdIncludeFollowedCollection(collectionId);
+
+        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
     }
 }

@@ -5,12 +5,17 @@ import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -29,7 +34,6 @@ public class Post extends BaseTimeEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "movie_id")
-    @NotNull
     private Movie movie;
 
     private String title;
@@ -185,5 +189,56 @@ public class Post extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
+    public CommentInPost getParentCommentById(Long commentInPostId) throws NotSearchCommentInPostException {
+
+        if (commentInPostId == null)
+            return null;
+
+        List<CommentInPost> commentInPost = commentInPosts.stream()
+                .filter(comment -> comment.getId().equals(commentInPostId))
+                .collect(Collectors.toList());
+
+        if (commentInPost.isEmpty()) {
+            throw new NotSearchCommentInPostException();
+        } else {
+            return commentInPost.get(0);
+        }
+    }
+
     //==조회 로직==//
+
+    public Boolean isNotIpAlreadyView(String ip, LocalDateTime timeNow, Long minuteDuration )
+            throws OverSearchViewedPostByIpException {
+
+        List<ViewedPostByIp> viewed = viewedPostByIps.stream()
+                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
+                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), timeNow) < minuteDuration)
+                .collect(Collectors.toList());
+
+        int size = viewed.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchViewedPostByIpException();
+
+    }
+
+    public Boolean isNotMemberAlreadyLikePost(Member member) throws OverSearchViewedPostByIpException {
+
+        List<LikedPost> likedPosts = this.likedPosts.stream().filter(likedPost -> likedPost.getMember().equals(member))
+                .collect(Collectors.toList());
+
+        int size = likedPosts.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchViewedPostByIpException();
+    }
+
 }

@@ -23,6 +23,7 @@ import javax.persistence.EntityManager;
 import javax.swing.text.html.parser.Entity;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,18 +57,12 @@ class JpaPostServiceTest {
 
         List<Long> collectionIds = collectionsByMember.stream().map(Collection::getId).collect(Collectors.toList());
 
-        PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(member.getId(),
-                "알라리숑", "얄라리얄라", PublicOfPostStatus.PUBLIC,
-                List.of("abc", "bdc"), List.of("형윤이", "형윤이?"), List.of(), collectionIds);
-
         List<Post> preparePosts = postRepository.findAll();
-        List<PostedMedia> preparePostedMedias = postedMediaRepository.findAll();
         List<Hashtag> prepareHashtags = hashtagRepository.findAll();
         List<Collection> prepareCollections = collectionRepository.findAllById(collectionIds);
 
 
         int preparePostsSize = preparePosts.size();
-        int preparePostedMediasSize = preparePostedMedias.size();
         int prepareHashtagsSize = prepareHashtags.size();
         List<CollectedPost> prepareCollectedPosts1 = prepareCollections.get(0).getCollectedPosts();
         List<CollectedPost> prepareCollectedPosts2 = prepareCollections.get(1).getCollectedPosts();
@@ -76,7 +71,16 @@ class JpaPostServiceTest {
         int prepareCollectedPosts1Size = prepareCollectedPosts1.size();
         int prepareCollectedPosts2Size = prepareCollectedPosts2.size();
         int prepareCollectedPosts3Size = prepareCollectedPosts3.size();
+
+        em.flush();
+        em.clear();
+
         //when
+
+        PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(member.getId(),
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                List.of("형윤이", "형윤이?"), List.of(), collectionIds);
+
         Long aLong = postService.savePostByPostVO(createPostVO);
         Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
 
@@ -85,12 +89,10 @@ class JpaPostServiceTest {
         int postPostedHashtagSize = postedHashtags.size();
 
         List<Post> postPosts = postRepository.findAll();
-        List<PostedMedia> postPostedMedias = postedMediaRepository.findAll();
         List<Hashtag> postHashtags = hashtagRepository.findAll();
         List<Collection> postCollections = collectionRepository.findAllById(collectionIds);
 
         int postPostsSize = postPosts.size();
-        int postPostedMediasSize = postPostedMedias.size();
         int postHashtagsSize = postHashtags.size();
         List<CollectedPost> postCollectedPosts1 = postCollections.get(0).getCollectedPosts();
         List<CollectedPost> postCollectedPosts2 = postCollections.get(1).getCollectedPosts();
@@ -103,7 +105,6 @@ class JpaPostServiceTest {
         //then
 
         assertThat(preparePostsSize).isEqualTo(postPostsSize - 1);
-        assertThat(preparePostedMediasSize).isEqualTo(postPostedMediasSize - 2);
         assertThat(prepareHashtagsSize).isEqualTo(postHashtagsSize - 2);
         assertThat(prepareCollectedPosts1Size).isEqualTo(postCollectedPosts1Size - 1);
         assertThat(prepareCollectedPosts2Size).isEqualTo(postCollectedPosts2Size - 1);
@@ -112,19 +113,28 @@ class JpaPostServiceTest {
         assertThat(postPostedHashtagSize).isEqualTo(2);
 
     }
+
     @Test
     public void 글_좋아요_체크() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        postRepository.save(post);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+
         em.flush();
         em.clear();
 
         //when
-        postService.updateLikedPostByMemberId(member.getId(), post.getId());
+        System.out.println("서비스함수");
+        postService.updateLikedPostByMemberId(mem.getId(), po.getId());
+
+        System.out.println("포스트");
+        Post post = postRepository.findById(po.getId()).get();
+        System.out.println("멤버");
+        Member member = memberRepository.findById(mem.getId()).get();
+
         //then
 
         List<LikedPost> likedPosts = post.getLikedPosts();
@@ -134,22 +144,48 @@ class JpaPostServiceTest {
         assertThat(likedPosts.get(0).getMember()).isEqualTo(member);
 
     }
-    
+
     @Test
-    public void 글_조회수_체크() throws Exception{
+    public void 글_조회수_증가() throws Exception{
         //given
         LocalDateTime now;
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
-        System.out.println(post.getId());
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        now = LocalDateTime.now();
+        System.out.println("서비스함수");
+        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+
+        //then
+        assertThat(post1.getViewCount()).isEqualTo(post1.getViewedPostByIps().size());
+        assertThat(post1.getViewCount()).isEqualTo(1);
+
+    }
+    
+    @Test
+    public void 글_조회수_중복_체크() throws Exception{
+        //given
+        LocalDateTime now;
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(post);
         now = LocalDateTime.now();
         Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+
         em.flush();
+        em.clear();
 
         //when
         now = LocalDateTime.now();
+        System.out.println("서비스함수");
         Post post2 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
         
         //then
@@ -158,4 +194,29 @@ class JpaPostServiceTest {
 
     }
 
+    @Test
+    public void 글_조회수_시간후_증가() throws Exception{
+
+        //given
+        LocalDateTime now;
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(post);
+        now = LocalDateTime.now();
+        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+
+        em.flush();
+        em.clear();
+
+        //when
+        now = LocalDateTime.now().plusHours(2);
+        System.out.println("서비스함수");
+        Post post2 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+
+        //then
+        assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
+        assertThat(post2.getViewCount()).isEqualTo(2);
+
+    }
 }

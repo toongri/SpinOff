@@ -4,10 +4,9 @@ import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.comment.NoSuchCommentInCollectionException;
-import com.nameless.spin_off.exception.comment.NoSuchCommentInPostException;
-import com.nameless.spin_off.exception.member.NoSuchMemberException;
-import com.nameless.spin_off.exception.post.NoSuchPostException;
+import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -29,18 +28,14 @@ public class JpaCommentInPostService implements CommentInPostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
-    private final MovieRepository movieRepository;
-    private final HashtagRepository hashtagRepository;
-    private final CollectionRepository collectionRepository;
-    private final CommentInPostRepository commentInPostRepository;
 
     @Override
     @Transactional(readOnly = false)
-    public CommentInPost saveCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NoSuchMemberException, NoSuchPostException, NoSuchCommentInPostException {
+    public CommentInPost saveCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotSearchMemberException, NotSearchPostException, NotSearchCommentInPostException {
 
         Member member = getMemberById(commentVO.getMemberId());
         Post post = getPostById(commentVO.getPostId());
-        CommentInPost parent = getCommentInPostById(post, commentVO.getParentId());
+        CommentInPost parent = post.getParentCommentById(commentVO.getParentId());
 
         CommentInPost commentInPost = CommentInPost.createCommentInPost(member, commentVO.getContent(), parent);
         post.addCommentInPost(commentInPost);
@@ -48,31 +43,15 @@ public class JpaCommentInPostService implements CommentInPostService {
         return commentInPost;
     }
 
-    private CommentInPost getCommentInPostById(Post post, Long commentInPostId)
-            throws NoSuchCommentInPostException {
-
-        if (commentInPostId == null)
-            return null;
-
-        List<CommentInPost> commentInPost = post.getCommentInPosts()
-                .stream().filter(comment -> comment.getId().equals(commentInPostId)).collect(Collectors.toList());
-
-        if (commentInPost.isEmpty()) {
-            throw new NoSuchCommentInPostException();
-        } else {
-            return commentInPost.get(0);
-        }
-    }
-
-    private Member getMemberById(Long memberId) throws NoSuchMemberException {
+    private Member getMemberById(Long memberId) throws NotSearchMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
-        return optionalMember.orElseThrow(NoSuchMemberException::new);
+        return optionalMember.orElseThrow(NotSearchMemberException::new);
     }
 
-    private Post getPostById(Long postId) throws NoSuchPostException {
+    private Post getPostById(Long postId) throws NotSearchPostException {
         Optional<Post> optionalPost = postRepository.findOneByIdIncludeCommentInPost(postId);
 
-        return optionalPost.orElseThrow(NoSuchPostException::new);
+        return optionalPost.orElseThrow(NotSearchPostException::new);
     }
 }

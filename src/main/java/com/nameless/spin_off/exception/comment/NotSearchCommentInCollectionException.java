@@ -3,5 +3,5 @@ package com.nameless.spin_off.exception.comment;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NoSuchCommentInCollectionException extends Exception{
+public class NotSearchCommentInCollectionException extends Exception{
 }

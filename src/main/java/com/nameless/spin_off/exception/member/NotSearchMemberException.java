@@ -4,5 +4,5 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class NoSuchMemberException extends Exception{
+public class NotSearchMemberException extends Exception{
 }
