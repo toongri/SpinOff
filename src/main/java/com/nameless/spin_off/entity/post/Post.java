@@ -6,6 +6,7 @@ import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -226,7 +227,7 @@ public class Post extends BaseTimeEntity {
 
     }
 
-    public Boolean isNotMemberAlreadyLikePost(Member member) throws OverSearchViewedPostByIpException {
+    public Boolean isNotMemberAlreadyLikePost(Member member) throws OverSearchLikedPostException {
 
         List<LikedPost> likedPosts = this.likedPosts.stream().filter(likedPost -> likedPost.getMember().equals(member))
                 .collect(Collectors.toList());
@@ -238,7 +239,7 @@ public class Post extends BaseTimeEntity {
         else if (size == 1)
             return false;
         else
-            throw new OverSearchViewedPostByIpException();
+            throw new OverSearchLikedPostException();
     }
 
 }

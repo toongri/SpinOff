@@ -1,10 +1,8 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
 import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
@@ -24,15 +22,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaCommentInCollectionServiceTest {
+class CommentInCollectionServiceTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
@@ -59,7 +55,7 @@ class JpaCommentInCollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        CommentInCollection comment = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살"));
+        CommentInCollection comment = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살"));
 
         System.out.println("컬렉션업로드");
         Collection newCollection = collectionRepository.getById(collection.getId());
@@ -85,10 +81,10 @@ class JpaCommentInCollectionServiceTest {
 
         //when
         System.out.println("서비스함수1");
-        CommentInCollection childComment1 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살"));
+        CommentInCollection childComment1 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살"));
 
         System.out.println("서비스함수2");
-        CommentInCollection childComment2 = commentInCollectionService.saveCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+        CommentInCollection childComment2 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
 
         System.out.println("부모댓글업로드");
         CommentInCollection parentComment = commentInCollectionRepository.findById(parent.getId()).get();
@@ -107,7 +103,7 @@ class JpaCommentInCollectionServiceTest {
     }
 
     @Test
-    public void 댓글_저장시_예외처리() throws Exception{
+    public void 댓글_저장시_파라미터_예외처리() throws Exception{
 
         //given
         Member mem = Member.buildMember().build();
@@ -127,11 +123,11 @@ class JpaCommentInCollectionServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO1))
+        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO1))
                 .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO2))
+        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO2))
                 .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO3))
+        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO3))
                 .isInstanceOf(NotSearchCommentInCollectionException.class);//.hasMessageContaining("")
 
     }

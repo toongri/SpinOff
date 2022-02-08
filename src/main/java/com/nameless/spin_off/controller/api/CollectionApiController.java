@@ -1,17 +1,10 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
+import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
-import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.service.collection.CollectionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,7 +30,7 @@ public class CollectionApiController {
     @PostMapping("")
     public CollectionApiResult<Long> createCollectionOne(@RequestBody CreateCollectionVO collectionVO)
             throws NotSearchMemberException {
-        Long aLong = collectionService.saveCollectionByCollectionVO(collectionVO);
+        Long aLong = collectionService.insertCollectionByCollectionVO(collectionVO);
 
         return new CollectionApiResult<Long>(aLong);
     }
@@ -44,9 +38,9 @@ public class CollectionApiController {
     @PostMapping("/like")
     public CollectionApiResult<Collection> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
             throws NotSearchMemberException, AlreadyLikedCollectionException,
-            NotSearchCollectionException, OverSearchViewedCollectionByIpException {
+            NotSearchCollectionException, OverSearchLikedCollectionException {
 
-        Collection collection = collectionService.updateLikedCollectionByMemberId(memberId, postId);
+        Collection collection = collectionService.insertLikedCollectionByMemberId(memberId, postId);
 
         return new CollectionApiResult<Collection>(collection);
     }
@@ -56,20 +50,32 @@ public class CollectionApiController {
             throws NotSearchCollectionException, OverSearchViewedCollectionByIpException {
 
         Collection collection = collectionService
-                .updateViewedCollectionByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
+                .insertViewedCollectionByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
 
         return new CollectionApiResult<Collection>(collection);
     }
 
     @PostMapping("/follow")
     public CollectionApiResult<Collection> createFollowOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotSearchMemberException, AlreadyLikedCollectionException,
+            throws NotSearchMemberException, AlreadyFollowedCollectionException,
             OverSearchFollowedCollectionException, NotSearchCollectionException {
 
-        Collection collection = collectionService.updateFollowedCollectionByMemberId(memberId, postId);
+        Collection collection = collectionService.insertFollowedCollectionByMemberId(memberId, postId);
 
         return new CollectionApiResult<Collection>(collection);
     }
+
+    @PostMapping("/post")
+    public CollectionApiResult<List<Collection>> addPostInCollections(
+            @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
+            throws OverSearchCollectedPostException, NotSearchMemberException,
+            NotSearchPostException, AlreadyCollectedPostException, NotSearchCollectionException {
+
+        List<Collection> collections = collectionService.insertCollectedPosts(memberId, postId, collectionIds);
+
+        return new CollectionApiResult<List<Collection>>(collections);
+    }
+
 
     @Data
     @AllArgsConstructor

@@ -1,14 +1,10 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
@@ -23,12 +19,9 @@ import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -36,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaCommentInPostServiceTest {
+class CommentInPostServiceTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
@@ -63,7 +56,7 @@ class JpaCommentInPostServiceTest {
 
         //when
         System.out.println("서비스함수");
-        CommentInPost comment = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
+        CommentInPost comment = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
 
         System.out.println("포스트업로드");
         Post post = postRepository.findById(po.getId()).get();
@@ -89,10 +82,10 @@ class JpaCommentInPostServiceTest {
         //when
 
         System.out.println("서비스함수1");
-        CommentInPost childComment1 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살"));
+        CommentInPost childComment1 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살"));
 
         System.out.println("서비스함수2");
-        CommentInPost childComment2 = commentInPostService.saveCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+        CommentInPost childComment2 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
 
         System.out.println("부모댓글업로드");
         CommentInPost parentComment = commentInPostRepository.findById(parent.getId()).get();
@@ -112,7 +105,7 @@ class JpaCommentInPostServiceTest {
     }
 
     @Test
-    public void 댓글_저장시_예외처리() throws Exception{
+    public void 댓글_저장시_파라미터_예외처리() throws Exception{
 
         //given
         Member mem = Member.buildMember().build();
@@ -130,11 +123,11 @@ class JpaCommentInPostServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO1))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO1))
                 .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO2))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2))
                 .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO3))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3))
                 .isInstanceOf(NotSearchCommentInPostException.class);//.hasMessageContaining("")
 
 

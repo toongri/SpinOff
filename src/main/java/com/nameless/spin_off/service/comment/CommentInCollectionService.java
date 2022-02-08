@@ -7,6 +7,6 @@ import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionExcep
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 
 public interface CommentInCollectionService {
-    CommentInCollection saveCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
+    CommentInCollection insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
             throws NotSearchMemberException, NotSearchCollectionException, NotSearchCommentInCollectionException;
 }

@@ -1,17 +1,14 @@
 package com.nameless.spin_off.entity.collections;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.ViewedPostByIp;
+import com.nameless.spin_off.exception.collection.OverSearchCollectedPostException;
 import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchLikedCollectionException;
 import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
 import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
-import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -241,7 +238,7 @@ public class Collection extends BaseTimeEntity {
     }
 
     public Boolean isNotMemberAlreadyLikeCollection(Member member)
-            throws OverSearchViewedCollectionByIpException {
+            throws OverSearchLikedCollectionException {
 
         List<LikedCollection> likedCollections = this.likedCollections
                 .stream().filter(likedCollection -> likedCollection.getMember().equals(member))
@@ -254,7 +251,7 @@ public class Collection extends BaseTimeEntity {
         else if (size == 1)
             return false;
         else
-            throw new OverSearchViewedCollectionByIpException();
+            throw new OverSearchLikedCollectionException();
     }
 
     public Boolean isNotMemberAlreadyFollowCollection(Member member)
@@ -272,6 +269,23 @@ public class Collection extends BaseTimeEntity {
             return false;
         else
             throw new OverSearchFollowedCollectionException();
+    }
+
+    public Boolean isNotAlreadyCollectedPost(Post post)
+            throws OverSearchCollectedPostException {
+
+        List<CollectedPost> collectedPosts = this.collectedPosts
+                .stream().filter(collectedPost -> collectedPost.getPost().equals(post))
+                .collect(Collectors.toList());
+
+        int size = collectedPosts.size();
+
+        if (size == 0)
+            return true;
+        else if (size == 1)
+            return false;
+        else
+            throw new OverSearchCollectedPostException();
     }
 
 }

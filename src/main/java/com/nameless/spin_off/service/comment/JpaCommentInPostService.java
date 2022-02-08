@@ -31,7 +31,7 @@ public class JpaCommentInPostService implements CommentInPostService {
 
     @Override
     @Transactional(readOnly = false)
-    public CommentInPost saveCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotSearchMemberException, NotSearchPostException, NotSearchCommentInPostException {
+    public CommentInPost insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotSearchMemberException, NotSearchPostException, NotSearchCommentInPostException {
 
         Member member = getMemberById(commentVO.getMemberId());
         Post post = getPostById(commentVO.getPostId());

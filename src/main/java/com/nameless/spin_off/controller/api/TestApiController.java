@@ -50,7 +50,7 @@ public class TestApiController {
     @PostMapping("/{id}/post")
     public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
 
-        Long postId = postService.savePostByPostVO(createPost);
+        Long postId = postService.insertPostByPostVO(createPost);
 
         return new TestApiResult(postId);
     }

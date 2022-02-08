@@ -1,6 +1,5 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
@@ -8,6 +7,7 @@ import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
@@ -32,7 +32,7 @@ public class PostApiController {
     public PostApiResult<Long> createPostOne(@RequestBody CreatePostVO createPost) throws
             NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
 
-        Long postId = postService.savePostByPostVO(createPost);
+        Long postId = postService.insertPostByPostVO(createPost);
 
         return new PostApiResult<Long>(postId);
     }
@@ -40,9 +40,9 @@ public class PostApiController {
     @PostMapping("/like")
     public PostApiResult<Post> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
             throws NotSearchMemberException, NotSearchPostException,
-            OverSearchViewedPostByIpException, AlreadyLikedPostException {
+            OverSearchLikedPostException, AlreadyLikedPostException {
 
-        Post post = postService.updateLikedPostByMemberId(memberId, postId);
+        Post post = postService.insertLikedPostByMemberId(memberId, postId);
 
         return new PostApiResult<Post>(post);
     }
@@ -51,7 +51,7 @@ public class PostApiController {
     public PostApiResult<Post> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
             throws NotSearchPostException, OverSearchViewedPostByIpException {
 
-        Post post = postService.updateViewedPostByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
+        Post post = postService.insertViewedPostByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
 
         return new PostApiResult<Post>(post);
     }

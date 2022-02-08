@@ -30,7 +30,7 @@ public class CommentApiController {
     @PostMapping("/post")
     public CommentApiResult<CommentInPost> createCommentInPost(@RequestBody CreateCommentInPostVO commentVO)
             throws NotSearchMemberException, NotSearchPostException, NotSearchCommentInPostException {
-        CommentInPost commentInPost = commentInPostService.saveCommentInPostByCommentVO(commentVO);
+        CommentInPost commentInPost = commentInPostService.insertCommentInPostByCommentVO(commentVO);
         return new CommentApiResult<CommentInPost>(commentInPost);
     }
 
@@ -39,7 +39,7 @@ public class CommentApiController {
             @RequestBody CommentDto.CreateCommentInCollectionVO commentVO)
             throws NotSearchMemberException, NotSearchCollectionException, NotSearchCommentInCollectionException {
 
-        CommentInCollection comment = commentInCollectionService.saveCommentInCollectionByCommentVO(commentVO);
+        CommentInCollection comment = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
         return new CommentApiResult<CommentInCollection>(comment);
     }
 

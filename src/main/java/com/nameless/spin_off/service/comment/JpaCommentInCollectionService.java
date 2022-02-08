@@ -27,7 +27,7 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
     @Override
     @Transactional(readOnly = false)
-    public CommentInCollection saveCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
+    public CommentInCollection insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
             throws NotSearchMemberException, NotSearchCollectionException, NotSearchCommentInCollectionException {
 
         Member member = getMemberById(commentVO.getMemberId());

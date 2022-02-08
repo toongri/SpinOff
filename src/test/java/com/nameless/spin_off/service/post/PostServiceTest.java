@@ -9,6 +9,10 @@ import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
+import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
+import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
+import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
@@ -19,14 +23,11 @@ import com.nameless.spin_off.service.comment.CommentInPostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import javax.swing.text.html.parser.Entity;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -35,7 +36,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaPostServiceTest {
+class PostServiceTest {
 
     @Autowired PostService postService;
     @Autowired CommentInPostService commentInPostService;
@@ -85,7 +86,7 @@ class JpaPostServiceTest {
                 "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
                 List.of("형윤이", "형윤이?"), List.of(), collectionIds);
 
-        Long aLong = postService.savePostByPostVO(createPostVO);
+        Long aLong = postService.insertPostByPostVO(createPostVO);
         Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
 
         Long postCollectionCount = post1.getCollectionCount();
@@ -119,7 +120,7 @@ class JpaPostServiceTest {
     }
 
     @Test
-    public void 글_생성_예외처리() throws Exception{
+    public void 글_생성_파라미터_예외처리() throws Exception{
 
         //given
         Member member = Member.buildMember().build();
@@ -139,13 +140,13 @@ class JpaPostServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO1))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO1))
                 .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO2))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2))
                 .isInstanceOf(NotSearchMovieException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO3))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3))
                 .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
     }
 
@@ -163,7 +164,7 @@ class JpaPostServiceTest {
 
         //when
         System.out.println("서비스함수");
-        postService.updateLikedPostByMemberId(mem.getId(), po.getId());
+        postService.insertLikedPostByMemberId(mem.getId(), po.getId());
 
         System.out.println("포스트");
         Post post = postRepository.findById(po.getId()).get();
@@ -177,6 +178,82 @@ class JpaPostServiceTest {
         assertThat(likeCount).isEqualTo(1);
         assertThat(likedPosts.size()).isEqualTo(1);
         assertThat(likedPosts.get(0).getMember()).isEqualTo(member);
+
+    }
+
+    @Test
+    public void 글_좋아요_파라미터_예외처리() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        postService.insertLikedPostByMemberId(mem.getId(), po.getId());
+
+        System.out.println("포스트");
+        Post post = postRepository.findById(po.getId()).get();
+        System.out.println("멤버");
+        Member member = memberRepository.findById(mem.getId()).get();
+
+        //then
+        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(0L, po.getId()))
+                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+
+        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), 0L))
+                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 글_좋아요_중복삽입_예외처리() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        postService.insertLikedPostByMemberId(mem.getId(), po.getId());
+        System.out.println("서비스함수2");
+
+        //then
+        System.out.println("서비스함수2");
+        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po.getId()))
+                .isInstanceOf(AlreadyLikedPostException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 글_좋아요_복수데이터_예외처리() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+        po.addLikedPostByMember(mem);
+        po.addLikedPostByMember(mem);
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po.getId()))
+                .isInstanceOf(OverSearchLikedPostException.class);//.hasMessageContaining("")
 
     }
 
@@ -196,7 +273,7 @@ class JpaPostServiceTest {
 
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
 
         //then
         assertThat(post1.getViewCount()).isEqualTo(post1.getViewedPostByIps().size());
@@ -213,7 +290,7 @@ class JpaPostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
 
         em.flush();
         em.clear();
@@ -221,7 +298,7 @@ class JpaPostServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post2 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        Post post2 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
         
         //then
         assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
@@ -239,7 +316,7 @@ class JpaPostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
 
         em.flush();
         em.clear();
@@ -247,11 +324,38 @@ class JpaPostServiceTest {
         //when
         now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
-        Post post2 = postService.updateViewedPostByIp("00", post.getId(), now, 60L);
+        Post post2 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
 
         //then
         assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
         assertThat(post2.getViewCount()).isEqualTo(2);
 
     }
+
+    @Test
+    public void 글_조회수_파리미터_AND_복수데이터_예외처리() throws Exception{
+
+        //given
+        LocalDateTime now;
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+        now = LocalDateTime.now();
+        po.addViewedPostByIp("00");
+        po.addViewedPostByIp("00");
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L, now, 60L))
+                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", po.getId(), now, 60L))
+                .isInstanceOf(OverSearchViewedPostByIpException.class);//.hasMessageContaining("")
+
+    }
+
 }

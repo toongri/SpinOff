@@ -10,6 +10,7 @@ import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -38,7 +39,7 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Long savePostByPostVO(CreatePostVO postVO)
+    public Long insertPostByPostVO(CreatePostVO postVO)
             throws NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
 
         Member member = getMemberById(postVO.getMemberId());
@@ -77,9 +78,9 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Post updateLikedPostByMemberId(Long memberId, Long postId)
+    public Post insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotSearchMemberException, NotSearchPostException,
-            OverSearchViewedPostByIpException, AlreadyLikedPostException {
+            OverSearchLikedPostException, AlreadyLikedPostException {
 
         Member member = getMemberById(memberId);
         Post post = getPostByIdWithLikedPost(postId);
@@ -95,7 +96,7 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Post updateViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
+    public Post insertViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
             throws NotSearchPostException, OverSearchViewedPostByIpException {
 
         Post post = getPostByIdWithViewedIp(postId);
@@ -106,7 +107,6 @@ public class JpaPostService implements PostService{
 
         return post;
     }
-
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) {
 
         List<Hashtag> alreadySavedHashtags = hashtagRepository.findAllByContentIn(hashtagContents);

@@ -23,6 +23,12 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findAllIncludePostOrderByCollectionIdAndPostId();
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
+            "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
+            "LEFT JOIN FETCH collectedposts.post post " +
+            "WHERE collection.id in :postIds AND collection.member.id = :memberId")
+    List<Collection> findAllByIdInIncludePost(@Param("postIds") List<Long> postIds, @Param("memberId") Long memberId);
+
+    @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.likedCollections " +
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdIncludeLikedCollection(@Param("id") Long id);

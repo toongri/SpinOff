@@ -4,15 +4,10 @@ import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
+import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
-import com.nameless.spin_off.repository.collections.ViewedCollectionByIpRepository;
-import com.nameless.spin_off.repository.collections.VisitedCollectionByMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,15 +24,13 @@ import java.util.Optional;
 public class JpaCollectionService implements CollectionService {
 
     private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
     private final CollectionRepository collectionRepository;
-    private final ViewedCollectionByIpRepository viewedCollectionByIpRepository;
-    private final VisitedCollectionByMemberRepository visitedCollectionByMemberRepository;
+    private final PostRepository postRepository;
 
 
     @Transactional(readOnly = false)
     @Override
-    public Long saveCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotSearchMemberException {
+    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotSearchMemberException {
 
         Member member = getMemberById(collectionVO.getMemberId());
         Collection collection = Collection.createCollection(member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
@@ -46,9 +40,9 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateLikedCollectionByMemberId(Long memberId, Long collectionId)
+    public Collection insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotSearchMemberException, NotSearchCollectionException,
-            OverSearchViewedCollectionByIpException, AlreadyLikedCollectionException {
+            OverSearchLikedCollectionException, AlreadyLikedCollectionException {
 
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithLikedCollection(collectionId);
@@ -64,7 +58,7 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateViewedCollectionByIp(String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
+    public Collection insertViewedCollectionByIp(String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
             throws NotSearchCollectionException, OverSearchViewedCollectionByIpException {
 
         Collection collection = getCollectionByIdWithViewedIp(collectionId);
@@ -78,9 +72,9 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Collection updateFollowedCollectionByMemberId(Long memberId, Long collectionId)
+    public Collection insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotSearchMemberException, NotSearchCollectionException,
-            OverSearchFollowedCollectionException, AlreadyLikedCollectionException {
+            OverSearchFollowedCollectionException, AlreadyFollowedCollectionException {
 
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithFollowedCollection(collectionId);
@@ -88,10 +82,49 @@ public class JpaCollectionService implements CollectionService {
         if (collection.isNotMemberAlreadyFollowCollection(member)) {
             collection.addFollowedCollectionByMember(member);
         } else {
-            throw new AlreadyLikedCollectionException();
+            throw new AlreadyFollowedCollectionException();
         }
 
         return collection;
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public List<Collection> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+            throws NotSearchMemberException, NotSearchCollectionException,
+            NotSearchPostException, OverSearchCollectedPostException, AlreadyCollectedPostException {
+
+        Member member = getMemberById(memberId);
+
+        Post post = getPost(postId);
+
+        List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
+
+        for (Collection collection : collections) {
+            if (collection.isNotAlreadyCollectedPost(post)) {
+                collection.addCollectedPostByPost(post);
+            } else {
+                throw new AlreadyCollectedPostException();
+            }
+        }
+
+        return collections;
+    }
+
+    private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
+            throws NotSearchCollectionException {
+        List<Collection> collections = collectionRepository.findAllByIdInIncludePost(collectionIds, memberId);
+
+        if (collections.size() != collectionIds.size()) {
+            throw new NotSearchCollectionException();
+        }
+        return collections;
+    }
+
+    private Post getPost(Long postId) throws NotSearchPostException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        Post post = optionalPost.orElseThrow(NotSearchPostException::new);
+        return post;
     }
 
     private Member getMemberById(Long memberId) throws NotSearchMemberException {

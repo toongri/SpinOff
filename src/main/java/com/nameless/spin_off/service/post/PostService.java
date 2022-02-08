@@ -7,19 +7,21 @@ import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface PostService {
 
-    Long savePostByPostVO(PostDto.CreatePostVO postVO)
+    Long insertPostByPostVO(PostDto.CreatePostVO postVO)
             throws NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException;
 
-    Post updateLikedPostByMemberId(Long memberId, Long postId)
+    Post insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotSearchMemberException, NotSearchPostException,
-            OverSearchViewedPostByIpException, AlreadyLikedPostException;
+            OverSearchLikedPostException, AlreadyLikedPostException;
 
-    Post updateViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
+    Post insertViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
             throws NotSearchPostException, OverSearchViewedPostByIpException;
 }
