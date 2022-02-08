@@ -107,39 +107,7 @@ class JpaCommentInCollectionServiceTest {
     }
 
     @Test
-    public void 댓글_저장시_멤버미스_예외처리() throws Exception{
-
-        //given
-        CreateCommentInCollectionVO commentInCollectionVO =
-                new CreateCommentInCollectionVO(0L, 0L, 0L, "");
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
-
-    }
-
-    @Test
-    public void 댓글_저장시_컬렉션미스_예외처리() throws Exception{
-
-        //given
-        Member mem = Member.buildMember().build();
-        memberRepository.save(mem);
-        CreateCommentInCollectionVO commentInCollectionVO =
-                new CreateCommentInCollectionVO(mem.getId(), 0L, 0L, "");
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
-
-    }
-
-    @Test
-    public void 댓글_저장시_부모댓글미스_예외처리() throws Exception{
+    public void 댓글_저장시_예외처리() throws Exception{
 
         //given
         Member mem = Member.buildMember().build();
@@ -147,15 +115,25 @@ class JpaCommentInCollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
 
-        CreateCommentInCollectionVO commentInCollectionVO =
+        CreateCommentInCollectionVO commentInCollectionVO1 =
+                new CreateCommentInCollectionVO(0L, 0L, 0L, "");
+
+        CreateCommentInCollectionVO commentInCollectionVO2 =
+                new CreateCommentInCollectionVO(mem.getId(), 0L, 0L, "");
+
+        CreateCommentInCollectionVO commentInCollectionVO3 =
                 new CreateCommentInCollectionVO(mem.getId(), col.getId(), 0L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO))
+        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO1))
+                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO2))
+                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInCollectionService.saveCommentInCollectionByCommentVO(commentInCollectionVO3))
                 .isInstanceOf(NotSearchCommentInCollectionException.class);//.hasMessageContaining("")
 
-
     }
+
 }

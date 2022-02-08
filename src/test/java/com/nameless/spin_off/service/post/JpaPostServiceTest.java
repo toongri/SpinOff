@@ -6,6 +6,9 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
@@ -27,6 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -112,6 +116,37 @@ class JpaPostServiceTest {
         assertThat(postCollectionCount).isEqualTo(3);
         assertThat(postPostedHashtagSize).isEqualTo(2);
 
+    }
+
+    @Test
+    public void 글_생성_예외처리() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+
+        PostDto.CreatePostVO createPostVO1 = new PostDto.CreatePostVO(0L,
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                List.of(), List.of(), List.of());
+
+        PostDto.CreatePostVO createPostVO2 = new PostDto.CreatePostVO(member.getId(),
+                "알라리숑", "얄라리얄라", 0L, PublicOfPostStatus.PUBLIC,
+                List.of(), List.of(), List.of());
+
+        PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(member.getId(),
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                List.of(), List.of(), List.of(0L));
+        //when
+
+        //then
+        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO1))
+                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+
+        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO2))
+                .isInstanceOf(NotSearchMovieException.class);//.hasMessageContaining("")
+
+        assertThatThrownBy(() -> postService.savePostByPostVO(createPostVO3))
+                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
     }
 
     @Test

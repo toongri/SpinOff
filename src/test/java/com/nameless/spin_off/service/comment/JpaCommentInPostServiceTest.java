@@ -112,39 +112,7 @@ class JpaCommentInPostServiceTest {
     }
 
     @Test
-    public void 댓글_저장시_멤버미스_예외처리() throws Exception{
-
-        //given
-        CommentDto.CreateCommentInPostVO commentInPostVO =
-                new CommentDto.CreateCommentInPostVO(0L, 0L, 0L, "");
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
-
-    }
-
-    @Test
-    public void 댓글_저장시_컬렉션미스_예외처리() throws Exception{
-
-        //given
-        Member mem = Member.buildMember().build();
-        memberRepository.save(mem);
-        CommentDto.CreateCommentInPostVO commentInPostVO =
-                new CommentDto.CreateCommentInPostVO(mem.getId(), 0L, 0L, "");
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
-                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
-
-    }
-
-    @Test
-    public void 댓글_저장시_부모댓글미스_예외처리() throws Exception{
+    public void 댓글_저장시_예외처리() throws Exception{
 
         //given
         Member mem = Member.buildMember().build();
@@ -152,13 +120,21 @@ class JpaCommentInPostServiceTest {
         Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
 
-        CommentDto.CreateCommentInPostVO commentInPostVO =
+        CommentDto.CreateCommentInPostVO commentInPostVO1 =
+                new CommentDto.CreateCommentInPostVO(0L, 0L, 0L, "");
+        CommentDto.CreateCommentInPostVO commentInPostVO2 =
+                new CommentDto.CreateCommentInPostVO(mem.getId(), 0L, 0L, "");
+        CommentDto.CreateCommentInPostVO commentInPostVO3 =
                 new CommentDto.CreateCommentInPostVO(mem.getId(), post.getId(), 0L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO))
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO1))
+                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO2))
+                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInPostService.saveCommentInPostByCommentVO(commentInPostVO3))
                 .isInstanceOf(NotSearchCommentInPostException.class);//.hasMessageContaining("")
 
 

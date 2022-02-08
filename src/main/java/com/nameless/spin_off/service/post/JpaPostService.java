@@ -5,6 +5,7 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
@@ -37,7 +38,8 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Long savePostByPostVO(CreatePostVO postVO) throws NotSearchMemberException, NotSearchMovieException {
+    public Long savePostByPostVO(CreatePostVO postVO)
+            throws NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
 
         Member member = getMemberById(postVO.getMemberId());
 
@@ -57,10 +59,20 @@ public class JpaPostService implements PostService{
                 .setContent(postVO.getContent())
                 .build();
 
-        List<Collection> collections = collectionRepository.findAllByIdIn(postVO.getCollectionIds());
+        List<Collection> collections = getCollectionsByIdIn(postVO.getCollectionIds());
         collections.forEach(collection -> collection.addCollectedPostByPost(post));
 
         return postRepository.save(post).getId();
+    }
+
+    private List<Collection> getCollectionsByIdIn(List<Long> collectionIds) throws NotSearchCollectionException {
+        List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
+
+        if (collections.size() == collectionIds.size()) {
+            return collections;
+        } else {
+            throw new NotSearchCollectionException();
+        }
     }
 
     @Transactional(readOnly = false)

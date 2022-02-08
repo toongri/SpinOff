@@ -1,7 +1,9 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
@@ -27,17 +29,31 @@ public class PostApiController {
 
 
     @PostMapping("")
-    public PostApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotSearchMemberException, NotSearchMovieException {
+    public PostApiResult<Long> createPostOne(@RequestBody CreatePostVO createPost) throws
+            NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
+
         Long postId = postService.savePostByPostVO(createPost);
 
-        return new PostApiResult(postId);
+        return new PostApiResult<Long>(postId);
     }
 
     @PostMapping("/like")
-    public PostApiResult createLikeOne(@RequestBody Long memberId, @RequestBody Long postId) throws NotSearchMemberException, NotSearchPostException, OverSearchViewedPostByIpException, AlreadyLikedPostException {
+    public PostApiResult<Post> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
+            throws NotSearchMemberException, NotSearchPostException,
+            OverSearchViewedPostByIpException, AlreadyLikedPostException {
+
         Post post = postService.updateLikedPostByMemberId(memberId, postId);
 
-        return new PostApiResult(post);
+        return new PostApiResult<Post>(post);
+    }
+
+    @PostMapping("/view")
+    public PostApiResult<Post> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
+            throws NotSearchPostException, OverSearchViewedPostByIpException {
+
+        Post post = postService.updateViewedPostByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
+
+        return new PostApiResult<Post>(post);
     }
 
     @Data
