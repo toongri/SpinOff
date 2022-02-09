@@ -1,6 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collections.QCollection;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.collections.QCollection.collection;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.post.QPost.post;
 
@@ -59,7 +61,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .where(post.createdDate.between(startDateTime, endDateTime))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
-                .orderBy(post.collectionCount.add(post.commentCount.add(post.likeCount).add(post.viewCount)).desc())
+                .orderBy(post.popularity.desc())
                 .fetch();
 
         boolean hasNext = false;
@@ -69,6 +71,28 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
 
+    @Override
+    public Slice<Collection> findCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
+            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
+
+        List<Collection> content = jpaQueryFactory
+                .select(collection)
+                .from(collection)
+                .join(collection.member, member).fetchJoin()
+                .where(collection.lastModifiedDate.between(startDateTime, endDateTime))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(collection.popularity.desc())
+                .fetch();
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
     }
 }
