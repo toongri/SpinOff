@@ -4,6 +4,7 @@ import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.repository.query.QuerydslPostQueryRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

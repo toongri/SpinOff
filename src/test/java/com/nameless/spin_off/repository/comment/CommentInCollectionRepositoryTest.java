@@ -8,7 +8,7 @@ import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.query.PostQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;

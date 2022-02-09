@@ -14,15 +14,25 @@ public class PostDto {
     @Data
     @NoArgsConstructor
     public static class MainPagePostDto {
-        private String imgUrl;
-        private String title;
-        private String memberProfileImg;
 
-        @QueryProjection
-        public MainPagePostDto(String imgUrl, String title, String memberProfileImg) {
-            this.imgUrl = imgUrl;
-            this.title = title;
-            this.memberProfileImg = memberProfileImg;
+        private Long postId;
+        private String postTitle;
+        private Long memberId;
+        private String memberNickname;
+        private String memberProfileImgUrl;
+        private String postImgUrl;
+
+        public MainPagePostDto(Post post) {
+            this.postId = post.getId();
+            this.postTitle = post.getTitle();
+            this.memberId = post.getMember().getId();
+            this.memberNickname = post.getMember().getNickname();
+            this.memberProfileImgUrl = post.getMember().getProfileImg();
+
+            if (post.getPostedMedias().size() != 0)
+                this.postImgUrl = post.getPostedMedias().get(0).getUrl();
+            else
+                this.postImgUrl = null;
         }
     }
 

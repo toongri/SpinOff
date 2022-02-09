@@ -1,8 +1,7 @@
-package com.nameless.spin_off.repository.post.query;
+package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
-import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -18,23 +17,20 @@ import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 @RequiredArgsConstructor
-public class QuerydslPostQueryRepository implements PostQueryRepository {
+public class QuerydslMainPageQueryRepository implements MainPageQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<MainPagePostDto> findPostsOrderByCreatedDateBySlicing(Pageable pageable) {
+    public Slice<Post> findPostsOrderByIdBySlicing(Pageable pageable) {
 
-        List<MainPagePostDto> content = jpaQueryFactory
-                .select(new QPostDto_MainPagePostDto(
-                        member.nickname,
-                        post.title,
-                        member.profileImg))
+        List<Post> content = jpaQueryFactory
+                .select(post)
                 .from(post)
-                .join(member).fetchJoin()
+                .join(post.member, member).fetchJoin()
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
-                .orderBy(post.createdDate.desc())
+                .orderBy(post.id.desc())
                 .fetch();
 
         boolean hasNext = false;
@@ -53,16 +49,13 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
     }
 
     @Override
-    public Slice<MainPagePostDto> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
+    public Slice<Post> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
-        List<MainPagePostDto> content = jpaQueryFactory
-                .select(new QPostDto_MainPagePostDto(
-                        member.nickname,
-                        post.title,
-                        member.profileImg))
+        List<Post> content = jpaQueryFactory
+                .select(post)
                 .from(post)
-                .join(member).fetchJoin()
+                .join(post.member, member).fetchJoin()
                 .where(post.createdDate.between(startDateTime, endDateTime))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -77,22 +70,5 @@ public class QuerydslPostQueryRepository implements PostQueryRepository {
 
         return new SliceImpl<>(content, pageable, hasNext);
 
-    }
-
-    public Post testFindOne(Long id) {
-        return jpaQueryFactory
-                .select(post)
-                .from(post)
-                .leftJoin(post.member, member).fetchJoin()
-                .where(post.id.eq(id))
-                .fetchOne();
-    }
-
-    public List<Post> testFindAll() {
-        return jpaQueryFactory
-                .select(post)
-                .from(post)
-                .leftJoin(post.member, member).fetchJoin()
-                .fetch();
     }
 }

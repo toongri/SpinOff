@@ -6,7 +6,7 @@ import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
 import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.exception.movie.NotSearchMovieException;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.query.PostQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;

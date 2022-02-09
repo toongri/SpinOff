@@ -66,6 +66,7 @@ public class Post extends BaseTimeEntity {
     private Long likeCount;
     private Long commentCount;
     private Long collectionCount;
+    private Long popularity;
 
     //==연관관계 메소드==//
 
@@ -138,6 +139,7 @@ public class Post extends BaseTimeEntity {
         this.likeCount = 0L;
         this.commentCount = 0L;
         this.collectionCount = 0L;
+        this.popularity = 0L;
     }
 
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
@@ -146,18 +148,22 @@ public class Post extends BaseTimeEntity {
 
     public void updateViewCount() {
         this.viewCount += 1;
+        this.popularity += 1;
     }
 
     public void updateLikeCount() {
         this.likeCount += 1;
+        this.popularity += 1;
     }
 
     public void updateCommentInPostCount() {
         this.commentCount += 1;
+        this.popularity += 1;
     }
 
     public void updateCollectionCount() {
         this.collectionCount += 1;
+        this.popularity += 1;
     }
 
     public void updatePostedMedias(List<PostedMedia> postedMedias) {
