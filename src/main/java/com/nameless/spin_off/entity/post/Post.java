@@ -145,19 +145,19 @@ public class Post extends BaseTimeEntity {
     }
 
     public void updateViewCount() {
-        this.viewCount = this.viewCount + 1;
+        this.viewCount += 1;
     }
 
     public void updateLikeCount() {
-        this.likeCount = this.likeCount + 1;
+        this.likeCount += 1;
     }
 
     public void updateCommentInPostCount() {
-        this.commentCount = this.commentCount + 1;
+        this.commentCount += 1;
     }
 
     public void updateCollectionCount() {
-        this.collectionCount = this.collectionCount + 1;
+        this.collectionCount += 1;
     }
 
     public void updatePostedMedias(List<PostedMedia> postedMedias) {
@@ -229,7 +229,8 @@ public class Post extends BaseTimeEntity {
 
     public Boolean isNotMemberAlreadyLikePost(Member member) throws OverSearchLikedPostException {
 
-        List<LikedPost> likedPosts = this.likedPosts.stream().filter(likedPost -> likedPost.getMember().equals(member))
+        List<LikedPost> likedPosts = this.likedPosts.stream()
+                .filter(likedPost -> likedPost.getMember().equals(member))
                 .collect(Collectors.toList());
 
         int size = likedPosts.size();

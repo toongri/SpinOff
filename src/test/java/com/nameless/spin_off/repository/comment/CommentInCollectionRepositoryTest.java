@@ -58,7 +58,7 @@ class CommentInCollectionRepositoryTest {
 
         //when
         List<CommentInCollection> list = commentInCollectionRepository
-                .findParentsByCollectionIncludeChildrenOrderByDesc(collection);
+                .findParentsByCollectionIdIncludeChildrenOrderByParentIdAndChildIdDesc(collection);
 
         //then
         for (CommentInCollection comment : list) {

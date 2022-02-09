@@ -1,16 +1,24 @@
 package com.nameless.spin_off.controller;
 
+import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
+import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.comment.CommentInCollectionService;
+import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -19,6 +27,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,7 +40,7 @@ public class InitDummy {
     private final InitDummyService initDummyService;
 
     @PostConstruct
-    public void init() {
+    public void init() throws Exception {
         initDummyService.init();
     }
 
@@ -45,9 +54,14 @@ public class InitDummy {
         private final CollectedPostRepository collectedPostRepository;
         private final HashtagRepository hashtagRepository;
         private final PostService postService;
+        private final CollectionService collectionService;
+        private final CommentInCollectionService commentInCollectionService;
+        private final CommentInPostService commentInPostService;
+        private final CommentInCollectionRepository commentInCollectionRepository;
+        private final CommentInPostRepository commentInPostRepository;
 
         @Transactional
-        public void init() {
+        public void init() throws Exception {
 
             List<Member> members = new ArrayList<>();
 
@@ -63,14 +77,59 @@ public class InitDummy {
             members.add(Member.createMember("jhkim03284@gmail.com", "abcdefg",
                     "toongri", "", "김준형", LocalDate.of(1994, 9, 23),
                     "010-3959-5195", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkimkkk0923@naver.com", "dfsdfd",
+                    "퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-2322-5195", "jhkimkkk0923@naver.com"));
+            members.add(Member.createMember("jhkimkkk0923@naver.com", "abcdefg",
+                    "투루투루퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-5195", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "abcdefg",
+                    "t00ngri", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-5195", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "dldld",
+                    "투투투퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "dkfjkd",
+                    "투퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "dfddd",
+                    "퉁투퉁퉁퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "ewhrtwjtr",
+                    "투루투루퉁퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "adfwfr",
+                    "앵그리퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "uikki7",
+                    "쏘앵그리퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "nrtyhyh",
+                    "엉터리퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "aetezwq",
+                    "mc퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "ghdrth",
+                    "투두두두두퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "gsgdfssg",
+                    "퉁퉁퉁퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "twtwru",
+                    "퉁퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
+            members.add(Member.createMember("jhkim03284@gmail.com", "hjgjty",
+                    "퉁기덕퉁그리", "", "김준형", LocalDate.of(1994, 9, 23),
+                    "010-3959-23123", "jhkim03284@gmail.com"));
 
             memberRepository.saveAll(members);
 
             List<Collection> collections = new ArrayList<>();
-            collections.add(Collection.createDefaultCollection(members.get(0)));
-            collections.add(Collection.createDefaultCollection(members.get(1)));
-            collections.add(Collection.createDefaultCollection(members.get(2)));
-            collections.add(Collection.createDefaultCollection(members.get(3)));
+
+            for (Member member : members) {
+                collections.add(Collection.createDefaultCollection(member));
+            }
             collections.add(Collection.createCollection(members.get(0), "감성쓰", "갬성스러운 컬렉션이에유", PublicOfCollectionStatus.PUBLIC));
             collections.add(Collection.createCollection(members.get(0), "spinoff레퍼런스", "개인레퍼런스", PublicOfCollectionStatus.PRIVATE));
             collections.add(Collection.createCollection(members.get(0), "졸작프로젝트", "졸작레퍼런스", PublicOfCollectionStatus.PUBLIC));
@@ -80,6 +139,16 @@ public class InitDummy {
             collections.add(Collection.createCollection(members.get(1), "독립영화", "독립영화 컬렉션", PublicOfCollectionStatus.PUBLIC));
             collections.add(Collection.createCollection(members.get(1), "상업영화", "상업영화 너무 달아~~~", PublicOfCollectionStatus.PUBLIC));
             collections.add(Collection.createCollection(members.get(2), "그거 진심이였어?", "이걸 드라이브를 진짜가네 ㄹㅇㅋㅋ", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(3), "퉁그리", "퉁그리 퉁그리 퉁그리 퉁그리", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(3), "퉁그리 퉁그리?", "퉁그리 퉁그리 퉁퉁그리", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(4), "test", "독립영화 컬렉션", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(5), "test", "상업영화 너무 달아~~~", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(6), "test?", "이걸 드라이브를 진짜가네 ㄹㅇㅋㅋ", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(7), "test?", "이걸 드라이브를 진짜가네 ㄹㅇㅋㅋ", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(8), "test", "독립영화 컬렉션", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(9), "test", "상업영화 너무 달아~~~", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(10), "test?", "이걸 드라이브를 진짜가네 ㄹㅇㅋㅋ", PublicOfCollectionStatus.PUBLIC));
+            collections.add(Collection.createCollection(members.get(11), "test?", "이걸 드라이브를 진짜가네 ㄹㅇㅋㅋ", PublicOfCollectionStatus.PUBLIC));
 
             collectionRepository.saveAll(collections);
 
@@ -137,23 +206,121 @@ public class InitDummy {
             posts.add(Post.createPost(members.get(1), "pinterest", "힙한 플랫폼", otoTstMeth(List.of("코딩", "개발", "취업", "네카라쿠베", "플랫폼", "어플"), hashtags), new ArrayList<>(), null, PublicOfPostStatus.PUBLIC));
             posts.add(Post.createPost(members.get(1), "스타트업", "솔직히 사수만 좋다고 보장해주면 대기업보다 여길 가고 싶어", otoTstMeth(List.of("코딩", "개발", "취업", "네카라쿠베", "플랫폼", "어플"), hashtags), new ArrayList<>(), null, PublicOfPostStatus.PUBLIC));
 
+            int hashNum = hashtags.size();
+            int mnum = members.size();
+            for (int i = 0; i < 80; i++) {
+                int memNum = (int)(Math.random() * mnum);
+                List<Hashtag> arr = new ArrayList<>();
+                for (int j = 0; j < 7; j++) {
+                    arr.add(hashtags.get((int)(Math.random() * hashNum)));
+                }
+                posts.add(Post.createPost(members.get(memNum), ""+i, ""+i, arr, List.of(), null, PublicOfPostStatus.PUBLIC));
+            }
+
             postRepository.saveAll(posts);
 
-            List<List<Integer>> lists = List.of(
-                    List.of(0, 1, 2, 23, 26, 27),
-                    List.of(3, 4, 5, 7, 10, 15, 16, 17, 19, 21, 22, 24, 25),
-                    List.of(3, 4, 5, 7, 10, 15, 16, 17, 19, 24, 25, 27, 33, 34, 35),
-                    List.of(3, 4, 5, 6, 7, 8, 10, 15, 16, 25, 27, 33, 34, 35),
-                    List.of(0, 1, 2, 5, 21, 22, 23, 26),
-                    List.of(0, 1, 2, 3, 4, 7, 15, 16, 17, 19, 20, 23, 24, 28, 34),
-                    List.of(0, 1, 2, 3, 8, 15, 16, 26, 35),
-                    List.of(4, 10, 17, 19, 20, 21, 22, 24, 28, 29, 30, 31, 32, 34),
-                    List.of(6, 11, 12, 13, 14, 18, 20, 28));
+            int max, mathNum, memberNum, postNum, collectionNum, parentNum;
+            Long memberId, postId, collectionId, parentId;
 
-            for (int i = members.size(); i < collections.size(); i++) {
-                for (int j : lists.get(i - members.size())) {
-                    collections.get(i).addCollectedPostByPost(posts.get(j));
+            max = collections.size() * posts.size();
+            int memberSize = members.size();
+            int postSize = posts.size();
+            int collectionSize = collections.size();
+
+            for (int j = 0; j < max; j++) {
+                mathNum = (int) (Math.random() * 10);
+                memberNum = (int) (Math.random() * memberSize);
+                postNum = (int) (Math.random() * postSize);
+                collectionNum = (int) (Math.random() * collectionSize);
+                memberId = members.get(memberNum).getId();
+                collectionId = collections.get(collectionNum).getId();
+
+                try {
+                    if (mathNum <= 5) {
+                        collectionService.insertViewedCollectionByIp("" + (int) (Math.random() * 100000), collectionId, LocalDateTime.now(), 0L);
+                    } else if (mathNum == 6) {
+                        collectionService.insertFollowedCollectionByMemberId(memberId, collectionId);
+                    } else if (mathNum == 7) {
+                        collectionService.insertLikedCollectionByMemberId(memberId, collectionId);
+                    } else if (mathNum < 9){
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(memberId, collectionId, null, ""));
+                    } else if (mathNum >= 9){
+                        Collection collection = collectionRepository.findById(collectionId).get();
+                        List<CommentInCollection> comment = commentInCollectionRepository.findParentsByCollectionId(collection);
+                        int size = comment.size();
+                        if (size == 0) {
+                            commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(memberId, collectionId, null, ""));
+                        } else {
+                            parentNum = (int) (Math.random() * size);
+
+                            parentId = comment.get(parentNum).getId();
+                            commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(memberId, collectionId, parentId, ""));
+                        }
+                    }
+
+                } catch (Exception e) {
+                    Collection collection = collectionRepository.findById(collectionId).get();
+                    List<CommentInCollection> comment = commentInCollectionRepository.findParentsByCollectionId(collection);
+                    int size = comment.size();
+                    if (size == 0) {
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(memberId, collectionId, null, ""));
+                    }else {
+                        parentNum = (int) (Math.random() * size);
+
+                        parentId = comment.get(parentNum).getId();
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(memberId, collectionId, parentId, ""));
+                    }
                 }
+
+            }
+
+            max = members.size() * posts.size() * 2;
+            for (int j = 0; j < max; j++) {
+                mathNum = (int) (Math.random() * 11);
+                memberNum = (int) (Math.random() * memberSize);
+                postNum = (int) (Math.random() * postSize);
+                collectionNum = (int) (Math.random() * collectionSize);
+                memberId = members.get(memberNum).getId();
+                postId = posts.get(postNum).getId();
+                collectionId = collections.get(collectionNum).getId();
+
+                try {
+                    if (mathNum == 0) {
+                        postService.insertLikedPostByMemberId(memberId, postId);
+                    } else if (mathNum <= 5) {
+                        postService.insertViewedPostByIp("" + (int) (Math.random() * 100000), postId, LocalDateTime.now(), 0L);
+                    } else if (mathNum <= 7) {
+                        Collection collection = collectionRepository.findById(collectionId).get();
+                        collectionService.insertCollectedPosts(collection.getMember().getId(), postId, List.of(collectionId));
+                    } else if (mathNum < 10) {
+                        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(memberId, postId, null, ""));
+                    } else if (mathNum >= 10) {
+                        Post post = postRepository.findById(postId).get();
+                        List<CommentInPost> comment = commentInPostRepository.findParentsByPost(post);
+                        int size = comment.size();
+                        if (size == 0) {
+                            commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(memberId, postId, null, ""));
+                        } else {
+                            parentNum = (int) (Math.random() * size);
+
+                            parentId = comment.get(parentNum).getId();
+                            commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(memberId, postId, parentId, ""));
+                        }
+                    }
+                } catch (Exception e) {
+                    Post post = postRepository.findById(postId).get();
+                    List<CommentInPost> comment = commentInPostRepository.findParentsByPost(post);
+                    int size = comment.size();
+                    if (size == 0) {
+                        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(memberId, postId, null, ""));
+                    } else {
+                        parentNum = (int) (Math.random() * size);
+
+                        parentId = comment.get(parentNum).getId();
+                        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(memberId, postId, parentId, ""));
+                    }
+                }
+
             }
         }
 

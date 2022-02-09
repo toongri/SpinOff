@@ -1,6 +1,5 @@
 package com.nameless.spin_off.repository.comment;
 
-import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -21,7 +20,6 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
@@ -50,7 +48,7 @@ class CommentInPostRepositoryTest {
         post.addCommentInPost(childComment1);
         post.addCommentInPost(childComment2);
         //when
-        List<CommentInPost> comments = commentInPostRepository.findParentByPostIncludeChildrenOrderByDesc(post);
+        List<CommentInPost> comments = commentInPostRepository.findParentsByPostIncludeChildrenOrderByParentIdAndChildIdDesc(post);
 
         //then
         for (CommentInPost comment : comments) {

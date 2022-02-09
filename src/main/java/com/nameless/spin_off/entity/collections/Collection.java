@@ -167,19 +167,19 @@ public class Collection extends BaseTimeEntity {
         this.followCount = 0L;
     }
     public void updateViewCount() {
-        this.viewCount = this.viewCount + 1;
+        this.viewCount += 1;
     }
 
     public void updateLikeCount() {
-        this.likeCount = this.commentCount + 1;
+        this.likeCount += 1;
     }
 
     public void updateCommentInCollectionCount() {
-        this.commentCount = this.commentCount + 1;
+        this.commentCount += 1;
     }
 
     public void updateFollowCount() {
-        this.followCount = this.followCount + 1;
+        this.followCount += 1;
     }
 
     private void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
@@ -240,8 +240,8 @@ public class Collection extends BaseTimeEntity {
     public Boolean isNotMemberAlreadyLikeCollection(Member member)
             throws OverSearchLikedCollectionException {
 
-        List<LikedCollection> likedCollections = this.likedCollections
-                .stream().filter(likedCollection -> likedCollection.getMember().equals(member))
+        List<LikedCollection> likedCollections = this.likedCollections.stream()
+                .filter(likedCollection -> likedCollection.getMember().equals(member))
                 .collect(Collectors.toList());
 
         int size = likedCollections.size();
@@ -257,8 +257,8 @@ public class Collection extends BaseTimeEntity {
     public Boolean isNotMemberAlreadyFollowCollection(Member member)
             throws OverSearchFollowedCollectionException {
 
-        List<FollowedCollection> followedCollections = this.followedCollections
-                .stream().filter(followedCollection -> followedCollection.getMember().equals(member))
+        List<FollowedCollection> followedCollections = this.followedCollections.stream()
+                .filter(followedCollection -> followedCollection.getMember().equals(member))
                 .collect(Collectors.toList());
 
         int size = followedCollections.size();
