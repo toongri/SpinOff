@@ -1,22 +1,22 @@
 package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.post.Hashtag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
-@ToString
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
@@ -33,7 +33,17 @@ public class Member extends BaseTimeEntity {
     private String email;
     private String profileImg;
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<FollowedHashtag> followedHashtags = new ArrayList<>();
+
     //==연관관계 메소드==//
+
+    public void addFollowedHashtag(Hashtag hashtag) {
+        FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(hashtag);
+
+        this.followedHashtags.add(followedHashtag);
+        followedHashtag.updateMember(this);
+    }
 
     //==생성 메소드==//
     public static Member createMember(String accountId, String accountPw, String nickname, String profileImg,
@@ -59,35 +69,35 @@ public class Member extends BaseTimeEntity {
 
     //==수정 메소드==//
 
-    private void updateNickname(String nickname) {
+    public void updateNickname(String nickname) {
         this.nickname = nickname;
     }
 
-    private void updateProfileImg(String profileImg) {
+    public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
     }
 
-    private void updateAccountId(String accountId) {
+    public void updateAccountId(String accountId) {
         this.accountId = accountId;
     }
 
-    private void updateAccountPw(String accountPw) {
+    public void updateAccountPw(String accountPw) {
         this.accountPw = accountPw;
     }
 
-    private void updateEmail(String email) {
+    public void updateEmail(String email) {
         this.email = email;
     }
 
-    private void updatePhoneNumber(String phoneNumber) {
+    public void updatePhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
-    private void updateBirth(LocalDate birth) {
+    public void updateBirth(LocalDate birth) {
         this.birth = birth;
     }
 
-    private void updateName(String name) {
+    public void updateName(String name) {
         this.name = name;
     }
 

@@ -3,7 +3,11 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.QCollectedPost;
 import com.nameless.spin_off.entity.collections.QCollection;
+import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.entity.post.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.QHashtag;
+import com.nameless.spin_off.entity.post.QPostedHashtag;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +24,9 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.entity.collections.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collections.QCollection.collection;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.entity.post.QPostedHashtag.postedHashtag;
 
 @Repository
 @RequiredArgsConstructor
@@ -29,7 +35,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<Post> findPostsOrderByIdBySlicing(Pageable pageable) {
+    public Slice<Post> findPostsOrderByIdBySliced(Pageable pageable) {
 
         List<Post> content = jpaQueryFactory
                 .select(post)
@@ -56,7 +62,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Post> findPostsOrderByPopularityBySlicingAfterLocalDateTime(
+    public Slice<Post> findPostsOrderByPopularityAfterLocalDateTimeSliced(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         List<Post> content = jpaQueryFactory
@@ -79,7 +85,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
+    public Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
         long hourDuration = ChronoUnit.HOURS.between(startDateTime, endDateTime);
@@ -94,9 +100,8 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .orderBy(collection.popularity.desc(), collectedPost.createdDate.desc())
                 .fetch();
 
-        List<Collection> content = new ArrayList<>(
-                collects)
-                .stream().filter(collect -> ChronoUnit.HOURS
+        List<Collection> content = new ArrayList<>(collects).stream()
+                .filter(collect -> ChronoUnit.HOURS
                         .between(collect.getCollectedPosts().get(0).getCreatedDate(), endDateTime) < hourDuration)
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
@@ -108,5 +113,84 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
         }
 
         return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Long> followedMemberIds) {
+
+        List<Post> content = jpaQueryFactory
+                .select(post)
+                .from(post)
+                .join(post.member, member).fetchJoin()
+                .where(member.id.in(followedMemberIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(post.id.desc())
+                .fetch();
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Long> followedMemberIds) {
+
+        List<Collection> content = jpaQueryFactory
+                .select(collection)
+                .from(collection)
+                .join(collection.member, member).fetchJoin()
+                .where(member.id.in(followedMemberIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .orderBy(collection.id.desc())
+                .fetch();
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<Post> findPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags) {
+
+        List<Post> posts = jpaQueryFactory
+                .select(post)
+                .from(post)
+                .join(post.member, member).fetchJoin()
+                .join(post.postedHashtags, postedHashtag).fetchJoin()
+                .where(postedHashtag.hashtag.in(followedHashtags))
+//                .join(postedHashtag.hashtag, hashtag).fetchJoin()
+//                .where(hashtag.id.in(followedHashtagIds))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize() + 1)
+                .orderBy(post.id.desc())
+                .fetch();
+
+        List<Post> content = new ArrayList<>(posts)
+                .stream()
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
+
+        boolean hasNext = false;
+        if (content.size() > pageable.getPageSize()) {
+            content.remove(pageable.getPageSize());
+            hasNext = true;
+        }
+
+        return new SliceImpl<>(content, pageable, hasNext);
+    }
+
+    @Override
+    public Slice<Post> findPostsByFollowedMovieOrderByIdSliced(Pageable pageable, List<Movie> followedMovies) {
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
+import com.nameless.spin_off.exception.member.NotSearchMemberException;
 import com.nameless.spin_off.service.member.JpaMemberService;
 import com.nameless.spin_off.service.query.MainPageService;
 import lombok.AllArgsConstructor;
@@ -56,6 +57,17 @@ public class MainPageApiController {
                 .getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
                         PageRequest.of(page, size), startTime, currentTime);
         return new MainPageResult<Slice<MainPageCollectionDto>>(slice);
+    }
+
+    @GetMapping("/following/post/hashtag")
+    public MainPageResult<Slice<MainPagePostDto>> dfd(
+            @RequestParam("page") Integer page, @RequestParam("size") Integer size,
+            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+
+        Slice<MainPagePostDto> slice = mainPageService
+                .getPostsByFollowedHashtagOrderByIdSliced(PageRequest.of(page, size), memberId);
+
+        return new MainPageResult<Slice<MainPagePostDto>>(slice);
     }
 
     @Data

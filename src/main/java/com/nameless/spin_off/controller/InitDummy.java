@@ -51,7 +51,6 @@ public class InitDummy {
         private final PostRepository postRepository;
         private final MemberRepository memberRepository;
         private final CollectionRepository collectionRepository;
-        private final CollectedPostRepository collectedPostRepository;
         private final HashtagRepository hashtagRepository;
         private final PostService postService;
         private final CollectionService collectionService;

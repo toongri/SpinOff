@@ -34,7 +34,7 @@ public class Hashtag extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-    private void updateContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 
