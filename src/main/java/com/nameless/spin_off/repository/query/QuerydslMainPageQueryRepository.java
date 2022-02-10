@@ -1,6 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collections.QCollectedPost;
 import com.nameless.spin_off.entity.collections.QCollection;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -11,8 +12,12 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.entity.collections.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collections.QCollection.collection;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.post.QPost.post;
@@ -77,15 +82,24 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     public Slice<Collection> findCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime) {
 
-        List<Collection> content = jpaQueryFactory
-                .select(collection)
+        long hourDuration = ChronoUnit.HOURS.between(startDateTime, endDateTime);
+
+        List<Collection> collects = jpaQueryFactory
+                .selectDistinct(collection)
                 .from(collection)
                 .join(collection.member, member).fetchJoin()
-                .where(collection.lastModifiedDate.between(startDateTime, endDateTime))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1)
-                .orderBy(collection.popularity.desc())
+                .join(collection.collectedPosts, collectedPost).fetchJoin()
+                .join(collectedPost.post, post).fetchJoin()
+                .where(collection.collectedPosts.isNotEmpty())
+                .orderBy(collection.popularity.desc(), collectedPost.createdDate.desc())
                 .fetch();
+
+        List<Collection> content = new ArrayList<>(
+                collects)
+                .stream().filter(collect -> ChronoUnit.HOURS
+                        .between(collect.getCollectedPosts().get(0).getCreatedDate(), endDateTime) < hourDuration)
+                .skip(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
 
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {

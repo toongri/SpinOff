@@ -49,7 +49,6 @@ public class JpaMainPageService implements MainPageService{
 
         Slice<Collection> collectionSlice = mainPageQueryRepository
                 .findCollectionsOrderByPopularityBySlicingAfterLocalDateTime(pageable, startDateTime, endDateTime);
-
         return collectionSlice.map(MainPageCollectionDto::new);
     }
 }

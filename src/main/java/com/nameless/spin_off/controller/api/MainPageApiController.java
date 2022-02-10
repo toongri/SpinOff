@@ -1,8 +1,8 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
+import com.nameless.spin_off.service.member.JpaMemberService;
 import com.nameless.spin_off.service.query.MainPageService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,7 +20,8 @@ import java.time.LocalDateTime;
 public class MainPageApiController {
 
     private final MainPageService mainPageService;
-    private final Long POPULARTY_DATE_DURATION = 2L;
+    private final JpaMemberService memberService;
+    private final Long POPULARITY_DATE_DURATION = 2L;
     private final LocalDateTime currentTime = LocalDateTime.now();
 
     @GetMapping("/discovery/post/id")
@@ -34,7 +36,7 @@ public class MainPageApiController {
     public MainPageResult<Slice<MainPagePostDto>> getPostsOrderByPopularityBySlicingAfterLocalDateTime(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size) {
 
-        LocalDateTime startTime = currentTime.minusDays(POPULARTY_DATE_DURATION);
+        LocalDateTime startTime = currentTime.minusDays(POPULARITY_DATE_DURATION);
 //        LocalDateTime startTime = LocalDateTime
 //                .of(2022, 2, 9, 21, 58, 25, 390);
         Slice<MainPagePostDto> slice = mainPageService
@@ -47,7 +49,7 @@ public class MainPageApiController {
     public MainPageResult<Slice<MainPageCollectionDto>> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size) {
 
-        LocalDateTime startTime = currentTime.minusDays(POPULARTY_DATE_DURATION);
+        LocalDateTime startTime = currentTime.minusDays(POPULARITY_DATE_DURATION);
 //        LocalDateTime startTime = LocalDateTime
 //                .of(2022, 2, 9, 21, 58, 25, 390);
         Slice<MainPageCollectionDto> slice = mainPageService
