@@ -1,0 +1,149 @@
+.banner-box{
+    background-color: black;
+    height: 703px;
+    width: 100%;
+}
+
+.movie-info-container{
+    height: 482px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    top: 408px;
+    .movie-container{
+        height: 100%;
+        width: 1352px;
+        display: flex;
+        .image-container{
+            width: 338px;
+            height: 482px;
+            margin-right: 100px;
+            img{
+               width: 100%;
+               height: 100%;
+               
+            }
+        }
+        .info-container{
+            width: 914px;
+            ul{
+                list-style-type: none;
+                padding: 0;
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 68px;
+                .title{
+                    p{
+                    width: 461px;
+                    height: 63px;
+                    flex-grow: 0;
+                    margin: 8px 11px 22px 0;
+                    font-family: SUIT;
+                    font-size: 40px;
+                    font-weight: bold;
+                    font-stretch: normal;
+                    font-style: normal;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: left;
+                    color:#fff;
+                    }
+                }
+                .follow-btn{
+                 
+                button{
+                    width: 119px;
+                    height: 57px; 
+                    flex-grow: 0;
+                    margin: 14px 0 22px 100px;
+                    padding: 13px 27px 13px 26px;
+                    background-color: #f24860;
+                    border-radius: 50px;
+                    border: 0;
+                    color: #fff;
+                    font-size: 20px;
+                }
+              }
+            }
+            .movie-infos{
+                color: #fff;
+                .info-container span{
+                    width: 135px;
+                    height: 28px;
+                    flex-grow: 0;
+                    margin: 0 6px 12px 19.9px;
+                    font-family: SUIT;
+                    font-size: 17px;
+                    font-weight: normal;
+                    font-stretch: normal;
+                    font-style: normal;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: left;
+                    color: #fff;
+                }
+                .info-container span::after{
+                    color: "yellow";
+                    content: '';
+                }
+                p{
+                    width: 860px;
+                    height: 34px;
+                    flex-grow: 0;
+                    margin: 12px 55px 72px 19.9px;
+                    font-family: SUIT;
+                    font-size: 17px;
+                    font-weight: normal;
+                    font-stretch: normal;
+                    font-style: normal;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: left;
+                    color: #fff;
+                }
+            }
+            .curation-box{
+                width: 914px;
+                display: flex;
+                .same-box{
+                    width: 224px;
+                    height: 38px;
+                    flex-grow: 0;
+                    margin: 0;
+                    font-family: SUIT;
+                    font-size: 25px;
+                    font-weight: bold;
+                    font-stretch: normal;
+                    font-style: normal;
+                    line-height: normal;
+                    letter-spacing: normal;
+                    text-align: left;
+                    color: #000;
+                    p{
+                        width: 224px;
+                        text-align: center;
+                    }
+                }
+                .curator{
+                    margin-right: 200px;
+                }
+                .curation{
+                    width: 224px;
+                    margin-right: 80px;
+                    span{
+                       display: flex;
+                       justify-content: center;
+                    }
+                }
+                .collection{
+                    width: 224px;
+                    span{
+                        display: flex;
+                        justify-content: center;
+                     }
+                }
+            }
+        }
+    }
+}
