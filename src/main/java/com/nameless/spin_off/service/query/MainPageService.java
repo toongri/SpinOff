@@ -13,10 +13,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MainPageService {
-    Slice<MainPagePostDto> getPostsOrderById(Pageable pageable);
+    Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId);
+
     Slice<MainPagePostDto> getPostsOrderByPopularityBySlicingAfterLocalDateTime(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime);
+            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
+
     Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime);
+            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
+
     Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException;
+
+    Slice<MainPagePostDto> getPostsByFollowedMovieOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException;
+
+    Slice<MainPagePostDto> getPostsByFollowingMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException;
+
+    Slice<MainPageCollectionDto> getCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException;
+
+    Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId);
 }

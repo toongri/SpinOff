@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+import static com.nameless.spin_off.StaticVariable.VIEWED_BY_IP_TIME;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/post")
@@ -24,7 +27,6 @@ public class PostApiController {
 
     private final PostService postService;
 
-    private final Long VIEWED_BY_IP_TIME = 1L;
     private final LocalDateTime currentTime = LocalDateTime.now();
 
 

@@ -1,7 +1,6 @@
-package com.nameless.spin_off.entity.movie;
+package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;

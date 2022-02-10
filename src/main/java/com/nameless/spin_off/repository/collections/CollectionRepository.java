@@ -54,4 +54,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdIncludeCommentInCollection(@Param("id") Long id);
 
+    @Query("SELECT followedCollection.collection FROM FollowedCollection followedCollection " +
+            "WHERE followedCollection.member.id = :id")
+    List<Collection> findCollectionsByFollowingMemberId(@Param("id") Long id);
 }

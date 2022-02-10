@@ -16,4 +16,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "LEFT JOIN FETCH followedHashtag.hashtag hashtag " +
             "WHERE m.id = :id")
     Optional<Member> findMemberByIdIncludeHashtag(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.followedMovies followedMovie " +
+            "LEFT JOIN FETCH followedMovie.movie movie " +
+            "WHERE m.id = :id")
+    Optional<Member> findMemberByIdIncludeMovie(@Param("id") Long id);
+
+    @Query("SELECT followedMember.member FROM FollowedMember followedMember " +
+            "WHERE followedMember.followingMember.id = :id")
+    List<Member> findMembersByFollowingMemberId(@Param("id") Long id);
 }

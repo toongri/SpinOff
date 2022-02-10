@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.exception.collection.*;
@@ -17,6 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.nameless.spin_off.StaticVariable.VIEWED_BY_IP_TIME;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/collection")
@@ -24,7 +27,6 @@ public class CollectionApiController {
 
     private final CollectionService collectionService;
 
-    private final Long VIEWED_BY_IP_TIME = 1L;
     private final LocalDateTime currentTime = LocalDateTime.now();
 
     @PostMapping("")

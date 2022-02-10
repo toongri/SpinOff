@@ -1,17 +1,15 @@
 package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Hashtag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +34,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<FollowedHashtag> followedHashtags = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<FollowedMovie> followedMovies = new ArrayList<>();
+
     //==연관관계 메소드==//
 
     public void addFollowedHashtag(Hashtag hashtag) {
@@ -43,6 +44,13 @@ public class Member extends BaseTimeEntity {
 
         this.followedHashtags.add(followedHashtag);
         followedHashtag.updateMember(this);
+    }
+
+    public void addFollowedMovie(Movie movie) {
+        FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(movie);
+
+        this.followedMovies.add(followedMovie);
+        followedMovie.updateMember(this);
     }
 
     //==생성 메소드==//

@@ -19,37 +19,37 @@ public class FollowedMember extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "following_member_id")
+    @NotNull
+    private Member followingMember;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     @NotNull
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "followed_members_id")
-    @NotNull
-    private Member followedMember;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedMember createFollowedMember(Member member, Member followedMember) {
+    public static FollowedMember createFollowedMember(Member followingMember, Member member) {
 
-        FollowedMember followedMember1 = new FollowedMember();
-        followedMember1.updateMember(member);
-        followedMember1.updateFollowedMember(followedMember);
+        FollowedMember newFollowedMember = new FollowedMember();
+        newFollowedMember.updateFollowingMember(followingMember);
+        newFollowedMember.updateMember(member);
 
-        return followedMember1;
+        return newFollowedMember;
 
     }
 
     //==수정 메소드==//
-    private void updateMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 
-    private void updateFollowedMember(Member followedMember) {
-        this.followedMember = followedMember;
+    public void updateFollowingMember(Member followingMember) {
+        this.followingMember = followingMember;
     }
-
 
     //==비즈니스 로직==//
 
