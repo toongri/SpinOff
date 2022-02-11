@@ -25,6 +25,8 @@ const Main = () => {
     observer.current = new IntersectionObserver(entries =>{
       if(entries[0].isIntersecting && hasMore){
         dispatch({
+
+          
          type: "UPDATE",
          pageNumber: pageNumber + 1
         })
