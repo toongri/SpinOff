@@ -2,29 +2,33 @@
     width: 100%;
     position: absolute;
     display: flex;
-    top: 20vh;
+    top: 313px;
     flex-direction: column;
     align-items: center;
  
     .tags-container{
-      margin: 25px 6.3%;
+      margin: 0 0 44px 0;
       position: relative;
      flex-wrap: wrap;
      display: flex;
      
         span{
+          height: 56px;
           flex-grow: 0;
-          margin: 0 10px;
-          padding: 10px 15px 10px 15px;
+          margin: 0 20px 0 0;
+          padding: 18px 17.4px 17px 17.4px;
           border-radius: 50px;
-          border: solid 2px #2800ee;
+          border: solid 2px #f24860;
+          font-size: 21px;
+          cursor: pointer;
+          background-color: #fff;
         }
     }
 
     .box-container{
       position: relative;
       display: grid;
-      grid-template-columns: repeat(3, 416px);
+      grid-template-columns: repeat(4, 416px);
       grid-template-rows: 345px;
       grid-gap: 28px;
       grid-auto-flow:column; 

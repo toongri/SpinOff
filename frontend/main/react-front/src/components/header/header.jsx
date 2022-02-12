@@ -1,6 +1,5 @@
 import React, {useState} from "react";
 import "./header.scss";
-import Button from "react-bootstrap/Button";
 import { FiSend } from "react-icons/fi";
 import { IoPersonCircleOutline } from "react-icons/io5";
 import { AiOutlineBell } from "react-icons/ai";
@@ -12,20 +11,18 @@ const buttonStyle = {
   position: "relative",
   borderRadius: "20px",
   padding: "0",
-  marginRight: '20px',
-  width: "45.8px",
-  height: '45.8px',
+  marginRight: '40px',
+  width: '47.6px',
+  height: '47.6px',
   color: "#fff",
   outline: 'none',
   border: 'none',
   backgroundColor: 'black'
 };
 
-const Header = () => {
+const Header = ({setAlarmPopup, setDmPopup}) => {
 
   let navigate = useNavigate();
-  const [showPopup, setShowPopup] = useState(false)
-
   return (
     <>
       <div className="navbarContainer">
@@ -47,27 +44,33 @@ const Header = () => {
           <ButtonGroup style = {{
           }}>
             <button
-              onClick={(e) => {
-                console.log(e.target.value)
-                setShowPopup(e.target.value)
+              onFocus={(e) => {
+                setAlarmPopup(true);
               }}
+              onBlur={(e) => {
+                setAlarmPopup(false);
+              }}
+
                 variant= "#000"
               bg="#000"
               style={buttonStyle}
               value = {false}
             >
-              <AiOutlineBell size="26"></AiOutlineBell>
+              <AiOutlineBell size="47"></AiOutlineBell>
             </button>
             <button
-              onClick={() => {
-      
-              }}
+                onFocus={(e) => {
+                  setDmPopup(true);
+                }}
+                onBlur={(e) => {
+                  setDmPopup(false);
+                }}
                variant= "#000"
               bg="#000"
-              active
+              vale={false}
               style={buttonStyle}
             >
-              <FiSend size="26"></FiSend>
+              <FiSend size="42"></FiSend>
             </button>
             <button
               onClick={() => {}}
@@ -86,7 +89,7 @@ const Header = () => {
                 backgroundColor: 'black'
               }}
             >
-              <IoPersonCircleOutline size="26"></IoPersonCircleOutline>
+              <IoPersonCircleOutline size="47"></IoPersonCircleOutline>
             </button>
           </ButtonGroup>
           </div>    

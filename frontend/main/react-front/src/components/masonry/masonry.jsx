@@ -8,9 +8,10 @@ import { useSelector } from 'react-redux';
 
 const Masonry = ({lastItemElement}) => {
     let navigate = useNavigate();
-    const items = useSelector((state) => {
-        console.log(state.items)
-        return state.items
+
+    const items = useSelector((state) =>{
+      console.log(state.items);
+      return state.items;
     })
 
     return (
