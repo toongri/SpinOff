@@ -25,8 +25,8 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
             "LEFT JOIN FETCH collectedposts.post post " +
-            "WHERE collection.id in :postIds AND collection.member.id = :memberId")
-    List<Collection> findAllByIdInIncludePost(@Param("postIds") List<Long> postIds, @Param("memberId") Long memberId);
+            "WHERE collection.id in :collectIds AND collection.member.id = :memberId")
+    List<Collection> findAllByIdInAndMemberIdIncludePost(@Param("collectIds") List<Long> collectIds, @Param("memberId") Long memberId);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.likedCollections " +

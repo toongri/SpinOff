@@ -2,8 +2,6 @@ package com.nameless.spin_off.repository.collection;
 
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
@@ -47,7 +45,7 @@ public class CollectionRepositoryTest {
 
         //when
         System.out.println("서비스함수");
-        List<Collection> collects = collectionRepository.findAllByIdInIncludePost(collectIds, mem.getId());
+        List<Collection> collects = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectIds, mem.getId());
 
         //then
         assertThat(collects.size()).isEqualTo(collectIds.size());

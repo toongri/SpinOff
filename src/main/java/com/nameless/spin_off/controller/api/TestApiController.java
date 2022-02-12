@@ -2,9 +2,10 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.movie.NotSearchMovieException;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.movie.NotExistMovieException;
+import com.nameless.spin_off.exception.post.InCorrectHashtagContentException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
@@ -48,7 +49,7 @@ public class TestApiController {
     }
 
     @PostMapping("/{id}/post")
-    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
+    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException {
 
         Long postId = postService.insertPostByPostVO(createPost);
 

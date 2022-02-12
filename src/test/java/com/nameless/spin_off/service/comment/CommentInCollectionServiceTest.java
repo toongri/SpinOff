@@ -4,9 +4,9 @@ import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -124,11 +124,11 @@ class CommentInCollectionServiceTest {
 
         //then
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO1))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO2))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO3))
-                .isInstanceOf(NotSearchCommentInCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
     }
 

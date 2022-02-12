@@ -4,11 +4,8 @@ import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.OverSearchCollectedPostException;
-import com.nameless.spin_off.exception.collection.OverSearchFollowedCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchLikedCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchViewedCollectionByIpException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
+import com.nameless.spin_off.exception.collection.*;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -125,8 +122,8 @@ public class Collection extends BaseTimeEntity {
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
         collection.updateCountToZero();
         return collection;
-
     }
+
     public static Collection createDefaultCollection(Member member) {
 
         final String DEFAULT_COLLECTION_TITLE = "나중에 볼 컬렉션";
@@ -206,8 +203,45 @@ public class Collection extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
+    public void insertCollectedPostByPost(Post post) throws OverSearchCollectedPostException, AlreadyCollectedPostException {
+
+        if (isNotAlreadyCollectedPost(post)) {
+            addCollectedPostByPost(post);
+        } else {
+            throw new AlreadyCollectedPostException();
+        }
+    }
+
+    public void insertFollowedCollectionByMember(Member member) throws OverSearchFollowedCollectionException, AlreadyFollowedCollectionException {
+
+        if (isNotMemberAlreadyFollowCollection(member)) {
+            addFollowedCollectionByMember(member);
+        } else {
+            throw new AlreadyFollowedCollectionException();
+        }
+    }
+
+    public boolean insertViewedCollectionByIp(String ip, LocalDateTime timeNow, Long minuteDuration) throws OverSearchViewedCollectionByIpException {
+
+        if (isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
+            addViewedCollectionByIp(ip);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void insertLikedCollectionByMember(Member member) throws OverSearchLikedCollectionException, AlreadyLikedCollectionException {
+
+        if (isNotMemberAlreadyLikeCollection(member)) {
+            addLikedCollectionByMember(member);
+        } else {
+            throw new AlreadyLikedCollectionException();
+        }
+    }
+
     public CommentInCollection getParentCommentById(Long commentInCollectionId)
-            throws NotSearchCommentInCollectionException {
+            throws NotExistCommentInCollectionException {
 
         if (commentInCollectionId == null)
             return null;
@@ -217,7 +251,7 @@ public class Collection extends BaseTimeEntity {
                 .collect(Collectors.toList());
 
         if (commentInCollection.isEmpty()) {
-            throw new NotSearchCommentInCollectionException();
+            throw new NotExistCommentInCollectionException();
         } else {
             return commentInCollection.get(0);
         }

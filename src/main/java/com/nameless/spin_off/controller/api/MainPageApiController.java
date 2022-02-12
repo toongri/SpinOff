@@ -1,10 +1,8 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.service.member.JpaMemberService;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.query.MainPageService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +12,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 import static com.nameless.spin_off.StaticVariable.POPULARITY_DATE_DURATION;
 
@@ -22,8 +19,8 @@ import static com.nameless.spin_off.StaticVariable.POPULARITY_DATE_DURATION;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/main-page")
 public class MainPageApiController {
+
     private final MainPageService mainPageService;
-    private final JpaMemberService memberService;
 
     @GetMapping("/discovery/post/id")
     public MainPageResult<Slice<MainPagePostDto>> getMainPagePostsOrderById(
@@ -66,7 +63,7 @@ public class MainPageApiController {
     @GetMapping("/following/post/hashtag")
     public MainPageResult<Slice<MainPagePostDto>> getPostsByFollowedHashtagOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+            @RequestParam("id") Long memberId) throws NotExistMemberException {
 
         Slice<MainPagePostDto> slice = mainPageService
                 .getPostsByFollowedHashtagOrderByIdSliced(PageRequest.of(page, size), memberId);
@@ -77,7 +74,7 @@ public class MainPageApiController {
     @GetMapping("/following/post/member")
     public MainPageResult<Slice<MainPagePostDto>> getPostsByFollowingMemberOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+            @RequestParam("id") Long memberId) throws NotExistMemberException {
 
         Slice<MainPagePostDto> slice = mainPageService
                 .getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(page, size), memberId);
@@ -88,7 +85,7 @@ public class MainPageApiController {
     @GetMapping("/following/collection/member")
     public MainPageResult<Slice<MainPageCollectionDto>> getCollectionsByFollowedMemberOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+            @RequestParam("id") Long memberId) throws NotExistMemberException {
 
         Slice<MainPageCollectionDto> slice = mainPageService
                 .getCollectionsByFollowedMemberOrderByIdSliced(PageRequest.of(page, size), memberId);
@@ -99,7 +96,7 @@ public class MainPageApiController {
     @GetMapping("/following/post/movie")
     public MainPageResult<Slice<MainPagePostDto>> getPostsByFollowedMovieOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+            @RequestParam("id") Long memberId) throws NotExistMemberException {
 
         Slice<MainPagePostDto> slice = mainPageService
                 .getPostsByFollowedMovieOrderByIdSliced(PageRequest.of(page, size), memberId);
@@ -110,7 +107,7 @@ public class MainPageApiController {
     @GetMapping("/following/collection/collection")
     public MainPageResult<Slice<MainPageCollectionDto>> getCollectionsByFollowedCollectionsOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam("id") Long memberId) throws NotSearchMemberException {
+            @RequestParam("id") Long memberId) throws NotExistMemberException {
 
         Slice<MainPageCollectionDto> slice = mainPageService
                 .getCollectionsByFollowedCollectionsOrderByIdSliced(PageRequest.of(page, size), memberId);

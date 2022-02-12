@@ -5,8 +5,8 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -30,7 +30,7 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional(readOnly = false)
     @Override
-    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotSearchMemberException {
+    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotExistMemberException {
 
         Member member = getMemberById(collectionVO.getMemberId());
         Collection collection = Collection.createCollection(member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
@@ -41,17 +41,13 @@ public class JpaCollectionService implements CollectionService {
     @Transactional(readOnly = false)
     @Override
     public Collection insertLikedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotSearchMemberException, NotSearchCollectionException,
+            throws NotExistMemberException, NotExistCollectionException,
             OverSearchLikedCollectionException, AlreadyLikedCollectionException {
 
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithLikedCollection(collectionId);
 
-        if (collection.isNotMemberAlreadyLikeCollection(member)) {
-            collection.addLikedCollectionByMember(member);
-        } else {
-            throw new AlreadyLikedCollectionException();
-        }
+        collection.insertLikedCollectionByMember(member);
 
         return collection;
     }
@@ -59,13 +55,11 @@ public class JpaCollectionService implements CollectionService {
     @Transactional(readOnly = false)
     @Override
     public Collection insertViewedCollectionByIp(String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
-            throws NotSearchCollectionException, OverSearchViewedCollectionByIpException {
+            throws NotExistCollectionException, OverSearchViewedCollectionByIpException {
 
         Collection collection = getCollectionByIdWithViewedIp(collectionId);
 
-        if (collection.isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
-            collection.addViewedCollectionByIp(ip);
-        }
+        collection.insertViewedCollectionByIp(ip, timeNow, minuteDuration);
 
         return collection;
     }
@@ -73,17 +67,13 @@ public class JpaCollectionService implements CollectionService {
     @Transactional(readOnly = false)
     @Override
     public Collection insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotSearchMemberException, NotSearchCollectionException,
+            throws NotExistMemberException, NotExistCollectionException,
             OverSearchFollowedCollectionException, AlreadyFollowedCollectionException {
 
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithFollowedCollection(collectionId);
 
-        if (collection.isNotMemberAlreadyFollowCollection(member)) {
-            collection.addFollowedCollectionByMember(member);
-        } else {
-            throw new AlreadyFollowedCollectionException();
-        }
+        collection.insertFollowedCollectionByMember(member);
 
         return collection;
     }
@@ -91,66 +81,59 @@ public class JpaCollectionService implements CollectionService {
     @Transactional(readOnly = false)
     @Override
     public List<Collection> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotSearchMemberException, NotSearchCollectionException,
-            NotSearchPostException, OverSearchCollectedPostException, AlreadyCollectedPostException {
-
-        Member member = getMemberById(memberId);
+            throws NotExistMemberException, NotExistCollectionException,
+            NotExistPostException, OverSearchCollectedPostException, AlreadyCollectedPostException {
 
         Post post = getPost(postId);
-
         List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
 
         for (Collection collection : collections) {
-            if (collection.isNotAlreadyCollectedPost(post)) {
-                collection.addCollectedPostByPost(post);
-            } else {
-                throw new AlreadyCollectedPostException();
-            }
+            collection.insertCollectedPostByPost(post);
         }
 
         return collections;
     }
 
     private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
-            throws NotSearchCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdInIncludePost(collectionIds, memberId);
+            throws NotExistCollectionException {
+        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectionIds, memberId);
 
         if (collections.size() != collectionIds.size()) {
-            throw new NotSearchCollectionException();
+            throw new NotExistCollectionException();
         }
         return collections;
     }
 
-    private Post getPost(Long postId) throws NotSearchPostException {
+    private Post getPost(Long postId) throws NotExistPostException {
         Optional<Post> optionalPost = postRepository.findById(postId);
-        Post post = optionalPost.orElseThrow(NotSearchPostException::new);
+        Post post = optionalPost.orElseThrow(NotExistPostException::new);
         return post;
     }
 
-    private Member getMemberById(Long memberId) throws NotSearchMemberException {
+    private Member getMemberById(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
 
-        return optionalMember.orElseThrow(NotSearchMemberException::new);
+        return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotSearchCollectionException {
+    private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
                 collectionRepository.findOneByIdIncludeViewedCollectionByIpOrderByViewedIpId(collectionId);
 
-        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
+        return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 
-    private Collection getCollectionByIdWithLikedCollection(Long collectionId) throws NotSearchCollectionException {
+    private Collection getCollectionByIdWithLikedCollection(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
                 collectionRepository.findOneByIdIncludeLikedCollection(collectionId);
 
-        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
+        return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 
-    private Collection getCollectionByIdWithFollowedCollection(Long collectionId) throws NotSearchCollectionException {
+    private Collection getCollectionByIdWithFollowedCollection(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
                 collectionRepository.findOneByIdIncludeFollowedCollection(collectionId);
 
-        return optionalCollection.orElseThrow(NotSearchCollectionException::new);
+        return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 }

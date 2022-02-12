@@ -5,7 +5,8 @@ import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.sun.istack.NotNull;
@@ -196,7 +197,26 @@ public class Post extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
-    public CommentInPost getParentCommentById(Long commentInPostId) throws NotSearchCommentInPostException {
+    public boolean insertViewedPostByIp(String ip, LocalDateTime timeNow, Long minuteDuration) throws OverSearchViewedPostByIpException {
+
+        if (isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
+            addViewedPostByIp(ip);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public void insertLikedPostByMember(Member member) throws OverSearchLikedPostException, AlreadyLikedPostException {
+
+        if (isNotMemberAlreadyLikePost(member)) {
+            addLikedPostByMember(member);
+        } else {
+            throw new AlreadyLikedPostException();
+        }
+    }
+
+    public CommentInPost getParentCommentById(Long commentInPostId) throws NotExistCommentInPostException {
 
         if (commentInPostId == null)
             return null;
@@ -206,7 +226,7 @@ public class Post extends BaseTimeEntity {
                 .collect(Collectors.toList());
 
         if (commentInPost.isEmpty()) {
-            throw new NotSearchCommentInPostException();
+            throw new NotExistCommentInPostException();
         } else {
             return commentInPost.get(0);
         }

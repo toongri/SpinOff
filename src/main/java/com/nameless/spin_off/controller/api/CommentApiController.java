@@ -4,11 +4,11 @@ import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInCollectionException;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.comment.CommentInPostService;
 import lombok.AllArgsConstructor;
@@ -29,7 +29,7 @@ public class CommentApiController {
 
     @PostMapping("/post")
     public CommentApiResult<CommentInPost> createCommentInPost(@RequestBody CreateCommentInPostVO commentVO)
-            throws NotSearchMemberException, NotSearchPostException, NotSearchCommentInPostException {
+            throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
         CommentInPost commentInPost = commentInPostService.insertCommentInPostByCommentVO(commentVO);
         return new CommentApiResult<CommentInPost>(commentInPost);
     }
@@ -37,7 +37,7 @@ public class CommentApiController {
     @PostMapping("/collection")
     public CommentApiResult<CommentInCollection> createCommentInCollection(
             @RequestBody CommentDto.CreateCommentInCollectionVO commentVO)
-            throws NotSearchMemberException, NotSearchCollectionException, NotSearchCommentInCollectionException {
+            throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
         CommentInCollection comment = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
         return new CommentApiResult<CommentInCollection>(comment);

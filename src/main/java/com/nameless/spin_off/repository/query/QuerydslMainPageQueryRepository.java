@@ -1,8 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
@@ -40,7 +38,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .select(post)
                 .from(post)
                 .join(post.member, member).fetchJoin()
-                .where(post.publicOfPostStatus.in(DISCOVER_POST_PUBLIC),
+                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
                         memberIdNotEq(memberId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -71,7 +69,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .from(post)
                 .join(post.member, member).fetchJoin()
                 .where(post.createdDate.between(startDateTime, endDateTime),
-                        post.publicOfPostStatus.in(DISCOVER_POST_PUBLIC),
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
                         memberIdNotEq(memberId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -100,7 +98,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(collection.collectedPosts, collectedPost).fetchJoin()
                 .join(collectedPost.post, post).fetchJoin()
                 .where(collection.collectedPosts.isNotEmpty(),
-                        collection.publicOfCollectionStatus.in(DISCOVER_COLLECTION_PUBLIC),
+                        collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC),
                         memberIdNotEq(memberId))
                 .orderBy(collection.popularity.desc(), collectedPost.createdDate.desc())
                 .fetch();
@@ -175,7 +173,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member).fetchJoin()
                 .join(post.postedHashtags, postedHashtag).fetchJoin()
                 .where(postedHashtag.hashtag.in(followedHashtags),
-                        post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC))
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
                 .orderBy(post.id.desc())
                 .fetch();
 
@@ -201,7 +199,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member).fetchJoin()
                 .join(post.movie, movie).fetchJoin()
                 .where(movie.in(followedMovies),
-                        post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC))
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
                 .orderBy(post.id.desc())
                 .fetch();
 

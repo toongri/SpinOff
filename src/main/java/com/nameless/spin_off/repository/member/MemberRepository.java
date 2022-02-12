@@ -15,15 +15,28 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
             "LEFT JOIN FETCH followedHashtag.hashtag hashtag " +
             "WHERE m.id = :id")
-    Optional<Member> findMemberByIdIncludeHashtag(@Param("id") Long id);
+    Optional<Member> findOneByIdIncludeHashtag(@Param("id") Long id);
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedMovies followedMovie " +
             "LEFT JOIN FETCH followedMovie.movie movie " +
             "WHERE m.id = :id")
-    Optional<Member> findMemberByIdIncludeMovie(@Param("id") Long id);
+    Optional<Member> findOneByIdIncludeMovie(@Param("id") Long id);
 
     @Query("SELECT followedMember.member FROM FollowedMember followedMember " +
             "WHERE followedMember.followingMember.id = :id")
-    List<Member> findMembersByFollowingMemberId(@Param("id") Long id);
+    List<Member> findAllByFollowingMemberId(@Param("id") Long id);
+
+
+    @Query("SELECT followedMember.followingMember FROM FollowedMember followedMember " +
+            "WHERE followedMember.member.id = :id")
+    List<Member> findAllByFollowedMemberId(@Param("id") Long id);
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.followedMembers followingMember " +
+            "LEFT JOIN FETCH followingMember.member followedMember " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdIncludeFollowedMember(@Param("id") Long id);
+
+    List<Member> findAllByAccountIdOrNickname(String accountId, String nickname);
 }

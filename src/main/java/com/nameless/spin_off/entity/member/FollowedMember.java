@@ -39,7 +39,14 @@ public class FollowedMember extends BaseTimeEntity {
         newFollowedMember.updateMember(member);
 
         return newFollowedMember;
+    }
 
+    public static FollowedMember createFollowedMember2(Member member) {
+
+        FollowedMember newFollowedMember = new FollowedMember();
+        newFollowedMember.updateMember(member);
+
+        return newFollowedMember;
     }
 
     //==수정 메소드==//

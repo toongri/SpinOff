@@ -3,11 +3,31 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.PublicOfPostStatus;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class MemberDto {
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class CreateMemberVO {
+
+        private String accountId;
+        private String accountPw;
+        private String name;
+        private String nickname;
+        private LocalDate birth;
+        private String email;
+
+        private String profileImg;
+    }
 
     public static class MemberBuilder {
 

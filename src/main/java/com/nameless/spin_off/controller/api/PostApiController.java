@@ -1,15 +1,11 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.movie.NotSearchMovieException;
-import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
-import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
-import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.movie.NotExistMovieException;
+import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,12 +23,9 @@ public class PostApiController {
 
     private final PostService postService;
 
-    private final LocalDateTime currentTime = LocalDateTime.now();
-
-
     @PostMapping("")
     public PostApiResult<Long> createPostOne(@RequestBody CreatePostVO createPost) throws
-            NotSearchMemberException, NotSearchMovieException, NotSearchCollectionException {
+            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException {
 
         Long postId = postService.insertPostByPostVO(createPost);
 
@@ -41,7 +34,7 @@ public class PostApiController {
 
     @PostMapping("/like")
     public PostApiResult<Post> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotSearchMemberException, NotSearchPostException,
+            throws NotExistMemberException, NotExistPostException,
             OverSearchLikedPostException, AlreadyLikedPostException {
 
         Post post = postService.insertLikedPostByMemberId(memberId, postId);
@@ -51,9 +44,9 @@ public class PostApiController {
 
     @PostMapping("/view")
     public PostApiResult<Post> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
-            throws NotSearchPostException, OverSearchViewedPostByIpException {
+            throws NotExistPostException, OverSearchViewedPostByIpException {
 
-        Post post = postService.insertViewedPostByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
+        Post post = postService.insertViewedPostByIp(ip, postId, LocalDateTime.now(), VIEWED_BY_IP_TIME);
 
         return new PostApiResult<Post>(post);
     }

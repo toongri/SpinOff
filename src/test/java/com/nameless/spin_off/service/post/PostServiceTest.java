@@ -6,11 +6,11 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.*;
-import com.nameless.spin_off.exception.collection.NotSearchCollectionException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.movie.NotSearchMovieException;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
@@ -141,13 +141,13 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO1))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2))
-                .isInstanceOf(NotSearchMovieException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMovieException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -204,10 +204,10 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(0L, po.getId()))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), 0L))
-                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
 
     }
 
@@ -352,7 +352,7 @@ class PostServiceTest {
 
         //then
         assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L, now, 60L))
-                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertViewedPostByIp("00", po.getId(), now, 60L))
                 .isInstanceOf(OverSearchViewedPostByIpException.class);//.hasMessageContaining("")
 

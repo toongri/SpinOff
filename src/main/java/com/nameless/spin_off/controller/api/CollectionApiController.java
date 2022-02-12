@@ -1,11 +1,10 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.service.collection.CollectionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,11 +26,9 @@ public class CollectionApiController {
 
     private final CollectionService collectionService;
 
-    private final LocalDateTime currentTime = LocalDateTime.now();
-
     @PostMapping("")
     public CollectionApiResult<Long> createCollectionOne(@RequestBody CreateCollectionVO collectionVO)
-            throws NotSearchMemberException {
+            throws NotExistMemberException {
         Long aLong = collectionService.insertCollectionByCollectionVO(collectionVO);
 
         return new CollectionApiResult<Long>(aLong);
@@ -39,8 +36,8 @@ public class CollectionApiController {
 
     @PostMapping("/like")
     public CollectionApiResult<Collection> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotSearchMemberException, AlreadyLikedCollectionException,
-            NotSearchCollectionException, OverSearchLikedCollectionException {
+            throws NotExistMemberException, AlreadyLikedCollectionException,
+            NotExistCollectionException, OverSearchLikedCollectionException {
 
         Collection collection = collectionService.insertLikedCollectionByMemberId(memberId, postId);
 
@@ -49,18 +46,18 @@ public class CollectionApiController {
 
     @PostMapping("/view")
     public CollectionApiResult<Collection> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
-            throws NotSearchCollectionException, OverSearchViewedCollectionByIpException {
+            throws NotExistCollectionException, OverSearchViewedCollectionByIpException {
 
         Collection collection = collectionService
-                .insertViewedCollectionByIp(ip, postId, currentTime, VIEWED_BY_IP_TIME);
+                .insertViewedCollectionByIp(ip, postId, LocalDateTime.now(), VIEWED_BY_IP_TIME);
 
         return new CollectionApiResult<Collection>(collection);
     }
 
     @PostMapping("/follow")
     public CollectionApiResult<Collection> createFollowOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotSearchMemberException, AlreadyFollowedCollectionException,
-            OverSearchFollowedCollectionException, NotSearchCollectionException {
+            throws NotExistMemberException, AlreadyFollowedCollectionException,
+            OverSearchFollowedCollectionException, NotExistCollectionException {
 
         Collection collection = collectionService.insertFollowedCollectionByMemberId(memberId, postId);
 
@@ -70,8 +67,8 @@ public class CollectionApiController {
     @PostMapping("/post")
     public CollectionApiResult<List<Collection>> addPostInCollections(
             @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
-            throws OverSearchCollectedPostException, NotSearchMemberException,
-            NotSearchPostException, AlreadyCollectedPostException, NotSearchCollectionException {
+            throws OverSearchCollectedPostException, NotExistMemberException,
+            NotExistPostException, AlreadyCollectedPostException, NotExistCollectionException {
 
         List<Collection> collections = collectionService.insertCollectedPosts(memberId, postId, collectionIds);
 

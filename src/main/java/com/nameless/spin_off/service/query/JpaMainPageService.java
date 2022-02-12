@@ -9,12 +9,10 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
 import com.nameless.spin_off.repository.query.MainPageQueryRepository;
-import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -37,6 +35,7 @@ public class JpaMainPageService implements MainPageService{
 
     @Override
     public Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId) {
+
         Slice<Post> postSlice = mainPageQueryRepository.findPostsOrderByIdBySliced(pageable, memberId);
 
         return postSlice.map(MainPagePostDto::new);
@@ -58,11 +57,12 @@ public class JpaMainPageService implements MainPageService{
 
         Slice<Collection> collectionSlice = mainPageQueryRepository
                 .findCollectionsOrderByPopularityAfterLocalDateTimeSliced(pageable, startDateTime, endDateTime, memberId);
+
         return collectionSlice.map(MainPageCollectionDto::new);
     }
 
     @Override
-    public Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException {
+    public Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdIncludeHashtags(memberId);
 
@@ -76,7 +76,7 @@ public class JpaMainPageService implements MainPageService{
     }
 
     @Override
-    public Slice<MainPagePostDto> getPostsByFollowedMovieOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException {
+    public Slice<MainPagePostDto> getPostsByFollowedMovieOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
         Member member = getMemberByIdIncludeMovie(memberId);
 
         List<Movie> movies =
@@ -89,9 +89,9 @@ public class JpaMainPageService implements MainPageService{
     }
 
     @Override
-    public Slice<MainPagePostDto> getPostsByFollowingMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException {
+    public Slice<MainPagePostDto> getPostsByFollowingMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
-        List<Member> members = memberRepository.findMembersByFollowingMemberId(memberId);
+        List<Member> members = memberRepository.findAllByFollowingMemberId(memberId);
 
         Slice<Post> membersSlice = mainPageQueryRepository.findPostsByFollowingMemberOrderByIdSliced(pageable, members);
 
@@ -99,9 +99,9 @@ public class JpaMainPageService implements MainPageService{
     }
 
     @Override
-    public Slice<MainPageCollectionDto> getCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotSearchMemberException {
+    public Slice<MainPageCollectionDto> getCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
-        List<Member> members = memberRepository.findMembersByFollowingMemberId(memberId);
+        List<Member> members = memberRepository.findAllByFollowingMemberId(memberId);
 
         Slice<Collection> membersSlice = mainPageQueryRepository.findCollectionsByFollowedMemberOrderByIdSliced(pageable, members);
 
@@ -120,16 +120,16 @@ public class JpaMainPageService implements MainPageService{
 
     }
 
-    private Member getMemberByIdIncludeHashtags(Long memberId) throws NotSearchMemberException {
-        Optional<Member> optionalMember = memberRepository.findMemberByIdIncludeHashtag(memberId);
+    private Member getMemberByIdIncludeHashtags(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdIncludeHashtag(memberId);
 
-        return optionalMember.orElseThrow(NotSearchMemberException::new);
+        return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Member getMemberByIdIncludeMovie(Long memberId) throws NotSearchMemberException {
-        Optional<Member> optionalMember = memberRepository.findMemberByIdIncludeMovie(memberId);
+    private Member getMemberByIdIncludeMovie(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdIncludeMovie(memberId);
 
-        return optionalMember.orElseThrow(NotSearchMemberException::new);
+        return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
 }

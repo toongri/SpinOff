@@ -5,9 +5,9 @@ import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
-import com.nameless.spin_off.exception.comment.NotSearchCommentInPostException;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -124,11 +124,11 @@ class CommentInPostServiceTest {
 
         //then
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO1))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2))
-                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3))
-                .isInstanceOf(NotSearchCommentInPostException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
 
 
     }

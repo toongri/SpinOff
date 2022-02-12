@@ -9,8 +9,8 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.NotSearchMemberException;
-import com.nameless.spin_off.exception.post.NotSearchPostException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -88,7 +88,7 @@ class CollectionServiceTest {
 
         //then
         assertThatThrownBy(() -> collectionService.insertCollectionByCollectionVO(createCollectionVO1))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
     }
 
 
@@ -142,10 +142,10 @@ class CollectionServiceTest {
 
         //then
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(0L, collection.getId()))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), 0L))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyLikedCollectionException.class);//.hasMessageContaining("")
@@ -206,10 +206,10 @@ class CollectionServiceTest {
 
         //then
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(0L, collection.getId()))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), 0L))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyFollowedCollectionException.class);//.hasMessageContaining("")
@@ -317,7 +317,7 @@ class CollectionServiceTest {
 
         //then
         assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", 0L, now, 60L))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L))
                 .isInstanceOf(OverSearchViewedCollectionByIpException.class);//.hasMessageContaining("")
 
@@ -385,11 +385,11 @@ class CollectionServiceTest {
         //when
         //then
         assertThatThrownBy(() -> collectionService.insertCollectedPosts(0L, po.getId(), ids))
-                .isInstanceOf(NotSearchMemberException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), 0L, ids))
-                .isInstanceOf(NotSearchPostException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), po.getId(), List.of(0L)))
-                .isInstanceOf(NotSearchCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
 

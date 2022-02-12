@@ -19,5 +19,5 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
 
     @Query("SELECT DISTINCT parent FROM CommentInCollection parent " +
             "WHERE parent.parent IS NULL AND parent.collection = :collection")
-    List<CommentInCollection> findParentsByCollectionId(@Param("collection") Collection collection);
+    List<CommentInCollection> findParentsByCollection(@Param("collection") Collection collection);
 }
