@@ -1,14 +1,13 @@
 .item {
   margin: 0 0 20px 0;
   break-inside: avoid; // 컬럼 넘어가는 방지 코드
-  width: 236px;
   border-radius: 20px;
   overflow: hidden;
   background-color: #fff;
   line-height: 0;
-  width: 236px;
+  width: 278px;
+ 
   position: relative;
-  margin: auto;
 
   .content {
     border-radius: 20px;
@@ -48,7 +47,7 @@
 
     img{
       border-radius: 20px;
-     
+     width: 100%;
     }
 
     &:hover{
@@ -103,25 +102,5 @@
       
     }
   }
-  .movie-info-container{
-    background-color: #fff;
-    position: relative;
-    padding: 12px 10px;
-    p{
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: #3c3c3c;
-     
-    }
-    .user-name-container{
-      font-size: 0.7rem;
-      color: #3c3c3c;
-    }
-
-    .user-info-container{
-      .user-info-img-container{
-        margin-right: 10px;
-      }
-    }
-  }
+  
 }

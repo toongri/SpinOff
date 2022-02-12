@@ -7,10 +7,10 @@ const ItemsDetail = ({ item, key }) => {
   let navigate = useNavigate();
 
   return (
+    <>
+    <div className="item">
     <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
-    <div 
-      className="item" 
-    >
+    
       <div className="content">
         <div className="content-overay">
 
@@ -26,25 +26,17 @@ const ItemsDetail = ({ item, key }) => {
             <button>저장</button>
           </div>
          </div>
-
         </div>
         
         </div>
-
-        <img src={item} className="content-image"/>
-        
+        <img src={item} className="content-image"/> 
         </div>
-        
-        <div className = "movie-info-container">
-          <p>파니 핑크와 아멜리에</p>
-          <div className = "user-info-container">
-            <span className = "user-info-img-container"><AiOutlineUser color = "red"></AiOutlineUser></span>
-            <span className = "user-name-container">일금천</span>
-          </div>
-        </div>
-     
-    </div>
     </Link>
+    </div>
+    <div className="movie-info">
+
+    </div>
+    </>
   );
 };
 

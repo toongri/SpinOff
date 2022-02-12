@@ -1,43 +1,7 @@
 import React from 'react';
 import Header from '../header/header';
-import Search from '../search/search';
 import './pin.scss';
-import { ButtonGroup, Button } from 'react-bootstrap';
-import { FiSend, FiExternalLink} from 'react-icons/fi';
-import { AiOutlineBook } from 'react-icons/ai';
-import { BsFillArrowUpCircleFill } from 'react-icons/bs';
-import {createStore} from 'redux';
-import {Provider} from 'react-redux';
 import { useLocation } from "react-router-dom";
-
-const reducer = (currentState, action) =>{
-  if(currentState === undefined){
-    return {
-      query: '',
-      items : [],
-      pageNumber: 1,
-      hasMore: false,
-      loading: true,
-      pinOn: true
-    }
-  }
-
-  const newState = {...currentState};
-
-  if(action.type === 'SEARCH'){
-    newState.items = action.items;
-    newState.query = action.query;
-    newState.loading = action.loading;
-  }
-  if(action.type === 'UPDATE' ){
-    newState.pageNumber = action.pageNumber;
-  }
-
-  return newState;
-}
-
-const store = createStore(reducer);
-
 
 const Pin = (props) => {
     const imgUrl = useLocation().state.imgUrl;

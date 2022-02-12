@@ -4,25 +4,138 @@
   --background-color: #f1f2f6;
   --hover-background: #bdc3c7;
 }
-
-.input-container{
+.wrapper{
   border: 0;
-  border-radius: 20px;
+  border-radius: 50px;
   position: fixed;
-  top: 15vh;
-  width: 52.5%;
-  height: 5vh;
-  z-Index: 2;
-  box-shadow: 0 4px 10px 3px rgba(0, 0, 0, 0.25);
+  top: 179px;
+  width: 1000px;
+  height: 70px;
+  z-index: 1;
+  background-color: #fff;
+ z-index: 2;
+.input-container{
+  height: 100%;
+  position: relative;
   
+  .popup-container{
+    position: absolute;
+    height: 803px;
+    width: 100%;
+    top: 0;
+    background-color: #fff;
+    border-radius: 50px;
+    padding: 1px 0 60px;
+     background-color: rgba(17, 17, 17, 0.9);
+     .popup-info-container{
+      position: relative;
+      padding: 0 62px 0 62px;
+      margin-top: 109px;
+      .current-record{
+       position: relative;
+      p{
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+        margin-bottom: 21px;
+      }
+      .curent-record-tags{
+        span{
+          width: 150px;
+          color: #fff;
+           height: 42px;
+           flex-grow: 0;
+           margin: 21px 20px 34px 2.8px;
+            padding: 9px 12.5px 9px 13px;
+            border-radius: 30px;
+            background-color: #2800ee;
+            cursor: pointer;
+        }
+      }
+     }
+     .popular-hashtags-container{
+      margin-top: 36px;
+      font-size: 24px;
+      font-weight: 800;
+      p{
+        color: #fff;
+      }
+      .popular-hashtags{
+        color: #fff;
+        list-style-type: none;
+        display: flex;
+        flex-wrap: wrap;
+        li{
+          width: 197px;
+          height: 92px;
+          background-image: url('https://toongri.notion.site/image/https%3A%2F%2Fs3-us-west-2.amazonaws.com%2Fsecure.notion-static.com%2F2c38fe2b-ef78-4665-8869-fc2161133ab1%2Fticket.png?table=block&id=b3e11a30-ff42-4812-9b50-8ebb396847f5&spaceId=8286226f-c017-460e-97aa-ca53116fac84&width=2000&userId=&cache=v2');
+          background-size: 100% 92px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin: 5px;
+          span{
+            width: 131px;
+            text-align: center;
+            font-size: 17px;
+            color: #000;
+          }
+        }
+      }
+    }
+    .curation-movies-container{
+      margin-top: 31px;
+      p{
+        color: #fff;
+        font-size: 24px;
+        font-weight: 800;
+      }
+      .images-container{
+        margin-top: 31px;
+        display: flex;
+        
+        .image-info:first-child{
+          margin: 0 60px 0 40px;
+        }
+        .image-info:last-child{
+          margin: 0 40px 0 60px;
+        }
+        .image-info{
+         margin: 0 60px;
+        
+          .image-box{
+            display: flex;
+            justify-content: center;
+            border: solid 4px rgba(242, 72, 96, 0.5);
+            img{
+              width: 97px;
+              height: 126px;
+            }
+          }
+          p{
+            font-size: 18px;
+            margin-top: 15px;
+            text-align: center;
+          }
+        }
+
+
+      }
+    }
+  }
+}
 .data-container{
+  z-index: 2;
   width: 100%;
+  height: 100%;
   display: flex;
   position: relative;
-  border-radius: 20px;
+  border-radius: 50px;
+  box-shadow: 0 4px 10px 3px rgba(0, 0, 0, 0.25);
   .input-select-container{
     width: 100%;
     position: relative;
+    height: 100%;
 .input{
   outline: none;
   border: 0;
@@ -30,16 +143,18 @@
   position: absolute;
   height: 100%;
   background-color: #f1f2f6;
-  border-radius: 0 20px 20px 0;
+  border-radius: 0 50px 50px 0;
+  font-size: 1.3rem;
   &:focus, &:hover{
     outline: none !important;
   }
-}
+  
+
 
 .select{
   position: absolute;
   right:0;
-  border-radius: 20px;
+  border-radius: 50px;
   text-align: center;
   font-size: 0.9rem;
   background-color: var(--background-color);
@@ -47,21 +162,12 @@
   border: 0;
   height: 100%;
   &:focus{
-    border: 1px solid pink;
+    border: 5px solid#f24860;;
     outline: none;
   }
 }
 }
 }
+  }
 }
-
-.container{
-  height: 100vh;
-    width: 100%;
-    position: absolute;
-    top:65vh;
-    left: 2.6%;
-    right: 2.6%;
-    width: 100%;
-    z-Index: 1 ;
 }
