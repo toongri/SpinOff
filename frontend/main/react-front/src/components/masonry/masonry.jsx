@@ -46,49 +46,30 @@ const Masonry = ({lastItemElement}) => {
         </div>
         <div className="buttonGroup">
         <div className="buttonBox1">
-            <Button
+            <button
               onClick={() => {
                 navigate("/pin-build");
               }}
               variant="secondary"
-              style={{
-                color: "#000",
-                backgroundColor: "black",
-                borderRadius: "50%",
-                height: "50px",
-                border: "none",
-                boxShadow: " 0px 0px 18px -10px #404040",
-                padding: "10px 10px",
-              }}
+              
             >
               <BsPencilFill
                 style={{
-                  color: "yellow",
+                  color: "#f9cf00",
                 }}
-                size="27"
+                size = "42"
               ></BsPencilFill>
-            </Button>
+            </button>
             </div>
             <div className="buttonBox2">
-            <Button
+            <button
               onClick={() => {
                 navigate("/pin-build");
               }}
               variant="secondary"
-              style={{
-                color: "#000",
-                backgroundColor: "black",
-                borderRadius: "50%",
-                height: "50px",
-                border: "none",
-                boxShadow: " 0px 0px 18px -10px #404040",
-                color: "yellow",
-                fontSize: "1.1rem",
-                padding: "10px 5px",
-              }}
             >
               HELP
-            </Button>
+            </button>
             </div>
         </div>
         </>

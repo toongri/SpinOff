@@ -14,7 +14,35 @@
       position: fixed;
       right: 2%;
       bottom: 12%;
+      margin: 79px 0 0 30px;
       .buttonBox1{
-        margin-bottom: 8px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50px;
+        margin-bottom: 22px;
+        & button{
+          border-radius: 50px;
+       
+        padding: 20px;
+        border: solid 2px rgba(255, 255, 255, 0.3);
+        background-color: #000
       }
     }
+
+      .buttonBox2{
+        width: 80px;
+        height: 80px;
+        border-radius: 50px;
+        & button{
+          border-radius: 50px;
+        margin: 0 0 22px;
+        padding: 20px;
+        border: solid 2px rgba(255, 255, 255, 0.3);
+        background-color: #000;
+        color: #f9cf00;
+        font-size: 22px;
+        font-family: NotoSans;
+        text-align: center;
+        }
+      }
+  }
