@@ -17,7 +17,6 @@ const Pin = (props) => {
                     <div className='img-container'>
                         <img src={imgUrl} alt="" />
                     </div>
-
                     <div className='data-container'>
                         {/*function container*/}
                         <div className='function-container'>

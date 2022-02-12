@@ -7,9 +7,10 @@ import FileUpload from './components/pin-build/pinBuild.jsx';
 import PinAll from './components/pinAll/pinAll.jsx'
 import Collection from './components/collection/collection.jsx'
 import PinDetail from './components/pinDetail/pinDetail';
+import {useState} from 'react';
 
 function App({network}) {
-
+  
   return (
     <Router>
       <Routes>
