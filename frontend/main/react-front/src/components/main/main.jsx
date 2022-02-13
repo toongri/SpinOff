@@ -8,11 +8,13 @@ import Alarm from '../popupScreen/alram/alarm';
 import Dm from '../popupScreen/Dm/Dm';
 
 const Main = ({ alarmPopup, dmPopup }) => {
+  
   let navigate = useNavigate();
 
   return (
+  
     <>
-      <div className="main-container">
+      <div className={`main-container`}>
         {alarmPopup && (
           <Alarm></Alarm>
         )}
@@ -33,6 +35,8 @@ const Main = ({ alarmPopup, dmPopup }) => {
           <Masonry></Masonry>
        </div>
       </div>
+      )
+    
     </>
   );
 };

@@ -13,14 +13,13 @@ store.subscribe(() =>{
   console.log(store)
 })
 
-const Search = () => {
+const Search = ({setPopup, popup}) => {
   const inputRef = useRef('');
   const [query, setQuery] = useState('');
   const [hasMore, setHasMore] = useState(false);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [address, setAddress] = useState('');
-  const [popup, setPopup] = useState(false);
+
   const dispatch = useDispatch();
 
   const handleSearch = (e) => {
@@ -128,8 +127,15 @@ const Search = () => {
           handleSearch();
         }
         }}
-      onFocus = {() =>{setPopup(true)}}
-      onBlur = {() =>{setPopup(false)}}
+      onFocus = {() =>{
+        setPopup(true)
+         document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.34)';
+      }}
+      onBlur = {() =>{
+        setPopup(false)
+        document.body.style.backgroundColor = '#fff';
+      }
+      }
     />
     
     <select className = "select">
@@ -170,7 +176,6 @@ const Search = () => {
             <li><span>#여름에_보기좋은_뮤지컬영화</span></li>
           </ul>
         </div>
-
         {/*curation movies*/}
 
         <div className='curation-movies-container'>
@@ -203,9 +208,7 @@ const Search = () => {
           </div>
         </div>
         </div>
-    </div>
-  
-  
+    </div> 
   )}
   </div>
   </div>

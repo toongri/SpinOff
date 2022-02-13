@@ -29,13 +29,20 @@ const ItemsDetail = ({ item, key }) => {
         </div>
         
         </div>
-        <img src={item} className="content-image"/> 
+
+        <img src={item} className="content-image"/>
+        
         </div>
     </Link>
-    </div>
     <div className="movie-info">
-
+      <p>파니 핑크와 아멜리에</p>
+      <div className="user-container">
+      <span className="user-img">< AiOutlineUser size= '25' color="red"/></span>
+      <span className="name">일금천</span>
+      </div>
     </div>
+    </div>
+  
     </>
   );
 };
