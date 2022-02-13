@@ -1,7 +1,6 @@
 package com.nameless.spin_off.entity.help;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.member.InquirePublicStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;

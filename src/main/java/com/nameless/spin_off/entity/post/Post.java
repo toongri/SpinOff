@@ -16,7 +16,9 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Entity
@@ -40,6 +42,7 @@ public class Post extends BaseTimeEntity {
 
     private String title;
     private String content;
+    private String thumbnailUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_post_status")
@@ -52,7 +55,7 @@ public class Post extends BaseTimeEntity {
     private List<LikedPost> likedPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<PostedHashtag> postedHashtags = new ArrayList<>();
+    private Set<PostedHashtag> postedHashtags = new HashSet<>();
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<PostedMedia> postedMedias = new ArrayList<>();
@@ -113,12 +116,13 @@ public class Post extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Post createPost(Member member, String title, String content,
+    public static Post createPost(Member member, String title, String content, String thumbnailUrl,
                                   List<Hashtag> hashtags, List<PostedMedia> postedMedias,
                                   Movie movie, PublicOfPostStatus publicOfPostStatus) {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
+        post.updateThumbnailUrl(thumbnailUrl);
         post.updateContent(content);
         post.updatePostedHashtagsByHashtags(hashtags);
         post.updatePostedMedias(postedMedias);
@@ -177,6 +181,10 @@ public class Post extends BaseTimeEntity {
         for (Hashtag hashtag : hashtags) {
             this.addPostedHashtagByHashtag(hashtag);
         }
+    }
+
+    public void updateThumbnailUrl(String thumbnailUrl) {
+        this.thumbnailUrl = thumbnailUrl;
     }
 
     public void updateMovie(Movie movie) {

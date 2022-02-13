@@ -18,8 +18,8 @@ public interface MainPageQueryRepository {
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
     Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(
             Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
-    Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Member> followedMemberIds);
-    Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMemberIds);
+    Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers);
+    Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers);
     Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags);
     Slice<Post> findPostsByFollowedMoviesOrderByIdSliced(Pageable pageable, List<Movie> followedMovies);
     Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections);

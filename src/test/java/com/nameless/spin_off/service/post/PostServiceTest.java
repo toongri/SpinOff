@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -83,14 +84,14 @@ class PostServiceTest {
         //when
 
         PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(member.getId(),
-                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.PUBLIC,
                 List.of("형윤이", "형윤이?"), List.of(), collectionIds);
 
         Long aLong = postService.insertPostByPostVO(createPostVO);
         Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
 
         Long postCollectionCount = post1.getCollectionCount();
-        List<PostedHashtag> postedHashtags = post1.getPostedHashtags();
+        Set<PostedHashtag> postedHashtags = post1.getPostedHashtags();
         int postPostedHashtagSize = postedHashtags.size();
 
         List<Post> postPosts = postRepository.findAll();
@@ -127,15 +128,15 @@ class PostServiceTest {
         memberRepository.save(member);
 
         PostDto.CreatePostVO createPostVO1 = new PostDto.CreatePostVO(0L,
-                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.PUBLIC,
                 List.of(), List.of(), List.of());
 
         PostDto.CreatePostVO createPostVO2 = new PostDto.CreatePostVO(member.getId(),
-                "알라리숑", "얄라리얄라", 0L, PublicOfPostStatus.PUBLIC,
+                "알라리숑", "얄라리얄라", 0L, null, PublicOfPostStatus.PUBLIC,
                 List.of(), List.of(), List.of());
 
         PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(member.getId(),
-                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.PUBLIC,
+                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.PUBLIC,
                 List.of(), List.of(), List.of(0L));
         //when
 

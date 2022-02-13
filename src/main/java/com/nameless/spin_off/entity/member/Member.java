@@ -5,15 +5,10 @@ import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Hashtag;
-import com.nameless.spin_off.entity.post.LikedPost;
-import com.nameless.spin_off.exception.collection.AlreadyFollowedCollectionException;
 import com.nameless.spin_off.exception.member.*;
-import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
-import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.web.HateoasPageableHandlerMethodArgumentResolver;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -65,7 +60,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void addFollowedMember(Member followedMember) {
-        FollowedMember newFollowedMember = FollowedMember.createFollowedMember2(followedMember);
+        FollowedMember newFollowedMember = FollowedMember.createFollowedMember(followedMember);
 
         this.followedMembers.add(newFollowedMember);
         newFollowedMember.updateFollowingMember(this);

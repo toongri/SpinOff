@@ -52,9 +52,17 @@ public class PostedHashtag extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-//    public static List<PostedHashtag> createPostedHashtags(List<Hashtag> hashtags) {
-//        return hashtags.stream().map(hashtag -> PostedHashtag.createPostedHashtag(hashtag, null)).collect(Collectors.toList());
-//    }
+
     //==조회 로직==//
 
+    @Override
+    public boolean equals(Object postedHashtag) {
+        if (postedHashtag instanceof PostedHashtag) {
+            if ((((PostedHashtag) postedHashtag).getPost() == this.getPost())) {
+                return ((PostedHashtag) postedHashtag).getHashtag() == this.getHashtag();
+            }
+        }
+
+        return false;
+    }
 }

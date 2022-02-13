@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Hashtag;
@@ -37,7 +38,9 @@ public class JpaMemberService implements MemberService {
                 .findAllByAccountIdOrNickname(memberVO.getAccountId(), memberVO.getNickname());
 
         if (memberList.isEmpty()) {
-            return memberRepository.save(Member.createMemberByCreateVO(memberVO)).getId();
+            Member member = memberRepository.save(Member.createMemberByCreateVO(memberVO));
+            collectionRepository.save(Collection.createDefaultCollection(member));
+            return member.getId();
         } else {
             List<Member> collect = memberList.stream()
                     .filter(member -> member.getAccountId().equals(memberVO.getAccountId()))

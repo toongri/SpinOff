@@ -9,6 +9,7 @@ import java.util.List;
 public final class StaticVariable {
     public static final Long VIEWED_BY_IP_TIME = 1L;
     public static final Long POPULARITY_DATE_DURATION = 2L;
+    public static final int COLLECTION_THUMBNAIL_NUMBER = 4;
     public static final List<PublicOfPostStatus> DEFAULT_POST_PUBLIC =
             List.of(PublicOfPostStatus.PUBLIC);
     public static final List<PublicOfCollectionStatus> DEFAULT_COLLECTION_PUBLIC =

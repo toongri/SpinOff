@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.member;
+package com.nameless.spin_off.entity.help;
 
 public enum InquirePublicStatus {
     PUBLIC, PRIVATED

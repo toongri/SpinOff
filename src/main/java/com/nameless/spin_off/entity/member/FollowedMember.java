@@ -32,16 +32,8 @@ public class FollowedMember extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedMember createFollowedMember(Member followingMember, Member member) {
 
-        FollowedMember newFollowedMember = new FollowedMember();
-        newFollowedMember.updateFollowingMember(followingMember);
-        newFollowedMember.updateMember(member);
-
-        return newFollowedMember;
-    }
-
-    public static FollowedMember createFollowedMember2(Member member) {
+    public static FollowedMember createFollowedMember(Member member) {
 
         FollowedMember newFollowedMember = new FollowedMember();
         newFollowedMember.updateMember(member);

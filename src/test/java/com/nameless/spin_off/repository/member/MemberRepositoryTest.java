@@ -36,13 +36,11 @@ public class MemberRepositoryTest {
         }
 
         List<Post> postList = new ArrayList<>();
-        List<FollowedMember> followedMembers = new ArrayList<>();
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
-            followedMembers.add(FollowedMember.createFollowedMember(member, mem));
+            member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(mem).build());
         }
-        followedMemberRepository.saveAll(followedMembers);
         postRepository.saveAll(postList);
 
         em.flush();

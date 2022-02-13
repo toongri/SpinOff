@@ -3,7 +3,6 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
-import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -20,7 +19,7 @@ public class PostDto {
         private Long memberId;
         private String memberNickname;
         private String memberProfileImgUrl;
-        private String postImgUrl;
+        private String thumbnailUrl;
 
         public MainPagePostDto(Post post) {
             this.postId = post.getId();
@@ -28,11 +27,7 @@ public class PostDto {
             this.memberId = post.getMember().getId();
             this.memberNickname = post.getMember().getNickname();
             this.memberProfileImgUrl = post.getMember().getProfileImg();
-
-            if (post.getPostedMedias().size() != 0)
-                this.postImgUrl = post.getPostedMedias().get(0).getUrl();
-            else
-                this.postImgUrl = null;
+            this.thumbnailUrl = post.getThumbnailUrl();
         }
     }
 
@@ -45,6 +40,7 @@ public class PostDto {
         private String title;
         private String content;
         private Long movieId;
+        private String thumbnailUrl;
         private PublicOfPostStatus publicOfPostStatus;
         private List<String> hashtagContents;
         private List<String> mediaUrls;
@@ -57,6 +53,7 @@ public class PostDto {
         private String title;
         private String content;
         private Movie movie;
+        private String thumbnailUrl;
         private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
         private List<PostedMedia> postedMedias = new ArrayList<>();
         private List<Hashtag> hashtags = new ArrayList<>();
@@ -96,8 +93,13 @@ public class PostDto {
             return this;
         }
 
+        public PostBuilder setThumbnailUrl(String thumbnailUrl) {
+            this.thumbnailUrl = thumbnailUrl;
+            return this;
+        }
+
         public Post build() {
-            return Post.createPost(member, title, content, hashtags, postedMedias, movie, publicOfPostStatus);
+            return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, movie, publicOfPostStatus);
         }
     }
 }

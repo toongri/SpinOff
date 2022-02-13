@@ -42,7 +42,9 @@ class JpaMainPageServiceTest {
 
         //given
         Member member = Member.buildMember().build();
+        Member member2 = Member.buildMember().build();
         memberRepository.save(member);
+        memberRepository.save(member2);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             hashtagList.add(Hashtag.createHashtag(""+i));
@@ -52,7 +54,7 @@ class JpaMainPageServiceTest {
         hashtagRepository.saveAll(hashtagList);
         for (Hashtag hashtag : hashtagList) {
             member.addFollowedHashtag(hashtag);
-            postList.add(Post.buildPost().setMember(member).setHashTags(List.of(hashtag)).build());
+            postList.add(Post.buildPost().setMember(member2).setHashTags(List.of(hashtag)).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build());
         }
         postRepository.saveAll(postList);
         em.flush();
@@ -72,7 +74,9 @@ class JpaMainPageServiceTest {
 
         //given
         Member member = Member.buildMember().build();
+        Member member2 = Member.buildMember().build();
         memberRepository.save(member);
+        memberRepository.save(member2);
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             movieList.add(Movie.createMovie((long) i, " ", " "));
@@ -82,7 +86,7 @@ class JpaMainPageServiceTest {
         movieList = movieRepository.saveAll(movieList);
         for (Movie movie : movieList) {
             member.addFollowedMovie(movie);
-            postList.add(Post.buildPost().setMember(member).setMovie(movie).build());
+            postList.add(Post.buildPost().setMember(member2).setMovie(movie).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build());
         }
         postRepository.saveAll(postList);
 
@@ -110,13 +114,11 @@ class JpaMainPageServiceTest {
         }
 
         List<Post> postList = new ArrayList<>();
-        List<FollowedMember> followedMembers = new ArrayList<>();
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
-            followedMembers.add(FollowedMember.createFollowedMember(member, mem));
+            member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build());
         }
-        followedMemberRepository.saveAll(followedMembers);
         postRepository.saveAll(postList);
 
         em.flush();
