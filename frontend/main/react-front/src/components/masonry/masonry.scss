@@ -1,52 +1,53 @@
+.my-masonry-grid {
+  display: -webkit-box; /* Not needed if autoprefixing */
+  display: -ms-flexbox; /* Not needed if autoprefixing */
+  display: flex;
+  margin-left: -30px; /* gutter size offset */
+  width: auto;
+}
+.my-masonry-grid_column {
+  padding-left: 15px; /* gutter size */
+  background-clip: padding-box;
+}
 
-    .masonry-container{
-      width: 96vw;
-      margin: 0;
-      padding: 0;
-      position: absolute;
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(278px, 1fr));
-      columns: 6;
-      column-gap: 10px;
-      left: 50%;
-      transform: translate(-50%);
-      grid-row-end: 10px;
-      justify-content: center;
-    }
-    
-    .buttonGroup{
-      position: fixed;
-      right: 2%;
-      bottom: 12%;
-      margin: 79px 0 0 30px;
-      .buttonBox1{
-        width: 80px;
-        height: 80px;
-        border-radius: 50px;
-        margin-bottom: 22px;
-        & button{
-          border-radius: 50px;
-       
-        padding: 20px;
-        border: solid 2px rgba(255, 255, 255, 0.3);
-        background-color: #000
-      }
-    }
+/* Style your items */
+.my-masonry-grid_column > div { /* change div to reference your elements you put in <Masonry> */
+ 
+  margin-bottom: 30px;
+}
 
-      .buttonBox2{
-        width: 80px;
-        height: 80px;
-        border-radius: 50px;
-        & button{
-          border-radius: 50px;
-        margin: 0 0 22px;
-        padding: 20px;
-        border: solid 2px rgba(255, 255, 255, 0.3);
-        background-color: #000;
-        color: #f9cf00;
-        font-size: 22px;
-        font-family: NotoSans;
-        text-align: center;
-        }
-      }
+.buttonGroup{
+  position: fixed;
+  right: 2%;
+  bottom: 12%;
+  margin: 79px 0 0 30px;
+  .buttonBox1{
+    width: 80px;
+    height: 80px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    & button{
+      border-radius: 50px;
+    padding: 25PX 25px;
+    border: solid 2px rgba(255, 255, 255, 0.3);
+    background-color: #000
   }
+}
+
+  .buttonBox2{
+    width: 80px;
+    height: 80px;
+    border-radius: 50px;
+    & button{
+    border-radius: 50px;
+    margin: 20PX 0;
+    padding: 27PX 20px;
+    border: solid 2px rgba(255, 255, 255, 0.3);
+    background-color: #000;
+    color: #f9cf00;
+    font-size: 22PX;
+    font-family: NotoSans;
+    text-align: center;
+    }
+  }
+}
