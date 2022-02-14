@@ -5,21 +5,24 @@
     display: flex;
     justify-content: center;
 .pin_container{
-    top: 18.6vh;
+    top: 284px;
     display: flex;
     position: relative;
     height: 500px;
     justify-content: center;
+    max-width: 1123px;
     width: 63%;
-    max-width: 700px;
-   
-   
     .writing-info-container{
-        margin-left: 40px;
-        width: 40%;
+        margin-left: 66px;
+        width: 410px;
+        min-height: 810px;
+
+        .writing-wrapper{
+            height: 100%;
+        
         .form-title{
             font-size: 1.1rem;
-            height: 55px;
+            height: 58px;
             border: 0;
             border-bottom: 0.5px solid grey; 
             margin-bottom: 15px;
@@ -28,7 +31,7 @@
             }
         }
         .form-text{
-            height: 150px;
+            height: 350px;
             margin-bottom: 30px;
             border: 0;
             &:focus{
@@ -91,13 +94,14 @@
         }
     }
     .complete-btn-container{
-        position: absolute;
-        right: 5%;
-       
+        position: relative;
+        right: 0;
         bottom: 0;
         .complete-btn{
             border: 0;
             border-radius: 20px;
+            position: relative;
+            right: 0;
             color: red;
             padding: 6px 18px 8px 16px;
             background-color: #f9cf00;
@@ -135,5 +139,6 @@
             align-items: center;
         }
     }
+}
 }
 }

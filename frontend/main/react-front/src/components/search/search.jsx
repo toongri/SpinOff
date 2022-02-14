@@ -67,14 +67,17 @@ const Search = ({setPopup, popup}) => {
        'https://movie-phinf.pstatic.net/20120426_172/1335428116411i030K_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20220125_283/1643101153330XwG2L_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20170928_85/1506564710105ua5fS_PNG/movie_image.jpg',
+       'https://images.pexels.com/photos/219692/pexels-photo-219692.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260',
        'https://movie-phinf.pstatic.net/20211214_145/1639457181732CP8WJ_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20211221_186/1640076751690RmQ3w_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20211222_130/1640135864950wrGkx_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20211220_81/1639963885244tPBWI_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20150922_4/14429125602616zXzR_JPEG/movie_image.jpg',
        'https://movie-phinf.pstatic.net/20220126_227/1643182432127j8nuq_JPEG/movie_image.jpg',
-       'https://movie-phinf.pstatic.net/20210915_104/1631681279096sdjNA_JPEG/movie_image.jpg'
-       ]
+       'https://movie-phinf.pstatic.net/20210915_104/1631681279096sdjNA_JPEG/movie_image.jpg',
+       'https://images.pexels.com/photos/2129796/pexels-photo-2129796.png?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940',
+       
+      ]
       });
       if(axios.isCancel(e)) return
     })

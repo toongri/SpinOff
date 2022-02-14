@@ -1,13 +1,17 @@
 
     .masonry-container{
-      width: 80%;
+      width: 96vw;
+      margin: 0;
+      padding: 0;
       position: absolute;
       display: grid;
-      gap: 30px;
-      grid-template-columns: repeat(6, minmax(278px, 1fr));
-      grid-template-rows: masonry;
+      grid-template-columns: repeat(auto-fill, minmax(278px, 1fr));
+      columns: 6;
+      column-gap: 10px;
+      left: 50%;
+      transform: translate(-50%);
+      grid-row-end: 10px;
       justify-content: center;
-      margin: 0 50px;
     }
     
     .buttonGroup{

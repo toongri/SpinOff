@@ -101,6 +101,7 @@ const PinBuild = () => {
           </div>
           
           <div className="writing-info-container">
+            <div className="writing-wrapper">
             <form className="form">
               <div className="form-group">
                 <div>
@@ -189,6 +190,7 @@ const PinBuild = () => {
         className="complete-btn">작성 완료</button>
       </div>
       </div>
+    </div>
     </div>
   );
 };

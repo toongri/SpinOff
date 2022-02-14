@@ -25,9 +25,9 @@ const Main = ({ alarmPopup, dmPopup }) => {
         }
         <div className="img-container">
           <div className="toggle-switch-container">
-            <span className="following-container">팔로잉</span>
+            <span className="following-container">발견</span>
             <ToggleButton />
-            <span className="found-container">발견</span>
+            <span className="found-container">팔로잉</span>
           </div>
         </div>
 

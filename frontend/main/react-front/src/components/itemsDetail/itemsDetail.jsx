@@ -2,6 +2,8 @@ import React from "react";
 import "./itemsDetail.scss";
 import { useNavigate, Link } from "react-router-dom";
 import {AiOutlineUser} from 'react-icons/ai';
+import {BiLinkExternal} from 'react-icons/bi';
+import {FiMoreHorizontal} from 'react-icons/fi';
 
 const ItemsDetail = ({ item, key }) => {
   let navigate = useNavigate();
@@ -9,9 +11,10 @@ const ItemsDetail = ({ item, key }) => {
   return (
     <>
     <div className="item">
-    <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
-    
+ 
       <div className="content">
+           <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
+    
         <div className="content-overay">
 
         <div className="content-details fadeIn-bottom">
@@ -26,14 +29,25 @@ const ItemsDetail = ({ item, key }) => {
             <button>저장</button>
           </div>
          </div>
-        </div>
-        
-        </div>
 
+         <div className="select-icons">
+            <span className="store-icons">
+              <BiLinkExternal size= "26" color="#f24860"></BiLinkExternal>
+            </span>
+            <span className="more-icons">
+              <FiMoreHorizontal size= "26"color="#f24860"></FiMoreHorizontal>
+            </span>
+          </div>
+        </div>
+         
+        </div>
+        </Link>
         <img src={item} className="content-image"/>
         
         </div>
-    </Link>
+        
+   
+    
     <div className="movie-info">
       <p>파니 핑크와 아멜리에</p>
       <div className="user-container">
