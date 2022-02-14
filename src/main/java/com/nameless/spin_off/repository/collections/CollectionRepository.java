@@ -41,7 +41,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.viewedCollectionByIps viewedCollectionByIp " +
             "WHERE collection.id = :id ORDER BY viewedCollectionByIp.id DESC")
-    Optional<Collection> findOneByIdIncludeViewedCollectionByIpOrderByViewedIpId(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludeViewedByIpOrderByViewedIpId(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
@@ -52,9 +52,15 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.commentInCollections comment " +
             "WHERE collection.id = :id")
-    Optional<Collection> findOneByIdIncludeCommentInCollection(@Param("id") Long id);
+    Optional<Collection> findOneByIdIncludeComment(@Param("id") Long id);
 
     @Query("SELECT followedCollection.collection FROM FollowedCollection followedCollection " +
             "WHERE followedCollection.member.id = :id")
-    List<Collection> findCollectionsByFollowingMemberId(@Param("id") Long id);
+    List<Collection> findAllByFollowingMemberId(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT collect FROM Collection collect " +
+            "LEFT JOIN FETCH collect.collectedPosts collectPost " +
+            "LEFT JOIN FETCH collectPost.post post " +
+            "WHERE post.id = :postId")
+    List<Collection> findAllByPostIdIncludePost(@Param("postId") Long postId);
 }

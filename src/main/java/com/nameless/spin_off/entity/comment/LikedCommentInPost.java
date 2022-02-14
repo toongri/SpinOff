@@ -33,10 +33,19 @@ public class LikedCommentInPost extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static LikedCommentInPost createLikedCommentInPost(Member member) {
+        LikedCommentInPost likedCommentInPost = new LikedCommentInPost();
+        likedCommentInPost.updateMember(member);
+
+        return likedCommentInPost;
+    }
 
     //==수정 메소드==//
     public void updateCommentInPost(CommentInPost commentInPost) {
         this.commentInPost = commentInPost;
+    }
+    public void updateMember(Member member) {
+        this.member = member;
     }
     //==비즈니스 로직==//
 

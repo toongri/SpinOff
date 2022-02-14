@@ -6,7 +6,9 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.collection.OverSearchCollectedPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
@@ -19,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -38,7 +39,7 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException {
+            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException {
 
         Member member = getMemberById(postVO.getMemberId());
 
@@ -65,7 +66,7 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Post insertLikedPostByMemberId(Long memberId, Long postId)
+    public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException,
             OverSearchLikedPostException, AlreadyLikedPostException {
 
@@ -74,19 +75,50 @@ public class JpaPostService implements PostService{
 
         post.insertLikedPostByMember(member);
 
-        return post;
+        return post.getId();
     }
 
     @Transactional(readOnly = false)
     @Override
-    public Post insertViewedPostByIp(String ip, Long postId, LocalDateTime timeNow, Long minuteDuration)
+    public Long insertViewedPostByIp(String ip, Long postId)
             throws NotExistPostException, OverSearchViewedPostByIpException {
 
         Post post = getPostByIdWithViewedIp(postId);
 
-        post.insertViewedPostByIp(ip, timeNow, minuteDuration);
+        post.insertViewedPostByIp(ip);
 
-        return post;
+        return post.getId();
+    }
+
+    @Transactional(readOnly = false)
+    @Override
+    public Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+            throws NotExistMemberException, NotExistCollectionException,
+            NotExistPostException, OverSearchCollectedPostException, AlreadyCollectedPostException {
+
+        Post post = getPost(postId);
+        List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
+
+        for (Collection collection : collections) {
+            collection.insertCollectedPostByPost(post);
+        }
+
+        return post.getId();
+    }
+
+    private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
+            throws NotExistCollectionException {
+        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectionIds, memberId);
+
+        if (collections.size() != collectionIds.size()) {
+            throw new NotExistCollectionException();
+        }
+        return collections;
+    }
+
+    private Post getPost(Long postId) throws NotExistPostException {
+        Optional<Post> optionalPost = postRepository.findById(postId);
+        return optionalPost.orElseThrow(NotExistPostException::new);
     }
 
     private List<Collection> getCollectionsByIdIn(List<Long> collectionIds, Long memberId) throws NotExistCollectionException {
@@ -150,7 +182,7 @@ public class JpaPostService implements PostService{
     }
 
     private Post getPostByIdWithViewedIp(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinViewedPostByIpOrderByViewedIpId(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinViewedByIpOrderByViewedIpId(postId);
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }

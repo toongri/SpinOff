@@ -34,10 +34,19 @@ public class LikedCommentInCollection extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
+    public static LikedCommentInCollection createLikedCommentInCollection(Member member) {
+        LikedCommentInCollection likedCommentInCollection = new LikedCommentInCollection();
+        likedCommentInCollection.updateMember(member);
+
+        return likedCommentInCollection;
+    }
 
     //==수정 메소드==//
     public void updateCommentInCollection(CommentInCollection commentInCollection) {
         this.commentInCollection = commentInCollection;
+    }
+    public void updateMember(Member member) {
+        this.member = member;
     }
     //==비즈니스 로직==//
 

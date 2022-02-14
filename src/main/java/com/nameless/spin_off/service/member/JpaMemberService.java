@@ -42,10 +42,7 @@ public class JpaMemberService implements MemberService {
             collectionRepository.save(Collection.createDefaultCollection(member));
             return member.getId();
         } else {
-            List<Member> collect = memberList.stream()
-                    .filter(member -> member.getAccountId().equals(memberVO.getAccountId()))
-                    .collect(Collectors.toList());
-            if (collect.isEmpty()) {
+            if (memberList.stream().noneMatch(member -> member.getAccountId().equals(memberVO.getAccountId()))) {
                 throw new AlreadyNicknameException();
             } else {
                 throw new AlreadyAccountIdException();

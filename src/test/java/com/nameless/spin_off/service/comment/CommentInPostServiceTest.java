@@ -56,14 +56,14 @@ class CommentInPostServiceTest {
 
         //when
         System.out.println("서비스함수");
-        CommentInPost comment = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
+        Long commentId = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
 
         System.out.println("포스트업로드");
         Post post = postRepository.findById(po.getId()).get();
 
         //then
         assertThat(post.getCommentCount()).isEqualTo(post.getCommentInPosts().size());
-        assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(comment);
+        assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(commentInPostRepository.getById(commentId));
     }
 
     @Test
@@ -82,10 +82,10 @@ class CommentInPostServiceTest {
         //when
 
         System.out.println("서비스함수1");
-        CommentInPost childComment1 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살"));
+        CommentInPost childComment1 = commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살")));
 
         System.out.println("서비스함수2");
-        CommentInPost childComment2 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+        CommentInPost childComment2 = commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살")));
 
         System.out.println("부모댓글업로드");
         CommentInPost parentComment = commentInPostRepository.findById(parent.getId()).get();

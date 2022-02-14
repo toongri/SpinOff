@@ -19,10 +19,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN FETCH post.viewedPostByIps viewdPostByIp " +
             "WHERE post.id = :id " +
             "ORDER BY viewdPostByIp.id DESC")
-    Optional<Post> findOneByIdFetchJoinViewedPostByIpOrderByViewedIpId(@Param("id") Long id);
+    Optional<Post> findOneByIdFetchJoinViewedByIpOrderByViewedIpId(@Param("id") Long id);
 
     @Query("SELECT DISTINCT post FROM Post post " +
             "LEFT JOIN FETCH post.commentInPosts comment " +
             "WHERE post.id = :id")
-    Optional<Post> findOneByIdIncludeCommentInPost(@Param("id") Long id);
+    Optional<Post> findOneByIdIncludeComment(@Param("id") Long id);
 }

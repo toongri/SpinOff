@@ -12,19 +12,11 @@ import java.util.List;
 public interface CollectionService {
     Long insertCollectionByCollectionVO(CreateCollectionVO postVO) throws NotExistMemberException;
 
-    Collection insertLikedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException,
-            OverSearchLikedCollectionException, AlreadyLikedCollectionException;
+    Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
+            throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException;
 
-    Collection insertViewedCollectionByIp(
-            String ip, Long collectionId, LocalDateTime timeNow, Long minuteDuration)
-            throws NotExistCollectionException, OverSearchViewedCollectionByIpException;
+    Long insertViewedCollectionByIp(String ip, Long collectionId) throws NotExistCollectionException;
 
-    Collection insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException,
-            OverSearchFollowedCollectionException, AlreadyFollowedCollectionException;
-
-    List<Collection> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotExistMemberException, NotExistCollectionException,
-            NotExistPostException, OverSearchCollectedPostException, AlreadyCollectedPostException;
+    Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
+            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException;
 }

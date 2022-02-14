@@ -3,6 +3,8 @@ package com.nameless.spin_off.entity.comment;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -52,7 +54,10 @@ public class CommentInCollection extends BaseTimeEntity {
         commentInCollection.updateParent(this);
     }
 
-    public void addCommentLike(LikedCommentInCollection likedCommentInCollection) {
+    public void addCommentLike(Member member) {
+        LikedCommentInCollection likedCommentInCollection =
+                LikedCommentInCollection.createLikedCommentInCollection(member);
+
         this.likedCommentInCollections.add(likedCommentInCollection);
         likedCommentInCollection.updateCommentInCollection(this);
     }
@@ -99,7 +104,16 @@ public class CommentInCollection extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-
+    public void insertLikedComment(Member member) throws AlreadyLikedCommentInCollectionException {
+        if (isNotAlreadyMemberLikeComment(member)) {
+            addCommentLike(member);
+        } else {
+            throw new AlreadyLikedCommentInCollectionException();
+        }
+    }
     //==조회 로직==//
-
+    public Boolean isNotAlreadyMemberLikeComment(Member member) {
+        return this.likedCommentInCollections.stream()
+                .noneMatch(likedCommentInCollection -> likedCommentInCollection.getMember().equals(member));
+    }
 }

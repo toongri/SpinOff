@@ -5,6 +5,7 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
@@ -22,8 +23,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.InstanceOfAssertFactories.completableFuture;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -55,8 +59,7 @@ class CommentInCollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        CommentInCollection comment = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살"));
-
+        CommentInCollection comment = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살")));
         System.out.println("컬렉션업로드");
         Collection newCollection = collectionRepository.getById(collection.getId());
 
@@ -81,10 +84,10 @@ class CommentInCollectionServiceTest {
 
         //when
         System.out.println("서비스함수1");
-        CommentInCollection childComment1 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살"));
+        CommentInCollection childComment1 = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살")));
 
         System.out.println("서비스함수2");
-        CommentInCollection childComment2 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살"));
+        CommentInCollection childComment2 = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살")));
 
         System.out.println("부모댓글업로드");
         CommentInCollection parentComment = commentInCollectionRepository.findById(parent.getId()).get();
@@ -129,6 +132,76 @@ class CommentInCollectionServiceTest {
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO3))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 좋아요_테스트() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Collection col = Collection.createDefaultCollection(mem);
+        collectionRepository.save(col);
+        col.addCommentInCollection(CommentInCollection.createCommentInCollection(mem, " ", null));
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        System.out.println("서비스함수");
+        Long commentId = commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId());
+
+        System.out.println("댓글함수");
+        CommentInCollection comment = commentInCollectionRepository.getById(commentId);
+
+        //then
+        assertThat(comment.getId()).isEqualTo(col.getCommentInCollections().get(0).getId());
+        assertThat(comment.getCollection().getId()).isEqualTo(col.getId());
+        assertThat(comment.getLikedCommentInCollections().size()).isEqualTo(1);
+        assertThat(comment.getLikedCommentInCollections().get(0).getMember().getId()).isEqualTo(member.getId());
+
+//        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO1))
+//                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
+//        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO2))
+//                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
+//        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO3))
+//                .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
+
+    }
+
+    @Test
+    public void 좋아요_테스트_예외처리() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Collection col = Collection.createDefaultCollection(mem);
+        collectionRepository.save(col);
+        col.addCommentInCollection(CommentInCollection.createCommentInCollection(mem, " ", null));
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        System.out.println("서비스함수");
+        Long commentId = commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId());
+
+        System.out.println("댓글함수");
+        CommentInCollection comment = commentInCollectionRepository.getById(commentId);
+
+        //then
+
+        assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(-1L, col.getCommentInCollections().get(0).getId()))
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), -1L))
+                .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId()))
+                .isInstanceOf(AlreadyLikedCommentInCollectionException.class);//.hasMessageContaining("")
 
     }
 

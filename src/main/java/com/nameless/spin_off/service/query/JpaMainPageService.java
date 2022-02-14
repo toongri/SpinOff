@@ -111,7 +111,7 @@ public class JpaMainPageService implements MainPageService{
     @Override
     public Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) {
 
-        List<Collection> collections = collectionRepository.findCollectionsByFollowingMemberId(memberId);
+        List<Collection> collections = collectionRepository.findAllByFollowingMemberId(memberId);
 
         Slice<Collection> slice = mainPageQueryRepository
                 .findCollectionsByFollowedCollectionsOrderByIdSliced(pageable, collections);

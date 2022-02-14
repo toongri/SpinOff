@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.StaticVariable.*;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -165,24 +167,53 @@ public class Collection extends BaseTimeEntity {
         this.followCount = 0L;
         this.popularity = 0L;
     }
+
+    public void updatePopularity() {
+        this.popularity = viewCount + likeCount + commentCount + followCount;
+    }
+
     public void updateViewCount() {
-        this.viewCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.viewCount = viewedCollectionByIps.stream()
+                .filter(viewedCollectionByIp -> ChronoUnit.DAYS
+                        .between(viewedCollectionByIp.getCreatedDate(), currentTime) < COLLECTION_VIEWED_COUNT_DAYS)
+                .count();
+
+        updatePopularity();
     }
 
     public void updateLikeCount() {
-        this.likeCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.likeCount = likedCollections.stream()
+                .filter(likedCollection -> ChronoUnit.DAYS
+                        .between(likedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
+                .count();
+
+        updatePopularity();
     }
 
     public void updateCommentInCollectionCount() {
-        this.commentCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.commentCount = commentInCollections.stream()
+                .filter(commentInCollection -> ChronoUnit.DAYS
+                        .between(commentInCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
+                .count();
+
+        updatePopularity();
     }
 
     public void updateFollowCount() {
-        this.followCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.followCount = followedCollections.stream()
+                .filter(followedCollection -> ChronoUnit.DAYS
+                        .between(followedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
+                .count();
+
+        updatePopularity();
     }
 
     private void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
@@ -203,7 +234,7 @@ public class Collection extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
-    public void insertCollectedPostByPost(Post post) throws OverSearchCollectedPostException, AlreadyCollectedPostException {
+    public void insertCollectedPostByPost(Post post) throws AlreadyCollectedPostException {
 
         if (isNotAlreadyCollectedPost(post)) {
             addCollectedPostByPost(post);
@@ -212,18 +243,18 @@ public class Collection extends BaseTimeEntity {
         }
     }
 
-    public void insertFollowedCollectionByMember(Member member) throws OverSearchFollowedCollectionException, AlreadyFollowedCollectionException {
+    public void insertFollowedCollectionByMember(Member member) throws AlreadyFollowedCollectionException {
 
-        if (isNotMemberAlreadyFollowCollection(member)) {
+        if (isNotAlreadyMemberFollowCollection(member)) {
             addFollowedCollectionByMember(member);
         } else {
             throw new AlreadyFollowedCollectionException();
         }
     }
 
-    public boolean insertViewedCollectionByIp(String ip, LocalDateTime timeNow, Long minuteDuration) throws OverSearchViewedCollectionByIpException {
+    public boolean insertViewedCollectionByIp(String ip) {
 
-        if (isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
+        if (isNotAlreadyIpView(ip)) {
             addViewedCollectionByIp(ip);
             return true;
         } else {
@@ -231,9 +262,9 @@ public class Collection extends BaseTimeEntity {
         }
     }
 
-    public void insertLikedCollectionByMember(Member member) throws OverSearchLikedCollectionException, AlreadyLikedCollectionException {
+    public void insertLikedCollectionByMember(Member member) throws AlreadyLikedCollectionException {
 
-        if (isNotMemberAlreadyLikeCollection(member)) {
+        if (isNotAlreadyMemberLikeCollection(member)) {
             addLikedCollectionByMember(member);
         } else {
             throw new AlreadyLikedCollectionException();
@@ -258,74 +289,24 @@ public class Collection extends BaseTimeEntity {
     }
     //==조회 로직==//
 
-    public Boolean isNotIpAlreadyView(String ip, LocalDateTime timeNow, Long minuteDuration )
-            throws OverSearchViewedCollectionByIpException {
-
-        List<ViewedCollectionByIp> viewed = viewedCollectionByIps.stream()
-                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
-                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), timeNow) < minuteDuration)
-                .collect(Collectors.toList());
-
-        int size = viewed.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchViewedCollectionByIpException();
+    public Boolean isNotAlreadyIpView(String ip) {
+        return viewedCollectionByIps.stream()
+                .noneMatch(viewedCollectionByIp -> viewedCollectionByIp.getIp().equals(ip) &&
+                        ChronoUnit.MINUTES.between(viewedCollectionByIp.getCreatedDate(), LocalDateTime.now())
+                                < VIEWED_BY_IP_MINUTE);
 
     }
 
-    public Boolean isNotMemberAlreadyLikeCollection(Member member)
-            throws OverSearchLikedCollectionException {
-
-        List<LikedCollection> likedCollections = this.likedCollections.stream()
-                .filter(likedCollection -> likedCollection.getMember().equals(member))
-                .collect(Collectors.toList());
-
-        int size = likedCollections.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchLikedCollectionException();
+    public Boolean isNotAlreadyMemberLikeCollection(Member member) {
+        return this.likedCollections.stream().noneMatch(likedCollection -> likedCollection.getMember().equals(member));
     }
 
-    public Boolean isNotMemberAlreadyFollowCollection(Member member)
-            throws OverSearchFollowedCollectionException {
-
-        List<FollowedCollection> followedCollections = this.followedCollections.stream()
-                .filter(followedCollection -> followedCollection.getMember().equals(member))
-                .collect(Collectors.toList());
-
-        int size = followedCollections.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchFollowedCollectionException();
+    public Boolean isNotAlreadyMemberFollowCollection(Member member) {
+        return this.followedCollections.stream()
+                .noneMatch(followedCollection -> followedCollection.getMember().equals(member));
     }
 
-    public Boolean isNotAlreadyCollectedPost(Post post)
-            throws OverSearchCollectedPostException {
-
-        List<CollectedPost> collectedPosts = this.collectedPosts
-                .stream().filter(collectedPost -> collectedPost.getPost().equals(post))
-                .collect(Collectors.toList());
-
-        int size = collectedPosts.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchCollectedPostException();
+    public Boolean isNotAlreadyCollectedPost(Post post) {
+        return this.collectedPosts.stream().noneMatch(collectedPost -> collectedPost.getPost().equals(post));
     }
-
 }

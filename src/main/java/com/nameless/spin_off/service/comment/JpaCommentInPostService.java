@@ -1,12 +1,16 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
+import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +26,11 @@ public class JpaCommentInPostService implements CommentInPostService {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CommentInPostRepository commentInPostRepository;
 
     @Override
     @Transactional(readOnly = false)
-    public CommentInPost insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
+    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
 
         Member member = getMemberById(commentVO.getMemberId());
         Post post = getPostById(commentVO.getPostId());
@@ -34,7 +39,25 @@ public class JpaCommentInPostService implements CommentInPostService {
         CommentInPost commentInPost = CommentInPost.createCommentInPost(member, commentVO.getContent(), parent);
         post.addCommentInPost(commentInPost);
 
-        return commentInPost;
+        return commentInPostRepository.save(commentInPost).getId();
+    }
+
+    @Override
+    @Transactional(readOnly = false)
+    public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
+            throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
+
+        Member member = getMemberById(memberId);
+        CommentInPost comment = getCommentByIdIncludeLikedComment(commentId);
+        comment.insertLikedComment(member);
+
+        return comment.getId();
+    }
+
+    private CommentInPost getCommentByIdIncludeLikedComment(Long commentId) throws NotExistCommentInPostException {
+        Optional<CommentInPost> optionalComment = commentInPostRepository.findOneByIdIncludeLikedComment(commentId);
+
+        return optionalComment.orElseThrow(NotExistCommentInPostException::new);
     }
 
     private Member getMemberById(Long memberId) throws NotExistMemberException {
@@ -44,7 +67,7 @@ public class JpaCommentInPostService implements CommentInPostService {
     }
 
     private Post getPostById(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdIncludeCommentInPost(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdIncludeComment(postId);
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }

@@ -106,7 +106,7 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId());
+        Collection collection = collectionRepository.getById(collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId()));
 
         System.out.println("멤버");
         Member member = memberRepository.findById(mem.getId()).get();
@@ -135,7 +135,7 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId());
+        Collection collection = collectionRepository.getById(collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId()));
 
         System.out.println("멤버");
         Member member = memberRepository.findById(mem.getId()).get();
@@ -170,7 +170,7 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId());
+        Collection collection = collectionRepository.getById(collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()));
 
         System.out.println("멤버");
         Member member = memberRepository.findById(mem.getId()).get();
@@ -199,7 +199,7 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId());
+        Collection collection = collectionRepository.getById(collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()));
 
         System.out.println("멤버");
         Member member = memberRepository.findById(mem.getId()).get();
@@ -237,7 +237,7 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Collection collection = collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L);
+        Collection collection = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
 
         //then
         assertThat(collection.getViewCount()).isEqualTo(collection.getViewedCollectionByIps().size());
@@ -255,7 +255,7 @@ class CollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
         now = LocalDateTime.now();
-        Collection collection1 = collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L);
+        Collection collection1 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
 
         em.flush();
         em.clear();
@@ -263,7 +263,7 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Collection collection2 = collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L);
+        Collection collection2 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
 
         //then
         assertThat(collection2.getViewCount()).isEqualTo(collection2.getViewedCollectionByIps().size());
@@ -281,7 +281,7 @@ class CollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
         now = LocalDateTime.now();
-        Collection collection1 = collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L);
+        Collection collection1 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
 
         em.flush();
         em.clear();
@@ -289,7 +289,7 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
-        Collection collection2 = collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L);
+        Collection collection2 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
 
         //then
         assertThat(collection2.getViewCount()).isEqualTo(collection2.getViewedCollectionByIps().size());
@@ -316,9 +316,9 @@ class CollectionServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", 0L, now, 60L))
+        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", 0L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", col.getId(), now, 60L))
+        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", col.getId()))
                 .isInstanceOf(OverSearchViewedCollectionByIpException.class);//.hasMessageContaining("")
 
     }
@@ -347,8 +347,8 @@ class CollectionServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<Collection> collections = collectionService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
-
+        Long postId = postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
+        List<Collection> collections = collectionRepository.findAllByPostIdIncludePost(postId);
         System.out.println("포스트함수");
         Post post = postRepository.findById(po.getId()).get();
 
@@ -384,18 +384,18 @@ class CollectionServiceTest {
 
         //when
         //then
-        assertThatThrownBy(() -> collectionService.insertCollectedPosts(0L, po.getId(), ids))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(0L, po.getId(), ids))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), 0L, ids))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), 0L, ids))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), po.getId(), List.of(0L)))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), List.of(0L)))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
 
         collectionList.get(0).addCollectedPostByPost(po);
 
-        assertThatThrownBy(() -> collectionService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(OverSearchCollectedPostException.class);//.hasMessageContaining("")
 
     }

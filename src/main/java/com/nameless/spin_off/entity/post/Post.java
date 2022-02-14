@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.post;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
@@ -7,8 +8,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
-import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
-import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
+import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.sun.istack.NotNull;
 import lombok.*;
 
@@ -108,17 +108,19 @@ public class Post extends BaseTimeEntity {
         this.updateLikeCount();
     }
 
-    public void addPostedHashtagByHashtag(Hashtag hashtag) {
+    public void addPostedHashtagByHashtag(Hashtag hashtag) throws AlreadyPostedHashtagException {
         PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag);
 
-        this.postedHashtags.add(postedHashtag);
+        if (!this.postedHashtags.add(postedHashtag)) {
+            throw new AlreadyPostedHashtagException();
+        }
         postedHashtag.updatePost(this);
     }
 
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
                                   List<Hashtag> hashtags, List<PostedMedia> postedMedias,
-                                  Movie movie, PublicOfPostStatus publicOfPostStatus) {
+                                  Movie movie, PublicOfPostStatus publicOfPostStatus) throws AlreadyPostedHashtagException {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
@@ -177,7 +179,7 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    public void updatePostedHashtagsByHashtags(List<Hashtag> hashtags) {
+    public void updatePostedHashtagsByHashtags(List<Hashtag> hashtags) throws AlreadyPostedHashtagException {
         for (Hashtag hashtag : hashtags) {
             this.addPostedHashtagByHashtag(hashtag);
         }
@@ -205,9 +207,9 @@ public class Post extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
-    public boolean insertViewedPostByIp(String ip, LocalDateTime timeNow, Long minuteDuration) throws OverSearchViewedPostByIpException {
+    public boolean insertViewedPostByIp(String ip) {
 
-        if (isNotIpAlreadyView(ip, timeNow, minuteDuration)) {
+        if (isNotAlreadyIpView(ip)) {
             addViewedPostByIp(ip);
             return true;
         } else {
@@ -215,9 +217,9 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    public void insertLikedPostByMember(Member member) throws OverSearchLikedPostException, AlreadyLikedPostException {
+    public void insertLikedPostByMember(Member member) throws AlreadyLikedPostException {
 
-        if (isNotMemberAlreadyLikePost(member)) {
+        if (isNotAlreadyMemberLikePost(member)) {
             addLikedPostByMember(member);
         } else {
             throw new AlreadyLikedPostException();
@@ -242,39 +244,15 @@ public class Post extends BaseTimeEntity {
 
     //==조회 로직==//
 
-    public Boolean isNotIpAlreadyView(String ip, LocalDateTime timeNow, Long minuteDuration )
-            throws OverSearchViewedPostByIpException {
-
-        List<ViewedPostByIp> viewed = viewedPostByIps.stream()
-                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
-                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), timeNow) < minuteDuration)
-                .collect(Collectors.toList());
-
-        int size = viewed.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchViewedPostByIpException();
-
+    public Boolean isNotAlreadyIpView(String ip) {
+        return viewedPostByIps.stream()
+                .noneMatch(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
+                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), LocalDateTime.now())
+                                < StaticVariable.VIEWED_BY_IP_MINUTE);
     }
 
-    public Boolean isNotMemberAlreadyLikePost(Member member) throws OverSearchLikedPostException {
-
-        List<LikedPost> likedPosts = this.likedPosts.stream()
-                .filter(likedPost -> likedPost.getMember().equals(member))
-                .collect(Collectors.toList());
-
-        int size = likedPosts.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchLikedPostException();
+    public Boolean isNotAlreadyMemberLikePost(Member member) {
+        return this.likedPosts.stream().noneMatch(likedPost -> likedPost.getMember().equals(member));
     }
 
 }

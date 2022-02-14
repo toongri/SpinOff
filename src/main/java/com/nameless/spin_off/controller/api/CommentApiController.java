@@ -28,19 +28,19 @@ public class CommentApiController {
     private final CommentInCollectionService commentInCollectionService;
 
     @PostMapping("/post")
-    public CommentApiResult<CommentInPost> createCommentInPost(@RequestBody CreateCommentInPostVO commentVO)
+    public CommentApiResult<Long> createCommentInPost(@RequestBody CreateCommentInPostVO commentVO)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
-        CommentInPost commentInPost = commentInPostService.insertCommentInPostByCommentVO(commentVO);
-        return new CommentApiResult<CommentInPost>(commentInPost);
+        Long commentInPostId = commentInPostService.insertCommentInPostByCommentVO(commentVO);
+        return new CommentApiResult<Long>(commentInPostId);
     }
 
     @PostMapping("/collection")
-    public CommentApiResult<CommentInCollection> createCommentInCollection(
+    public CommentApiResult<Long> createCommentInCollection(
             @RequestBody CommentDto.CreateCommentInCollectionVO commentVO)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
-        CommentInCollection comment = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
-        return new CommentApiResult<CommentInCollection>(comment);
+        Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
+        return new CommentApiResult<Long>(commentId);
     }
 
     @Data

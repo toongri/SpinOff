@@ -14,7 +14,6 @@ import javax.persistence.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -138,27 +137,27 @@ public class Member extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public void insertFollowedMemberByMember(Member member) throws AlreadyFollowedMemberException, OverSearchFollowedMemberException {
+    public void insertFollowedMemberByMember(Member member) throws AlreadyFollowedMemberException {
 
-        if (isNotMemberAlreadyFollowedMember(member)) {
+        if (isNotAlreadyMemberFollowedMember(member)) {
             addFollowedMember(member);
         } else {
             throw new AlreadyFollowedMemberException();
         }
     }
 
-    public void insertFollowedMovieByMovie(Movie movie) throws AlreadyFollowedMovieException, OverSearchFollowedMovieException {
+    public void insertFollowedMovieByMovie(Movie movie) throws AlreadyFollowedMovieException {
 
-        if (isNotMemberAlreadyFollowedMovie(movie)) {
+        if (isNotAlreadyMemberFollowMovie(movie)) {
             addFollowedMovie(movie);
         } else {
             throw new AlreadyFollowedMovieException();
         }
     }
 
-    public void insertFollowedHashtagByHashtag(Hashtag hashtag) throws OverSearchFollowedHashtagException, AlreadyFollowedHashtagException {
+    public void insertFollowedHashtagByHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
 
-        if (isNotMemberAlreadyFollowedHashtag(hashtag)) {
+        if (isNotAlreadyMemberFollowHashtag(hashtag)) {
             addFollowedHashtag(hashtag);
         } else {
             throw new AlreadyFollowedHashtagException();
@@ -167,51 +166,16 @@ public class Member extends BaseTimeEntity {
 
     //==조회 로직==//
 
-    public Boolean isNotMemberAlreadyFollowedHashtag(Hashtag hashtag) throws OverSearchFollowedHashtagException {
-
-        List<FollowedHashtag> followedHashtags = this.followedHashtags.stream()
-                .filter(followedHashtag -> followedHashtag.getHashtag().equals(hashtag))
-                .collect(Collectors.toList());
-
-        int size = followedHashtags.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchFollowedHashtagException();
+    public Boolean isNotAlreadyMemberFollowHashtag(Hashtag hashtag) {
+        return this.followedHashtags.stream()
+                .noneMatch(followedHashtag -> followedHashtag.getHashtag().equals(hashtag));
     }
 
-    public Boolean isNotMemberAlreadyFollowedMovie(Movie movie) throws OverSearchFollowedMovieException {
-
-        List<FollowedMovie> followedMovies = this.followedMovies.stream()
-                .filter(followedMovie -> followedMovie.getMovie().equals(movie))
-                .collect(Collectors.toList());
-
-        int size = followedMovies.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchFollowedMovieException();
+    public Boolean isNotAlreadyMemberFollowMovie(Movie movie) {
+        return this.followedMovies.stream().noneMatch(followedMovie -> followedMovie.getMovie().equals(movie));
     }
 
-    public Boolean isNotMemberAlreadyFollowedMember(Member member) throws OverSearchFollowedMemberException {
-
-        List<FollowedMember> followedMembers = this.followedMembers.stream()
-                .filter(followedMember -> followedMember.getMember().equals(member))
-                .collect(Collectors.toList());
-
-        int size = followedMembers.size();
-
-        if (size == 0)
-            return true;
-        else if (size == 1)
-            return false;
-        else
-            throw new OverSearchFollowedMemberException();
+    public Boolean isNotAlreadyMemberFollowedMember(Member member) {
+        return this.followedMembers.stream().noneMatch(followedMember -> followedMember.getMember().equals(member));
     }
 }

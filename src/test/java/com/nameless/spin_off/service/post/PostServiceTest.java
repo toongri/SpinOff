@@ -274,7 +274,7 @@ class PostServiceTest {
 
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         //then
         assertThat(post1.getViewCount()).isEqualTo(post1.getViewedPostByIps().size());
@@ -291,7 +291,7 @@ class PostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         em.flush();
         em.clear();
@@ -299,7 +299,7 @@ class PostServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post2 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
+        Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
         
         //then
         assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
@@ -317,7 +317,7 @@ class PostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
+        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         em.flush();
         em.clear();
@@ -325,7 +325,7 @@ class PostServiceTest {
         //when
         now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
-        Post post2 = postService.insertViewedPostByIp("00", post.getId(), now, 60L);
+        Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         //then
         assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
@@ -352,9 +352,9 @@ class PostServiceTest {
         //when
 
         //then
-        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L, now, 60L))
+        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", po.getId(), now, 60L))
+        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", po.getId()))
                 .isInstanceOf(OverSearchViewedPostByIpException.class);//.hasMessageContaining("")
 
     }

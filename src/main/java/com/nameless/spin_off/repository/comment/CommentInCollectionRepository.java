@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CommentInCollectionRepository extends JpaRepository<CommentInCollection, Long> {
 
@@ -20,4 +21,10 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
     @Query("SELECT DISTINCT parent FROM CommentInCollection parent " +
             "WHERE parent.parent IS NULL AND parent.collection = :collection")
     List<CommentInCollection> findParentsByCollection(@Param("collection") Collection collection);
+
+    @Query("SELECT DISTINCT comment FROM CommentInCollection comment " +
+            "LEFT JOIN FETCH comment.likedCommentInCollections likedComment " +
+            "LEFT JOIN FETCH likedComment.member m " +
+            "WHERE comment.id = :id")
+    Optional<CommentInCollection> findOneByIdIncludeLikedComment(@Param("id") Long id);
 }
