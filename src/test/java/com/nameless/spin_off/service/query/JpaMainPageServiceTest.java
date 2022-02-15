@@ -1,16 +1,15 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.Hashtag;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

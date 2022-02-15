@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -50,7 +49,7 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
             throws NotExistMemberException, NotExistCommentInCollectionException, AlreadyLikedCommentInCollectionException {
 
         Member member = getMemberById(memberId);
-        CommentInCollection comment = getCommentByIdIncludeLikedComment(commentId);
+        CommentInCollection comment = getCommentByIdWithLikedComment(commentId);
         comment.insertLikedComment(member);
 
         return comment.getId();
@@ -62,15 +61,15 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private CommentInCollection getCommentByIdIncludeLikedComment(Long commentId) throws NotExistCommentInCollectionException {
+    private CommentInCollection getCommentByIdWithLikedComment(Long commentId) throws NotExistCommentInCollectionException {
         Optional<CommentInCollection> optionalComment =
-                commentInCollectionRepository.findOneByIdIncludeLikedComment(commentId);
+                commentInCollectionRepository.findOneByIdWithLikedComment(commentId);
 
         return optionalComment.orElseThrow(NotExistCommentInCollectionException::new);
     }
 
     private Collection getCollectionById(Long collectionId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection = collectionRepository.findOneByIdIncludeComment(collectionId);
+        Optional<Collection> optionalCollection = collectionRepository.findOneByIdWithComment(collectionId);
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }

@@ -14,7 +14,7 @@ import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
@@ -149,11 +149,6 @@ class CollectionServiceTest {
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyLikedCollectionException.class);//.hasMessageContaining("")
-
-        collection.addLikedCollectionByMember(member);
-
-        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), collection.getId()))
-                .isInstanceOf(OverSearchLikedCollectionException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -213,11 +208,6 @@ class CollectionServiceTest {
 
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyFollowedCollectionException.class);//.hasMessageContaining("")
-
-        collection.addFollowedCollectionByMember(member);
-
-        assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
-                .isInstanceOf(OverSearchFollowedCollectionException.class);//.hasMessageContaining("")
 
     }
     
@@ -318,8 +308,6 @@ class CollectionServiceTest {
         //then
         assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", 0L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", col.getId()))
-                .isInstanceOf(OverSearchViewedCollectionByIpException.class);//.hasMessageContaining("")
 
     }
     
@@ -348,7 +336,7 @@ class CollectionServiceTest {
 
         System.out.println("서비스함수");
         Long postId = postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
-        List<Collection> collections = collectionRepository.findAllByPostIdIncludePost(postId);
+        List<Collection> collections = collectionRepository.findAllByPostIdWithPost(postId);
         System.out.println("포스트함수");
         Post post = postRepository.findById(po.getId()).get();
 
@@ -392,11 +380,6 @@ class CollectionServiceTest {
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
-
-        collectionList.get(0).addCollectedPostByPost(po);
-
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
-                .isInstanceOf(OverSearchCollectedPostException.class);//.hasMessageContaining("")
 
     }
 }

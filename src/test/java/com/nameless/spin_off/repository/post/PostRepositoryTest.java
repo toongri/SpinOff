@@ -5,6 +5,7 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
@@ -26,7 +27,8 @@ public class PostRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired CollectedPostRepository collectedPostRepository;
-    @Autowired HashtagRepository hashtagRepository;
+    @Autowired
+    HashtagRepository hashtagRepository;
     @Autowired PostService postService;
 
     @Test

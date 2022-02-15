@@ -79,7 +79,7 @@ public class MemberRepositoryTest {
 
         //when
         System.out.println("쿼리");
-        Member member2 = memberRepository.findOneByIdIncludeFollowedMember(member.getId()).get();
+        Member member2 = memberRepository.findOneByIdWithFollowedMember(member.getId()).get();
         //then
         assertThat(member2.getFollowedMembers().size()).isEqualTo(memberList.size());
 

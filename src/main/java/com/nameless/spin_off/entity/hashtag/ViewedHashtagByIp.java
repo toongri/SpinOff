@@ -1,7 +1,8 @@
-package com.nameless.spin_off.entity.member;
+package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.post.Hashtag;
+import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.entity.movie.ViewedMovieByIp;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,17 +13,14 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class FollowedHashtag extends BaseTimeEntity {
+public class ViewedHashtagByIp extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "followed_hashtag_id")
+    @Column(name="viewed_hashtag_by_ip_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    @NotNull
-    private Member member;
+    private String ip;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "hashtag_id")
@@ -32,25 +30,23 @@ public class FollowedHashtag extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedHashtag createFollowedHashtag(Hashtag hashtag) {
+    public static ViewedHashtagByIp createViewedHashtagByIp(String ip) {
+        ViewedHashtagByIp viewedHashtagByIp = new ViewedHashtagByIp();
+        viewedHashtagByIp.updateIp(ip);
 
-        FollowedHashtag followedHashtag = new FollowedHashtag();
-        followedHashtag.updateHashtag(hashtag);
-
-        return followedHashtag;
+        return viewedHashtagByIp;
     }
 
     //==수정 메소드==//
-    public void updateMember(Member member) {
-        this.member = member;
-    }
-
     public void updateHashtag(Hashtag hashtag) {
         this.hashtag = hashtag;
+    }
+
+    private void updateIp(String ip) {
+        this.ip = ip;
     }
 
     //==비즈니스 로직==//
 
     //==조회 로직==//
-
 }

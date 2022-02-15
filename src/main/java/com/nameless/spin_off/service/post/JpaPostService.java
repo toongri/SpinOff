@@ -3,19 +3,20 @@ package com.nameless.spin_off.service.post;
 import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchCollectedPostException;
+import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -67,8 +68,7 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
-            throws NotExistMemberException, NotExistPostException,
-            OverSearchLikedPostException, AlreadyLikedPostException {
+            throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         Member member = getMemberById(memberId);
         Post post = getPostByIdWithLikedPost(postId);
@@ -80,8 +80,7 @@ public class JpaPostService implements PostService{
 
     @Transactional(readOnly = false)
     @Override
-    public Long insertViewedPostByIp(String ip, Long postId)
-            throws NotExistPostException, OverSearchViewedPostByIpException {
+    public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
 
         Post post = getPostByIdWithViewedIp(postId);
 
@@ -94,7 +93,7 @@ public class JpaPostService implements PostService{
     @Override
     public Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotExistCollectionException,
-            NotExistPostException, OverSearchCollectedPostException, AlreadyCollectedPostException {
+            NotExistPostException, AlreadyCollectedPostException {
 
         Post post = getPost(postId);
         List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
@@ -108,7 +107,7 @@ public class JpaPostService implements PostService{
 
     private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
             throws NotExistCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectionIds, memberId);
+        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdWithPost(collectionIds, memberId);
 
         if (collections.size() != collectionIds.size()) {
             throw new NotExistCollectionException();
@@ -122,7 +121,7 @@ public class JpaPostService implements PostService{
     }
 
     private List<Collection> getCollectionsByIdIn(List<Long> collectionIds, Long memberId) throws NotExistCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectionIds, memberId);
+        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdWithPost(collectionIds, memberId);
 
         if (collections.size() == collectionIds.size()) {
             return collections;
@@ -182,13 +181,13 @@ public class JpaPostService implements PostService{
     }
 
     private Post getPostByIdWithViewedIp(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinViewedByIpOrderByViewedIpId(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdWithViewedByIp(postId);
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }
 
     private Post getPostByIdWithLikedPost(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdFetchJoinLikedPost(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdWithLikedPost(postId);
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }

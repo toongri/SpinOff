@@ -41,7 +41,7 @@ public class MainPageApiController {
 
         Slice<MainPagePostDto> slice = mainPageService
                 .getPostsOrderByPopularityBySlicingAfterLocalDateTime(
-                        PageRequest.of(page, size), startTime, currentTime, memberId);
+                        PageRequest.of(page, size), memberId);
         return new MainPageResult<Slice<MainPagePostDto>>(slice);
     }
 
@@ -56,7 +56,7 @@ public class MainPageApiController {
 //                .of(2022, 2, 9, 21, 58, 25, 390);
         Slice<MainPageCollectionDto> slice = mainPageService
                 .getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
-                        PageRequest.of(page, size), startTime, currentTime, memberId);
+                        PageRequest.of(page, size), memberId);
         return new MainPageResult<Slice<MainPageCollectionDto>>(slice);
     }
 

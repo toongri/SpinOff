@@ -6,7 +6,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
@@ -58,7 +58,7 @@ class CommentInCollectionRepositoryTest {
 
         //when
         List<CommentInCollection> list = commentInCollectionRepository
-                .findParentsByCollectionIdIncludeChildrenOrderByParentIdAndChildIdDesc(collection);
+                .findParentsByCollectionIdWithChildren(collection);
 
         //then
         for (CommentInCollection comment : list) {
@@ -98,7 +98,7 @@ class CommentInCollectionRepositoryTest {
 
         //when
         List<CommentInCollection> list = commentInCollectionRepository
-                .findParentsByCollectionIdIncludeChildrenOrderByParentIdAndChildIdDesc(collection);
+                .findParentsByCollectionIdWithChildren(collection);
 
         //then
         for (CommentInCollection comment : list) {

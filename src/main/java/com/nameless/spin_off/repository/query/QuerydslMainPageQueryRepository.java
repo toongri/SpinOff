@@ -1,6 +1,8 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
@@ -20,10 +22,10 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.StaticVariable.*;
 import static com.nameless.spin_off.entity.collections.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collections.QCollection.collection;
+import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QPost.post;
-import static com.nameless.spin_off.entity.post.QPostedHashtag.postedHashtag;
 
 @Repository
 @RequiredArgsConstructor
@@ -62,13 +64,16 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
 
     @Override
     public Slice<Post> findPostsOrderByPopularityAfterLocalDateTimeSliced(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId) {
+            Pageable pageable, Long memberId) {
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime startTime = now.minusDays(POPULARITY_DATE_DURATION);
 
         List<Post> content = jpaQueryFactory
                 .select(post)
                 .from(post)
                 .join(post.member, member).fetchJoin()
-                .where(post.createdDate.between(startDateTime, endDateTime),
+                .where(post.createdDate.between(startTime, now),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
                         memberIdNotEq(memberId))
                 .offset(pageable.getOffset())
@@ -87,9 +92,9 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
 
     @Override
     public Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId) {
+            Pageable pageable, Long memberId) {
 
-        long hourDuration = ChronoUnit.HOURS.between(startDateTime, endDateTime);
+        LocalDateTime now = LocalDateTime.now();
 
         List<Collection> collects = jpaQueryFactory
                 .selectDistinct(collection)
@@ -105,7 +110,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
 
         List<Collection> content = collects.stream()
                 .filter(collect -> ChronoUnit.HOURS
-                        .between(collect.getCollectedPosts().get(0).getCreatedDate(), endDateTime) < hourDuration)
+                        .between(collect.getCollectedPosts().get(0).getCreatedDate(), now) < POPULARITY_DATE_DURATION)
                 .skip(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
 

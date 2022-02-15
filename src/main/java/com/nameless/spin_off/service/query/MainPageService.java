@@ -11,11 +11,9 @@ import java.time.LocalDateTime;
 public interface MainPageService {
     Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId);
 
-    Slice<MainPagePostDto> getPostsOrderByPopularityBySlicingAfterLocalDateTime(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
+    Slice<MainPagePostDto> getPostsOrderByPopularityBySlicingAfterLocalDateTime(Pageable pageable, Long memberId);
 
-    Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
-            Pageable pageable, LocalDateTime startDateTime, LocalDateTime endDateTime, Long memberId);
+    Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(Pageable pageable, Long memberId);
 
     Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
 

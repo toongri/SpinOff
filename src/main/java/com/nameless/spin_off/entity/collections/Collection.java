@@ -71,9 +71,9 @@ public class Collection extends BaseTimeEntity {
     public void addViewedCollectionByIp(String ip) {
         ViewedCollectionByIp viewedCollectionByIp = ViewedCollectionByIp.createViewedCollectionByIp(ip);
 
+        this.updateViewCount();
         this.viewedCollectionByIps.add(viewedCollectionByIp);
         viewedCollectionByIp.updateCollections(this);
-        this.updateViewCount();
     }
 
     public void addVisitedCollectionByMember(Member member) {
@@ -86,17 +86,17 @@ public class Collection extends BaseTimeEntity {
     public void addLikedCollectionByMember(Member member) {
         LikedCollection likedCollection = LikedCollection.createLikedCollection(member);
 
+        this.updateLikeCount();
         this.likedCollections.add(likedCollection);
         likedCollection.updateCollections(this);
-        this.updateLikeCount();
     }
 
     public void addFollowedCollectionByMember(Member member) {
         FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member);
 
+        this.updateFollowCount();
         this.followedCollections.add(followedCollection);
         followedCollection.updateCollections(this);
-        this.updateFollowCount();
     }
 
     public void addCollectedPostByPost(Post post) {
@@ -104,13 +104,15 @@ public class Collection extends BaseTimeEntity {
 
         this.collectedPosts.add(collectedPost);
         collectedPost.updateCollections(this);
-        post.updateCollectionCount();
+        post.addCollectedPost(collectedPost);
     }
 
     public void addCommentInCollection(CommentInCollection commentInCollection) {
+
+        this.updateCommentInCollectionCount();
+
         this.commentInCollections.add(commentInCollection);
         commentInCollection.updateCollection(this);
-        this.updateCommentInCollectionCount();
     }
 
     //==생성 메소드==//
@@ -177,8 +179,8 @@ public class Collection extends BaseTimeEntity {
 
         this.viewCount = viewedCollectionByIps.stream()
                 .filter(viewedCollectionByIp -> ChronoUnit.DAYS
-                        .between(viewedCollectionByIp.getCreatedDate(), currentTime) < COLLECTION_VIEWED_COUNT_DAYS)
-                .count();
+                        .between(viewedCollectionByIp.getCreatedDate(), currentTime) < COLLECTION_VIEW_COUNT_DAYS)
+                .count() + 1;
 
         updatePopularity();
     }
@@ -188,8 +190,8 @@ public class Collection extends BaseTimeEntity {
 
         this.likeCount = likedCollections.stream()
                 .filter(likedCollection -> ChronoUnit.DAYS
-                        .between(likedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
-                .count();
+                        .between(likedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKE_COUNT_DAYS)
+                .count() + 1;
 
         updatePopularity();
     }
@@ -199,8 +201,8 @@ public class Collection extends BaseTimeEntity {
 
         this.commentCount = commentInCollections.stream()
                 .filter(commentInCollection -> ChronoUnit.DAYS
-                        .between(commentInCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
-                .count();
+                        .between(commentInCollection.getCreatedDate(), currentTime) < COLLECTION_COMMENT_COUNT_DAYS)
+                .count() + 1;
 
         updatePopularity();
     }
@@ -210,8 +212,8 @@ public class Collection extends BaseTimeEntity {
 
         this.followCount = followedCollections.stream()
                 .filter(followedCollection -> ChronoUnit.DAYS
-                        .between(followedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKED_COUNT_DAYS)
-                .count();
+                        .between(followedCollection.getCreatedDate(), currentTime) < COLLECTION_FOLLOW_COUNT_DAYS)
+                .count() + 1;
 
         updatePopularity();
     }

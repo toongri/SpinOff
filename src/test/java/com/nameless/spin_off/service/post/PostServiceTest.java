@@ -4,6 +4,8 @@ import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -11,11 +13,9 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
-import com.nameless.spin_off.exception.post.OverSearchLikedPostException;
-import com.nameless.spin_off.exception.post.OverSearchViewedPostByIpException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
@@ -237,28 +237,6 @@ class PostServiceTest {
     }
 
     @Test
-    public void 글_좋아요_복수데이터_예외처리() throws Exception{
-
-        //given
-        Member mem = Member.buildMember().build();
-        memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        postRepository.save(po);
-        po.addLikedPostByMember(mem);
-        po.addLikedPostByMember(mem);
-
-        em.flush();
-        em.clear();
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po.getId()))
-                .isInstanceOf(OverSearchLikedPostException.class);//.hasMessageContaining("")
-
-    }
-
-    @Test
     public void 글_조회수_증가() throws Exception{
         //given
         LocalDateTime now;
@@ -354,9 +332,6 @@ class PostServiceTest {
         //then
         assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", po.getId()))
-                .isInstanceOf(OverSearchViewedPostByIpException.class);//.hasMessageContaining("")
-
     }
 
 }

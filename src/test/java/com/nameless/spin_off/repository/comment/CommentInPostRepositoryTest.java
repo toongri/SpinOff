@@ -7,7 +7,7 @@ import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectedPostRepository;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.post.PostService;
@@ -48,7 +48,7 @@ class CommentInPostRepositoryTest {
         post.addCommentInPost(childComment1);
         post.addCommentInPost(childComment2);
         //when
-        List<CommentInPost> comments = commentInPostRepository.findParentsByPostIncludeChildrenOrderByParentIdAndChildIdDesc(post);
+        List<CommentInPost> comments = commentInPostRepository.findParentsByPostWithChildren(post);
 
         //then
         for (CommentInPost comment : comments) {

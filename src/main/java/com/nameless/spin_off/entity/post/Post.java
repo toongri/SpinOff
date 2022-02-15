@@ -2,7 +2,10 @@ package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -20,6 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static com.nameless.spin_off.StaticVariable.*;
 
 @Entity
 @Getter
@@ -66,6 +71,9 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<VisitedPostByMember> visitedPostByMembers = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    private List<CollectedPost> collectedPosts = new ArrayList<>();
+
     private Long viewCount;
     private Long likeCount;
     private Long commentCount;
@@ -79,12 +87,17 @@ public class Post extends BaseTimeEntity {
         postedMedia.updatePost(this);
     }
 
+    public void addCollectedPost(CollectedPost collectedPost) {
+        this.updateCollectionCount();
+        this.collectedPosts.add(collectedPost);
+    }
+
     public void addViewedPostByIp(String ip) {
         ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip);
 
+        this.updateViewCount();
         this.viewedPostByIps.add(viewedPostByIp);
         viewedPostByIp.updatePost(this);
-        this.updateViewCount();
     }
 
     public void addVisitedPostByMember(Member member) {
@@ -95,17 +108,17 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addCommentInPost(CommentInPost commentInPost) {
+        this.updateCommentInPostCount();
         this.commentInPosts.add(commentInPost);
         commentInPost.updatePost(this);
-        this.updateCommentInPostCount();
     }
 
     public void addLikedPostByMember(Member member) {
         LikedPost likedPost = LikedPost.createLikedPost(member);
 
+        this.updateLikeCount();
         this.likedPosts.add(likedPost);
         likedPost.updatePost(this);
-        this.updateLikeCount();
     }
 
     public void addPostedHashtagByHashtag(Hashtag hashtag) throws AlreadyPostedHashtagException {
@@ -129,8 +142,10 @@ public class Post extends BaseTimeEntity {
         post.updatePostedHashtagsByHashtags(hashtags);
         post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
-        post.updateMovie(movie);
         post.updateCountToZero();
+
+        if (movie != null)
+            movie.addTaggedPosts(post);
 
         return post;
     }
@@ -149,28 +164,56 @@ public class Post extends BaseTimeEntity {
         this.popularity = 0L;
     }
 
+    public void updatePopularity() {
+        this.popularity = viewCount + likeCount + commentCount + collectionCount;
+    }
+
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
         this.publicOfPostStatus = publicStatus;
     }
 
     public void updateViewCount() {
-        this.viewCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.viewCount = viewedPostByIps.stream()
+                .filter(viewedPostByIp -> ChronoUnit.DAYS
+                        .between(viewedPostByIp.getCreatedDate(), currentTime) < POST_VIEW_COUNT_DAYS)
+                .count() + 1;
+
+        updatePopularity();
     }
 
     public void updateLikeCount() {
-        this.likeCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.likeCount = likedPosts.stream()
+                .filter(likedPost -> ChronoUnit.DAYS
+                        .between(likedPost.getCreatedDate(), currentTime) < POST_LIKE_COUNT_DAYS)
+                .count() + 1;
+
+        updatePopularity();
     }
 
     public void updateCommentInPostCount() {
-        this.commentCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.commentCount = commentInPosts.stream()
+                .filter(commentInPost -> ChronoUnit.DAYS
+                        .between(commentInPost.getCreatedDate(), currentTime) < POST_COMMENT_COUNT_DAYS)
+                .count() + 1;
+
+        updatePopularity();
     }
 
     public void updateCollectionCount() {
-        this.collectionCount += 1;
-        this.popularity += 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        this.collectionCount = collectedPosts.stream()
+                .filter(collectedPost -> ChronoUnit.DAYS
+                        .between(collectedPost.getCreatedDate(), currentTime) < POST_COLLECTION_COUNT_DAYS)
+                .count() + 1;
+
+        updatePopularity();
     }
 
     public void updatePostedMedias(List<PostedMedia> postedMedias) {

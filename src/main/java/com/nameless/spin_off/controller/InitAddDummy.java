@@ -13,7 +13,7 @@ import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
@@ -60,142 +60,7 @@ public class InitAddDummy {
         
         @Transactional
         public void init() throws Exception {
-            int userNicknameIndex;
-            List<Member> newMembers = new ArrayList<>();
-            List<FollowedMember> newFollowedMembers = new ArrayList<>();
-            List<Collection> newCollections = new ArrayList<>();
-            List<Post> newPosts = new ArrayList<>();
-
-            List<Member> existMembers = memberRepository.findAll();
-            List<Collection> existCollections = collectionRepository.findAll();
-            List<Post> existPosts = postRepository.findAll();
-
-            int newMemberSize = (int) (Math.random() * 5) + 2;
-            
-            for (int i = 0; i < newMemberSize; i++) {
-                userNicknameIndex = (int) (Math.random() * randomSize);
-                newMembers.add(Member.buildMember().setNickname(arr.get(userNicknameIndex) + i).build());
-            }
-
-            StringBuilder title;
-            StringBuilder content;
-            List<String> newHashtagContentList;
-            CommentInPost commentInPostParent;
-            CommentInCollection commentInCollectionParent;
-
-            for (Member member : newMembers) {
-
-                int randomI = (int) (Math.random() * existMembers.size() / 4);
-
-                for (int i = 0; i < randomI; i++) {
-                    try {
-                        int i1 = (int) (Math.random() * existMembers.size());
-                        newFollowedMembers.add(FollowedMember.createFollowedMember(member, existMembers.get(i1)));
-                    } catch (Exception e) {
-                        continue;
-                    }
-
-                }
-                newCollections.add(Collection.createDefaultCollection(member));
-
-                int newCollectionLength = (int) (Math.random() * 1);
-                int newCollectionTitleLength = (int) (Math.random() * 2) + 2;
-
-                for (int i = 0; i < newCollectionLength; i++) {
-                    title = new StringBuilder();
-                    content = new StringBuilder();
-
-                    for (int j = 0; j < newCollectionTitleLength; j++) {
-                        title.append(arr.get((int) (Math.random() * randomSize)));
-                        content.append(arr.get((int) (Math.random() * randomSize)));
-                        content.append(arr.get((int) (Math.random() * randomSize)));
-                    }
-                    newCollections.add(Collection.createCollection(
-                            member, title.toString(), content.toString(),
-                            PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-                }
-
-                int newPostLength = (int) (Math.random() * 3) + 1;
-                int newPostTitleLength = (int) (Math.random() * 2) + 3;
-                int newPostHashtagLength = (int) (Math.random() * 26) + 5;
-
-                for (int i = 0; i < newPostLength; i++) {
-                    title = new StringBuilder();
-                    content = new StringBuilder();
-                    newHashtagContentList = new ArrayList<>();
-
-                    for (int j = 0; j < newPostTitleLength; j++) {
-                        title.append(arr.get((int) (Math.random() * randomSize)));
-                        content.append(arr.get((int) (Math.random() * randomSize)));
-                        content.append(arr.get((int) (Math.random() * randomSize)));
-                    }
-
-                    for (int j = 0; j < newPostHashtagLength; j++) {
-                        newHashtagContentList.add(arr.get((int) (Math.random() * randomSize)));
-                    }
-
-                    newPosts.add(Post.buildPost()
-                                    .setMember(member)
-                                    .setTitle(title.toString())
-                                    .setContent(content.toString())
-                                    .setPostPublicStatus(PublicOfPostStatus.values()[(int) (Math.random() * PublicOfPostStatus.values().length)])
-                                    .setHashTags(hashtagRepository.findAllByContentIn(newHashtagContentList))
-                            .build());
-                }
-
-                int newCommentLength = (int) (Math.random() * 3) + 1;
-                int newCommentParent = (int) (Math.random() * 4);
-                int newCommentContentLength = (int) (Math.random() * 2) + 2;
-
-                for (int i = 0; i < newCommentLength; i++) {
-                    Post existPost = existPosts.get((int) (Math.random() * existPosts.size()));
-                    if (existPost.getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC) {
-                        content = new StringBuilder();
-
-                        if (newCommentParent != 0) {
-                            commentInPostParent = null;
-                        } else {
-                            List<CommentInPost> parentsByPost = commentInPostRepository.findParentsByPost(existPost);
-                            commentInPostParent = parentsByPost.get((int)(Math.random() * parentsByPost.size()));
-                        }
-                        for (int j = 0; j < newCommentContentLength; j++) {
-                            content.append(arr.get((int) (Math.random() * randomSize)));
-                        }
-                        existPost.addCommentInPost(CommentInPost.createCommentInPost(member, content.toString(), commentInPostParent));
-                    }
-
-                }
-
-                newCommentLength = (int) (Math.random() * 3) + 1;
-                newCommentParent = (int) (Math.random() * 4);
-                newCommentContentLength = (int) (Math.random() * 2) + 2;
-
-                for (int i = 0; i < newCommentLength; i++) {
-                    Collection existCollection = existCollections.get((int) (Math.random() * existCollections.size()));
-                    if (existCollection.getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC) {
-                        content = new StringBuilder();
-
-                        if (newCommentParent != 0) {
-                            commentInCollectionParent = null;
-                        } else {
-                            List<CommentInCollection> parentsByCollection = commentInCollectionRepository.findParentsByCollection(existCollection);
-                            commentInCollectionParent = parentsByCollection.get((int)(Math.random() * parentsByCollection.size()));
-                        }
-                        for (int j = 0; j < newCommentContentLength; j++) {
-                            content.append(arr.get((int) (Math.random() * randomSize)));
-                        }
-
-                        existCollection.addCommentInCollection(CommentInCollection.createCommentInCollection(member, content.toString(), commentInCollectionParent));
-                    }
-                }
-            }
-
-            collectionRepository.saveAll(newCollections);
-            followedMemberRepository.saveAll(newFollowedMembers);
-            postRepository.saveAll(newPosts);
-
 
         }
     }
-
 }

@@ -34,7 +34,7 @@ public class CollectionApiController {
     @PostMapping("/like")
     public CollectionApiResult<Long> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
-            NotExistCollectionException, OverSearchLikedCollectionException {
+            NotExistCollectionException {
 
         Long collectionId = collectionService.insertLikedCollectionByMemberId(memberId, postId);
 
@@ -43,7 +43,7 @@ public class CollectionApiController {
 
     @PostMapping("/view")
     public CollectionApiResult<Long> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
-            throws NotExistCollectionException, OverSearchViewedCollectionByIpException {
+            throws NotExistCollectionException {
 
         Long collectionId = collectionService
                 .insertViewedCollectionByIp(ip, postId);
@@ -53,8 +53,7 @@ public class CollectionApiController {
 
     @PostMapping("/follow")
     public CollectionApiResult<Long> createFollowOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotExistMemberException, AlreadyFollowedCollectionException,
-            OverSearchFollowedCollectionException, NotExistCollectionException {
+            throws NotExistMemberException, AlreadyFollowedCollectionException, NotExistCollectionException {
 
         Long collectionId = collectionService.insertFollowedCollectionByMemberId(memberId, postId);
 

@@ -1,12 +1,10 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
-import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
-import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -48,14 +46,14 @@ public class JpaCommentInPostService implements CommentInPostService {
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
         Member member = getMemberById(memberId);
-        CommentInPost comment = getCommentByIdIncludeLikedComment(commentId);
+        CommentInPost comment = getCommentByIdWithLikedComment(commentId);
         comment.insertLikedComment(member);
 
         return comment.getId();
     }
 
-    private CommentInPost getCommentByIdIncludeLikedComment(Long commentId) throws NotExistCommentInPostException {
-        Optional<CommentInPost> optionalComment = commentInPostRepository.findOneByIdIncludeLikedComment(commentId);
+    private CommentInPost getCommentByIdWithLikedComment(Long commentId) throws NotExistCommentInPostException {
+        Optional<CommentInPost> optionalComment = commentInPostRepository.findOneByIdWithLikedComment(commentId);
 
         return optionalComment.orElseThrow(NotExistCommentInPostException::new);
     }
@@ -67,7 +65,7 @@ public class JpaCommentInPostService implements CommentInPostService {
     }
 
     private Post getPostById(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdIncludeComment(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdWithComment(postId);
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }

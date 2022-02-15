@@ -14,8 +14,8 @@ import java.util.Optional;
 public interface CommentInCollectionRepository extends JpaRepository<CommentInCollection, Long> {
 
     @Query("SELECT DISTINCT parent FROM CommentInCollection parent LEFT JOIN FETCH parent.children children " +
-            "WHERE parent.parent IS NULL AND parent.collection = :collection ORDER BY parent.id DESC, children.id DESC")
-    List<CommentInCollection> findParentsByCollectionIdIncludeChildrenOrderByParentIdAndChildIdDesc(
+            "WHERE parent.parent IS NULL AND parent.collection = :collection")
+    List<CommentInCollection> findParentsByCollectionIdWithChildren(
             @Param("collection") Collection collection);
 
     @Query("SELECT DISTINCT parent FROM CommentInCollection parent " +
@@ -26,5 +26,5 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
             "LEFT JOIN FETCH comment.likedCommentInCollections likedComment " +
             "LEFT JOIN FETCH likedComment.member m " +
             "WHERE comment.id = :id")
-    Optional<CommentInCollection> findOneByIdIncludeLikedComment(@Param("id") Long id);
+    Optional<CommentInCollection> findOneByIdWithLikedComment(@Param("id") Long id);
 }

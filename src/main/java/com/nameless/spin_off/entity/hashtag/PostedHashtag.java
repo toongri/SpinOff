@@ -1,14 +1,13 @@
-package com.nameless.spin_off.entity.post;
+package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter

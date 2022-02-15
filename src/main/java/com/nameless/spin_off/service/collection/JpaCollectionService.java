@@ -7,7 +7,6 @@ import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +20,6 @@ public class JpaCollectionService implements CollectionService {
 
     private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;
-    private final PostRepository postRepository;
 
 
     @Transactional(readOnly = false)
@@ -80,21 +78,21 @@ public class JpaCollectionService implements CollectionService {
 
     private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdIncludeViewedByIpOrderByViewedIpId(collectionId);
+                collectionRepository.findOneByIdWithViewedByIp(collectionId);
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 
     private Collection getCollectionByIdWithLikedCollection(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdIncludeLikedCollection(collectionId);
+                collectionRepository.findOneByIdWithLikedCollection(collectionId);
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 
     private Collection getCollectionByIdWithFollowedCollection(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdIncludeFollowedCollection(collectionId);
+                collectionRepository.findOneByIdWithFollowedCollection(collectionId);
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }

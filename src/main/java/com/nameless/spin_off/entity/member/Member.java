@@ -2,9 +2,11 @@ package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.Hashtag;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -56,6 +58,7 @@ public class Member extends BaseTimeEntity {
 
         this.followedMovies.add(followedMovie);
         followedMovie.updateMember(this);
+        movie.addFollowingMembers(followedMovie);
     }
 
     public void addFollowedMember(Member followedMember) {

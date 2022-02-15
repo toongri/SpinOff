@@ -3,7 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
-import com.nameless.spin_off.exception.collection.OverSearchCollectedPostException;
+import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
@@ -13,10 +13,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-
-import static com.nameless.spin_off.StaticVariable.VIEWED_BY_IP_MINUTE;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,8 +33,7 @@ public class PostApiController {
 
     @PostMapping("/like")
     public PostApiResult<Long> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotExistMemberException, NotExistPostException,
-            OverSearchLikedPostException, AlreadyLikedPostException {
+            throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         Long resultId = postService.insertLikedPostByMemberId(memberId, postId);
 
@@ -46,7 +42,7 @@ public class PostApiController {
 
     @PostMapping("/view")
     public PostApiResult<Long> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
-            throws NotExistPostException, OverSearchViewedPostByIpException {
+            throws NotExistPostException {
 
         Long resultId = postService.insertViewedPostByIp(ip, postId);
 
@@ -56,7 +52,7 @@ public class PostApiController {
     @PostMapping("/collections")
     public PostApiResult<Long> addPostInCollections(
             @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
-            throws OverSearchCollectedPostException, NotExistMemberException,
+            throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotExistCollectionException {
 
         Long resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);

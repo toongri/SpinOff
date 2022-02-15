@@ -4,21 +4,20 @@ import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.Hashtag;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
-import com.nameless.spin_off.exception.post.NotExistHashtagException;
+import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.post.HashtagRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,7 +51,7 @@ public class JpaMemberService implements MemberService {
 
     @Override
     public Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
-            throws NotExistMemberException, OverSearchFollowedMemberException, AlreadyFollowedMemberException {
+            throws NotExistMemberException, AlreadyFollowedMemberException {
 
         Member member = getMemberByIdIncludeFollowedMember(memberId);
         Member followedMember = getMember(followedMemberId);
@@ -64,8 +63,7 @@ public class JpaMemberService implements MemberService {
 
     @Override
     public Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws
-            NotExistMemberException, NotExistHashtagException,
-            OverSearchFollowedHashtagException, AlreadyFollowedHashtagException {
+            NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException {
 
         Member member = getMemberByIdIncludeHashtag(memberId);
         Hashtag hashtag = getHashtag(hashtagId);
@@ -78,7 +76,7 @@ public class JpaMemberService implements MemberService {
     @Override
     public Long insertFollowedMovieByMovieId(Long memberId, Long movieId) throws
             NotExistMemberException, NotExistMovieException,
-            AlreadyFollowedMovieException, OverSearchFollowedMovieException {
+            AlreadyFollowedMovieException {
 
         Member member = getMemberByIdIncludeMovie(memberId);
         Movie movie = getMovie(movieId);
@@ -107,19 +105,19 @@ public class JpaMemberService implements MemberService {
     }
 
     private Member getMemberByIdIncludeFollowedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdIncludeFollowedMember(memberId);
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMember(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdIncludeMovie(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdIncludeMovie(memberId);
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithMovie(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdIncludeHashtag(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdIncludeHashtag(memberId);
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithHashtag(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }

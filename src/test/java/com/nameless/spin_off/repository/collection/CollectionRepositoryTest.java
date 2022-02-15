@@ -45,7 +45,7 @@ public class CollectionRepositoryTest {
 
         //when
         System.out.println("서비스함수");
-        List<Collection> collects = collectionRepository.findAllByIdInAndMemberIdIncludePost(collectIds, mem.getId());
+        List<Collection> collects = collectionRepository.findAllByIdInAndMemberIdWithPost(collectIds, mem.getId());
 
         //then
         assertThat(collects.size()).isEqualTo(collectIds.size());
