@@ -1,6 +1,7 @@
 import React from 'react';
 import './pinDetail.scss'
 import Header from '../header/header';
+import Masonry from '../masonry/masonry';
 
 const PinDetail = () =>{
     return (
@@ -48,9 +49,12 @@ const PinDetail = () =>{
                             <span>23</span>
                         </div>
                     </div>
+                    
                 </div>
                 </div>
+              
             </div>
+          
         </>
     )
 }

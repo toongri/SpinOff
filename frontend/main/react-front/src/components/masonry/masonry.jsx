@@ -5,8 +5,10 @@ import { Button } from "react-bootstrap";
 import { BsPencilFill } from "react-icons/bs";
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import Masonry from 'react-masonry-css';
 
-const Masonry = ({lastItemElement}) => {
+const LayOut = ({lastItemElement}) => {
     let navigate = useNavigate();
 
     const items = useSelector((state) =>{
@@ -14,13 +16,31 @@ const Masonry = ({lastItemElement}) => {
       return state.items;
     })
 
+    // useEffect(() =>{
+    //   const script = document.createElement('script');
+    //   script.src = "./masonry/masonry.pkgd.min.js";
+    //   console.log(script)
+    //   script.async = true;
+    //   document.body.appendChild(script);
+
+    //   return () => {
+    //     document.body.removeChild(script);
+    //   }
+    // }, [])
+    const breakpointColumnsObj = {
+      default: 6,
+      1100: 4,
+      700: 3,
+      500: 2
+    };
+    
     return (
        <>
-        <div className="masonry-container">
-            {
-              
-              items.map((item, index) => {
-                if(items.length === index + 1){
+       <Masonry 
+        breakpointCols={breakpointColumnsObj}
+        className="my-masonry-grid"
+        columnClassName="my-masonry-grid_column"> 
+             {items.map((item, index) => {
                   return <ItemsDetail
                     style={{
                       width: "278px",
@@ -29,21 +49,10 @@ const Masonry = ({lastItemElement}) => {
                     item={item}
                     ref = {lastItemElement}
                   />
-                }else{
-                return (
-                  <ItemsDetail
-                    style={{
-                      width: "278px",
-                    }}
-                    key={index}
-                    item={item}
-                  />
-              );
-                }
-            })
-            
+             }
+             )
             }
-        </div>
+        </Masonry>
         <div className="buttonGroup">
         <div className="buttonBox1">
             <button
@@ -57,7 +66,7 @@ const Masonry = ({lastItemElement}) => {
                 style={{
                   color: "#f9cf00",
                 }}
-                size = "42"
+                size = "40"
               ></BsPencilFill>
             </button>
             </div>
@@ -76,4 +85,4 @@ const Masonry = ({lastItemElement}) => {
     );
 };
 
-export default Masonry;
+export default LayOut;
