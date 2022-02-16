@@ -3,7 +3,6 @@ package com.nameless.spin_off.service.movie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.movie.ViewedMovieByIp;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -39,12 +37,12 @@ class JpaMovieServiceTest {
         }
 
         //then
-        assertThat(movie.getViewCount()).isEqualTo(movie.getViewedMovieByIps().size());
-        assertThat(movie.getViewCount()).isEqualTo(10);
-        assertThat(movie2.getViewCount()).isEqualTo(movie2.getViewedMovieByIps().size());
-        assertThat(movie2.getViewCount()).isEqualTo(2);
-        assertThat(movie3.getViewCount()).isEqualTo(movie3.getViewedMovieByIps().size());
-        assertThat(movie3.getViewCount()).isEqualTo(3);
+        assertThat(movie.getViewScore()).isEqualTo(movie.getViewedMovieByIps().size());
+        assertThat(movie.getViewScore()).isEqualTo(10);
+        assertThat(movie2.getViewScore()).isEqualTo(movie2.getViewedMovieByIps().size());
+        assertThat(movie2.getViewScore()).isEqualTo(2);
+        assertThat(movie3.getViewScore()).isEqualTo(movie3.getViewedMovieByIps().size());
+        assertThat(movie3.getViewScore()).isEqualTo(3);
 
         for (ViewedMovieByIp viewedMovieByIp : movie.getViewedMovieByIps()) {
             System.out.println("viewedMovieByIp.getId() = " + viewedMovieByIp.getId());

@@ -51,6 +51,7 @@ public class Member extends BaseTimeEntity {
 
         this.followedHashtags.add(followedHashtag);
         followedHashtag.updateMember(this);
+        hashtag.addFollowingMembers(followedHashtag);
     }
 
     public void addFollowedMovie(Movie movie) {

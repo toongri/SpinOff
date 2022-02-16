@@ -53,7 +53,9 @@ class CommentInCollectionRepositoryTest {
         CommentInCollection childComment2 = CommentInCollection
                 .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment);
 
+        em.flush();
         collection.addCommentInCollection(childComment1);
+        em.flush();
         collection.addCommentInCollection(childComment2);
 
         //when
@@ -93,7 +95,10 @@ class CommentInCollectionRepositoryTest {
         CommentInCollection childComment2 = CommentInCollection
                 .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment);
 
+        em.flush();
         collection.addCommentInCollection(childComment1);
+
+        em.flush();
         collection.addCommentInCollection(childComment2);
 
         //when

@@ -27,8 +27,7 @@ public class PostRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired CollectedPostRepository collectedPostRepository;
-    @Autowired
-    HashtagRepository hashtagRepository;
+    @Autowired HashtagRepository hashtagRepository;
     @Autowired PostService postService;
 
     @Test
@@ -45,7 +44,7 @@ public class PostRepositoryTest {
                 int i = (int) (Math.random() * 10);
 
                 if (i % 3 == 0) {
-                    collection.addCollectedPostByPost(post);
+                    post.insertCollectedPostByCollections(List.of(collection));
                 }
             }
         }
@@ -53,7 +52,7 @@ public class PostRepositoryTest {
         for (Post post : posts) {
             List<CollectedPost> collectedPosts = collectedPostRepository.findAllByPost(post);
 
-            assertThat(post.getCollectionCount()).isEqualTo(collectedPosts.size());
+            assertThat(post.getCollectionScore()).isEqualTo(collectedPosts.size());
 
         }
     }

@@ -3,6 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -24,7 +25,7 @@ public class PostApiController {
 
     @PostMapping("")
     public PostApiResult<Long> createPostOne(@RequestBody CreatePostVO createPost) throws
-            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException {
+            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException {
 
         Long postId = postService.insertPostByPostVO(createPost);
 
@@ -53,7 +54,7 @@ public class PostApiController {
     public PostApiResult<Long> addPostInCollections(
             @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
             throws NotExistMemberException,
-            NotExistPostException, AlreadyCollectedPostException, NotExistCollectionException {
+            NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
         Long resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);
 

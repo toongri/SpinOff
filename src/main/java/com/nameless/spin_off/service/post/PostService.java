@@ -3,6 +3,7 @@ package com.nameless.spin_off.service.post;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -13,7 +14,7 @@ import java.util.List;
 public interface PostService {
 
     Long insertPostByPostVO(PostDto.CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException;
+            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException;
 
     Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException;
@@ -22,6 +23,6 @@ public interface PostService {
             throws NotExistPostException;
 
     Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotExistMemberException, NotExistCollectionException,
+            throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException;
 }

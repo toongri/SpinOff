@@ -61,7 +61,7 @@ class CommentInCollectionServiceTest {
         Collection newCollection = collectionRepository.getById(collection.getId());
 
         //then
-        assertThat(newCollection.getCommentCount()).isEqualTo(newCollection.getCommentInCollections().size());
+        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size());
         assertThat(newCollection.getCommentInCollections().get(newCollection.getCommentInCollections().size() - 1)).isEqualTo(comment);
     }
 
@@ -75,9 +75,6 @@ class CommentInCollectionServiceTest {
         CommentInCollection parent = CommentInCollection.createCommentInCollection(mem, "야스히로 라할살", null);
         col.addCommentInCollection(parent);
         commentInCollectionRepository.save(parent);
-
-        em.flush();
-        em.clear();
 
         //when
         System.out.println("서비스함수1");
@@ -93,7 +90,7 @@ class CommentInCollectionServiceTest {
         Collection collection = collectionRepository.getById(col.getId());
 
         //then
-        assertThat(collection.getCommentCount()).isEqualTo(collection.getCommentInCollections().size());
+        assertThat(collection.getCommentScore()).isEqualTo(collection.getCommentInCollections().size());
         assertThat(collection.getCommentInCollections().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
         assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);

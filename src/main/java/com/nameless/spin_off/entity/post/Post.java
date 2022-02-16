@@ -1,14 +1,16 @@
 package com.nameless.spin_off.entity.post;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.CollectedPost;
+import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collections.ViewedCollectionByIp;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
@@ -16,6 +18,7 @@ import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -74,11 +77,11 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
-    private Long viewCount;
-    private Long likeCount;
-    private Long commentCount;
-    private Long collectionCount;
-    private Long popularity;
+    private Double viewScore;
+    private Double likeScore;
+    private Double commentScore;
+    private Double collectionScore;
+    private Double popularity;
 
     //==연관관계 메소드==//
 
@@ -87,15 +90,22 @@ public class Post extends BaseTimeEntity {
         postedMedia.updatePost(this);
     }
 
-    public void addCollectedPost(CollectedPost collectedPost) {
-        this.updateCollectionCount();
-        this.collectedPosts.add(collectedPost);
+    private void addCollectedPosts(List<Collection> collections) {
+        this.updateCollectScore(collections.size());
+        List<CollectedPost> collectedPosts = new ArrayList<>();
+
+        for (Collection collection : collections) {
+            CollectedPost collectedPost = CollectedPost.createCollectedPost(collection, this);
+            collection.addCollectedPost(collectedPost);
+            collectedPosts.add(collectedPost);
+        }
+        this.collectedPosts.addAll(collectedPosts);
     }
 
-    public void addViewedPostByIp(String ip) {
+    private void addViewedPostByIp(String ip) {
         ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip);
 
-        this.updateViewCount();
+        this.updateViewScore();
         this.viewedPostByIps.add(viewedPostByIp);
         viewedPostByIp.updatePost(this);
     }
@@ -108,15 +118,15 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addCommentInPost(CommentInPost commentInPost) {
-        this.updateCommentInPostCount();
+        this.updateCommentScore();
         this.commentInPosts.add(commentInPost);
         commentInPost.updatePost(this);
     }
 
-    public void addLikedPostByMember(Member member) {
+    private void addLikedPostByMember(Member member) {
         LikedPost likedPost = LikedPost.createLikedPost(member);
 
-        this.updateLikeCount();
+        this.updateLikeScore();
         this.likedPosts.add(likedPost);
         likedPost.updatePost(this);
     }
@@ -128,6 +138,7 @@ public class Post extends BaseTimeEntity {
             throw new AlreadyPostedHashtagException();
         }
         postedHashtag.updatePost(this);
+        hashtag.addTaggedPosts(postedHashtag);
     }
 
     //==생성 메소드==//
@@ -157,63 +168,19 @@ public class Post extends BaseTimeEntity {
     //==수정 메소드==//
 
     public void updateCountToZero() {
-        this.viewCount = 0L;
-        this.likeCount = 0L;
-        this.commentCount = 0L;
-        this.collectionCount = 0L;
-        this.popularity = 0L;
+        this.viewScore = 0.0;
+        this.likeScore = 0.0;
+        this.commentScore = 0.0;
+        this.collectionScore = 0.0;
+        this.popularity = 0.0;
     }
 
     public void updatePopularity() {
-        this.popularity = viewCount + likeCount + commentCount + collectionCount;
+        popularity = viewScore + likeScore + commentScore + collectionScore;
     }
 
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
         this.publicOfPostStatus = publicStatus;
-    }
-
-    public void updateViewCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.viewCount = viewedPostByIps.stream()
-                .filter(viewedPostByIp -> ChronoUnit.DAYS
-                        .between(viewedPostByIp.getCreatedDate(), currentTime) < POST_VIEW_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
-    }
-
-    public void updateLikeCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.likeCount = likedPosts.stream()
-                .filter(likedPost -> ChronoUnit.DAYS
-                        .between(likedPost.getCreatedDate(), currentTime) < POST_LIKE_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
-    }
-
-    public void updateCommentInPostCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.commentCount = commentInPosts.stream()
-                .filter(commentInPost -> ChronoUnit.DAYS
-                        .between(commentInPost.getCreatedDate(), currentTime) < POST_COMMENT_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
-    }
-
-    public void updateCollectionCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.collectionCount = collectedPosts.stream()
-                .filter(collectedPost -> ChronoUnit.DAYS
-                        .between(collectedPost.getCreatedDate(), currentTime) < POST_COLLECTION_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
     }
 
     public void updatePostedMedias(List<PostedMedia> postedMedias) {
@@ -249,6 +216,14 @@ public class Post extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
+    public void insertCollectedPostByCollections(List<Collection> collections) throws AlreadyCollectedPostException {
+
+        if (isNotAlreadyCollectedPosts(collections)) {
+            addCollectedPosts(collections);
+        } else {
+            throw new AlreadyCollectedPostException();
+        }
+    }
 
     public boolean insertViewedPostByIp(String ip) {
 
@@ -285,17 +260,156 @@ public class Post extends BaseTimeEntity {
         }
     }
 
+    public void updateViewScore() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        ViewedPostByIp viewedPostByIp;
+        int j = 0, i = viewedPostByIps.size() - 1;
+        double result = 0, total = 1 * POST_VIEW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            viewedPostByIp = viewedPostByIps.get(i);
+            if (isInTimeViewedPost(currentTime, viewedPostByIp, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == POST_VIEW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += POST_VIEW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        viewScore = total + POST_VIEW_COUNT_SCORES.get(j) * result;
+        updatePopularity();
+    }
+
+    public void updateLikeScore() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        LikedPost likedPost;
+        int j = 0, i = likedPosts.size() - 1;
+        double result = 0, total = 1 * POST_LIKE_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            likedPost = likedPosts.get(i);
+            if (isInTimeLikedPost(currentTime, likedPost, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == POST_LIKE_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += POST_LIKE_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        likeScore = total + POST_LIKE_COUNT_SCORES.get(j) * result;
+        updatePopularity();
+    }
+
+    public void updateCommentScore() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        CommentInPost commentInPost;
+        int j = 0, i = commentInPosts.size() - 1;
+        double result = 0, total = 1 * POST_COMMENT_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            commentInPost = commentInPosts.get(i);
+            if (isInTimeCommentInPost(currentTime, commentInPost, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == POST_COMMENT_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += POST_COMMENT_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        commentScore = total + POST_COMMENT_COUNT_SCORES.get(j) * result;
+        updatePopularity();
+    }
+
+    public void updateCollectScore(int listSize) {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        CollectedPost collectedPost;
+        int j = 0, i = collectedPosts.size() - 1;
+        double result = 0, total = listSize * POST_COLLECT_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            collectedPost = collectedPosts.get(i);
+            if (isInTimeCollectedPost(currentTime, collectedPost, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == POST_COLLECT_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += POST_COLLECT_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        collectionScore = total + POST_COLLECT_COUNT_SCORES.get(j) * result;
+        updatePopularity();
+    }
+
     //==조회 로직==//
 
     public Boolean isNotAlreadyIpView(String ip) {
-        return viewedPostByIps.stream()
-                .noneMatch(viewedPostByIp -> viewedPostByIp.getIp().equals(ip) &&
-                        ChronoUnit.MINUTES.between(viewedPostByIp.getCreatedDate(), LocalDateTime.now())
-                                < StaticVariable.VIEWED_BY_IP_MINUTE);
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        List<ViewedPostByIp> views = viewedPostByIps.stream()
+                .filter(viewedPostByIp -> viewedPostByIp.getIp().equals(ip))
+                .collect(Collectors.toList());
+
+        if (views.isEmpty()) {
+            return true;
+        }
+        return ChronoUnit.MINUTES
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
     }
 
     public Boolean isNotAlreadyMemberLikePost(Member member) {
         return this.likedPosts.stream().noneMatch(likedPost -> likedPost.getMember().equals(member));
     }
 
+    public Boolean isNotAlreadyCollectedPosts(List<Collection> collections) {
+        return this.collectedPosts.stream().noneMatch(collectedPost -> collections.contains(collectedPost.getCollection()));
+    }
+
+    private boolean isInTimeViewedPost(LocalDateTime currentTime, ViewedPostByIp viewedPostByIp, int j) {
+        return ChronoUnit.DAYS
+                .between(viewedPostByIp.getCreatedDate(), currentTime) >= POST_VIEW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(viewedPostByIp.getCreatedDate(), currentTime) < POST_VIEW_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeLikedPost(LocalDateTime currentTime, LikedPost likedPost, int j) {
+        return ChronoUnit.DAYS
+                .between(likedPost.getCreatedDate(), currentTime) >= POST_LIKE_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(likedPost.getCreatedDate(), currentTime) < POST_LIKE_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeCollectedPost(LocalDateTime currentTime, CollectedPost collectedPost, int j) {
+        return ChronoUnit.DAYS
+                .between(collectedPost.getCreatedDate(), currentTime) >= POST_COLLECT_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(collectedPost.getCreatedDate(), currentTime) < POST_COLLECT_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeCommentInPost(LocalDateTime currentTime, CommentInPost commentInPost, int j) {
+        return ChronoUnit.DAYS
+                .between(commentInPost.getCreatedDate(), currentTime) >= POST_COMMENT_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(commentInPost.getCreatedDate(), currentTime) < POST_COMMENT_COUNT_DAYS.get(j + 1);
+    }
 }

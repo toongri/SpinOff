@@ -62,7 +62,7 @@ class CommentInPostServiceTest {
         Post post = postRepository.findById(po.getId()).get();
 
         //then
-        assertThat(post.getCommentCount()).isEqualTo(post.getCommentInPosts().size());
+        assertThat(post.getCommentScore()).isEqualTo(post.getCommentInPosts().size());
         assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(commentInPostRepository.getById(commentId));
     }
 
@@ -95,7 +95,7 @@ class CommentInPostServiceTest {
 
         //then
 
-        assertThat(post.getCommentCount()).isEqualTo(post.getCommentInPosts().size());
+        assertThat(post.getCommentScore()).isEqualTo(post.getCommentInPosts().size());
         assertThat(post.getCommentInPosts().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
         assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);

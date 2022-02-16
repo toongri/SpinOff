@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.collection;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.FollowedCollection;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.StaticVariable.COLLECTION_LIKE_COUNT_SCORES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -114,8 +116,8 @@ class CollectionServiceTest {
         //then
 
         List<LikedCollection> likedCollections = collection.getLikedCollections();
-        Long likeCount = collection.getLikeCount();
-        assertThat(likeCount).isEqualTo(1);
+        Double likeCount = collection.getLikeScore();
+        assertThat(likeCount).isEqualTo(COLLECTION_LIKE_COUNT_SCORES.get(0) * 1.0);
         assertThat(likedCollections.size()).isEqualTo(1);
         assertThat(likedCollections.get(0).getMember()).isEqualTo(member);
 
@@ -173,8 +175,8 @@ class CollectionServiceTest {
         //then
 
         List<FollowedCollection> followedCollections = collection.getFollowedCollections();
-        Long followCount = collection.getFollowCount();
-        assertThat(followCount).isEqualTo(1);
+        Double followCount = collection.getFollowScore();
+        assertThat(followCount).isEqualTo(StaticVariable.COLLECTION_FOLLOW_COUNT_SCORES.get(0) * 1.0);
         assertThat(followedCollections.size()).isEqualTo(1);
         assertThat(followedCollections.get(0).getMember()).isEqualTo(member);
 
@@ -297,8 +299,7 @@ class CollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
         now = LocalDateTime.now();
-        col.addViewedCollectionByIp("00");
-        col.addViewedCollectionByIp("00");
+        col.insertViewedCollectionByIp("00");
 
         em.flush();
         em.clear();
@@ -342,7 +343,7 @@ class CollectionServiceTest {
 
         //then
         assertThat(collections.size()).isEqualTo(collectionList.size());
-        assertThat(post.getCollectionCount()).isEqualTo(collections.size());
+        assertThat(post.getCollectionScore()).isEqualTo(collections.size());
 
     }
 
@@ -362,8 +363,7 @@ class CollectionServiceTest {
             collectionList.add(Collection.createDefaultCollection(mem2));
         collectionRepository.saveAll(collectionList);
 
-        for (Collection collection : collectionList)
-            collection.addCollectedPostByPost(po);
+        po.insertCollectedPostByCollections(collectionList);
 
         List<Long> ids = collectionList.stream().map(Collection::getId).collect(Collectors.toList());
 
@@ -372,12 +372,12 @@ class CollectionServiceTest {
 
         //when
         //then
-        assertThatThrownBy(() -> postService.insertCollectedPosts(0L, po.getId(), ids))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> postService.insertCollectedPosts(-1L, po.getId(), ids))
+                .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), 0L, ids))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), List.of(0L)))
-                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
 

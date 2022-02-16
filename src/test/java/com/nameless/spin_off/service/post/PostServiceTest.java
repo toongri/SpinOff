@@ -90,7 +90,7 @@ class PostServiceTest {
         Long aLong = postService.insertPostByPostVO(createPostVO);
         Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
 
-        Long postCollectionCount = post1.getCollectionCount();
+        Double postCollectionCount = post1.getCollectionScore();
         Set<PostedHashtag> postedHashtags = post1.getPostedHashtags();
         int postPostedHashtagSize = postedHashtags.size();
 
@@ -175,7 +175,7 @@ class PostServiceTest {
         //then
 
         List<LikedPost> likedPosts = post.getLikedPosts();
-        Long likeCount = post.getLikeCount();
+        Double likeCount = post.getLikeScore();
         assertThat(likeCount).isEqualTo(1);
         assertThat(likedPosts.size()).isEqualTo(1);
         assertThat(likedPosts.get(0).getMember()).isEqualTo(member);
@@ -255,8 +255,8 @@ class PostServiceTest {
         Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         //then
-        assertThat(post1.getViewCount()).isEqualTo(post1.getViewedPostByIps().size());
-        assertThat(post1.getViewCount()).isEqualTo(1);
+        assertThat(post1.getViewScore()).isEqualTo(post1.getViewedPostByIps().size());
+        assertThat(post1.getViewScore()).isEqualTo(1);
 
     }
     
@@ -280,8 +280,8 @@ class PostServiceTest {
         Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
         
         //then
-        assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
-        assertThat(post2.getViewCount()).isEqualTo(1);
+        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size());
+        assertThat(post2.getViewScore()).isEqualTo(1);
 
     }
 
@@ -306,8 +306,8 @@ class PostServiceTest {
         Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
 
         //then
-        assertThat(post2.getViewCount()).isEqualTo(post2.getViewedPostByIps().size());
-        assertThat(post2.getViewCount()).isEqualTo(2);
+        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size());
+        assertThat(post2.getViewScore()).isEqualTo(2);
 
     }
 
@@ -321,8 +321,9 @@ class PostServiceTest {
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(po);
         now = LocalDateTime.now();
-        po.addViewedPostByIp("00");
-        po.addViewedPostByIp("00");
+        po.insertViewedPostByIp("00");
+        em.flush();
+        po.insertViewedPostByIp("00");
 
         em.flush();
         em.clear();

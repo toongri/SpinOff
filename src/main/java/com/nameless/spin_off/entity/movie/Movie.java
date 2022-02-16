@@ -1,19 +1,18 @@
 package com.nameless.spin_off.entity.movie;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import javax.swing.text.View;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.*;
 
@@ -40,13 +39,13 @@ public class Movie extends BaseTimeEntity {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedMovieByIp> viewedMovieByIps = new ArrayList<>();
 
-    private Long postCount;
-    private Long viewCount;
-    private Long followCount;
-    private Long popularity;
+    private Double postScore;
+    private Double viewScore;
+    private Double followScore;
+    private Double popularity;
 
     //==연관관계 메소드==//
-    public void addViewedMovieByIp(String ip) {
+    private void addViewedMovieByIp(String ip) {
         ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip);
 
         updateViewCount();
@@ -80,47 +79,14 @@ public class Movie extends BaseTimeEntity {
     //==수정 메소드==//
 
     public void updateCountToZero() {
-        this.viewCount = 0L;
-        this.postCount = 0L;
-        this.followCount = 0L;
-        this.popularity = 0L;
+        this.viewScore = 0.0;
+        this.postScore = 0.0;
+        this.followScore = 0.0;
+        this.popularity = 0.0;
     }
 
     public void updatePopularity() {
-        this.popularity = viewCount + postCount + followCount;
-    }
-
-    public void updateFollowCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.followCount = followingMembers.stream()
-                .filter(followingMember -> ChronoUnit.DAYS
-                        .between(followingMember.getCreatedDate(), currentTime) < MOVIE_FOLLOW_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
-    }
-
-    public void updateViewCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.viewCount = viewedMovieByIps.stream()
-                .filter(viewedMovieByIp -> ChronoUnit.DAYS
-                        .between(viewedMovieByIp.getCreatedDate(), currentTime) < MOVIE_VIEW_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
-    }
-
-    public void updatePostCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
-
-        this.postCount = taggedPosts.stream()
-                .filter(taggedPost -> ChronoUnit.DAYS
-                        .between(taggedPost.getCreatedDate(), currentTime) < MOVIE_POST_COUNT_DAYS)
-                .count() + 1;
-
-        updatePopularity();
+        this.popularity = viewScore + postScore + followScore;
     }
 
     private void updateImageUrl(String imageUrl) {
@@ -145,15 +111,119 @@ public class Movie extends BaseTimeEntity {
             return false;
         }
     }
-    //==조회 로직==//
 
+    public void updateFollowCount() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        FollowedMovie followedMovie ;
+        int j = 0, i = followingMembers.size() - 1;
+        double result = 0, total = 1 * MOVIE_FOLLOW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            followedMovie = followingMembers.get(i);
+            if (isInTimeFollowedMovie(currentTime, followedMovie, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == MOVIE_FOLLOW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += MOVIE_FOLLOW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        followScore = total + MOVIE_FOLLOW_COUNT_SCORES.get(j) * result;
+
+        updatePopularity();
+    }
+
+    public void updateViewCount() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        ViewedMovieByIp viewedMovieByIp ;
+        int j = 0, i = viewedMovieByIps.size() - 1;
+        double result = 0, total = 1 * MOVIE_VIEW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            viewedMovieByIp = viewedMovieByIps.get(i);
+            if (isInTimeViewedMovie(currentTime, viewedMovieByIp, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == MOVIE_VIEW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += MOVIE_VIEW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        viewScore = total + MOVIE_VIEW_COUNT_SCORES.get(j) * result;
+
+        updatePopularity();
+    }
+
+    public void updatePostCount() {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+        Post post ;
+        int j = 0, i = taggedPosts.size() - 1;
+        double result = 0, total = 1 * MOVIE_POST_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            post = taggedPosts.get(i);
+            if (isInTimeTaggedPost(currentTime, post, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == MOVIE_POST_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += MOVIE_POST_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        postScore = total + MOVIE_POST_COUNT_SCORES.get(j) * result;
+
+        updatePopularity();
+    }
+    //==조회 로직==//
     public Boolean isNotAlreadyIpView(String ip) {
 
         LocalDateTime currentTime = LocalDateTime.now();
 
-        return viewedMovieByIps.stream()
-                .noneMatch(viewedMovieByIp -> viewedMovieByIp.getIp().equals(ip) &&
-                        ChronoUnit.MINUTES.between(viewedMovieByIp.getCreatedDate(), currentTime)
-                                < VIEWED_BY_IP_MINUTE);
+        List<ViewedMovieByIp> views = viewedMovieByIps.stream()
+                .filter(viewedMovieByIp -> viewedMovieByIp.getIp().equals(ip))
+                .collect(Collectors.toList());
+
+        if (views.isEmpty()) {
+            return true;
+        }
+        return ChronoUnit.MINUTES
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
     }
+
+    private boolean isInTimeFollowedMovie(LocalDateTime currentTime, FollowedMovie followedMovie, int j) {
+        return ChronoUnit.DAYS
+                .between(followedMovie.getCreatedDate(), currentTime) >= MOVIE_FOLLOW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(followedMovie.getCreatedDate(), currentTime) < MOVIE_FOLLOW_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeViewedMovie(LocalDateTime currentTime, ViewedMovieByIp viewedMovieByIp, int j) {
+        return ChronoUnit.DAYS
+                .between(viewedMovieByIp.getCreatedDate(), currentTime) >= MOVIE_VIEW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(viewedMovieByIp.getCreatedDate(), currentTime) < MOVIE_VIEW_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeTaggedPost(LocalDateTime currentTime, Post post, int j) {
+        return ChronoUnit.DAYS
+                .between(post.getCreatedDate(), currentTime) >= MOVIE_POST_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(post.getCreatedDate(), currentTime) < MOVIE_POST_COUNT_DAYS.get(j + 1);
+    }
+
 }

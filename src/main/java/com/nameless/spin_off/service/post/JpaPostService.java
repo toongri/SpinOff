@@ -9,6 +9,7 @@ import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -40,7 +41,7 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException {
+            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException {
 
         Member member = getMemberById(postVO.getMemberId());
 
@@ -61,7 +62,7 @@ public class JpaPostService implements PostService{
                 .build();
 
         List<Collection> collections = getCollectionsByIdIn(postVO.getCollectionIds(), postVO.getMemberId());
-        collections.forEach(collection -> collection.addCollectedPostByPost(post));
+        post.insertCollectedPostByCollections(collections);
         return postRepository.save(post).getId();
     }
 
@@ -92,31 +93,29 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotExistMemberException, NotExistCollectionException,
+            throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
         Post post = getPost(postId);
         List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
 
-        for (Collection collection : collections) {
-            collection.insertCollectedPostByPost(post);
-        }
+        post.insertCollectedPostByCollections(collections);
 
         return post.getId();
     }
 
     private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
-            throws NotExistCollectionException {
+            throws NotMatchCollectionException {
         List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdWithPost(collectionIds, memberId);
 
         if (collections.size() != collectionIds.size()) {
-            throw new NotExistCollectionException();
+            throw new NotMatchCollectionException();
         }
         return collections;
     }
 
     private Post getPost(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findById(postId);
+        Optional<Post> optionalPost = postRepository.findOneByIdWithCollection(postId);
         return optionalPost.orElseThrow(NotExistPostException::new);
     }
 

@@ -1,9 +1,8 @@
 package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
-import com.nameless.spin_off.entity.movie.ViewedMovieByIp;
-import com.nameless.spin_off.entity.post.Post;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,6 +12,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.*;
 
@@ -37,13 +37,13 @@ public class Hashtag extends BaseTimeEntity {
     @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedHashtagByIp> viewedHashtagByIps = new ArrayList<>();
 
-    private Long postCount;
-    private Long viewCount;
-    private Long followCount;
-    private Long popularity;
+    private Double postScore;
+    private Double viewScore;
+    private Double followScore;
+    private Double popularity;
 
     //==연관관계 메소드==//
-    public void addViewedHashtagByIp(String ip) {
+    private void addViewedHashtagByIp(String ip) {
         ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip);
 
         updateViewCount();
@@ -77,50 +77,141 @@ public class Hashtag extends BaseTimeEntity {
     }
 
     public void updatePopularity() {
-        this.popularity = viewCount + postCount + followCount;
+        this.popularity = viewScore + postScore + followScore;
     }
 
     public void updateCountToZero() {
-        this.viewCount = 0L;
-        this.postCount = 0L;
-        this.followCount = 0L;
-        this.popularity = 0L;
+        viewScore = 0.0;
+        postScore = 0.0;
+        followScore = 0.0;
+        popularity = 0.0;
+    }
+
+    //==비즈니스 로직==//
+    public boolean insertViewedHashtagByIp(String ip) {
+
+        if (isNotAlreadyIpView(ip)) {
+            addViewedHashtagByIp(ip);
+            return true;
+        } else {
+            return false;
+        }
     }
 
     public void updateFollowCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
 
-        this.followCount = followingMembers.stream()
-                .filter(followingMember -> ChronoUnit.DAYS
-                        .between(followingMember.getCreatedDate(), currentTime) < HASHTAG_FOLLOW_COUNT_DAYS)
-                .count() + 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+        FollowedHashtag followedHashtag ;
+        int j = 0, i = followingMembers.size() - 1;
+        double result = 0, total = 1 * HASHTAG_FOLLOW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            followedHashtag = followingMembers.get(i);
+            if (isInTimeFollowedHashtag(currentTime, followedHashtag, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == HASHTAG_FOLLOW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        followScore = total + HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result;
 
         updatePopularity();
     }
 
     public void updateViewCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
 
-        this.viewCount = viewedHashtagByIps.stream()
-                .filter(viewedHashtagByIp -> ChronoUnit.DAYS
-                        .between(viewedHashtagByIp.getCreatedDate(), currentTime) < HASHTAG_VIEW_COUNT_DAYS)
-                .count() + 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+        ViewedHashtagByIp viewedHashtagByIp ;
+        int j = 0, i = viewedHashtagByIps.size() - 1;
+        double result = 0, total = 1 * HASHTAG_VIEW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            viewedHashtagByIp = viewedHashtagByIps.get(i);
+            if (isInTimeViewedHashtag(currentTime, viewedHashtagByIp, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == HASHTAG_VIEW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += HASHTAG_VIEW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        viewScore = total + HASHTAG_VIEW_COUNT_SCORES.get(j) * result;
 
         updatePopularity();
     }
 
     public void updatePostCount() {
-        LocalDateTime currentTime = LocalDateTime.now();
 
-        this.postCount = taggedPosts.stream()
-                .filter(taggedPost -> ChronoUnit.DAYS
-                        .between(taggedPost.getCreatedDate(), currentTime) < HASHTAG_POST_COUNT_DAYS)
-                .count() + 1;
+        LocalDateTime currentTime = LocalDateTime.now();
+        PostedHashtag postedHashtag ;
+        int j = 0, i = taggedPosts.size() - 1;
+        double result = 0, total = 1 * HASHTAG_POST_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            postedHashtag = taggedPosts.get(i);
+            if (isInTimePostedHashtag(currentTime, postedHashtag, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == HASHTAG_POST_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += HASHTAG_POST_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
+        }
+        postScore = total + HASHTAG_POST_COUNT_SCORES.get(j) * result;
 
         updatePopularity();
     }
-    //==비즈니스 로직==//
 
     //==조회 로직==//
+    public Boolean isNotAlreadyIpView(String ip) {
+
+        LocalDateTime currentTime = LocalDateTime.now();
+
+        List<ViewedHashtagByIp> views = viewedHashtagByIps.stream()
+                .filter(viewedHashtagByIp -> viewedHashtagByIp.getIp().equals(ip))
+                .collect(Collectors.toList());
+
+        if (views.isEmpty()) {
+            return true;
+        }
+        return ChronoUnit.MINUTES
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
+
+    }
+
+    private boolean isInTimeFollowedHashtag(LocalDateTime currentTime, FollowedHashtag followedHashtag, int j) {
+        return ChronoUnit.DAYS
+                .between(followedHashtag.getCreatedDate(), currentTime) >= HASHTAG_FOLLOW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(followedHashtag.getCreatedDate(), currentTime) < HASHTAG_FOLLOW_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimeViewedHashtag(LocalDateTime currentTime, ViewedHashtagByIp viewedHashtagByIp, int j) {
+        return ChronoUnit.DAYS
+                .between(viewedHashtagByIp.getCreatedDate(), currentTime) >= HASHTAG_VIEW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(viewedHashtagByIp.getCreatedDate(), currentTime) < HASHTAG_VIEW_COUNT_DAYS.get(j + 1);
+    }
+
+    private boolean isInTimePostedHashtag(LocalDateTime currentTime, PostedHashtag postedHashtag, int j) {
+        return ChronoUnit.DAYS
+                .between(postedHashtag.getCreatedDate(), currentTime) >= HASHTAG_POST_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(postedHashtag.getCreatedDate(), currentTime) < HASHTAG_POST_COUNT_DAYS.get(j + 1);
+    }
 
 }
