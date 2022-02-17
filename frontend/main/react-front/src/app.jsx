@@ -7,7 +7,7 @@ import FileUpload from './components/pin-build/pinBuild.jsx';
 import PinAll from './components/pinAll/pinAll.jsx'
 import Collection from './components/collection/collection.jsx'
 import PinDetail from './components/pinDetail/pinDetail';
-import {useState} from 'react';
+import Mypage from './components/myPage/Mypage';
 
 function App({network}) {
   
@@ -21,6 +21,7 @@ function App({network}) {
          <Route path = '/pinAll' element = {<PinAll />}></Route>
          <Route path = '/collection' element = {<Collection />}></Route>
          <Route path = '/pinDetail' element = {<PinDetail />}></Route>
+         <Route path = '/myPage' element = {<Mypage />}></Route>
       </Routes>
     </Router>
   );

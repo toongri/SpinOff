@@ -21,8 +21,8 @@ const buttonStyle = {
 };
 
 const Header = ({setAlarmPopup, setDmPopup}) => {
-
   let navigate = useNavigate();
+
   return (
     <>
       <div className="navbarContainer">
@@ -30,16 +30,14 @@ const Header = ({setAlarmPopup, setDmPopup}) => {
             <ul className="navLink_container">
               <li className="document-container">도슨트</li>
               <li className="socialing-container">소셜링</li>
-            </ul>
-       
+            </ul>      
             <div className="logo-container">
               <img 
                 src= {logoImg}
                 alt="logo"
                 onClick={() =>{navigate("/")}}
                 />
-            </div>
-
+          </div>
          <div className="buttonGroup-box">
           <ButtonGroup style = {{
           }}>
@@ -73,7 +71,9 @@ const Header = ({setAlarmPopup, setDmPopup}) => {
               <FiSend size="42"></FiSend>
             </button>
             <button
-              onClick={() => {}}
+              onClick={() => {
+                navigate('/myPage')
+              }}
               variant= "#000"
               bg="#000"
               active

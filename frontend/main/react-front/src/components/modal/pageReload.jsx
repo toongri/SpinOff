@@ -10,9 +10,10 @@ const PageReload = ({ formpage, setFormpage,files, saveFileImage }) => {
     setFormpage(false);
     saveFileImage(e.target.files);
   }
-
+  
   return (
       <>   
+      
           <input
             onChange={handleSaveFileImage}
             type="file"
@@ -25,6 +26,7 @@ const PageReload = ({ formpage, setFormpage,files, saveFileImage }) => {
                 <BsFillArrowUpCircleFill size="30"></BsFillArrowUpCircleFill>
                 <p>드래그하거나 클릭하여 업로드</p>
              </div>
+          
       </>
   );
 };
