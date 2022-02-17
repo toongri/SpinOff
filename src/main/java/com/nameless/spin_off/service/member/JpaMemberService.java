@@ -14,6 +14,7 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

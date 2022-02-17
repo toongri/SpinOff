@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: local
+    active: add
   datasource:
     url: jdbc:mariadb://localhost:3306/spinoff?useUnicode=true&characterEncoding=utf-8
     username: spinoff
@@ -9,7 +9,7 @@ spring:
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: none
     properties:
       hibernate:
         format_sql: true
