@@ -74,9 +74,7 @@ public class JpaPostService implements PostService{
         Member member = getMemberById(memberId);
         Post post = getPostByIdWithLikedPost(postId);
 
-        post.insertLikedPostByMember(member);
-
-        return post.getId();
+        return post.insertLikedPostByMember(member);
     }
 
     @Transactional(readOnly = false)
@@ -85,23 +83,19 @@ public class JpaPostService implements PostService{
 
         Post post = getPostByIdWithViewedIp(postId);
 
-        post.insertViewedPostByIp(ip);
-
-        return post.getId();
+        return post.insertViewedPostByIp(ip);
     }
 
     @Transactional(readOnly = false)
     @Override
-    public Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+    public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
         Post post = getPost(postId);
         List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
 
-        post.insertCollectedPostByCollections(collections);
-
-        return post.getId();
+        return post.insertCollectedPostByCollections(collections);
     }
 
     private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)

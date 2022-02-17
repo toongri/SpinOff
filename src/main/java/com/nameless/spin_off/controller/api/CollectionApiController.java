@@ -53,7 +53,7 @@ public class CollectionApiController {
 
     @PostMapping("/follow")
     public CollectionApiResult<Long> createFollowOne(@RequestBody Long memberId, @RequestBody Long postId)
-            throws NotExistMemberException, AlreadyFollowedCollectionException, NotExistCollectionException {
+            throws NotExistMemberException, AlreadyFollowedCollectionException, NotExistCollectionException, CantFollowOwnCollectionException {
 
         Long collectionId = collectionService.insertFollowedCollectionByMemberId(memberId, postId);
 

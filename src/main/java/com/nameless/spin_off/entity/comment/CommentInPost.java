@@ -55,11 +55,13 @@ public class CommentInPost extends BaseTimeEntity {
         commentInPost.updateParent(this);
     }
 
-    public void addCommentLike(Member member) {
+    public Long addCommentLike(Member member) {
         LikedCommentInPost likedCommentInPost = LikedCommentInPost.createLikedCommentInPost(member);
 
         this.likedCommentInPosts.add(likedCommentInPost);
         likedCommentInPost.updateCommentInPost(this);
+
+        return likedCommentInPost.getId();
     }
 
     //==생성 메소드==//
@@ -103,9 +105,9 @@ public class CommentInPost extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public void insertLikedComment(Member member) throws AlreadyLikedCommentInPostException {
+    public Long insertLikedComment(Member member) throws AlreadyLikedCommentInPostException {
         if (isNotAlreadyMemberLikeComment(member)) {
-            addCommentLike(member);
+            return addCommentLike(member);
         } else {
             throw new AlreadyLikedCommentInPostException();
         }

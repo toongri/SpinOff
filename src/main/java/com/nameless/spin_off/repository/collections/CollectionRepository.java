@@ -62,4 +62,10 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "LEFT JOIN FETCH collectPost.post post " +
             "WHERE post.id = :postId")
     List<Collection> findAllByPostIdWithPost(@Param("postId") Long postId);
+
+    @Query("SELECT collection FROM Collection collection " +
+            "LEFT JOIN FETCH collection.member m " +
+            "LEFT JOIN FETCH m.complains complain " +
+            "WHERE collection.id = :id")
+    Optional<Collection> findOneByIdWithComplainOfMember(@Param("id") Long id);
 }

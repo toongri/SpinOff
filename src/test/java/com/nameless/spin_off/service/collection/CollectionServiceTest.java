@@ -85,7 +85,7 @@ class CollectionServiceTest {
         memberRepository.save(member);
 
         CollectionDto.CreateCollectionVO createCollectionVO1 = new CollectionDto
-                .CreateCollectionVO(0L, "", "", PublicOfCollectionStatus.PUBLIC);
+                .CreateCollectionVO(-1L, "", "", PublicOfCollectionStatus.PUBLIC);
         //when
 
         //then
@@ -108,19 +108,17 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionRepository.getById(collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId()));
+        collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId());
+        Collection collection = collectionRepository.getById(col.getId());
 
         System.out.println("멤버");
-        Member member = memberRepository.findById(mem.getId()).get();
+        Member member = memberRepository.getById(mem.getId());
 
         //then
 
-        List<LikedCollection> likedCollections = collection.getLikedCollections();
-        Double likeCount = collection.getLikeScore();
-        assertThat(likeCount).isEqualTo(COLLECTION_LIKE_COUNT_SCORES.get(0) * 1.0);
-        assertThat(likedCollections.size()).isEqualTo(1);
-        assertThat(likedCollections.get(0).getMember()).isEqualTo(member);
-
+        assertThat(collection.getLikeScore()).isEqualTo(COLLECTION_LIKE_COUNT_SCORES.get(0) * 1.0);
+        assertThat(collection.getLikedCollections().size()).isEqualTo(1);
+        assertThat(collection.getLikedCollections().get(0).getMember()).isEqualTo(member);
     }
 
     @Test
@@ -137,16 +135,17 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionRepository.getById(collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId()));
+        collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId());
 
         System.out.println("멤버");
-        Member member = memberRepository.findById(mem.getId()).get();
+        Member member = memberRepository.getById(mem.getId());
+        Collection collection = collectionRepository.getById(col.getId());
 
         //then
-        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(0L, collection.getId()))
+        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(-1L, collection.getId()))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), 0L))
+        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), -1L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), collection.getId()))
@@ -159,7 +158,9 @@ class CollectionServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Collection col = Collection.createDefaultCollection(mem);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+        Collection col = Collection.createDefaultCollection(mem2);
         collectionRepository.save(col);
 
         em.flush();
@@ -167,19 +168,17 @@ class CollectionServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionRepository.getById(collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()));
+        collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId());
 
         System.out.println("멤버");
-        Member member = memberRepository.findById(mem.getId()).get();
+        Member member = memberRepository.getById(mem.getId());
+        Collection collection = collectionRepository.getById(col.getId());
 
         //then
 
-        List<FollowedCollection> followedCollections = collection.getFollowedCollections();
-        Double followCount = collection.getFollowScore();
-        assertThat(followCount).isEqualTo(StaticVariable.COLLECTION_FOLLOW_COUNT_SCORES.get(0) * 1.0);
-        assertThat(followedCollections.size()).isEqualTo(1);
-        assertThat(followedCollections.get(0).getMember()).isEqualTo(member);
-
+        assertThat(collection.getFollowScore()).isEqualTo(StaticVariable.COLLECTION_FOLLOW_COUNT_SCORES.get(0) * 1.0);
+        assertThat(collection.getFollowedCollections().size()).isEqualTo(1);
+        assertThat(collection.getFollowedCollections().get(0).getMember()).isEqualTo(member);
     }
 
     @Test
@@ -188,20 +187,28 @@ class CollectionServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
+        Collection col2 = Collection.createDefaultCollection(mem2);
+        collectionRepository.save(col2);
 
         em.flush();
         em.clear();
 
         //when
         System.out.println("서비스함수");
-        Collection collection = collectionRepository.getById(collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()));
+        collectionService.insertFollowedCollectionByMemberId(mem.getId(), col2.getId());
 
         System.out.println("멤버");
+        Collection collection = collectionRepository.getById(col2.getId());
         Member member = memberRepository.findById(mem.getId()).get();
 
         //then
+        assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()))
+                .isInstanceOf(CantFollowOwnCollectionException.class);//.hasMessageContaining("")
+
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(0L, collection.getId()))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
@@ -229,11 +236,14 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Collection collection = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
+        collectionService.insertViewedCollectionByIp("00", col.getId());
+
+        System.out.println("컬렉션셀렉");
+        Collection collection = collectionRepository.getById(col.getId());
 
         //then
-        assertThat(collection.getViewCount()).isEqualTo(collection.getViewedCollectionByIps().size());
-        assertThat(collection.getViewCount()).isEqualTo(1);
+        assertThat(collection.getViewSize()).isEqualTo(collection.getViewedCollectionByIps().size());
+        assertThat(collection.getViewSize()).isEqualTo(1);
 
     }
     
@@ -247,7 +257,8 @@ class CollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
         now = LocalDateTime.now();
-        Collection collection1 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
+        collectionService.insertViewedCollectionByIp("00", col.getId());
+        Collection collection1 = collectionRepository.getById(col.getId());
 
         em.flush();
         em.clear();
@@ -255,11 +266,14 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Collection collection2 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
+        collectionService.insertViewedCollectionByIp("00", col.getId());
+
+        System.out.println("컬렉션셀렉");
+        Collection collection2 = collectionRepository.getById(col.getId());
 
         //then
-        assertThat(collection2.getViewCount()).isEqualTo(collection2.getViewedCollectionByIps().size());
-        assertThat(collection2.getViewCount()).isEqualTo(1);
+        assertThat(collection2.getViewSize()).isEqualTo(collection2.getViewedCollectionByIps().size());
+        assertThat(collection2.getViewSize()).isEqualTo(1);
 
     }
     
@@ -273,7 +287,8 @@ class CollectionServiceTest {
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
         now = LocalDateTime.now();
-        Collection collection1 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
+        collectionService.insertViewedCollectionByIp("00", col.getId());
+        Collection collection1 = collectionRepository.getById(col.getId());
 
         em.flush();
         em.clear();
@@ -281,11 +296,12 @@ class CollectionServiceTest {
         //when
         now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
-        Collection collection2 = collectionRepository.getById(collectionService.insertViewedCollectionByIp("00", col.getId()));
+        collectionService.insertViewedCollectionByIp("00", col.getId());
+        Collection collection2 = collectionRepository.getById(col.getId());
 
         //then
-        assertThat(collection2.getViewCount()).isEqualTo(collection2.getViewedCollectionByIps().size());
-        assertThat(collection2.getViewCount()).isEqualTo(2);
+        assertThat(collection2.getViewSize()).isEqualTo(collection2.getViewedCollectionByIps().size());
+        assertThat(collection2.getViewSize()).isEqualTo(2);
 
     }
 
@@ -336,14 +352,15 @@ class CollectionServiceTest {
         //when
 
         System.out.println("서비스함수");
-        Long postId = postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
-        List<Collection> collections = collectionRepository.findAllByPostIdWithPost(postId);
+        postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
+
         System.out.println("포스트함수");
+        List<Collection> collections = collectionRepository.findAllByPostIdWithPost(po.getId());
         Post post = postRepository.findById(po.getId()).get();
 
         //then
         assertThat(collections.size()).isEqualTo(collectionList.size());
-        assertThat(post.getCollectionScore()).isEqualTo(collections.size());
+        assertThat(post.getCollectionScore()).isEqualTo(collections.size()*StaticVariable.POST_COLLECT_COUNT_SCORES.get(0));
 
     }
 

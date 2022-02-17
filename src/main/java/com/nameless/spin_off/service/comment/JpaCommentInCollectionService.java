@@ -50,9 +50,8 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
         Member member = getMemberById(memberId);
         CommentInCollection comment = getCommentByIdWithLikedComment(commentId);
-        comment.insertLikedComment(member);
 
-        return comment.getId();
+        return comment.insertLikedComment(member);
     }
 
     private Member getMemberById(Long memberId) throws NotExistMemberException {

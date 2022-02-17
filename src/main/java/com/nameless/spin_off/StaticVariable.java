@@ -10,6 +10,10 @@ public final class StaticVariable {
     public static final Long VIEWED_BY_IP_MINUTE = 60L;
 //    public static final Long VIEWED_BY_IP_MINUTE = 0L;
 
+    public static final Double COLLECTION_SCORE_VIEW_RATES = 1.0;
+    public static final Double COLLECTION_SCORE_LIKE_RATES = 0.5;
+    public static final Double COLLECTION_SCORE_COMMENT_RATES = 0.3;
+    public static final Double COLLECTION_SCORE_FOLLOW_RATES = 1.0;
     public static final List<Long> COLLECTION_VIEW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> COLLECTION_VIEW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
     public static final List<Long> COLLECTION_LIKE_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
@@ -19,7 +23,10 @@ public final class StaticVariable {
     public static final List<Long> COLLECTION_FOLLOW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> COLLECTION_FOLLOW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
-
+    public static final Double POST_SCORE_VIEW_RATES = 1.0;
+    public static final Double POST_SCORE_LIKE_RATES = 0.5;
+    public static final Double POST_SCORE_COMMENT_RATES = 0.3;
+    public static final Double POST_SCORE_COLLECT_RATES = 1.0;
     public static final List<Long> POST_VIEW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> POST_VIEW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
     public static final List<Long> POST_LIKE_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
@@ -30,6 +37,9 @@ public final class StaticVariable {
     public static final List<Double> POST_COLLECT_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
 
+    public static final Double MOVIE_SCORE_VIEW_RATES = 0.3;
+    public static final Double MOVIE_SCORE_POST_RATES = 1.0;
+    public static final Double MOVIE_SCORE_FOLLOW_RATES = 0.5;
     public static final List<Long> MOVIE_VIEW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> MOVIE_VIEW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
     public static final List<Long> MOVIE_POST_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
@@ -37,7 +47,9 @@ public final class StaticVariable {
     public static final List<Long> MOVIE_FOLLOW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> MOVIE_FOLLOW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
-
+    public static final Double HASHTAG_SCORE_VIEW_RATES = 0.3;
+    public static final Double HASHTAG_SCORE_POST_RATES = 1.0;
+    public static final Double HASHTAG_SCORE_FOLLOW_RATES = 0.5;
     public static final List<Long> HASHTAG_VIEW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> HASHTAG_VIEW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
     public static final List<Long> HASHTAG_POST_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);

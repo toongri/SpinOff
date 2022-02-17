@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 
-import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_SCORES;
+import static com.nameless.spin_off.StaticVariable.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -111,17 +111,17 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long aLong = memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
+        memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
+        Member newMember = memberRepository.getById(memberId);
         Hashtag newHashtag = hashtagRepository.getById(hashtagId);
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
         assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
         assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newHashtag.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
+        assertThat(newHashtag.getFollowScore()).isEqualTo(HASHTAG_FOLLOW_COUNT_SCORES.get(0));
     }
 
     @Test
@@ -142,7 +142,6 @@ class JpaMemberServiceTest {
         Long aLong = memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
 
         //then
         assertThatThrownBy(() -> memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId))
@@ -167,10 +166,10 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long aLong = memberService.insertFollowedMemberByMemberId(memberId, followedMemberId);
+        memberService.insertFollowedMemberByMemberId(memberId, followedMemberId);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
+        Member newMember = memberRepository.getById(memberId);
         Member newFollowedMember = memberRepository.getById(followedMemberId);
 
         //then
@@ -196,9 +195,6 @@ class JpaMemberServiceTest {
         System.out.println("서비스함수");
         Long aLong = memberService.insertFollowedMemberByMemberId(memberId, followedMemberId);
 
-        System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
-
         //then
         assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, followedMemberId))
                 .isInstanceOf(AlreadyFollowedMemberException.class);
@@ -222,10 +218,10 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long aLong = memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
+        Member newMember = memberRepository.getById(memberId);
         Member newBlockedMember = memberRepository.getById(blockedMemberId);
 
         //then
@@ -249,10 +245,10 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long aLong = memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
+        Member newMember = memberRepository.getById(memberId);
 
         //then
         assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL))
@@ -277,10 +273,10 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long aLong = memberService.insertFollowedMovieByMovieId(memberId, movieId);
+        memberService.insertFollowedMovieByMovieId(memberId, movieId);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
+        Member newMember = memberRepository.getById(memberId);
         Movie newMovie = movieRepository.getById(movieId);
 
         //then
@@ -288,7 +284,7 @@ class JpaMemberServiceTest {
         assertThat(newMember.getFollowedMovies().size()).isEqualTo(1);
         assertThat(newMember.getFollowedMovies().iterator().next().getMovie().getId()).isEqualTo(movieId);
         assertThat(newMovie.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newMovie.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
+        assertThat(newMovie.getFollowScore()).isEqualTo(MOVIE_FOLLOW_COUNT_SCORES.get(0));
     }
 
     @Test
@@ -308,7 +304,6 @@ class JpaMemberServiceTest {
         Long aLong = memberService.insertFollowedMovieByMovieId(memberId, movieId);
 
         System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(aLong);
 
         //then
         assertThatThrownBy(() -> memberService.insertFollowedMovieByMovieId(memberId, movieId))

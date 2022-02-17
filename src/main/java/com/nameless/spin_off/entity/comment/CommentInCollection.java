@@ -54,12 +54,14 @@ public class CommentInCollection extends BaseTimeEntity {
         commentInCollection.updateParent(this);
     }
 
-    public void addCommentLike(Member member) {
+    public Long addCommentLike(Member member) {
         LikedCommentInCollection likedCommentInCollection =
                 LikedCommentInCollection.createLikedCommentInCollection(member);
 
         this.likedCommentInCollections.add(likedCommentInCollection);
         likedCommentInCollection.updateCommentInCollection(this);
+
+        return likedCommentInCollection.getId();
     }
 
     //==생성 메소드==//
@@ -104,9 +106,9 @@ public class CommentInCollection extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public void insertLikedComment(Member member) throws AlreadyLikedCommentInCollectionException {
+    public Long insertLikedComment(Member member) throws AlreadyLikedCommentInCollectionException {
         if (isNotAlreadyMemberLikeComment(member)) {
-            addCommentLike(member);
+            return addCommentLike(member);
         } else {
             throw new AlreadyLikedCommentInCollectionException();
         }

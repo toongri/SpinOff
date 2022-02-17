@@ -57,9 +57,7 @@ public class JpaMemberService implements MemberService {
         Member member = getMemberByIdWithFollowedMember(memberId);
         Member followedMember = getMemberByIdWithFollowingMember(followedMemberId);
 
-        member.addFollowedMember(followedMember);
-
-        return member.getId();
+        return member.addFollowedMember(followedMember);
     }
 
     @Override
@@ -69,9 +67,7 @@ public class JpaMemberService implements MemberService {
         Member member = getMemberByIdWithHashtag(memberId);
         Hashtag hashtag = getHashtagByIdWithFollowingMember(hashtagId);
 
-        member.addFollowedHashtag(hashtag);
-
-        return member.getId();
+        return member.addFollowedHashtag(hashtag);
     }
 
     @Override
@@ -79,9 +75,7 @@ public class JpaMemberService implements MemberService {
         Member member = getMemberByIdWithBlockedMember(memberId);
         Member blockedMember = getMemberByIdWithBlockingMember(blockedMemberId);
 
-        member.addBlockedMember(blockedMember, blockedMemberStatus);
-
-        return member.getId();
+        return member.addBlockedMember(blockedMember, blockedMemberStatus);
     }
 
     @Override
@@ -92,9 +86,7 @@ public class JpaMemberService implements MemberService {
         Member member = getMemberByIdWithMovie(memberId);
         Movie movie = getMovieByIdWithFollowingMember(movieId);
 
-        member.addFollowedMovie(movie);
-
-        return member.getId();
+        return member.addFollowedMovie(movie);
     }
 
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {

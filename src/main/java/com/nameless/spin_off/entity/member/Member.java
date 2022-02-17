@@ -2,12 +2,15 @@ package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.help.Complain;
+import com.nameless.spin_off.entity.help.ComplainStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.*;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -73,7 +76,7 @@ public class Member extends BaseTimeEntity {
 
     //==연관관계 메소드==//
 
-    public void addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
+    public Long addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
         FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(hashtag);
         followedHashtag.updateMember(this);
 
@@ -81,9 +84,11 @@ public class Member extends BaseTimeEntity {
             throw new AlreadyFollowedHashtagException();
         }
         hashtag.addFollowingMembers(followedHashtag);
+
+        return followedHashtag.getId();
     }
 
-    public void addFollowedMovie(Movie movie) throws AlreadyFollowedMovieException {
+    public Long addFollowedMovie(Movie movie) throws AlreadyFollowedMovieException {
         FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(movie);
         followedMovie.updateMember(this);
 
@@ -91,9 +96,11 @@ public class Member extends BaseTimeEntity {
             throw new AlreadyFollowedMovieException();
         }
         movie.addFollowingMembers(followedMovie);
+
+        return followedMovie.getId();
     }
 
-    public void addFollowedMember(Member followedMember) throws AlreadyFollowedMemberException {
+    public Long addFollowedMember(Member followedMember) throws AlreadyFollowedMemberException {
         FollowedMember newFollowedMember = FollowedMember.createFollowedMember(followedMember);
         newFollowedMember.updateFollowingMember(this);
 
@@ -101,9 +108,11 @@ public class Member extends BaseTimeEntity {
             throw new AlreadyFollowedMemberException();
         }
         followedMember.addFollowingMember(newFollowedMember);
+
+        return newFollowedMember.getId();
     }
 
-    public void addBlockedMember(Member blockedMember, BlockedMemberStatus blockedMemberStatus) throws AlreadyBlockedMemberException {
+    public Long addBlockedMember(Member blockedMember, BlockedMemberStatus blockedMemberStatus) throws AlreadyBlockedMemberException {
         BlockedMember newBlockedMember = BlockedMember.createBlockedMember(blockedMember, blockedMemberStatus);
         newBlockedMember.updateBlockingMember(this);
 
@@ -111,6 +120,8 @@ public class Member extends BaseTimeEntity {
             throw new AlreadyBlockedMemberException();
         }
         blockedMember.addBlockingMember(newBlockedMember);
+
+        return newBlockedMember.getId();
     }
 
     public void addBlockingMember(BlockedMember blockingMember) {
@@ -123,13 +134,17 @@ public class Member extends BaseTimeEntity {
         this.followingMembers.add(followingMember);
     }
 
-    public void addComplain(Complain complain) throws AlreadyComplainException {
+    public Long addComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) throws AlreadyComplainException {
+        Complain complain = Complain.createComplain(member, post, collection, complainStatus);
+
         complain.updateComplainedMember(this);
 
         if (!this.complains.add(complain)) {
             throw new AlreadyComplainException();
         }
-        updateBlockCount();
+        updateComplainCount();
+
+        return complain.getId();
     }
 
     //==생성 메소드==//
@@ -207,7 +222,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updatePopularity() {
-        this.popularity = complainCount + blockCount + followScore;
+        this.popularity = followScore - complainCount - blockCount;
     }
 
     public void updateCountToZero() {

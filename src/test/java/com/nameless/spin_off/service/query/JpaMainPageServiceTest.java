@@ -60,7 +60,7 @@ class JpaMainPageServiceTest {
         em.clear();
 
         //when
-        System.out.println("쿼리");
+        System.out.println("서비스");
         List<MainPagePostDto> content = mainPageService
                 .getPostsByFollowedHashtagOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
@@ -93,7 +93,7 @@ class JpaMainPageServiceTest {
         em.clear();
 
         //when
-        System.out.println("쿼리");
+        System.out.println("서비스");
         List<MainPagePostDto> content = mainPageService
                 .getPostsByFollowedMovieOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
@@ -124,7 +124,7 @@ class JpaMainPageServiceTest {
         em.clear();
 
         //when
-        System.out.println("쿼리");
+        System.out.println("서비스");
         List<MainPagePostDto> content =
                 mainPageService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 

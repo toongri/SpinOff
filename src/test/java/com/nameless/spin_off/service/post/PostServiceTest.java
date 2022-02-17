@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.post;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collections.CollectedPost;
 import com.nameless.spin_off.entity.collections.Collection;
@@ -168,17 +169,14 @@ class PostServiceTest {
         postService.insertLikedPostByMemberId(mem.getId(), po.getId());
 
         System.out.println("포스트");
-        Post post = postRepository.findById(po.getId()).get();
+        Post post = postRepository.getById(po.getId());
         System.out.println("멤버");
-        Member member = memberRepository.findById(mem.getId()).get();
+        Member member = memberRepository.getById(mem.getId());
 
         //then
-
-        List<LikedPost> likedPosts = post.getLikedPosts();
-        Double likeCount = post.getLikeScore();
-        assertThat(likeCount).isEqualTo(1);
-        assertThat(likedPosts.size()).isEqualTo(1);
-        assertThat(likedPosts.get(0).getMember()).isEqualTo(member);
+        assertThat(post.getLikeScore()).isEqualTo(StaticVariable.POST_LIKE_COUNT_SCORES.get(0));
+        assertThat(post.getLikedPosts().size()).isEqualTo(1);
+        assertThat(post.getLikedPosts().get(0).getMember()).isEqualTo(member);
 
     }
 
@@ -227,7 +225,6 @@ class PostServiceTest {
         //when
         System.out.println("서비스함수");
         postService.insertLikedPostByMemberId(mem.getId(), po.getId());
-        System.out.println("서비스함수2");
 
         //then
         System.out.println("서비스함수2");
@@ -252,11 +249,13 @@ class PostServiceTest {
 
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
+        postService.insertViewedPostByIp("00", post.getId());
+        System.out.println("포스트");
+        Post post1 = postRepository.getById(post.getId());
 
         //then
-        assertThat(post1.getViewScore()).isEqualTo(post1.getViewedPostByIps().size());
-        assertThat(post1.getViewScore()).isEqualTo(1);
+        assertThat(post1.getViewScore()).isEqualTo(post1.getViewedPostByIps().size() * StaticVariable.POST_VIEW_COUNT_SCORES.get(0));
+        assertThat(post1.getViewSize()).isEqualTo(1);
 
     }
     
@@ -269,7 +268,7 @@ class PostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
+        postService.insertViewedPostByIp("00", post.getId());
 
         em.flush();
         em.clear();
@@ -277,11 +276,13 @@ class PostServiceTest {
         //when
         now = LocalDateTime.now();
         System.out.println("서비스함수");
-        Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
+        postService.insertViewedPostByIp("00", post.getId());
+        System.out.println("포스트");
+        Post post2 = postRepository.getById(post.getId());
         
         //then
-        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size());
-        assertThat(post2.getViewScore()).isEqualTo(1);
+        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size() * StaticVariable.POST_VIEW_COUNT_SCORES.get(0));
+        assertThat(post2.getViewSize()).isEqualTo(1);
 
     }
 
@@ -295,7 +296,7 @@ class PostServiceTest {
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(post);
         now = LocalDateTime.now();
-        Post post1 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
+        postService.insertViewedPostByIp("00", post.getId());
 
         em.flush();
         em.clear();
@@ -303,7 +304,9 @@ class PostServiceTest {
         //when
         now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
-        Post post2 = postRepository.getById(postService.insertViewedPostByIp("00", post.getId()));
+        postService.insertViewedPostByIp("00", post.getId());
+        System.out.println("포스트");
+        Post post2 = postRepository.getById(post.getId());
 
         //then
         assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size());

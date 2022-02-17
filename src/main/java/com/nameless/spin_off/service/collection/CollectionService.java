@@ -18,5 +18,5 @@ public interface CollectionService {
     Long insertViewedCollectionByIp(String ip, Long collectionId) throws NotExistCollectionException;
 
     Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException;
+            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException;
 }

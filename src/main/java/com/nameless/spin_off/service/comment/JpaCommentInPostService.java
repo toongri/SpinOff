@@ -47,9 +47,8 @@ public class JpaCommentInPostService implements CommentInPostService {
 
         Member member = getMemberById(memberId);
         CommentInPost comment = getCommentByIdWithLikedComment(commentId);
-        comment.insertLikedComment(member);
 
-        return comment.getId();
+        return comment.insertLikedComment(member);
     }
 
     private CommentInPost getCommentByIdWithLikedComment(Long commentId) throws NotExistCommentInPostException {

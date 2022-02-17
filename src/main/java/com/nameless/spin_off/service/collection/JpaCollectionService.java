@@ -40,9 +40,7 @@ public class JpaCollectionService implements CollectionService {
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithLikedCollection(collectionId);
 
-        collection.insertLikedCollectionByMember(member);
-
-        return collection.getId();
+        return collection.insertLikedCollectionByMember(member);
     }
 
     @Transactional(readOnly = false)
@@ -52,22 +50,18 @@ public class JpaCollectionService implements CollectionService {
 
         Collection collection = getCollectionByIdWithViewedIp(collectionId);
 
-        collection.insertViewedCollectionByIp(ip);
-
-        return collection.getId();
+        return collection.insertViewedCollectionByIp(ip);
     }
 
     @Transactional(readOnly = false)
     @Override
     public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException {
+            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
         Member member = getMemberById(memberId);
         Collection collection = getCollectionByIdWithFollowedCollection(collectionId);
 
-        collection.insertFollowedCollectionByMember(member);
-
-        return collection.getId();
+        return collection.insertFollowedCollectionByMember(member);
     }
 
     private Member getMemberById(Long memberId) throws NotExistMemberException {

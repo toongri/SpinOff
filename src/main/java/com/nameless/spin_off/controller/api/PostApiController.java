@@ -51,14 +51,14 @@ public class PostApiController {
     }
 
     @PostMapping("/collections")
-    public PostApiResult<Long> addPostInCollections(
+    public PostApiResult<List<Long>> addPostInCollections(
             @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        Long resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);
+        List<Long> resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);
 
-        return new PostApiResult<Long>(resultId);
+        return new PostApiResult<List<Long>>(resultId);
     }
 
     @Data

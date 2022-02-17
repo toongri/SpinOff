@@ -22,7 +22,7 @@ public interface PostService {
     Long insertViewedPostByIp(String ip, Long postId)
             throws NotExistPostException;
 
-    Long insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+    List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException;
 }

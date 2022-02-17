@@ -41,12 +41,14 @@ public class Hashtag extends BaseTimeEntity {
     private Double popularity;
 
     //==연관관계 메소드==//
-    private void addViewedHashtagByIp(String ip) {
+    private Long addViewedHashtagByIp(String ip) {
         ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip);
 
         updateViewScore();
         this.viewedHashtagByIps.add(viewedHashtagByIp);
         viewedHashtagByIp.updateHashtag(this);
+
+        return viewedHashtagByIp.getId();
     }
 
     public void addTaggedPosts(PostedHashtag postedHashtag) {
@@ -86,13 +88,12 @@ public class Hashtag extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public boolean insertViewedHashtagByIp(String ip) {
+    public Long insertViewedHashtagByIp(String ip) {
 
         if (isNotAlreadyIpView(ip)) {
-            addViewedHashtagByIp(ip);
-            return true;
+            return addViewedHashtagByIp(ip);
         } else {
-            return false;
+            return -1L;
         }
     }
 
@@ -117,7 +118,7 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        followScore = total + HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result;
+        followScore = (total + HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_FOLLOW_RATES;
 
         updatePopularity();
     }
@@ -143,7 +144,7 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = total + HASHTAG_VIEW_COUNT_SCORES.get(j) * result;
+        viewScore = (total + HASHTAG_VIEW_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_VIEW_RATES;
 
         updatePopularity();
     }
@@ -169,7 +170,7 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        postScore = total + HASHTAG_POST_COUNT_SCORES.get(j) * result;
+        postScore = (total + HASHTAG_POST_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_POST_RATES;
 
         updatePopularity();
     }

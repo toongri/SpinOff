@@ -1,10 +1,16 @@
 package com.nameless.spin_off.service.comment;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -23,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import static com.nameless.spin_off.StaticVariable.POST_COMMENT_COUNT_SCORES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -75,7 +82,6 @@ class CommentInPostServiceTest {
         postRepository.save(po);
         CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
         po.addCommentInPost(parent);
-        commentInPostRepository.save(parent);
 
         em.flush();
         em.clear();
@@ -102,6 +108,10 @@ class CommentInPostServiceTest {
         assertThat(parentComment.getChildren().get(1)).isEqualTo(childComment2);
         assertThat(childComment1.getParent()).isEqualTo(parentComment);
         assertThat(childComment2.getParent()).isEqualTo(parentComment);
+
+        assertThat(post.getCommentScore()).isEqualTo(post.getPopularity());
+        assertThat(post.getCommentScore())
+                .isEqualTo(post.getCommentInPosts().size() * POST_COMMENT_COUNT_SCORES.get(0));
     }
 
     @Test
@@ -129,7 +139,69 @@ class CommentInPostServiceTest {
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3))
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
+    }
 
+    @Test
+    public void 좋아요_테스트() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
+        po.addCommentInPost(parent);
 
+        em.flush();
+        em.clear();
+
+        //when
+
+        System.out.println("서비스함수");
+        commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId());
+
+        System.out.println("댓글함수");
+        CommentInPost comment = commentInPostRepository.getById(po.getCommentInPosts().get(0).getId());
+
+        //then
+        assertThat(comment.getId()).isEqualTo(po.getCommentInPosts().get(0).getId());
+        assertThat(comment.getPost().getId()).isEqualTo(po.getId());
+        assertThat(comment.getLikedCommentInPosts().size()).isEqualTo(1);
+        assertThat(comment.getLikedCommentInPosts().get(0).getMember().getId()).isEqualTo(member.getId());
+
+    }
+
+    @Test
+    public void 좋아요_테스트_예외처리() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        postRepository.save(po);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
+        po.addCommentInPost(parent);
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        System.out.println("서비스함수");
+        commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId());
+
+        System.out.println("댓글함수");
+        CommentInPost comment = commentInPostRepository.getById(po.getCommentInPosts().get(0).getId());
+
+        //then
+
+        assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(-1L, po.getCommentInPosts().get(0).getId()))
+                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), -1L))
+                .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
+        assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId()))
+                .isInstanceOf(AlreadyLikedCommentInPostException.class);//.hasMessageContaining("")
     }
 }

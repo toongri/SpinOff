@@ -21,7 +21,7 @@ public class JpaHashtagService implements HashtagService{
 
         Hashtag hashtag = getHashtagByIdWithViewedByIp(hashtagId);
 
-        return null;
+        return hashtag.insertViewedHashtagByIp(ip);
     }
 
     public Hashtag getHashtagByIdWithViewedByIp(Long hashtagId) throws NotExistHashtagException {

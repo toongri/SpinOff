@@ -95,7 +95,7 @@ public class Post extends BaseTimeEntity {
         postedMedia.updatePost(this);
     }
 
-    private void addCollectedPosts(List<Collection> collections) {
+    private List<Long> addCollectedPosts(List<Collection> collections) {
         this.updateCollectScore(collections.size());
         List<CollectedPost> collectedPosts = new ArrayList<>();
 
@@ -105,14 +105,18 @@ public class Post extends BaseTimeEntity {
             collectedPosts.add(collectedPost);
         }
         this.collectedPosts.addAll(collectedPosts);
+
+        return collectedPosts.stream().map(CollectedPost::getId).collect(Collectors.toList());
     }
 
-    private void addViewedPostByIp(String ip) {
+    private Long addViewedPostByIp(String ip) {
         ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip);
 
         this.updateViewScore();
         this.viewedPostByIps.add(viewedPostByIp);
         viewedPostByIp.updatePost(this);
+
+        return viewedPostByIp.getId();
     }
 
     public void addVisitedPostByMember(Member member) {
@@ -128,12 +132,14 @@ public class Post extends BaseTimeEntity {
         commentInPost.updatePost(this);
     }
 
-    private void addLikedPostByMember(Member member) {
+    private Long addLikedPostByMember(Member member) {
         LikedPost likedPost = LikedPost.createLikedPost(member);
 
         this.updateLikeScore();
         this.likedPosts.add(likedPost);
         likedPost.updatePost(this);
+
+        return likedPost.getId();
     }
 
     public void addPostedHashtagByHashtag(Hashtag hashtag) throws AlreadyPostedHashtagException {
@@ -231,29 +237,28 @@ public class Post extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public void insertCollectedPostByCollections(List<Collection> collections) throws AlreadyCollectedPostException {
+    public List<Long> insertCollectedPostByCollections(List<Collection> collections) throws AlreadyCollectedPostException {
 
         if (isNotAlreadyCollectedPosts(collections)) {
-            addCollectedPosts(collections);
+            return addCollectedPosts(collections);
         } else {
             throw new AlreadyCollectedPostException();
         }
     }
 
-    public boolean insertViewedPostByIp(String ip) {
+    public Long insertViewedPostByIp(String ip) {
 
         if (isNotAlreadyIpView(ip)) {
-            addViewedPostByIp(ip);
-            return true;
+            return addViewedPostByIp(ip);
         } else {
-            return false;
+            return -1L;
         }
     }
 
-    public void insertLikedPostByMember(Member member) throws AlreadyLikedPostException {
+    public Long insertLikedPostByMember(Member member) throws AlreadyLikedPostException {
 
         if (isNotAlreadyMemberLikePost(member)) {
-            addLikedPostByMember(member);
+            return addLikedPostByMember(member);
         } else {
             throw new AlreadyLikedPostException();
         }
@@ -296,7 +301,7 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = total + POST_VIEW_COUNT_SCORES.get(j) * result;
+        viewScore = (total + POST_VIEW_COUNT_SCORES.get(j) * result ) * POST_SCORE_VIEW_RATES;
         updatePopularity();
     }
 
@@ -321,7 +326,7 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        likeScore = total + POST_LIKE_COUNT_SCORES.get(j) * result;
+        likeScore = (total + POST_LIKE_COUNT_SCORES.get(j) * result) * POST_SCORE_LIKE_RATES;
         updatePopularity();
     }
 
@@ -346,7 +351,7 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        commentScore = total + POST_COMMENT_COUNT_SCORES.get(j) * result;
+        commentScore = (total + POST_COMMENT_COUNT_SCORES.get(j) * result) * POST_SCORE_COMMENT_RATES;
         updatePopularity();
     }
 
@@ -371,11 +376,15 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        collectionScore = total + POST_COLLECT_COUNT_SCORES.get(j) * result;
+        collectionScore = (total + POST_COLLECT_COUNT_SCORES.get(j) * result) * POST_SCORE_COLLECT_RATES;
         updatePopularity();
     }
 
     //==조회 로직==//
+
+    public Integer getViewSize() {
+        return viewedPostByIps.size();
+    }
 
     public Boolean isNotAlreadyIpView(String ip) {
 

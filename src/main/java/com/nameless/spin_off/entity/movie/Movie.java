@@ -44,12 +44,14 @@ public class Movie extends BaseTimeEntity {
     private Double popularity;
 
     //==연관관계 메소드==//
-    private void addViewedMovieByIp(String ip) {
+    private Long addViewedMovieByIp(String ip) {
         ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip);
 
         updateViewScore();
         this.viewedMovieByIps.add(viewedMovieByIp);
         viewedMovieByIp.updateMovie(this);
+
+        return viewedMovieByIp.getId();
     }
 
     public void addTaggedPosts(Post post) {
@@ -101,13 +103,12 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public boolean insertViewedMovieByIp(String ip) {
+    public Long insertViewedMovieByIp(String ip) {
 
         if (isNotAlreadyIpView(ip)) {
-            addViewedMovieByIp(ip);
-            return true;
+            return addViewedMovieByIp(ip);
         } else {
-            return false;
+            return -1L;
         }
     }
 
@@ -132,7 +133,7 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        followScore = total + MOVIE_FOLLOW_COUNT_SCORES.get(j) * result;
+        followScore = (total + MOVIE_FOLLOW_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_FOLLOW_RATES;
 
         updatePopularity();
     }
@@ -158,7 +159,7 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = total + MOVIE_VIEW_COUNT_SCORES.get(j) * result;
+        viewScore = (total + MOVIE_VIEW_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_VIEW_RATES;
 
         updatePopularity();
     }
@@ -184,7 +185,7 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        postScore = total + MOVIE_POST_COUNT_SCORES.get(j) * result;
+        postScore = (total + MOVIE_POST_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_POST_RATES;
 
         updatePopularity();
     }

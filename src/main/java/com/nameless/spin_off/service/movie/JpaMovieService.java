@@ -22,9 +22,7 @@ public class JpaMovieService implements MovieService{
 
         Movie movie = getMovieByIdWithViewedIp(movieId);
 
-        movie.insertViewedMovieByIp(ip);
-
-        return movie.getId();
+        return movie.insertViewedMovieByIp(ip);
     }
 
     private Movie getMovieByIdWithViewedIp(Long movieId) throws NotExistMovieException {

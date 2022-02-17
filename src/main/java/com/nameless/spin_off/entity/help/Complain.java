@@ -47,19 +47,11 @@ public class Complain extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Complain createComplainByPost(Member member, Post post, ComplainStatus complainStatus) {
+    public static Complain createComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) {
 
         Complain complain = new Complain();
         complain.updateMember(member);
         complain.updatePost(post);
-        complain.updateComplainStatus(complainStatus);
-
-        return complain;
-    }
-    public static Complain createComplainByCollection(Member member, Collection collection, ComplainStatus complainStatus) {
-
-        Complain complain = new Complain();
-        complain.updateMember(member);
         complain.updateCollection(collection);
         complain.updateComplainStatus(complainStatus);
 
@@ -101,8 +93,8 @@ public class Complain extends BaseTimeEntity {
     public boolean equals(Object complain) {
         if (complain instanceof Complain) {
             if ((((Complain) complain).getMember().equals(member))) {
-                if (((Complain) complain).getPost().equals(post)) {
-                    return ((Complain) complain).getCollection().equals(collection);
+                if (((Complain) complain).getPost() == post) {
+                    return ((Complain) complain).getCollection() == collection;
                 }
             }
         }
