@@ -13,6 +13,7 @@ import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
+import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.sun.istack.NotNull;
 import lombok.*;
@@ -54,6 +55,7 @@ public class Post extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_post_status")
+    @NotNull
     private PublicOfPostStatus publicOfPostStatus;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -76,6 +78,9 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<AuthorityOfPost> authorityOfPosts = new HashSet<>();
 
     private Double viewScore;
     private Double likeScore;
@@ -133,18 +138,27 @@ public class Post extends BaseTimeEntity {
 
     public void addPostedHashtagByHashtag(Hashtag hashtag) throws AlreadyPostedHashtagException {
         PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag);
+        postedHashtag.updatePost(this);
 
         if (!this.postedHashtags.add(postedHashtag)) {
             throw new AlreadyPostedHashtagException();
         }
-        postedHashtag.updatePost(this);
         hashtag.addTaggedPosts(postedHashtag);
+    }
+
+    public void addAuthorityOfPost(AuthorityOfPostStatus authorityOfPostStatus) throws AlreadyPAuthorityOfPostStatusException {
+        AuthorityOfPost authorityOfPost = AuthorityOfPost.createAuthorityOfPost(authorityOfPostStatus);
+        authorityOfPost.updatePost(this);
+
+        if (!authorityOfPosts.add(authorityOfPost)) {
+            throw new AlreadyPAuthorityOfPostStatusException();
+        }
     }
 
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
                                   List<Hashtag> hashtags, List<PostedMedia> postedMedias,
-                                  Movie movie, PublicOfPostStatus publicOfPostStatus) throws AlreadyPostedHashtagException {
+                                  Movie movie, PublicOfPostStatus publicOfPostStatus) throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException {
         Post post = new Post();
         post.updateMember(member);
         post.updateTitle(title);
@@ -154,6 +168,7 @@ public class Post extends BaseTimeEntity {
         post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateCountToZero();
+        post.addAuthorityOfPost(AuthorityOfPostStatus.NORMAL);
 
         if (movie != null)
             movie.addTaggedPosts(post);

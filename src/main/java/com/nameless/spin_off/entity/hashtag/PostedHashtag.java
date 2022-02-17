@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -53,12 +54,16 @@ public class PostedHashtag extends BaseTimeEntity {
     //==비즈니스 로직==//
 
     //==조회 로직==//
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPost(), getHashtag());
+    }
 
     @Override
     public boolean equals(Object postedHashtag) {
         if (postedHashtag instanceof PostedHashtag) {
-            if ((((PostedHashtag) postedHashtag).getPost() == this.getPost())) {
-                return ((PostedHashtag) postedHashtag).getHashtag() == this.getHashtag();
+            if ((((PostedHashtag) postedHashtag).getPost().equals(post))) {
+                return ((PostedHashtag) postedHashtag).getHashtag().equals(hashtag);
             }
         }
 

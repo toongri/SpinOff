@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -8,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -53,4 +55,19 @@ public class FollowedHashtag extends BaseTimeEntity {
 
     //==조회 로직==//
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(member, hashtag);
+    }
+
+    @Override
+    public boolean equals(Object followedHashtag) {
+        if (followedHashtag instanceof FollowedHashtag) {
+            if ((((FollowedHashtag) followedHashtag).getMember().equals(member))) {
+                return ((FollowedHashtag) followedHashtag).getHashtag().equals(hashtag);
+            }
+        }
+
+        return false;
+    }
 }

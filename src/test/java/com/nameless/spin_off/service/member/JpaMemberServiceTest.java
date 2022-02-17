@@ -1,6 +1,8 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 
+import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_SCORES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -112,10 +115,13 @@ class JpaMemberServiceTest {
 
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(aLong);
+        Hashtag newHashtag = hashtagRepository.getById(hashtagId);
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
-        assertThat(newMember.getFollowedHashtags().get(0).getHashtag().getId()).isEqualTo(hashtagId);
+        assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
+        assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
+        assertThat(newHashtag.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
     }
 
     @Test
@@ -153,8 +159,8 @@ class JpaMemberServiceTest {
         //given
         Member member = Member.buildMember().build();
         Long memberId = memberRepository.save(member).getId();
-        Member followedMember = Member.buildMember().build();
-        Long followedMemberId = memberRepository.save(followedMember).getId();
+        Member followedM = Member.buildMember().build();
+        Long followedMemberId = memberRepository.save(followedM).getId();
 
         em.flush();
         em.clear();
@@ -165,10 +171,14 @@ class JpaMemberServiceTest {
 
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(aLong);
+        Member newFollowedMember = memberRepository.getById(followedMemberId);
+
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getFollowedMembers().size()).isEqualTo(1);
-        assertThat(newMember.getFollowedMembers().get(0).getMember().getId()).isEqualTo(followedMemberId);
+        assertThat(newMember.getFollowedMembers().iterator().next().getMember().getId()).isEqualTo(followedMemberId);
+        assertThat(newFollowedMember.getFollowingMembers().size()).isEqualTo(1);
+        assertThat(newFollowedMember.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
     }
 
     @Test
@@ -192,9 +202,64 @@ class JpaMemberServiceTest {
         //then
         assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, followedMemberId))
                 .isInstanceOf(AlreadyFollowedMemberException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(0L, followedMemberId))
+        assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(-1L, followedMemberId))
                 .isInstanceOf(NotExistMemberException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, 0L))
+        assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, -1L))
+                .isInstanceOf(NotExistMemberException.class);
+    }
+
+    @Test
+    public void 멤버_블락_멤버() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+        Member blockedMember = Member.buildMember().build();
+        Long blockedMemberId = memberRepository.save(blockedMember).getId();
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        Long aLong = memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+
+        System.out.println("멤버함수");
+        Member newMember = memberRepository.getById(aLong);
+        Member newBlockedMember = memberRepository.getById(blockedMemberId);
+
+        //then
+        assertThat(newMember.getId()).isEqualTo(memberId);
+        assertThat(newMember.getBlockedMembers().size()).isEqualTo(1);
+        assertThat(newMember.getBlockedMembers().iterator().next().getMember().getId()).isEqualTo(blockedMemberId);
+        assertThat(newBlockedMember.getBlockingMembers().size()).isEqualTo(1);
+        assertThat(newBlockedMember.getBlockCount()).isEqualTo(1);
+    }
+
+    @Test
+    public void 멤버_블락_멤버_예외처리() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+        Member blockedMember = Member.buildMember().build();
+        Long blockedMemberId = memberRepository.save(blockedMember).getId();
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        Long aLong = memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+
+        System.out.println("멤버함수");
+        Member newMember = memberRepository.getById(aLong);
+
+        //then
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL))
+                .isInstanceOf(AlreadyBlockedMemberException.class);
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(-1L, blockedMemberId, BlockedMemberStatus.ALL))
+                .isInstanceOf(NotExistMemberException.class);
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, -1L, BlockedMemberStatus.ALL))
                 .isInstanceOf(NotExistMemberException.class);
     }
 
@@ -216,11 +281,14 @@ class JpaMemberServiceTest {
 
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(aLong);
+        Movie newMovie = movieRepository.getById(movieId);
 
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getFollowedMovies().size()).isEqualTo(1);
-        assertThat(newMember.getFollowedMovies().get(0).getMovie().getId()).isEqualTo(movieId);
+        assertThat(newMember.getFollowedMovies().iterator().next().getMovie().getId()).isEqualTo(movieId);
+        assertThat(newMovie.getFollowingMembers().size()).isEqualTo(1);
+        assertThat(newMovie.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
     }
 
     @Test

@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -53,10 +54,10 @@ public class JpaMemberService implements MemberService {
     public Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
             throws NotExistMemberException, AlreadyFollowedMemberException {
 
-        Member member = getMemberByIdIncludeFollowedMember(memberId);
-        Member followedMember = getMember(followedMemberId);
+        Member member = getMemberByIdWithFollowedMember(memberId);
+        Member followedMember = getMemberByIdWithFollowingMember(followedMemberId);
 
-        member.insertFollowedMemberByMember(followedMember);
+        member.addFollowedMember(followedMember);
 
         return member.getId();
     }
@@ -65,10 +66,20 @@ public class JpaMemberService implements MemberService {
     public Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws
             NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException {
 
-        Member member = getMemberByIdIncludeHashtag(memberId);
-        Hashtag hashtag = getHashtag(hashtagId);
+        Member member = getMemberByIdWithHashtag(memberId);
+        Hashtag hashtag = getHashtagByIdWithFollowingMember(hashtagId);
 
-        member.insertFollowedHashtagByHashtag(hashtag);
+        member.addFollowedHashtag(hashtag);
+
+        return member.getId();
+    }
+
+    @Override
+    public Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException {
+        Member member = getMemberByIdWithBlockedMember(memberId);
+        Member blockedMember = getMemberByIdWithBlockingMember(blockedMemberId);
+
+        member.addBlockedMember(blockedMember, blockedMemberStatus);
 
         return member.getId();
     }
@@ -78,45 +89,57 @@ public class JpaMemberService implements MemberService {
             NotExistMemberException, NotExistMovieException,
             AlreadyFollowedMovieException {
 
-        Member member = getMemberByIdIncludeMovie(memberId);
-        Movie movie = getMovie(movieId);
+        Member member = getMemberByIdWithMovie(memberId);
+        Movie movie = getMovieByIdWithFollowingMember(movieId);
 
-        member.insertFollowedMovieByMovie(movie);
+        member.addFollowedMovie(movie);
 
         return member.getId();
     }
 
-    private Member getMember(Long followedMemberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findById(followedMemberId);
+    private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowingMember(followedMemberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Hashtag getHashtag(Long hashtagId) throws NotExistHashtagException {
-        Optional<Hashtag> optionalHashtag = hashtagRepository.findById(hashtagId);
+    private Member getMemberByIdWithBlockingMember(Long blockedMemberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockingMember(blockedMemberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private Hashtag getHashtagByIdWithFollowingMember(Long hashtagId) throws NotExistHashtagException {
+        Optional<Hashtag> optionalHashtag = hashtagRepository.findOneByIdWithFollowingMember(hashtagId);
 
         return optionalHashtag.orElseThrow(NotExistHashtagException::new);
     }
 
-    private Movie getMovie(Long movieId) throws NotExistMovieException {
-        Optional<Movie> optionalMovie = movieRepository.findById(movieId);
+    private Movie getMovieByIdWithFollowingMember(Long movieId) throws NotExistMovieException {
+        Optional<Movie> optionalMovie = movieRepository.findOneByIdWithFollowingMember(movieId);
 
         return optionalMovie.orElseThrow(NotExistMovieException::new);
     }
 
-    private Member getMemberByIdIncludeFollowedMember(Long memberId) throws NotExistMemberException {
+    private Member getMemberByIdWithFollowedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMember(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Member getMemberByIdIncludeMovie(Long memberId) throws NotExistMemberException {
+    private Member getMemberByIdWithBlockedMember(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockedMember(memberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private Member getMemberByIdWithMovie(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithMovie(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Member getMemberByIdIncludeHashtag(Long memberId) throws NotExistMemberException {
+    private Member getMemberByIdWithHashtag(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithHashtag(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);

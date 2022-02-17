@@ -38,5 +38,23 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowedMember(@Param("id") Long id);
 
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.blockedMembers blockingMember " +
+            "LEFT JOIN FETCH blockingMember.member blockedMember " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdWithBlockedMember(@Param("id") Long id);
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.followingMembers followedMember " +
+            "LEFT JOIN FETCH followedMember.followingMember followingMember " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdWithFollowingMember(@Param("id") Long id);
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.blockingMembers blockedMember " +
+            "LEFT JOIN FETCH blockedMember.blockingMember blockingMember " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdWithBlockingMember(@Param("id") Long id);
+
     List<Member> findAllByAccountIdOrNickname(String accountId, String nickname);
 }

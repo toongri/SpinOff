@@ -1,8 +1,6 @@
 package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.member.FollowedMember;
-import com.nameless.spin_off.entity.movie.FollowedMovie;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -46,18 +44,18 @@ public class Hashtag extends BaseTimeEntity {
     private void addViewedHashtagByIp(String ip) {
         ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip);
 
-        updateViewCount();
+        updateViewScore();
         this.viewedHashtagByIps.add(viewedHashtagByIp);
         viewedHashtagByIp.updateHashtag(this);
     }
 
     public void addTaggedPosts(PostedHashtag postedHashtag) {
-        updatePostCount();
+        updatePostScore();
         this.taggedPosts.add(postedHashtag);
     }
 
     public void addFollowingMembers(FollowedHashtag followedHashtag) {
-        updateFollowCount();
+        updateFollowScore();
         this.followingMembers.add(followedHashtag);
     }
 
@@ -98,7 +96,7 @@ public class Hashtag extends BaseTimeEntity {
         }
     }
 
-    public void updateFollowCount() {
+    public void updateFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedHashtag followedHashtag ;
@@ -124,7 +122,7 @@ public class Hashtag extends BaseTimeEntity {
         updatePopularity();
     }
 
-    public void updateViewCount() {
+    public void updateViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedHashtagByIp viewedHashtagByIp ;
@@ -150,7 +148,7 @@ public class Hashtag extends BaseTimeEntity {
         updatePopularity();
     }
 
-    public void updatePostCount() {
+    public void updatePostScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         PostedHashtag postedHashtag ;

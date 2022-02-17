@@ -1,12 +1,14 @@
 package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -53,5 +55,19 @@ public class FollowedMember extends BaseTimeEntity {
     //==비즈니스 로직==//
 
     //==조회 로직==//
+    @Override
+    public int hashCode() {
+        return Objects.hash(member, followingMember);
+    }
 
+    @Override
+    public boolean equals(Object followedMember) {
+        if (followedMember instanceof FollowedMember) {
+            if (((FollowedMember) followedMember).getMember().equals(member)) {
+                return ((FollowedMember) followedMember).getFollowingMember().equals(followingMember);
+            }
+        }
+
+        return false;
+    }
 }

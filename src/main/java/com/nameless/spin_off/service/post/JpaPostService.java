@@ -41,7 +41,7 @@ public class JpaPostService implements PostService{
     @Transactional(readOnly = false)
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException {
+            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
 
         Member member = getMemberById(postVO.getMemberId());
 

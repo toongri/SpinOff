@@ -4,6 +4,7 @@ import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import lombok.*;
 
@@ -100,7 +101,7 @@ public class PostDto {
             return this;
         }
 
-        public Post build() throws AlreadyPostedHashtagException {
+        public Post build() throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException {
             return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, movie, publicOfPostStatus);
         }
     }

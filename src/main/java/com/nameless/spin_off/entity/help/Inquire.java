@@ -30,6 +30,7 @@ public class Inquire extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "inquire_public_status")
+    @NotNull
     private InquirePublicStatus inquirePublicStatus;
 
     //==연관관계 메소드==//

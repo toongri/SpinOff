@@ -2,7 +2,6 @@ package com.nameless.spin_off.entity.movie;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -48,19 +47,19 @@ public class Movie extends BaseTimeEntity {
     private void addViewedMovieByIp(String ip) {
         ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip);
 
-        updateViewCount();
+        updateViewScore();
         this.viewedMovieByIps.add(viewedMovieByIp);
         viewedMovieByIp.updateMovie(this);
     }
 
     public void addTaggedPosts(Post post) {
-        updatePostCount();
+        updatePostScore();
         this.taggedPosts.add(post);
         post.updateMovie(this);
     }
 
     public void addFollowingMembers(FollowedMovie followedMovie) {
-        updateFollowCount();
+        updateFollowScore();
         this.followingMembers.add(followedMovie);
     }
 
@@ -112,7 +111,7 @@ public class Movie extends BaseTimeEntity {
         }
     }
 
-    public void updateFollowCount() {
+    public void updateFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedMovie followedMovie ;
@@ -138,7 +137,7 @@ public class Movie extends BaseTimeEntity {
         updatePopularity();
     }
 
-    public void updateViewCount() {
+    public void updateViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedMovieByIp viewedMovieByIp ;
@@ -164,7 +163,7 @@ public class Movie extends BaseTimeEntity {
         updatePopularity();
     }
 
-    public void updatePostCount() {
+    public void updatePostScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         Post post ;
@@ -189,6 +188,7 @@ public class Movie extends BaseTimeEntity {
 
         updatePopularity();
     }
+
     //==조회 로직==//
     public Boolean isNotAlreadyIpView(String ip) {
 

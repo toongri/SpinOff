@@ -39,6 +39,7 @@ public class Collection extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
+    @NotNull
     private PublicOfCollectionStatus publicOfCollectionStatus;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

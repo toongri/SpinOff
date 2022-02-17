@@ -1,12 +1,15 @@
 package com.nameless.spin_off.entity.post;
 
+import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Entity
 @Getter
@@ -30,26 +33,38 @@ public class AuthorityOfPost extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static AuthorityOfPost createAuthorityOfPost(Post post, AuthorityOfPostStatus authorityOfPostStatus) {
+    public static AuthorityOfPost createAuthorityOfPost(AuthorityOfPostStatus authorityOfPostStatus) {
 
         AuthorityOfPost authorityOfPost = new AuthorityOfPost();
-        authorityOfPost.updatePost(post);
         authorityOfPost.updateAuthorityOfPostStatus(authorityOfPostStatus);
 
         return authorityOfPost;
 
     }
     //==수정 메소드==//
-    private void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
+    public void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
         this.authorityOfPostStatus = authorityOfPostStatus;
     }
 
-    private void updatePost(Post post) {
+    public void updatePost(Post post) {
         this.post = post;
     }
 
     //==비즈니스 로직==//
 
     //==조회 로직==//
+    @Override
+    public int hashCode() {
+        return Objects.hash(post, authorityOfPostStatus);
+    }
+    @Override
+    public boolean equals(Object authorityOfPost) {
+        if (authorityOfPost instanceof AuthorityOfPost) {
+            if ((((AuthorityOfPost) authorityOfPost).getPost().equals(post))) {
+                return ((AuthorityOfPost) authorityOfPost).getAuthorityOfPostStatus().equals(authorityOfPostStatus);
+            }
+        }
 
+        return false;
+    }
 }

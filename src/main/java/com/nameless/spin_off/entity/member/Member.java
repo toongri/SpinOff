@@ -3,19 +3,27 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
+import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.*;
+import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static com.nameless.spin_off.StaticVariable.*;
 
 @Entity
 @Getter
@@ -26,7 +34,9 @@ public class Member extends BaseTimeEntity {
     @Column(name="member_id")
     private Long id;
 
+    @NotNull
     private String accountId;
+    @NotNull
     private String accountPw;
     private String name;
     private String nickname;
@@ -36,38 +46,92 @@ public class Member extends BaseTimeEntity {
     private String profileImg;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<FollowedHashtag> followedHashtags = new ArrayList<>();
+    private Set<FollowedHashtag> followedHashtags = new HashSet<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<FollowedMovie> followedMovies = new ArrayList<>();
+    private Set<FollowedMovie> followedMovies = new HashSet<>();
 
     @OneToMany(mappedBy = "followingMember", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<FollowedMember> followedMembers = new ArrayList<>();
+    private Set<FollowedMember> followedMembers = new HashSet<>();
+
+    @OneToMany(mappedBy = "blockingMember", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<BlockedMember> blockedMembers = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private List<FollowedMember> followingMembers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private Set<BlockedMember> blockingMembers = new HashSet<>();
+
+    @OneToMany(mappedBy = "complainedMember", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private Set<Complain> complains = new HashSet<>();
+
+    private Long complainCount;
+    private Long blockCount;
+    private Double followScore;
+    private Double popularity;
 
     //==연관관계 메소드==//
 
-    public void addFollowedHashtag(Hashtag hashtag) {
+    public void addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
         FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(hashtag);
-
-        this.followedHashtags.add(followedHashtag);
         followedHashtag.updateMember(this);
+
+        if (!this.followedHashtags.add(followedHashtag)) {
+            throw new AlreadyFollowedHashtagException();
+        }
         hashtag.addFollowingMembers(followedHashtag);
     }
 
-    public void addFollowedMovie(Movie movie) {
+    public void addFollowedMovie(Movie movie) throws AlreadyFollowedMovieException {
         FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(movie);
-
-        this.followedMovies.add(followedMovie);
         followedMovie.updateMember(this);
+
+        if (!this.followedMovies.add(followedMovie)) {
+            throw new AlreadyFollowedMovieException();
+        }
         movie.addFollowingMembers(followedMovie);
     }
 
-    public void addFollowedMember(Member followedMember) {
+    public void addFollowedMember(Member followedMember) throws AlreadyFollowedMemberException {
         FollowedMember newFollowedMember = FollowedMember.createFollowedMember(followedMember);
-
-        this.followedMembers.add(newFollowedMember);
         newFollowedMember.updateFollowingMember(this);
+
+        if (!this.followedMembers.add(newFollowedMember)) {
+            throw new AlreadyFollowedMemberException();
+        }
+        followedMember.addFollowingMember(newFollowedMember);
     }
+
+    public void addBlockedMember(Member blockedMember, BlockedMemberStatus blockedMemberStatus) throws AlreadyBlockedMemberException {
+        BlockedMember newBlockedMember = BlockedMember.createBlockedMember(blockedMember, blockedMemberStatus);
+        newBlockedMember.updateBlockingMember(this);
+
+        if (!this.blockedMembers.add(newBlockedMember)) {
+            throw new AlreadyBlockedMemberException();
+        }
+        blockedMember.addBlockingMember(newBlockedMember);
+    }
+
+    public void addBlockingMember(BlockedMember blockingMember) {
+        blockingMembers.add(blockingMember);
+        updateBlockCount();
+    }
+
+    public void addFollowingMember(FollowedMember followingMember) {
+        updateFollowScore();
+        this.followingMembers.add(followingMember);
+    }
+
+    public void addComplain(Complain complain) throws AlreadyComplainException {
+        complain.updateComplainedMember(this);
+
+        if (!this.complains.add(complain)) {
+            throw new AlreadyComplainException();
+        }
+        updateBlockCount();
+    }
+
     //==생성 메소드==//
     public static Member createMember(String accountId, String accountPw, String nickname, String profileImg,
                                       String name, LocalDate birth, String phoneNumber, String email) {
@@ -81,6 +145,7 @@ public class Member extends BaseTimeEntity {
         member.updateEmail(email);
         member.updateNickname(nickname);
         member.updateProfileImg(profileImg);
+        member.updateCountToZero();
 
         return member;
     }
@@ -95,6 +160,7 @@ public class Member extends BaseTimeEntity {
         member.updateEmail(createMemberVO.getEmail());
         member.updateName(createMemberVO.getName());
         member.updateNickname(createMemberVO.getNickname());
+        member.updateCountToZero();
 
         if (createMemberVO.getProfileImg() != null) {
             member.updateProfileImg(createMemberVO.getProfileImg());
@@ -140,46 +206,58 @@ public class Member extends BaseTimeEntity {
         this.name = name;
     }
 
+    public void updatePopularity() {
+        this.popularity = complainCount + blockCount + followScore;
+    }
+
+    public void updateCountToZero() {
+        complainCount = 0L;
+        blockCount = 0L;
+        followScore = 0.0;
+        popularity = 0.0;
+    }
+
+    public void updateBlockCount() {
+        blockCount = (long)blockingMembers.size();
+        updatePopularity();
+    }
+
+    public void updateComplainCount() {
+        complainCount = (long)complains.size();
+        updatePopularity();
+    }
     //==비즈니스 로직==//
-    public void insertFollowedMemberByMember(Member member) throws AlreadyFollowedMemberException {
+    public void updateFollowScore() {
 
-        if (isNotAlreadyMemberFollowedMember(member)) {
-            addFollowedMember(member);
-        } else {
-            throw new AlreadyFollowedMemberException();
+        LocalDateTime currentTime = LocalDateTime.now();
+        FollowedMember followedMember ;
+        int j = 0, i = followingMembers.size() - 1;
+        double result = 0, total = 1 * MEMBER_FOLLOW_COUNT_SCORES.get(0);
+
+        while (i > -1) {
+            followedMember = followingMembers.get(i);
+            if (isInTimeFollowingMember(currentTime, followedMember, j)) {
+                result += 1;
+                i--;
+            } else {
+                if (j == MEMBER_FOLLOW_COUNT_SCORES.size() - 1) {
+                    break;
+                }
+                total += MEMBER_FOLLOW_COUNT_SCORES.get(j) * result;
+                result = 0;
+                j++;
+            }
         }
-    }
+        followScore = total + MEMBER_FOLLOW_COUNT_SCORES.get(j) * result;
 
-    public void insertFollowedMovieByMovie(Movie movie) throws AlreadyFollowedMovieException {
-
-        if (isNotAlreadyMemberFollowMovie(movie)) {
-            addFollowedMovie(movie);
-        } else {
-            throw new AlreadyFollowedMovieException();
-        }
-    }
-
-    public void insertFollowedHashtagByHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
-
-        if (isNotAlreadyMemberFollowHashtag(hashtag)) {
-            addFollowedHashtag(hashtag);
-        } else {
-            throw new AlreadyFollowedHashtagException();
-        }
+        updatePopularity();
     }
 
     //==조회 로직==//
-
-    public Boolean isNotAlreadyMemberFollowHashtag(Hashtag hashtag) {
-        return this.followedHashtags.stream()
-                .noneMatch(followedHashtag -> followedHashtag.getHashtag().equals(hashtag));
-    }
-
-    public Boolean isNotAlreadyMemberFollowMovie(Movie movie) {
-        return this.followedMovies.stream().noneMatch(followedMovie -> followedMovie.getMovie().equals(movie));
-    }
-
-    public Boolean isNotAlreadyMemberFollowedMember(Member member) {
-        return this.followedMembers.stream().noneMatch(followedMember -> followedMember.getMember().equals(member));
+    private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {
+        return ChronoUnit.DAYS
+                .between(followingMember.getCreatedDate(), currentTime) >= MEMBER_FOLLOW_COUNT_DAYS.get(j) &&
+                ChronoUnit.DAYS
+                        .between(followingMember.getCreatedDate(), currentTime) < MEMBER_FOLLOW_COUNT_DAYS.get(j + 1);
     }
 }

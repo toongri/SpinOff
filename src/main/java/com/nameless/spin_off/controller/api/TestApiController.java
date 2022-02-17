@@ -6,6 +6,7 @@ import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
+import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -51,7 +52,7 @@ public class TestApiController {
     }
 
     @PostMapping("/{id}/post")
-    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException {
+    public TestApiResult createPostOne(@RequestBody PostDto.CreatePostVO createPost) throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
 
         Long postId = postService.insertPostByPostVO(createPost);
 

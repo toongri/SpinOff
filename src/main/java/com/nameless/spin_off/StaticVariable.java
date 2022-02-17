@@ -45,6 +45,8 @@ public final class StaticVariable {
     public static final List<Long> HASHTAG_FOLLOW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
     public static final List<Double> HASHTAG_FOLLOW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
+    public static final List<Long> MEMBER_FOLLOW_COUNT_DAYS = List.of(0L, 7L, 14L, 21L, 28L);
+    public static final List<Double> MEMBER_FOLLOW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
     public static final Long POPULARITY_DATE_DURATION = 2L;
     public static final int COLLECTION_THUMBNAIL_NUMBER = 4;
