@@ -15,6 +15,7 @@ store.subscribe(() =>{
 
 const Search = ({setPopup, popup}) => {
   const inputRef = useRef('');
+  const divRef = useRef(undefined);
   const [query, setQuery] = useState('');
   const [hasMore, setHasMore] = useState(false);
   const [data, setData] = useState([]);
@@ -103,7 +104,7 @@ const Search = ({setPopup, popup}) => {
     
     <div className='wrapper'>
     <div className="input-container">
-     <div class = 'data-container'>
+     <div className = 'data-container'>
     <Button
      id="button-addon1"
      style={{
@@ -137,23 +138,22 @@ const Search = ({setPopup, popup}) => {
         }}
       onFocus = {() =>{
         setPopup(true);
-         document.body.style.backgroundColor = 'rgba(0, 0, 0, 0.34)';
-      
+        
       }}
       onBlur = {() =>{
         setPopup(false)
-        document.body.style.backgroundColor = '#fff';
       }
       }
     />
     
-    <select className = "select">
+    {/* <select className = "select">
       <option>ALL</option>
       <option>컬렉션</option>
       <option>큐레이터</option>
-      <option>도슨트</option>
+     
       <option>영화</option>
-    </select>
+    </select> */}
+
     </div>
   </div>
   {

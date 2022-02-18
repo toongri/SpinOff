@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import "./itemsDetail.scss";
 import { useNavigate, Link } from "react-router-dom";
 import {AiOutlineUser} from 'react-icons/ai';
@@ -6,6 +6,7 @@ import {BiLinkExternal} from 'react-icons/bi';
 import {FiMoreHorizontal} from 'react-icons/fi';
 
 const ItemsDetail = ({ item, key }) => {
+  const [collectionPopup, setCollectionPopup] = useState(false);
   let navigate = useNavigate();
 
   return (
@@ -13,7 +14,6 @@ const ItemsDetail = ({ item, key }) => {
     <div className="item">
  
       <div className="content">
-           <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
     
         <div className="content-overay">
 
@@ -29,34 +29,37 @@ const ItemsDetail = ({ item, key }) => {
             <button>저장</button>
           </div>
          </div>
+         {/* <Link to="/pin" style={{ textDecoration: 'none' }} state = {{imgUrl: item}}>
+          <div className="empty-box">
 
+          </div>
+         </Link> */}
          <div className="select-icons">
             <span className="store-icons">
-              <BiLinkExternal size= "26" color="#f24860"></BiLinkExternal>
+              <BiLinkExternal size= "23" color="#f24860"></BiLinkExternal>
             </span>
             <span className="more-icons">
-              <FiMoreHorizontal size= "26"color="#f24860"></FiMoreHorizontal>
+              <FiMoreHorizontal size= "23"color="#f24860"></FiMoreHorizontal>
             </span>
           </div>
+        
         </div>
          
         </div>
-        </Link>
-        <img src={item} className="content-image"/>
+       
+       
+          <img src={item} className="content-image"/>
         
         </div>
-        
-   
-    
-    <div className="movie-info">
+        <div className="movie-info">
       <p>파니 핑크와 아멜리에</p>
       <div className="user-container">
       <span className="user-img">< AiOutlineUser size= '25' color="red"/></span>
-      <span className="name">일금천</span>
+      <span className="user-name">일금천</span>
       </div>
     </div>
     </div>
-  
+   
     </>
   );
 };

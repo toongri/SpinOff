@@ -33,9 +33,7 @@ const Main = ({ alarmPopup, dmPopup }) => {
       <div className = "slide-container">
          <Slider {...settings}>
          <div>
-            
-               <img src="https://cdn.pixabay.com/photo/2021/10/16/05/43/love-6713977_960_720.jpg" alt="" /> 
-            
+            <img src="https://cdn.pixabay.com/photo/2021/10/16/05/43/love-6713977_960_720.jpg" alt="" /> 
           </div>
           <div>
           <img src="https://cdn.pixabay.com/photo/2018/09/30/10/21/woman-3713108_960_720.jpg" alt="" />
@@ -71,9 +69,9 @@ const Main = ({ alarmPopup, dmPopup }) => {
           </div>
         </div>
 
-        <div className = "container-masonry">
+        {/* <div className = "container-masonry"> */}
           <Masonry></Masonry>
-       </div>
+       {/* </div> */}
       </div>
       )
     

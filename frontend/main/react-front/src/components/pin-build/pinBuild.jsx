@@ -8,14 +8,13 @@ import { FiExternalLink } from "react-icons/fi";
 import { AiOutlineBook } from "react-icons/ai";
 import { BsFillArrowUpCircleFill } from "react-icons/bs";
 import axios from "axios";
-import FileUpload from './fileUpload.jsx';
 import {AiFillFolderAdd} from 'react-icons/ai'
 import {useNavigate} from 'react-router-dom'
-import PageReload from './pageReload';
+import Slider from 'react-slick';
 
-const PinBuild = () => {
+const PinBuild = ({open}) => {
   let navigate = useNavigate();
-
+  
   const [title, setTitle] = useState('');
   const [content, setContent] = useState("");
   const [files, setFiles] = useState('');
@@ -86,28 +85,55 @@ const PinBuild = () => {
     setContent(e.target.value);
   }
 
-  const renderCondition = formpage ? <PageReload setFormpage = {setFormpage} files = {files} saveFileImage = {saveFileImage}/> : <FileUpload saveFileImage = {saveFileImage} files = {files}/>;
+
 
   useEffect(() =>{
     
-  }, [renderCondition])
+  }, [])
 
   return (
     <div className="navbarContainer">
-      <Header></Header>
         <div className="pin_container">
           <div className="file-upload-container">
-           {renderCondition}
+         
+            {/* plus screen */}
+          {
+            fileImages && (
+            <div className = "fileImages-container">
+          {
+          files && (
+          <div className = "imageAdd-container">
+        
+            <div 
+            className = "imageAdd-btn" 
+            onClick = {() => setFormpage(true)}>
+                <AiFillFolderAdd size = "24"></AiFillFolderAdd>
+            </div>
           </div>
+          )
+        } 
+          {fileImages.map((data) => (
+            <div className = "data-container">
+              <img src = {data} />
+            </div>
+          ))}
+
+        </div>
+        )
+      }
+      </div>
           
           <div className="writing-info-container">
             <div className="writing-wrapper">
             <form className="form">
               <div className="form-group">
-                <div>
+                <div className="form-select-box">
                   <select>
-                    <option>테마이름</option>
+                    <option>컬렉션이름</option>
                   </select>
+                  <span className="btn-container">
+                    <button>저장</button>
+                  </span>
                 </div>
                 <input
                   type="text"
@@ -161,35 +187,14 @@ const PinBuild = () => {
             </div>
           </div>
         </div>
-        {/* plus screen */}
-      {
-        fileImages && (
-        <div className = "fileImages-container">
-        {
-          files && (
-          <div className = "imageAdd-container">
-            <div 
-            className = "imageAdd-btn" 
-            onClick = {() => setFormpage(true)}>
-                <AiFillFolderAdd size = "24"></AiFillFolderAdd>
-            </div>
-          </div>
-          )
-        } 
-          {fileImages.map((data) => (
-            <div className = "data-container">
-              <img src = {data} />
-            </div>
-          ))}
-        </div>
-        )
-      }
-        <div className = "complete-btn-container">
+      </div>
+
+      <div className = "complete-btn-container">
         <button 
           onClick={submit}
         className="complete-btn">작성 완료</button>
       </div>
-      </div>
+      
     </div>
     </div>
   );
