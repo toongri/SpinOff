@@ -1,6 +1,5 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -34,14 +33,15 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<Post> findPostsOrderByIdBySliced(Pageable pageable, Long memberId) {
+    public Slice<Post> findPostsOrderByIdBySliced(Pageable pageable, Member user, List<Member> blockedMembers) {
 
         List<Post> content = jpaQueryFactory
                 .select(post)
                 .from(post)
                 .join(post.member, member).fetchJoin()
                 .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
-                        memberIdNotEq(memberId))
+                        member.notIn(blockedMembers),
+                        memberNotEq(user))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())
@@ -63,8 +63,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Post> findPostsOrderByPopularityAfterLocalDateTimeSliced(
-            Pageable pageable, Long memberId) {
+    public Slice<Post> findPostsOrderByPopularityAfterLocalDateTimeSliced(Pageable pageable, Member user, List<Member> blockedMembers) {
 
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime startTime = now.minusDays(POPULARITY_DATE_DURATION);
@@ -75,7 +74,8 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member).fetchJoin()
                 .where(post.createdDate.between(startTime, now),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
-                        memberIdNotEq(memberId))
+                        member.notIn(blockedMembers),
+                        memberNotEq(user))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.popularity.desc())
@@ -92,7 +92,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
 
     @Override
     public Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(
-            Pageable pageable, Long memberId) {
+            Pageable pageable, Member user, List<Member> blockedMembers) {
 
         LocalDateTime now = LocalDateTime.now();
 
@@ -104,7 +104,8 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(collectedPost.post, post).fetchJoin()
                 .where(collection.collectedPosts.isNotEmpty(),
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC),
-                        memberIdNotEq(memberId))
+                        member.notIn(blockedMembers),
+                        memberNotEq(user))
                 .orderBy(collection.popularity.desc(), collectedPost.createdDate.desc())
                 .fetch();
 
@@ -124,13 +125,14 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers) {
+    public Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
 
         List<Post> content = jpaQueryFactory
                 .select(post)
                 .from(post)
                 .join(post.member, member).fetchJoin()
                 .where(member.in(followedMembers),
+                        member.notIn(blockedMembers),
                         post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -147,13 +149,14 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers) {
+    public Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
 
         List<Collection> content = jpaQueryFactory
                 .select(collection)
                 .from(collection)
                 .join(collection.member, member).fetchJoin()
                 .where(member.in(followedMembers),
+                        member.notIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -170,7 +173,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags) {
+    public Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags, List<Member> blockedMembers) {
 
         List<Post> posts = jpaQueryFactory
                 .select(post)
@@ -178,6 +181,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member).fetchJoin()
                 .join(post.postedHashtags, postedHashtag).fetchJoin()
                 .where(postedHashtag.hashtag.in(followedHashtags),
+                        member.notIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
                 .orderBy(post.id.desc())
                 .fetch();
@@ -196,7 +200,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Post> findPostsByFollowedMoviesOrderByIdSliced(Pageable pageable, List<Movie> followedMovies) {
+    public Slice<Post> findPostsByFollowedMoviesOrderByIdSliced(Pageable pageable, List<Movie> followedMovies, List<Member> blockedMembers) {
 
         List<Post> posts = jpaQueryFactory
                 .select(post)
@@ -204,6 +208,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member).fetchJoin()
                 .join(post.movie, movie).fetchJoin()
                 .where(movie.in(followedMovies),
+                        member.notIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
                 .orderBy(post.id.desc())
                 .fetch();
@@ -222,7 +227,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections) {
+    public Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections, List<Member> blockedMembers) {
 
         List<Collection> collects = jpaQueryFactory
                 .selectDistinct(collection)
@@ -231,6 +236,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(collection.collectedPosts, collectedPost).fetchJoin()
                 .join(collectedPost.post, post).fetchJoin()
                 .where(collection.collectedPosts.isNotEmpty(),
+                        member.notIn(blockedMembers),
                         collection.in(collections))
                 .orderBy(collection.popularity.desc(), collectedPost.createdDate.desc())
                 .fetch();
@@ -248,7 +254,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
         return new SliceImpl<>(content, pageable, hasNext);
     }
 
-    private BooleanExpression memberIdNotEq(Long memberId) {
-        return memberId != null ? member.id.ne(memberId) : null;
+    private BooleanExpression memberNotEq(Member user) {
+        return user != null ? member.ne(user) : null;
     }
 }

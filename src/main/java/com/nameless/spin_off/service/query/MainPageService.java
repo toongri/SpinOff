@@ -9,11 +9,11 @@ import org.springframework.data.domain.Slice;
 import java.time.LocalDateTime;
 
 public interface MainPageService {
-    Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId);
+    Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId) throws NotExistMemberException;
 
-    Slice<MainPagePostDto> getPostsOrderByPopularityBySlicingAfterLocalDateTime(Pageable pageable, Long memberId);
+    Slice<MainPagePostDto> getPostsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
 
-    Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(Pageable pageable, Long memberId);
+    Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
 
     Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
 
@@ -23,5 +23,5 @@ public interface MainPageService {
 
     Slice<MainPageCollectionDto> getCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
 
-    Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId);
+    Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
 }

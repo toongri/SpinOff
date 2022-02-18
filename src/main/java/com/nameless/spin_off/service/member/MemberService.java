@@ -12,9 +12,5 @@ public interface MemberService {
 
     Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId) throws NotExistMemberException, AlreadyFollowedMemberException;
 
-    Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException;
-
     Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
-
-    Long insertFollowedMovieByMovieId(Long memberId, Long movieId) throws NotExistMemberException, NotExistMovieException, AlreadyFollowedMovieException;
 }

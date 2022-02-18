@@ -24,7 +24,7 @@ public class PostApiController {
     private final PostService postService;
 
     @PostMapping("")
-    public PostApiResult<Long> createPostOne(@RequestBody CreatePostVO createPost) throws
+    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPost) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
 
         Long postId = postService.insertPostByPostVO(createPost);
@@ -33,7 +33,7 @@ public class PostApiController {
     }
 
     @PostMapping("/like")
-    public PostApiResult<Long> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
+    public PostApiResult<Long> createLikeOne(@RequestParam Long memberId, @RequestParam Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         Long resultId = postService.insertLikedPostByMemberId(memberId, postId);
@@ -42,7 +42,7 @@ public class PostApiController {
     }
 
     @PostMapping("/view")
-    public PostApiResult<Long> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
+    public PostApiResult<Long> createViewOne(@RequestParam String ip, @RequestParam Long postId)
             throws NotExistPostException {
 
         Long resultId = postService.insertViewedPostByIp(ip, postId);
@@ -51,8 +51,8 @@ public class PostApiController {
     }
 
     @PostMapping("/collections")
-    public PostApiResult<List<Long>> addPostInCollections(
-            @RequestBody Long memberId, @RequestBody Long postId, @RequestBody List<Long> collectionIds)
+    public PostApiResult<List<Long>> createCollectedAll(
+            @RequestParam Long memberId, @RequestParam Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 

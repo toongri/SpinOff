@@ -25,7 +25,7 @@ public class MainPageApiController {
     @GetMapping("/discovery/post/id")
     public MainPageResult<Slice<MainPagePostDto>> getMainPagePostsOrderById(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam(value = "memberId", required = false) Long memberId) {
+            @RequestParam(value = "memberId", required = false) Long memberId) throws NotExistMemberException {
 
         Slice<MainPagePostDto> slice = mainPageService.getPostsOrderById(PageRequest.of(page, size), memberId);
         return new MainPageResult<Slice<MainPagePostDto>>(slice);
@@ -34,13 +34,10 @@ public class MainPageApiController {
     @GetMapping("/discovery/post/popularity")
     public MainPageResult<Slice<MainPagePostDto>> getPostsOrderByPopularityBySlicingAfterLocalDateTime(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam(value = "id", required = false) Long memberId) {
-
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime startTime = currentTime.minusDays(POPULARITY_DATE_DURATION);
+            @RequestParam(value = "id", required = false) Long memberId) throws NotExistMemberException {
 
         Slice<MainPagePostDto> slice = mainPageService
-                .getPostsOrderByPopularityBySlicingAfterLocalDateTime(
+                .getPostsOrderByPopularityBySlicing(
                         PageRequest.of(page, size), memberId);
         return new MainPageResult<Slice<MainPagePostDto>>(slice);
     }
@@ -48,14 +45,10 @@ public class MainPageApiController {
     @GetMapping("/discovery/collection/popularity")
     public MainPageResult<Slice<MainPageCollectionDto>> getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
-            @RequestParam(value = "id", required = false) Long memberId) {
+            @RequestParam(value = "id", required = false) Long memberId) throws NotExistMemberException {
 
-        LocalDateTime currentTime = LocalDateTime.now();
-        LocalDateTime startTime = currentTime.minusDays(POPULARITY_DATE_DURATION);
-//        LocalDateTime startTime = LocalDateTime
-//                .of(2022, 2, 9, 21, 58, 25, 390);
         Slice<MainPageCollectionDto> slice = mainPageService
-                .getCollectionsOrderByPopularityBySlicingAfterLocalDateTime(
+                .getCollectionsOrderByPopularityBySlicing(
                         PageRequest.of(page, size), memberId);
         return new MainPageResult<Slice<MainPageCollectionDto>>(slice);
     }

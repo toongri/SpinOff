@@ -98,61 +98,6 @@ class JpaMemberServiceTest {
     }
 
     @Test
-    public void 멤버_팔로우_해시태그() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-        Hashtag hashtag = Hashtag.createHashtag("팔로우_해시태그");
-        Long hashtagId = hashtagRepository.save(hashtag).getId();
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스함수");
-        memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
-
-        System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(memberId);
-        Hashtag newHashtag = hashtagRepository.getById(hashtagId);
-        //then
-        assertThat(newMember.getId()).isEqualTo(memberId);
-        assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
-        assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
-        assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newHashtag.getFollowScore()).isEqualTo(HASHTAG_FOLLOW_COUNT_SCORES.get(0) * HASHTAG_SCORE_FOLLOW_RATES);
-    }
-
-    @Test
-    public void 멤버_팔로우_해시태그_예외처리() throws Exception{
-
-        //given
-
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-        Hashtag hashtag = Hashtag.createHashtag("팔로우_해시태그");
-        Long hashtagId = hashtagRepository.save(hashtag).getId();
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스함수");
-        Long aLong = memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
-
-        System.out.println("멤버함수");
-
-        //then
-        assertThatThrownBy(() -> memberService.insertFollowedHashtagByHashtagId(memberId, hashtagId))
-                .isInstanceOf(AlreadyFollowedHashtagException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedHashtagByHashtagId(0L, hashtagId))
-                .isInstanceOf(NotExistMemberException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedHashtagByHashtagId(memberId, 0L))
-                .isInstanceOf(NotExistHashtagException.class);
-    }
-
-    @Test
     public void 멤버_팔로우_멤버() throws Exception{
 
         //given
@@ -259,59 +204,5 @@ class JpaMemberServiceTest {
                 .isInstanceOf(NotExistMemberException.class);
     }
 
-    @Test
-    public void 멤버_팔로우_영화() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-        Movie movie = Movie.createMovie(0L, "abc", "d");
-        Long movieId = movieRepository.save(movie).getId();
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스함수");
-        memberService.insertFollowedMovieByMovieId(memberId, movieId);
-
-        System.out.println("멤버함수");
-        Member newMember = memberRepository.getById(memberId);
-        Movie newMovie = movieRepository.getById(movieId);
-
-        //then
-        assertThat(newMember.getId()).isEqualTo(memberId);
-        assertThat(newMember.getFollowedMovies().size()).isEqualTo(1);
-        assertThat(newMember.getFollowedMovies().iterator().next().getMovie().getId()).isEqualTo(movieId);
-        assertThat(newMovie.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newMovie.getFollowScore()).isEqualTo(MOVIE_FOLLOW_COUNT_SCORES.get(0) * MOVIE_SCORE_FOLLOW_RATES);
-    }
-
-    @Test
-    public void 멤버_팔로우_영화_예외처리() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-        Movie movie = Movie.createMovie(0L, "abc", "d");
-        Long movieId = movieRepository.save(movie).getId();
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스함수");
-        Long aLong = memberService.insertFollowedMovieByMovieId(memberId, movieId);
-
-        System.out.println("멤버함수");
-
-        //then
-        assertThatThrownBy(() -> memberService.insertFollowedMovieByMovieId(memberId, movieId))
-                .isInstanceOf(AlreadyFollowedMovieException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedMovieByMovieId(0L, movieId))
-                .isInstanceOf(NotExistMemberException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedMovieByMovieId(memberId, -1L))
-                .isInstanceOf(NotExistMovieException.class);
-    }
 
 }

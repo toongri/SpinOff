@@ -3,6 +3,7 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collections.FollowedCollection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.help.ComplainStatus;
@@ -61,6 +62,9 @@ public class Member extends BaseTimeEntity {
     private Set<BlockedMember> blockedMembers = new HashSet<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
+    private Set<FollowedCollection> followedCollections = new HashSet<>();
+
+    @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
     private List<FollowedMember> followingMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "member", fetch = FetchType.LAZY)
@@ -75,7 +79,6 @@ public class Member extends BaseTimeEntity {
     private Double popularity;
 
     //==연관관계 메소드==//
-
     public Long addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
         FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(hashtag);
         followedHashtag.updateMember(this);
@@ -131,7 +134,11 @@ public class Member extends BaseTimeEntity {
 
     public void addFollowingMember(FollowedMember followingMember) {
         updateFollowScore();
-        this.followingMembers.add(followingMember);
+        followingMembers.add(followingMember);
+    }
+
+    public void addFollowedCollection(FollowedCollection followedCollection) {
+        followedCollections.add(followedCollection);
     }
 
     public Long addComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) throws AlreadyComplainException {

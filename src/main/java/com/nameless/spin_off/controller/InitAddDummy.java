@@ -234,7 +234,7 @@ public class InitAddDummy {
                     Member byId = memberRepository.getById(member.getId());
                     if (byId.getFollowedMovies().stream()
                             .noneMatch(followedMovie -> followedMovie.getMovie().getId().equals(movies.get(i1).getId()))) {
-                        memberService.insertFollowedMovieByMovieId(member.getId(), movies.get(i1).getId());
+                        movieService.insertFollowedMovieByMovieId(member.getId(), movies.get(i1).getId());
                     }
                 }
 
@@ -246,7 +246,7 @@ public class InitAddDummy {
                     Member byId = memberRepository.getById(member.getId());
                     if (byId.getFollowedHashtags().stream()
                             .noneMatch(followedHashtag -> followedHashtag.getHashtag().equals(hashtags.get(i1)))) {
-                        memberService.insertFollowedHashtagByHashtagId(member.getId(), hashtags.get(i1).getId());
+                        hashtagService.insertFollowedHashtagByHashtagId(member.getId(), hashtags.get(i1).getId());
                     }
                 }
 

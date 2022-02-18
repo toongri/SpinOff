@@ -12,14 +12,21 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MainPageQueryRepository {
-    Slice<Post> findPostsOrderByIdBySliced(Pageable pageable, Long memberId);
+    Slice<Post> findPostsOrderByIdBySliced(
+            Pageable pageable, Member user, List<Member> blockedMembers);
     Slice<Post> findPostsOrderByPopularityAfterLocalDateTimeSliced(
-            Pageable pageable, Long memberId);
-    Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(Pageable pageable, Long memberId);
-    Slice<Post> findPostsByFollowingMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers);
-    Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers);
-    Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags);
-    Slice<Post> findPostsByFollowedMoviesOrderByIdSliced(Pageable pageable, List<Movie> followedMovies);
-    Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections);
+            Pageable pageable, Member user, List<Member> blockedMembers);
+    Slice<Collection> findCollectionsOrderByPopularityAfterLocalDateTimeSliced(
+            Pageable pageable, Member user, List<Member> blockedMembers);
+    Slice<Post> findPostsByFollowingMemberOrderByIdSliced(
+            Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers);
+    Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(
+            Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers);
+    Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(
+            Pageable pageable, List<Hashtag> followedHashtags, List<Member> blockedMembers);
+    Slice<Post> findPostsByFollowedMoviesOrderByIdSliced(
+            Pageable pageable, List<Movie> followedMovies, List<Member> blockedMembers);
+    Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(
+            Pageable pageable, List<Collection> collections, List<Member> blockedMembers);
 
 }

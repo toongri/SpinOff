@@ -99,6 +99,7 @@ public class Collection extends BaseTimeEntity {
 
         this.updateFollowScore();
         this.followedCollections.add(followedCollection);
+        member.addFollowedCollection(followedCollection);
         followedCollection.updateCollections(this);
         return followedCollection.getId();
     }

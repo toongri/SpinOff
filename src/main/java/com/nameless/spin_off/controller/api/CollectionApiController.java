@@ -7,10 +7,7 @@ import com.nameless.spin_off.service.collection.CollectionService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -32,7 +29,7 @@ public class CollectionApiController {
     }
 
     @PostMapping("/like")
-    public CollectionApiResult<Long> createLikeOne(@RequestBody Long memberId, @RequestBody Long postId)
+    public CollectionApiResult<Long> createLikeOne(@RequestParam Long memberId, @RequestParam Long postId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
@@ -42,7 +39,7 @@ public class CollectionApiController {
     }
 
     @PostMapping("/view")
-    public CollectionApiResult<Long> viewPostByIp(@RequestBody String ip, @RequestBody Long postId)
+    public CollectionApiResult<Long> createViewOne(@RequestParam String ip, @RequestParam Long postId)
             throws NotExistCollectionException {
 
         Long collectionId = collectionService
@@ -52,7 +49,7 @@ public class CollectionApiController {
     }
 
     @PostMapping("/follow")
-    public CollectionApiResult<Long> createFollowOne(@RequestBody Long memberId, @RequestBody Long postId)
+    public CollectionApiResult<Long> createFollowOne(@RequestParam Long memberId, @RequestParam Long postId)
             throws NotExistMemberException, AlreadyFollowedCollectionException, NotExistCollectionException, CantFollowOwnCollectionException {
 
         Long collectionId = collectionService.insertFollowedCollectionByMemberId(memberId, postId);

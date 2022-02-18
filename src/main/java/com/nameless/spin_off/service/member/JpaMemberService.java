@@ -61,31 +61,11 @@ public class JpaMemberService implements MemberService {
     }
 
     @Override
-    public Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws
-            NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException {
-
-        Member member = getMemberByIdWithHashtag(memberId);
-        Hashtag hashtag = getHashtagByIdWithFollowingMember(hashtagId);
-
-        return member.addFollowedHashtag(hashtag);
-    }
-
-    @Override
     public Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException {
         Member member = getMemberByIdWithBlockedMember(memberId);
         Member blockedMember = getMemberByIdWithBlockingMember(blockedMemberId);
 
         return member.addBlockedMember(blockedMember, blockedMemberStatus);
-    }
-
-    @Override
-    public Long insertFollowedMovieByMovieId(Long memberId, Long movieId) throws
-            NotExistMemberException, NotExistMovieException,
-            AlreadyFollowedMovieException {
-
-        Member member = getMemberByIdWithFollowedMovie(memberId);
-        Movie movie = getMovieByIdWithFollowingMember(movieId);
-        return member.addFollowedMovie(movie);
     }
 
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {
@@ -100,18 +80,6 @@ public class JpaMemberService implements MemberService {
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Hashtag getHashtagByIdWithFollowingMember(Long hashtagId) throws NotExistHashtagException {
-        Optional<Hashtag> optionalHashtag = hashtagRepository.findOneByIdWithFollowingMember(hashtagId);
-
-        return optionalHashtag.orElseThrow(NotExistHashtagException::new);
-    }
-
-    private Movie getMovieByIdWithFollowingMember(Long movieId) throws NotExistMovieException {
-        Optional<Movie> optionalMovie = movieRepository.findOneByIdWithFollowingMember(movieId);
-
-        return optionalMovie.orElseThrow(NotExistMovieException::new);
-    }
-
     private Member getMemberByIdWithFollowedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMember(memberId);
 
@@ -120,18 +88,6 @@ public class JpaMemberService implements MemberService {
 
     private Member getMemberByIdWithBlockedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithFollowedMovie(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMovie(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithHashtag(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedHashtag(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }

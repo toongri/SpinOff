@@ -8,7 +8,6 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -17,7 +16,6 @@ import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collections.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
-import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -38,7 +36,6 @@ import javax.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Profile("dummy")
 @Component
@@ -66,7 +63,6 @@ public class InitDummy {
         private final CommentInPostService commentInPostService;
         private final CommentInCollectionRepository commentInCollectionRepository;
         private final CommentInPostRepository commentInPostRepository;
-        private final FollowedMemberRepository followedMemberRepository;
         private final MovieRepository movieRepository;
         private final MemberService memberService;
         private final MovieService movieService;
@@ -83,7 +79,6 @@ public class InitDummy {
             List<Member> members = new ArrayList<>();
             List<Post> posts = new ArrayList<>();
             List<Collection> collections = new ArrayList<>();
-            List<FollowedMember> followedMembers = new ArrayList<>();
             List<CommentInPost> commentInPosts = new ArrayList<>();
             List<CommentInCollection> commentInCollections = new ArrayList<>();
             List<CommentInPost> childCommentInPosts = new ArrayList<>();
@@ -165,8 +160,6 @@ public class InitDummy {
                 Long aLong = memberService.insertMemberByMemberVO(createMemberVO);
                 members.add(memberRepository.getById(aLong));
             }
-            int memberSize = members.size();
-
 
             //글 생성
             List<CreateCollectionVO> createCollectionVOs = new ArrayList<>();
@@ -303,7 +296,7 @@ public class InitDummy {
                     Member byId = memberRepository.getById(member.getId());
                     if (byId.getFollowedMovies().stream()
                             .noneMatch(followedMovie -> followedMovie.getMovie().getId().equals(movies.get(i1).getId()))) {
-                        memberService.insertFollowedMovieByMovieId(member.getId(), movies.get(i1).getId());
+                        movieService.insertFollowedMovieByMovieId(member.getId(), movies.get(i1).getId());
                     }
                 }
 
@@ -316,7 +309,7 @@ public class InitDummy {
                     Member byId = memberRepository.getById(member.getId());
                     if (byId.getFollowedHashtags().stream()
                             .noneMatch(followedHashtag -> followedHashtag.getHashtag().equals(hashtags.get(i1)))) {
-                        memberService.insertFollowedHashtagByHashtagId(member.getId(), hashtags.get(i1).getId());
+                        hashtagService.insertFollowedHashtagByHashtagId(member.getId(), hashtags.get(i1).getId());
                     }
                 }
 

@@ -41,10 +41,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdWithComment(@Param("id") Long id);
 
-    @Query("SELECT followedCollection.collection FROM FollowedCollection followedCollection " +
-            "WHERE followedCollection.member.id = :id")
-    List<Collection> findAllByFollowingMemberId(@Param("id") Long id);
-
     @Query("SELECT DISTINCT collect FROM Collection collect " +
             "LEFT JOIN FETCH collect.collectedPosts collectPost " +
             "LEFT JOIN FETCH collectPost.post post " +
@@ -56,4 +52,5 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "LEFT JOIN FETCH m.complains complain " +
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdWithComplainOfMember(@Param("id") Long id);
+
 }
