@@ -6,6 +6,7 @@ import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.FollowedCollection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.member.BlockedMember;
+import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.member.Member;
@@ -48,7 +49,9 @@ public class JpaMainPageService implements MainPageService{
             blockedMembers = new ArrayList<>();
         } else {
             member = optionalMember.get();
-            blockedMembers = member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+            blockedMembers = member.getBlockedMembers().stream()
+                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.ALL))
+                    .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
         Slice<Post> postSlice = mainPageQueryRepository.findPostsOrderByIdBySliced(pageable, member, blockedMembers);
@@ -69,7 +72,9 @@ public class JpaMainPageService implements MainPageService{
             blockedMembers = new ArrayList<>();
         } else {
             member = optionalMember.get();
-            blockedMembers = member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+            blockedMembers = member.getBlockedMembers().stream()
+                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.ALL))
+                    .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
 
@@ -92,7 +97,9 @@ public class JpaMainPageService implements MainPageService{
             blockedMembers = new ArrayList<>();
         } else {
             member = optionalMember.get();
-            blockedMembers = member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+            blockedMembers = member.getBlockedMembers().stream()
+                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.ALL))
+                    .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
         Slice<Collection> collectionSlice = mainPageQueryRepository
@@ -108,8 +115,9 @@ public class JpaMainPageService implements MainPageService{
 
         List<Hashtag> hashtags =
                 member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
-        List<Member> blockedMembers =
-                member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+        List<Member> blockedMembers = member.getBlockedMembers().stream()
+                        .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.ALL))
+                        .map(BlockedMember::getMember).collect(Collectors.toList());
 
         Slice<Post> postsSlice = mainPageQueryRepository
                 .findPostsByFollowedHashtagsOrderByIdSliced(pageable, hashtags, blockedMembers);

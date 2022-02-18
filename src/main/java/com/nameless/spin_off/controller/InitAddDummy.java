@@ -10,6 +10,7 @@ import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -188,7 +189,7 @@ public class InitAddDummy {
             for (Member member : members) {
 
                 //멤버 팔로우
-                int randomI = (int) (Math.random() * members.size() / 4);
+                int randomI = (int) (Math.random() * members.size() / 8);
 
                 for (int i = 0; i < randomI; i++) {
 
@@ -203,8 +204,24 @@ public class InitAddDummy {
                     }
                 }
 
+                randomI = (int) (Math.random() * members.size() / 32);
+
+                for (int i = 0; i < randomI; i++) {
+
+                    int i1 = (int) (Math.random() * members.size());
+                    while (members.get(i1).equals(member))
+                        i1 = (int) (Math.random() * members.size());
+
+                    Member byId = memberRepository.getById(member.getId());
+                    Member df = members.get(i1);
+                    if (byId.getBlockedMembers().stream()
+                            .noneMatch(blockedMember -> blockedMember.getMember().equals(df))) {
+                        memberService.insertBlockedMemberByMemberId(member.getId(), df.getId(), BlockedMemberStatus.ALL);
+                    }
+                }
+
                 //컬렉션 팔로우
-                randomI = (int) (Math.random() * collections.size() / 4);
+                randomI = (int) (Math.random() * collections.size() / 8);
 
                 for (int i = 0; i < randomI; i++) {
 
@@ -226,7 +243,7 @@ public class InitAddDummy {
                 }
 
                 //영화 팔로우
-                randomI = (int) (Math.random() * 10);
+                randomI = (int) (Math.random() * 3);
 
                 for (int i = 0; i < randomI; i++) {
                     int i1 = (int) (Math.random() * movieSize);
