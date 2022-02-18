@@ -19,7 +19,6 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
     @Query("SELECT hashtag FROM Hashtag hashtag " +
             "LEFT JOIN FETCH hashtag.followingMembers followingMember " +
-            "LEFT JOIN FETCH followingMember.member m " +
             "WHERE hashtag.id = :id")
     Optional<Hashtag> findOneByIdWithFollowingMember(@Param("id") Long id);
 

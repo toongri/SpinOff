@@ -30,16 +30,16 @@ public class JpaComplainService implements ComplainService{
     public Long insertComplain(Long memberId, Long postId, Long collectionId, ComplainStatus complainStatus) throws NotExistMemberException, NotExistPostException, AlreadyComplainException, NotExistCollectionException {
         Member member = getMember(memberId);
 
-        Post post = getPost(postId);
+        Post post = getPostByIdWithComplainOfMember(postId);
 
-        Collection collection = getCollection(collectionId);
+        Collection collection = getCollectionByIdWithComplainOfMember(collectionId);
 
         Member contentOwnMember = getMemberByPostOrCollection(post, collection);
 
         return contentOwnMember.addComplain(member, post, collection, complainStatus);
     }
 
-    private Post getPost(Long postId) throws NotExistPostException {
+    private Post getPostByIdWithComplainOfMember(Long postId) throws NotExistPostException {
         if (postId == null) {
             return null;
         }
@@ -47,7 +47,7 @@ public class JpaComplainService implements ComplainService{
         return optionalPost.orElseThrow(NotExistPostException::new);
     }
 
-    private Collection getCollection(Long collectionId) throws NotExistCollectionException {
+    private Collection getCollectionByIdWithComplainOfMember(Long collectionId) throws NotExistCollectionException {
         if (collectionId == null) {
             return null;
         }

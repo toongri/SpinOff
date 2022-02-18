@@ -57,11 +57,18 @@ class CommentInCollectionRepositoryTest {
         collection.addCommentInCollection(childComment1);
         em.flush();
         collection.addCommentInCollection(childComment2);
+        em.flush();
+        em.clear();
 
         //when
+        System.out.println("레포지토리함수");
         List<CommentInCollection> list = commentInCollectionRepository
                 .findParentsByCollectionIdWithChildren(collection);
 
+        System.out.println("컬렉션");
+        collection = collectionRepository.getById(collection.getId());
+        System.out.println("멤버");
+        member = memberRepository.getById(member.getId());
         //then
         for (CommentInCollection comment : list) {
             assertThat(comment.getParent()).isNull();

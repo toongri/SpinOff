@@ -13,13 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
-    List<Collection> findAllByIdIn(List<Long> ids);
     List<Collection> findAllByMember(Member member);
-
-    @Query("SELECT DISTINCT collection FROM Collection collection " +
-            "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
-            "LEFT JOIN FETCH collectedposts.post post")
-    List<Collection> findAllWithPost();
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
@@ -41,12 +35,6 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "LEFT JOIN FETCH collection.viewedCollectionByIps viewedCollectionByIp " +
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdWithViewedByIp(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT collection FROM Collection collection " +
-            "LEFT JOIN FETCH collection.collectedPosts collectedposts " +
-            "LEFT JOIN FETCH collectedposts.post post " +
-            "WHERE collection.id = :id")
-    Optional<Collection> findOneByIdWithPost(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.commentInCollections comment " +

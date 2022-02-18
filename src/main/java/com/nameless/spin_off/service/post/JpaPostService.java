@@ -92,7 +92,7 @@ public class JpaPostService implements PostService{
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
-        Post post = getPost(postId);
+        Post post = getPostWithCollectedPost(postId);
         List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
 
         return post.insertCollectedPostByCollections(collections);
@@ -108,8 +108,8 @@ public class JpaPostService implements PostService{
         return collections;
     }
 
-    private Post getPost(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdWithCollection(postId);
+    private Post getPostWithCollectedPost(Long postId) throws NotExistPostException {
+        Optional<Post> optionalPost = postRepository.findOneByIdWithCollectedPost(postId);
         return optionalPost.orElseThrow(NotExistPostException::new);
     }
 

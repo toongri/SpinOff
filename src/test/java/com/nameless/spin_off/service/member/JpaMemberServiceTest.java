@@ -121,7 +121,7 @@ class JpaMemberServiceTest {
         assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
         assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
         assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newHashtag.getFollowScore()).isEqualTo(HASHTAG_FOLLOW_COUNT_SCORES.get(0));
+        assertThat(newHashtag.getFollowScore()).isEqualTo(HASHTAG_FOLLOW_COUNT_SCORES.get(0) * HASHTAG_SCORE_FOLLOW_RATES);
     }
 
     @Test
@@ -284,7 +284,7 @@ class JpaMemberServiceTest {
         assertThat(newMember.getFollowedMovies().size()).isEqualTo(1);
         assertThat(newMember.getFollowedMovies().iterator().next().getMovie().getId()).isEqualTo(movieId);
         assertThat(newMovie.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newMovie.getFollowScore()).isEqualTo(MOVIE_FOLLOW_COUNT_SCORES.get(0));
+        assertThat(newMovie.getFollowScore()).isEqualTo(MOVIE_FOLLOW_COUNT_SCORES.get(0) * MOVIE_SCORE_FOLLOW_RATES);
     }
 
     @Test

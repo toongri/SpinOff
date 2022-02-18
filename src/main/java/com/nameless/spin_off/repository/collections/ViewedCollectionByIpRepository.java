@@ -10,6 +10,4 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface ViewedCollectionByIpRepository extends JpaRepository<ViewedCollectionByIp, Long> {
-    Optional<ViewedCollectionByIp> findOneByCreatedDateBetweenAndIpAndCollection(
-            LocalDateTime startDate, LocalDateTime endDate, String ip, Collection collection);
 }

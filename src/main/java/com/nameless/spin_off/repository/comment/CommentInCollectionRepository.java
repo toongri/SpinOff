@@ -13,7 +13,8 @@ import java.util.Optional;
 
 public interface CommentInCollectionRepository extends JpaRepository<CommentInCollection, Long> {
 
-    @Query("SELECT DISTINCT parent FROM CommentInCollection parent LEFT JOIN FETCH parent.children children " +
+    @Query("SELECT DISTINCT parent FROM CommentInCollection parent " +
+            "LEFT JOIN FETCH parent.children children " +
             "WHERE parent.parent IS NULL AND parent.collection = :collection")
     List<CommentInCollection> findParentsByCollectionIdWithChildren(
             @Param("collection") Collection collection);
@@ -24,7 +25,6 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
 
     @Query("SELECT DISTINCT comment FROM CommentInCollection comment " +
             "LEFT JOIN FETCH comment.likedCommentInCollections likedComment " +
-            "LEFT JOIN FETCH likedComment.member m " +
             "WHERE comment.id = :id")
     Optional<CommentInCollection> findOneByIdWithLikedComment(@Param("id") Long id);
 }

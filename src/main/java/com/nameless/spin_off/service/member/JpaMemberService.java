@@ -14,7 +14,6 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.aop.scope.ScopedProxyUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,9 +83,8 @@ public class JpaMemberService implements MemberService {
             NotExistMemberException, NotExistMovieException,
             AlreadyFollowedMovieException {
 
-        Member member = getMemberByIdWithMovie(memberId);
+        Member member = getMemberByIdWithFollowedMovie(memberId);
         Movie movie = getMovieByIdWithFollowingMember(movieId);
-
         return member.addFollowedMovie(movie);
     }
 
@@ -126,14 +124,14 @@ public class JpaMemberService implements MemberService {
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
-    private Member getMemberByIdWithMovie(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithMovie(memberId);
+    private Member getMemberByIdWithFollowedMovie(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMovie(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdWithHashtag(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithHashtag(memberId);
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedHashtag(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }

@@ -63,7 +63,7 @@ public class JpaMainPageService implements MainPageService{
     @Override
     public Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
-        Member member = getMemberByIdIncludeHashtags(memberId);
+        Member member = getMemberByIdWithFollowedHashtags(memberId);
 
         List<Hashtag> hashtags =
                 member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
@@ -119,14 +119,14 @@ public class JpaMainPageService implements MainPageService{
 
     }
 
-    private Member getMemberByIdIncludeHashtags(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithHashtag(memberId);
+    private Member getMemberByIdWithFollowedHashtags(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedHashtag(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdIncludeMovie(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithMovie(memberId);
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMovie(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }
