@@ -22,7 +22,7 @@ public class JpaCollectionService implements CollectionService {
     private final CollectionRepository collectionRepository;
 
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotExistMemberException {
 
@@ -32,7 +32,7 @@ public class JpaCollectionService implements CollectionService {
         return collectionRepository.save(collection).getId();
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
@@ -43,7 +43,7 @@ public class JpaCollectionService implements CollectionService {
         return collection.insertLikedCollectionByMember(member);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertViewedCollectionByIp(String ip, Long collectionId)
             throws NotExistCollectionException {
@@ -53,7 +53,7 @@ public class JpaCollectionService implements CollectionService {
         return collection.insertViewedCollectionByIp(ip);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException {

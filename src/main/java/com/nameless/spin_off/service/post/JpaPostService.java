@@ -38,7 +38,7 @@ public class JpaPostService implements PostService{
     private final HashtagRepository hashtagRepository;
     private final CollectionRepository collectionRepository;
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
             throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
@@ -66,7 +66,7 @@ public class JpaPostService implements PostService{
         return postRepository.save(post).getId();
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
@@ -77,7 +77,7 @@ public class JpaPostService implements PostService{
         return post.insertLikedPostByMember(member);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
 
@@ -86,7 +86,7 @@ public class JpaPostService implements PostService{
         return post.insertViewedPostByIp(ip);
     }
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotMatchCollectionException,

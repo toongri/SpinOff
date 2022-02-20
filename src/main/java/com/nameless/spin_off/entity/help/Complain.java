@@ -47,10 +47,11 @@ public class Complain extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Complain createComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) {
+    public static Complain createComplain(Member member, Member complainedMember, Post post, Collection collection, ComplainStatus complainStatus) {
 
         Complain complain = new Complain();
         complain.updateMember(member);
+        complain.updateComplainedMember(complainedMember);
         complain.updatePost(post);
         complain.updateCollection(collection);
         complain.updateComplainStatus(complainStatus);

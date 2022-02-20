@@ -30,7 +30,7 @@ public class JpaMemberService implements MemberService {
     private final HashtagRepository hashtagRepository;
     private final MovieRepository movieRepository;
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertMemberByMemberVO(CreateMemberVO memberVO) throws AlreadyAccountIdException, AlreadyNicknameException {
 
@@ -50,6 +50,7 @@ public class JpaMemberService implements MemberService {
         }
     }
 
+    @Transactional()
     @Override
     public Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
             throws NotExistMemberException, AlreadyFollowedMemberException {
@@ -60,6 +61,7 @@ public class JpaMemberService implements MemberService {
         return member.addFollowedMember(followedMember);
     }
 
+    @Transactional()
     @Override
     public Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException {
         Member member = getMemberByIdWithBlockedMember(memberId);

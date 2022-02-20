@@ -4,6 +4,7 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,6 +14,24 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public class MemberDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class RelatedSearchMemberDto {
+        private Long id;
+        private String profileImg;
+        private String nickname;
+        private String accountId;
+
+        @QueryProjection
+        public RelatedSearchMemberDto(Long id, String profileImg, String nickname, String accountId) {
+            this.id = id;
+            this.profileImg = profileImg;
+            this.nickname = nickname;
+            this.accountId = accountId;
+        }
+    }
+
 
     @Data
     @AllArgsConstructor

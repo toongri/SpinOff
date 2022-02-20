@@ -25,28 +25,23 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE followedMember.followingMember.id = :id")
     List<Member> findAllByFollowingMemberId(@Param("id") Long id);
 
-
-    @Query("SELECT followedMember.followingMember FROM FollowedMember followedMember " +
-            "WHERE followedMember.member.id = :id")
-    List<Member> findAllByFollowedMemberId(@Param("id") Long id);
-
-    @Query("SELECT m FROM Member m " +
+    @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedMembers followedMember " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowedMember(@Param("id") Long id);
 
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.blockedMembers blockingMember " +
+    @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithBlockedMember(@Param("id") Long id);
 
-    @Query("SELECT m FROM Member m " +
+    @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followingMembers followingMember " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowingMember(@Param("id") Long id);
 
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.blockingMembers blockedMember " +
+    @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.blockingMembers blockingMember " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithBlockingMember(@Param("id") Long id);
 
@@ -75,4 +70,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOneByIdWithFollowedCollectionAndBlockedMember(@Param("id") Long id);
 
     List<Member> findAllByAccountIdOrNickname(String accountId, String nickname);
+
+    @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.searches " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdWithSearch(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.searches search " +
+            "WHERE m.id = :id " +
+            "ORDER BY search.id DESC")
+    Optional<Member> findOneByIdWithSearchOrderBySearches(@Param("id") Long id);
 }

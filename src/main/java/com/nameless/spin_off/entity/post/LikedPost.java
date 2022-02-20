@@ -32,9 +32,10 @@ public class LikedPost extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static LikedPost createLikedPost(Member member) {
+    public static LikedPost createLikedPost(Member member, Post post) {
         LikedPost likedPost = new LikedPost();
         likedPost.updateMember(member);
+        likedPost.updatePost(post);
 
         return likedPost;
 

@@ -69,11 +69,10 @@ public class Collection extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     private Long addViewedCollectionByIp(String ip) {
-        ViewedCollectionByIp viewedCollectionByIp = ViewedCollectionByIp.createViewedCollectionByIp(ip);
+        ViewedCollectionByIp viewedCollectionByIp = ViewedCollectionByIp.createViewedCollectionByIp(ip, this);
 
         updateViewScore();
         this.viewedCollectionByIps.add(viewedCollectionByIp);
-        viewedCollectionByIp.updateCollections(this);
         return viewedCollectionByIp.getId();
     }
 
@@ -85,22 +84,20 @@ public class Collection extends BaseTimeEntity {
     }
 
     private Long addLikedCollectionByMember(Member member) {
-        LikedCollection likedCollection = LikedCollection.createLikedCollection(member);
+        LikedCollection likedCollection = LikedCollection.createLikedCollection(member, this);
 
         this.updateLikeScore();
         this.likedCollections.add(likedCollection);
-        likedCollection.updateCollections(this);
 
         return likedCollection.getId();
     }
 
     private Long addFollowedCollectionByMember(Member member) {
-        FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member);
+        FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member, this);
 
         this.updateFollowScore();
         this.followedCollections.add(followedCollection);
         member.addFollowedCollection(followedCollection);
-        followedCollection.updateCollections(this);
         return followedCollection.getId();
     }
 

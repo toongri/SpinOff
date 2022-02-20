@@ -34,9 +34,10 @@ public class FollowedHashtag extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedHashtag createFollowedHashtag(Hashtag hashtag) {
+    public static FollowedHashtag createFollowedHashtag(Member member, Hashtag hashtag) {
 
         FollowedHashtag followedHashtag = new FollowedHashtag();
+        followedHashtag.updateMember(member);
         followedHashtag.updateHashtag(hashtag);
 
         return followedHashtag;

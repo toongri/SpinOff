@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.*;
 
@@ -73,6 +74,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "complainedMember", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<Complain> complains = new HashSet<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<SearchedByMember> searches = new ArrayList<>();
+
     private Long complainCount;
     private Long blockCount;
     private Double followScore;
@@ -80,8 +84,7 @@ public class Member extends BaseTimeEntity {
 
     //==연관관계 메소드==//
     public Long addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
-        FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(hashtag);
-        followedHashtag.updateMember(this);
+        FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(this, hashtag);
 
         if (!this.followedHashtags.add(followedHashtag)) {
             throw new AlreadyFollowedHashtagException();
@@ -92,8 +95,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public Long addFollowedMovie(Movie movie) throws AlreadyFollowedMovieException {
-        FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(movie);
-        followedMovie.updateMember(this);
+        FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(this, movie);
 
         if (!this.followedMovies.add(followedMovie)) {
             throw new AlreadyFollowedMovieException();
@@ -104,8 +106,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public Long addFollowedMember(Member followedMember) throws AlreadyFollowedMemberException {
-        FollowedMember newFollowedMember = FollowedMember.createFollowedMember(followedMember);
-        newFollowedMember.updateFollowingMember(this);
+        FollowedMember newFollowedMember = FollowedMember.createFollowedMember(this, followedMember);
 
         if (!this.followedMembers.add(newFollowedMember)) {
             throw new AlreadyFollowedMemberException();
@@ -116,8 +117,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public Long addBlockedMember(Member blockedMember, BlockedMemberStatus blockedMemberStatus) throws AlreadyBlockedMemberException {
-        BlockedMember newBlockedMember = BlockedMember.createBlockedMember(blockedMember, blockedMemberStatus);
-        newBlockedMember.updateBlockingMember(this);
+        BlockedMember newBlockedMember = BlockedMember.createBlockedMember(this, blockedMember, blockedMemberStatus);
 
         if (!this.blockedMembers.add(newBlockedMember)) {
             throw new AlreadyBlockedMemberException();
@@ -142,9 +142,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public Long addComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) throws AlreadyComplainException {
-        Complain complain = Complain.createComplain(member, post, collection, complainStatus);
-
-        complain.updateComplainedMember(this);
+        Complain complain = Complain.createComplain(member, this, post, collection, complainStatus);
 
         if (!this.complains.add(complain)) {
             throw new AlreadyComplainException();
@@ -152,6 +150,14 @@ public class Member extends BaseTimeEntity {
         updateComplainCount();
 
         return complain.getId();
+    }
+
+    public Long addSearch(String search, SearchedByMemberStatus searchedByMemberStatus) {
+        SearchedByMember searchedByMember = SearchedByMember.createMemberSearch(this, search, searchedByMemberStatus);
+
+        searches.add(searchedByMember);
+
+        return searchedByMember.getId();
     }
 
     //==생성 메소드==//
@@ -276,6 +282,10 @@ public class Member extends BaseTimeEntity {
     }
 
     //==조회 로직==//
+    public List<SearchedByMember> getLastSearches() {
+        return searches.stream().limit(5).collect(Collectors.toList());
+    }
+
     private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {
         return ChronoUnit.DAYS
                 .between(followingMember.getCreatedDate(), currentTime) >= MEMBER_FOLLOW_COUNT_DAYS.get(j) &&

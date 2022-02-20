@@ -32,8 +32,8 @@ public class SearchedByMember extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static SearchedByMember createMemberSearch(Member member, String content,
-                                                      SearchedByMemberStatus searchedByMemberStatus) {
+    public static SearchedByMember createMemberSearch(
+            Member member, String content, SearchedByMemberStatus searchedByMemberStatus) {
 
         SearchedByMember searchedByMember = new SearchedByMember();
         searchedByMember.updateMember(member);
@@ -46,15 +46,15 @@ public class SearchedByMember extends BaseTimeEntity {
 
     //==수정 메소드==//
 
-    private void updateContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 
-    private void updateMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
     }
 
-    private void updateSearchedByMemberStatus(SearchedByMemberStatus searchedByMemberStatus) {
+    public void updateSearchedByMemberStatus(SearchedByMemberStatus searchedByMemberStatus) {
         this.searchedByMemberStatus = searchedByMemberStatus;
     }
     //==비즈니스 로직==//

@@ -21,6 +21,7 @@ public class JpaHashtagService implements HashtagService{
     private final HashtagRepository hashtagRepository;
     private final MemberRepository memberRepository;
 
+    @Transactional()
     @Override
     public Long insertViewedHashtagByIp(String ip, Long hashtagId) throws NotExistHashtagException {
 
@@ -29,6 +30,7 @@ public class JpaHashtagService implements HashtagService{
         return hashtag.insertViewedHashtagByIp(ip);
     }
 
+    @Transactional()
     @Override
     public Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws
             NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException {

@@ -42,11 +42,10 @@ public class Hashtag extends BaseTimeEntity {
 
     //==연관관계 메소드==//
     private Long addViewedHashtagByIp(String ip) {
-        ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip);
+        ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip, this);
 
         updateViewScore();
         this.viewedHashtagByIps.add(viewedHashtagByIp);
-        viewedHashtagByIp.updateHashtag(this);
 
         return viewedHashtagByIp.getId();
     }

@@ -30,9 +30,10 @@ public class ViewedHashtagByIp extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static ViewedHashtagByIp createViewedHashtagByIp(String ip) {
+    public static ViewedHashtagByIp createViewedHashtagByIp(String ip, Hashtag hashtag) {
         ViewedHashtagByIp viewedHashtagByIp = new ViewedHashtagByIp();
         viewedHashtagByIp.updateIp(ip);
+        viewedHashtagByIp.updateHashtag(hashtag);
 
         return viewedHashtagByIp;
     }

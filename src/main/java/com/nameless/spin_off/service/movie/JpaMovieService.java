@@ -21,7 +21,7 @@ public class JpaMovieService implements MovieService{
     private final MovieRepository movieRepository;
     private final MemberRepository memberRepository;
 
-    @Transactional(readOnly = false)
+    @Transactional()
     @Override
     public Long insertViewedMovieByIp(String ip, Long movieId) throws NotExistMovieException {
 
@@ -30,6 +30,7 @@ public class JpaMovieService implements MovieService{
         return movie.insertViewedMovieByIp(ip);
     }
 
+    @Transactional()
     @Override
     public Long insertFollowedMovieByMovieId(Long memberId, Long movieId) throws
             NotExistMemberException, NotExistMovieException, AlreadyFollowedMovieException {

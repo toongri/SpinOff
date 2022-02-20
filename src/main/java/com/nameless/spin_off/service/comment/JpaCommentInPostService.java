@@ -26,8 +26,8 @@ public class JpaCommentInPostService implements CommentInPostService {
     private final PostRepository postRepository;
     private final CommentInPostRepository commentInPostRepository;
 
+    @Transactional()
     @Override
-    @Transactional(readOnly = false)
     public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
 
         Member member = getMemberById(commentVO.getMemberId());
@@ -40,8 +40,8 @@ public class JpaCommentInPostService implements CommentInPostService {
         return commentInPostRepository.save(commentInPost).getId();
     }
 
+    @Transactional()
     @Override
-    @Transactional(readOnly = false)
     public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 

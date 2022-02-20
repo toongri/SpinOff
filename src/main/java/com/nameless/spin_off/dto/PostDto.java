@@ -6,12 +6,27 @@ import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.*;
 import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class RelatedSearchPostDto {
+
+        private Long id;
+        private String title;
+
+        @QueryProjection
+        public RelatedSearchPostDto(Long id, String title) {
+            this.id = id;
+            this.title = title;
+        }
+    }
 
     @Data
     @NoArgsConstructor

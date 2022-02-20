@@ -26,6 +26,7 @@ public class JpaComplainService implements ComplainService{
     private final PostRepository postRepository;
     private final CollectionRepository collectionRepository;
 
+    @Transactional()
     @Override
     public Long insertComplain(Long memberId, Long postId, Long collectionId, ComplainStatus complainStatus) throws NotExistMemberException, NotExistPostException, AlreadyComplainException, NotExistCollectionException {
         Member member = getMember(memberId);

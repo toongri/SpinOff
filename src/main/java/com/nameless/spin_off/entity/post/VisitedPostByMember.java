@@ -32,9 +32,10 @@ public class VisitedPostByMember extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static VisitedPostByMember createVisitedPostByMember(Member member) {
+    public static VisitedPostByMember createVisitedPostByMember(Member member, Post post) {
         VisitedPostByMember visitedPostByMember = new VisitedPostByMember();
         visitedPostByMember.updateMember(member);
+        visitedPostByMember.updatePost(post);
 
         return visitedPostByMember;
 

@@ -39,9 +39,10 @@ public class BlockedMember extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static BlockedMember createBlockedMember(Member member, BlockedMemberStatus blockedMemberStatus) {
+    public static BlockedMember createBlockedMember(Member blockingMember, Member member, BlockedMemberStatus blockedMemberStatus) {
         BlockedMember blockedMember1 = new BlockedMember();
         blockedMember1.updateBlockedMemberStatus(blockedMemberStatus);
+        blockedMember1.updateBlockingMember(blockingMember);
         blockedMember1.updateMember(member);
 
         return blockedMember1;

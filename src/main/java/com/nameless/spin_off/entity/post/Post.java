@@ -110,20 +110,18 @@ public class Post extends BaseTimeEntity {
     }
 
     private Long addViewedPostByIp(String ip) {
-        ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip);
+        ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip, this);
 
         this.updateViewScore();
         this.viewedPostByIps.add(viewedPostByIp);
-        viewedPostByIp.updatePost(this);
 
         return viewedPostByIp.getId();
     }
 
     public void addVisitedPostByMember(Member member) {
-        VisitedPostByMember visitedPostByMember = VisitedPostByMember.createVisitedPostByMember(member);
+        VisitedPostByMember visitedPostByMember = VisitedPostByMember.createVisitedPostByMember(member, this);
 
         this.visitedPostByMembers.add(visitedPostByMember);
-        visitedPostByMember.updatePost(this);
     }
 
     public void addCommentInPost(CommentInPost commentInPost) {
@@ -133,18 +131,16 @@ public class Post extends BaseTimeEntity {
     }
 
     private Long addLikedPostByMember(Member member) {
-        LikedPost likedPost = LikedPost.createLikedPost(member);
+        LikedPost likedPost = LikedPost.createLikedPost(member, this);
 
         this.updateLikeScore();
         this.likedPosts.add(likedPost);
-        likedPost.updatePost(this);
 
         return likedPost.getId();
     }
 
     public void addPostedHashtagByHashtag(Hashtag hashtag) throws AlreadyPostedHashtagException {
-        PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag);
-        postedHashtag.updatePost(this);
+        PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag, this);
 
         if (!this.postedHashtags.add(postedHashtag)) {
             throw new AlreadyPostedHashtagException();
@@ -153,8 +149,7 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addAuthorityOfPost(AuthorityOfPostStatus authorityOfPostStatus) throws AlreadyPAuthorityOfPostStatusException {
-        AuthorityOfPost authorityOfPost = AuthorityOfPost.createAuthorityOfPost(authorityOfPostStatus);
-        authorityOfPost.updatePost(this);
+        AuthorityOfPost authorityOfPost = AuthorityOfPost.createAuthorityOfPost(this, authorityOfPostStatus);
 
         if (!authorityOfPosts.add(authorityOfPost)) {
             throw new AlreadyPAuthorityOfPostStatusException();

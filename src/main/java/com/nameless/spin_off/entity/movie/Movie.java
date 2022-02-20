@@ -45,11 +45,10 @@ public class Movie extends BaseTimeEntity {
 
     //==연관관계 메소드==//
     private Long addViewedMovieByIp(String ip) {
-        ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip);
+        ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip, this);
 
         updateViewScore();
         this.viewedMovieByIps.add(viewedMovieByIp);
-        viewedMovieByIp.updateMovie(this);
 
         return viewedMovieByIp.getId();
     }

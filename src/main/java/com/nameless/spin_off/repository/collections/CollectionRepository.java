@@ -47,7 +47,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE post.id = :postId")
     List<Collection> findAllByPostIdWithPost(@Param("postId") Long postId);
 
-    @Query("SELECT collection FROM Collection collection " +
+    @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.member m " +
             "LEFT JOIN FETCH m.complains complain " +
             "WHERE collection.id = :id")

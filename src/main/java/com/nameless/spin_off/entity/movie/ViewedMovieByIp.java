@@ -30,9 +30,10 @@ public class ViewedMovieByIp extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static ViewedMovieByIp createViewedMovieByIp(String ip) {
+    public static ViewedMovieByIp createViewedMovieByIp(String ip, Movie movie) {
         ViewedMovieByIp viewedMovieByIp = new ViewedMovieByIp();
         viewedMovieByIp.updateIp(ip);
+        viewedMovieByIp.updateMovie(movie);
 
         return viewedMovieByIp;
     }

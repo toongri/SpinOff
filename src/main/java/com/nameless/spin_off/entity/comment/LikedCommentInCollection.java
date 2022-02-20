@@ -34,9 +34,10 @@ public class LikedCommentInCollection extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static LikedCommentInCollection createLikedCommentInCollection(Member member) {
+    public static LikedCommentInCollection createLikedCommentInCollection(Member member, CommentInCollection comment) {
         LikedCommentInCollection likedCommentInCollection = new LikedCommentInCollection();
         likedCommentInCollection.updateMember(member);
+        likedCommentInCollection.updateCommentInCollection(comment);
 
         return likedCommentInCollection;
     }

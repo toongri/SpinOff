@@ -56,10 +56,9 @@ public class CommentInCollection extends BaseTimeEntity {
 
     public Long addCommentLike(Member member) {
         LikedCommentInCollection likedCommentInCollection =
-                LikedCommentInCollection.createLikedCommentInCollection(member);
+                LikedCommentInCollection.createLikedCommentInCollection(member, this);
 
         this.likedCommentInCollections.add(likedCommentInCollection);
-        likedCommentInCollection.updateCommentInCollection(this);
 
         return likedCommentInCollection.getId();
     }

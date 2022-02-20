@@ -12,12 +12,12 @@ import java.util.Optional;
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     List<Hashtag> findAllByContentIn(List<String> contents);
 
-    @Query("SELECT hashtag FROM Hashtag hashtag " +
+    @Query("SELECT DISTINCT hashtag FROM Hashtag hashtag " +
             "LEFT JOIN FETCH hashtag.viewedHashtagByIps viewedHashtagByip " +
             "WHERE hashtag.id = :id")
     Optional<Hashtag> findOneByIdWithViewedByIp(@Param("id") Long id);
 
-    @Query("SELECT hashtag FROM Hashtag hashtag " +
+    @Query("SELECT DISTINCT hashtag FROM Hashtag hashtag " +
             "LEFT JOIN FETCH hashtag.followingMembers followingMember " +
             "WHERE hashtag.id = :id")
     Optional<Hashtag> findOneByIdWithFollowingMember(@Param("id") Long id);

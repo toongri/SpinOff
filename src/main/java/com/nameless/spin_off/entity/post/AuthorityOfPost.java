@@ -33,9 +33,10 @@ public class AuthorityOfPost extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static AuthorityOfPost createAuthorityOfPost(AuthorityOfPostStatus authorityOfPostStatus) {
+    public static AuthorityOfPost createAuthorityOfPost(Post post, AuthorityOfPostStatus authorityOfPostStatus) {
 
         AuthorityOfPost authorityOfPost = new AuthorityOfPost();
+        authorityOfPost.updatePost(post);
         authorityOfPost.updateAuthorityOfPostStatus(authorityOfPostStatus);
 
         return authorityOfPost;

@@ -34,9 +34,10 @@ public class FollowedMovie extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static FollowedMovie createFollowedMovie(Movie movie) {
+    public static FollowedMovie createFollowedMovie(Member member, Movie movie) {
 
         FollowedMovie followedMovie = new FollowedMovie();
+        followedMovie.updateMember(member);
         followedMovie.updateMovie(movie);
 
         return followedMovie;

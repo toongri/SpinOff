@@ -11,12 +11,12 @@ import java.util.Optional;
 public interface MovieRepository extends JpaRepository<Movie, Long> {
     List<Movie> findTagsByIdIn(List<Long> ids);
 
-    @Query("SELECT movie FROM Movie movie " +
+    @Query("SELECT DISTINCT movie FROM Movie movie " +
             "LEFT JOIN FETCH movie.viewedMovieByIps viewedMovieByip " +
             "WHERE movie.id = :id")
     Optional<Movie> findOneByIdWithViewedByIp(@Param("id") Long id);
 
-    @Query("SELECT movie FROM Movie movie " +
+    @Query("SELECT DISTINCT movie FROM Movie movie " +
             "LEFT JOIN FETCH movie.followingMembers followingMember " +
             "WHERE movie.id = :id")
     Optional<Movie> findOneByIdWithFollowingMember(@Param("id") Long id);

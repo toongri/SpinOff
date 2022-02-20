@@ -30,7 +30,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE post.id = :id")
     Optional<Post> findOneByIdWithCollectedPost(@Param("id") Long id);
 
-    @Query("SELECT post FROM Post post " +
+    @Query("SELECT DISTINCT post FROM Post post " +
             "LEFT JOIN FETCH post.member m " +
             "LEFT JOIN FETCH m.complains complain " +
             "WHERE post.id = :id")

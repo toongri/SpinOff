@@ -28,9 +28,10 @@ public class ViewedPostByIp extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static ViewedPostByIp createViewedPostByIp(String ip) {
+    public static ViewedPostByIp createViewedPostByIp(String ip, Post post) {
         ViewedPostByIp viewedPostByIp = new ViewedPostByIp();
         viewedPostByIp.updateIp(ip);
+        viewedPostByIp.updatePost(post);
 
         return viewedPostByIp;
 

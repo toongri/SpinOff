@@ -28,8 +28,9 @@ public class ViewedCollectionByIp extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static ViewedCollectionByIp createViewedCollectionByIp(String ip) {
+    public static ViewedCollectionByIp createViewedCollectionByIp(String ip, Collection collection) {
         ViewedCollectionByIp viewedCollectionByIp = new ViewedCollectionByIp();
+        viewedCollectionByIp.updateCollection(collection);
         viewedCollectionByIp.updateIp(ip);
 
         return viewedCollectionByIp;
@@ -37,7 +38,7 @@ public class ViewedCollectionByIp extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-    public void updateCollections(Collection collection) {
+    public void updateCollection(Collection collection) {
         this.collection = collection;
     }
 
