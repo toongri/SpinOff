@@ -1,18 +1,19 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.StaticVariable;
-import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
+import com.nameless.spin_off.dto.*;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.nameless.spin_off.StaticVariable.MOST_POPULAR_HASHTAG_NUMBER;
 import static com.nameless.spin_off.StaticVariable.RELATED_SEARCH_NUMBER;
 import static com.nameless.spin_off.entity.collections.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
@@ -84,6 +85,17 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
                 .where(movie.title.contains(keyword))
                 .orderBy(movie.popularity.desc())
                 .limit(RELATED_SEARCH_NUMBER)
+                .fetch();
+    }
+
+    @Override
+    public List<MostPopularHashtag> getMostPopularHashtags() {
+        return jpaQueryFactory
+                .select(new QHashtagDto_MostPopularHashtag(
+                        hashtag.id, hashtag.content))
+                .from(hashtag)
+                .orderBy(hashtag.popularity.desc())
+                .limit(MOST_POPULAR_HASHTAG_NUMBER)
                 .fetch();
     }
 

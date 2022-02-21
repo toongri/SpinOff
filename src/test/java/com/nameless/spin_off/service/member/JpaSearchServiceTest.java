@@ -1,17 +1,17 @@
 package com.nameless.spin_off.service.member;
 
-import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
+import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchDto;
 import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.member.SearchedByMember;
 import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
@@ -21,20 +21,16 @@ import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -86,11 +82,11 @@ class JpaSearchServiceTest {
         em.clear();
         //when
         System.out.println("서비스함수");
-        List<SearchedByMember> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
-        assertThat(lastSearchesByMember.stream().map(SearchedByMember::getContent).collect(Collectors.toList()))
+        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
                 .containsExactly("9", "8", "7", "6", "5");
 
     }
@@ -111,11 +107,11 @@ class JpaSearchServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<SearchedByMember> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
-        assertThat(lastSearchesByMember.stream().map(SearchedByMember::getContent).collect(Collectors.toList()))
+        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
                 .containsExactly();
     }
 
@@ -135,11 +131,11 @@ class JpaSearchServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<SearchedByMember> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
-        assertThat(lastSearchesByMember.stream().map(SearchedByMember::getContent).collect(Collectors.toList()))
+        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
                 .containsExactly("2", "1", "0");
 
     }
@@ -200,5 +196,38 @@ class JpaSearchServiceTest {
                 .collect(Collectors.toList()))
                 .containsExactly(keyword+"fgd", keyword+"adfgf");
 
+    }
+    
+    @Test
+    public void 인기_해시태그_출력() throws Exception{
+
+        //given
+        Hashtag hashtag1 = hashtagRepository.save(Hashtag.createHashtag("asdfa"));
+        Hashtag hashtag2 = hashtagRepository.save(Hashtag.createHashtag("asdfa"));
+        Hashtag hashtag3 = hashtagRepository.save(Hashtag.createHashtag("asdfabdf"));
+        Hashtag hashtag4 = hashtagRepository.save(Hashtag.createHashtag("asdfaweq"));
+        Hashtag hashtag5 = hashtagRepository.save(Hashtag.createHashtag("asdfabdffsd"));
+        Hashtag hashtag6 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweq"));
+
+        for (int i = 0; i < 10; i++) {
+            hashtag1.insertViewedHashtagByIp(""+i);
+            hashtag2.insertViewedHashtagByIp(""+i%8);
+            hashtag3.insertViewedHashtagByIp(""+i%6);
+            hashtag4.insertViewedHashtagByIp(""+i%4);
+            hashtag5.insertViewedHashtagByIp(""+i%2);
+            hashtag6.insertViewedHashtagByIp(""+ 0);
+            em.flush();
+        }
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<MostPopularHashtag> mostPopularHashtags = searchService.getMostPopularHashtag();
+
+        //then
+        assertThat(mostPopularHashtags.stream().map(MostPopularHashtag::getId).collect(Collectors.toList()))
+                .containsExactly(hashtag1.getId(), hashtag2.getId(), hashtag3.getId(), hashtag4.getId(),
+                        hashtag5.getId());
+        
     }
 }

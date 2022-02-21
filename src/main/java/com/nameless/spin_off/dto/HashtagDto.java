@@ -8,6 +8,20 @@ public class HashtagDto {
 
     @Data
     @NoArgsConstructor
+    public static class MostPopularHashtag {
+
+        private Long id;
+        private String content;
+
+        @QueryProjection
+        public MostPopularHashtag(Long id, String content) {
+            this.id = id;
+            this.content = content;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class RelatedSearchHashtagDto {
 
         private Long id;

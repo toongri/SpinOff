@@ -10,7 +10,6 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 public interface CommentInCollectionService {
     Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException;
-
     Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInCollectionException, AlreadyLikedCommentInCollectionException;
 }

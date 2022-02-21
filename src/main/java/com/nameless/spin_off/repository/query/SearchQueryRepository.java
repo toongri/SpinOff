@@ -2,6 +2,7 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
@@ -20,4 +21,5 @@ public interface SearchQueryRepository {
     List<RelatedSearchHashtagDto> getHashtagsAboutKeyword(String keyword);
     List<RelatedSearchCollectionDto> getCollectionsAboutKeyword(String keyword);
     List<RelatedSearchMovieDto> getMoviesAboutKeyword(String keyword);
+    List<MostPopularHashtag> getMostPopularHashtags();
 }

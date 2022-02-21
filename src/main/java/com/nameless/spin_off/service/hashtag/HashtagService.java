@@ -8,7 +8,6 @@ import com.nameless.spin_off.exception.movie.NotExistMovieException;
 public interface HashtagService {
 
     Long insertViewedHashtagByIp(String ip, Long hashtagId) throws NotExistHashtagException;
-
     Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException;
 
 }

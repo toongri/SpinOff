@@ -283,7 +283,7 @@ public class Member extends BaseTimeEntity {
 
     //==조회 로직==//
     public List<SearchedByMember> getLastSearches() {
-        return searches.stream().limit(5).collect(Collectors.toList());
+        return searches.stream().limit(LAST_SEARCH_NUMBER).collect(Collectors.toList());
     }
 
     private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {

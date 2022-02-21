@@ -9,8 +9,6 @@ import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 public interface MemberService {
 
     Long insertMemberByMemberVO(CreateMemberVO memberVO) throws AlreadyAccountIdException, AlreadyNicknameException;
-
     Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId) throws NotExistMemberException, AlreadyFollowedMemberException;
-
     Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
 }

@@ -8,5 +8,6 @@ import com.nameless.spin_off.exception.post.NotExistPostException;
 
 public interface ComplainService {
 
-    Long insertComplain(Long memberId, Long postId, Long collectionId, ComplainStatus complainStatus) throws NotExistMemberException, NotExistPostException, AlreadyComplainException, NotExistCollectionException;
+    Long insertComplain(Long memberId, Long postId, Long collectionId, ComplainStatus complainStatus)
+            throws NotExistMemberException, NotExistPostException, AlreadyComplainException, NotExistCollectionException;
 }
