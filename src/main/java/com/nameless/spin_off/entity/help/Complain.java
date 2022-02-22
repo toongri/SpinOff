@@ -1,10 +1,7 @@
 package com.nameless.spin_off.entity.help;
 
-import com.nameless.spin_off.entity.collections.Collection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.FollowedMovie;
-import com.nameless.spin_off.entity.post.Post;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,29 +28,27 @@ public class Complain extends BaseTimeEntity {
     @JoinColumn(name = "complained_member_id")
     private Member complainedMember;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
-    private Post post;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "collection_id")
-    private Collection collection;
+    private Long contentId;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "complain_status")
+    @NotNull
+    private ContentTypeStatus contentTypeStatus;
+
+    @Enumerated(EnumType.STRING)
     @NotNull
     private ComplainStatus complainStatus;
 
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static Complain createComplain(Member member, Member complainedMember, Post post, Collection collection, ComplainStatus complainStatus) {
+    public static Complain createComplain(Member member, Member complainedMember, Long contentId,
+                                          ContentTypeStatus contentTypeStatus, ComplainStatus complainStatus) {
 
         Complain complain = new Complain();
         complain.updateMember(member);
         complain.updateComplainedMember(complainedMember);
-        complain.updatePost(post);
-        complain.updateCollection(collection);
+        complain.updateContentId(contentId);
+        complain.updateContentTypeStatus(contentTypeStatus);
         complain.updateComplainStatus(complainStatus);
 
         return complain;
@@ -68,12 +63,12 @@ public class Complain extends BaseTimeEntity {
         this.complainedMember = complainedMember;
     }
 
-    public void updatePost(Post post) {
-        this.post = post;
+    public void updateContentId(Long contentId) {
+        this.contentId = contentId;
     }
 
-    public void updateCollection(Collection collection) {
-        this.collection = collection;
+    public void updateContentTypeStatus(ContentTypeStatus contentTypeStatus) {
+        this.contentTypeStatus = contentTypeStatus;
     }
 
     public void updateComplainStatus(ComplainStatus complainStatus) {

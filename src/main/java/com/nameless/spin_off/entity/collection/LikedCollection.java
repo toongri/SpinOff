@@ -1,6 +1,7 @@
-package com.nameless.spin_off.entity.collections;
+package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
+import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -11,14 +12,17 @@ import javax.persistence.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ViewedCollectionByIp extends BaseTimeEntity {
+public class LikedCollection extends BaseTimeEntity {
 
     @Id
     @GeneratedValue
-    @Column(name="viewed_collection_by_ip_id")
+    @Column(name="liked_collection_id")
     private Long id;
 
-    private String ip;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "member_id")
+    @NotNull
+    private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "collection_id")
@@ -28,12 +32,12 @@ public class ViewedCollectionByIp extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static ViewedCollectionByIp createViewedCollectionByIp(String ip, Collection collection) {
-        ViewedCollectionByIp viewedCollectionByIp = new ViewedCollectionByIp();
-        viewedCollectionByIp.updateCollection(collection);
-        viewedCollectionByIp.updateIp(ip);
+    public static LikedCollection createLikedCollection(Member member, Collection collection) {
+        LikedCollection likedCollection = new LikedCollection();
+        likedCollection.updateCollection(collection);
+        likedCollection.updateMember(member);
 
-        return viewedCollectionByIp;
+        return likedCollection;
 
     }
 
@@ -42,11 +46,12 @@ public class ViewedCollectionByIp extends BaseTimeEntity {
         this.collection = collection;
     }
 
-    private void updateIp(String ip) {
-        this.ip = ip;
+    private void updateMember(Member member) {
+        this.member = member;
     }
 
     //==비즈니스 로직==//
 
     //==조회 로직==//
+
 }

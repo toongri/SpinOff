@@ -3,11 +3,17 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.PostedMedia;
+import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
+import com.nameless.spin_off.exception.post.OverContentOfPostException;
+import com.nameless.spin_off.exception.post.OverTitleOfPostException;
 import com.querydsl.core.annotations.QueryProjection;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -116,7 +122,7 @@ public class PostDto {
             return this;
         }
 
-        public Post build() throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException {
+        public Post build() throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
             return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, movie, publicOfPostStatus);
         }
     }

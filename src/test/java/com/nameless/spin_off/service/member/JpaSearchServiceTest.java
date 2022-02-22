@@ -8,15 +8,15 @@ import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchDto;
-import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -210,12 +210,12 @@ class JpaSearchServiceTest {
         Hashtag hashtag6 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweq"));
 
         for (int i = 0; i < 10; i++) {
-            hashtag1.insertViewedHashtagByIp(""+i);
+            hashtag4.insertViewedHashtagByIp(""+i);
             hashtag2.insertViewedHashtagByIp(""+i%8);
-            hashtag3.insertViewedHashtagByIp(""+i%6);
-            hashtag4.insertViewedHashtagByIp(""+i%4);
+            hashtag6.insertViewedHashtagByIp(""+i%6);
+            hashtag1.insertViewedHashtagByIp(""+i%4);
             hashtag5.insertViewedHashtagByIp(""+i%2);
-            hashtag6.insertViewedHashtagByIp(""+ 0);
+            hashtag3.insertViewedHashtagByIp(""+ 0);
             em.flush();
         }
         em.clear();
@@ -226,7 +226,7 @@ class JpaSearchServiceTest {
 
         //then
         assertThat(mostPopularHashtags.stream().map(MostPopularHashtag::getId).collect(Collectors.toList()))
-                .containsExactly(hashtag1.getId(), hashtag2.getId(), hashtag3.getId(), hashtag4.getId(),
+                .containsExactly(hashtag4.getId(), hashtag2.getId(), hashtag6.getId(), hashtag1.getId(),
                         hashtag5.getId());
         
     }

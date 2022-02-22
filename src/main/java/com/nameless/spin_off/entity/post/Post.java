@@ -1,9 +1,8 @@
 package com.nameless.spin_off.entity.post;
 
 import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.entity.collections.CollectedPost;
-import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.ViewedCollectionByIp;
+import com.nameless.spin_off.entity.collection.CollectedPost;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
@@ -12,14 +11,14 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
-import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
-import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
-import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
+import com.nameless.spin_off.exception.post.*;
 import com.sun.istack.NotNull;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
-import javax.xml.stream.events.Comment;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -58,6 +57,11 @@ public class Post extends BaseTimeEntity {
     @NotNull
     private PublicOfPostStatus publicOfPostStatus;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "authority_of_post_status")
+    @NotNull
+    private AuthorityOfPostStatus authorityOfPostStatus;
+
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CommentInPost> commentInPosts = new ArrayList<>();
 
@@ -78,9 +82,6 @@ public class Post extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private Set<AuthorityOfPost> authorityOfPosts = new HashSet<>();
 
     private Double viewScore;
     private Double likeScore;
@@ -148,28 +149,35 @@ public class Post extends BaseTimeEntity {
         hashtag.addTaggedPosts(postedHashtag);
     }
 
-    public void addAuthorityOfPost(AuthorityOfPostStatus authorityOfPostStatus) throws AlreadyPAuthorityOfPostStatusException {
-        AuthorityOfPost authorityOfPost = AuthorityOfPost.createAuthorityOfPost(this, authorityOfPostStatus);
-
-        if (!authorityOfPosts.add(authorityOfPost)) {
-            throw new AlreadyPAuthorityOfPostStatusException();
+    public void addAllPostedHashtagsByHashtags(List<Hashtag> hashtags) throws AlreadyPostedHashtagException {
+        for (Hashtag hashtag : hashtags) {
+            this.addPostedHashtagByHashtag(hashtag);
         }
     }
 
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
                                   List<Hashtag> hashtags, List<PostedMedia> postedMedias,
-                                  Movie movie, PublicOfPostStatus publicOfPostStatus) throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException {
+                                  Movie movie, PublicOfPostStatus publicOfPostStatus)
+            throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException,
+            OverTitleOfPostException, OverContentOfPostException {
         Post post = new Post();
         post.updateMember(member);
+
+        if (title.length() > 100) {
+            throw new OverTitleOfPostException();
+        }
         post.updateTitle(title);
-        post.updateThumbnailUrl(thumbnailUrl);
+        if (content.length() > 500) {
+            throw new OverContentOfPostException();
+        }
         post.updateContent(content);
-        post.updatePostedHashtagsByHashtags(hashtags);
+        post.updateThumbnailUrl(thumbnailUrl);
+        post.addAllPostedHashtagsByHashtags(hashtags);
         post.updatePostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateCountToZero();
-        post.addAuthorityOfPost(AuthorityOfPostStatus.NORMAL);
+        post.updateAuthorityOfPostStatus(AuthorityOfPostStatus.NORMAL);
 
         if (movie != null)
             movie.addTaggedPosts(post);
@@ -205,12 +213,6 @@ public class Post extends BaseTimeEntity {
         }
     }
 
-    public void updatePostedHashtagsByHashtags(List<Hashtag> hashtags) throws AlreadyPostedHashtagException {
-        for (Hashtag hashtag : hashtags) {
-            this.addPostedHashtagByHashtag(hashtag);
-        }
-    }
-
     public void updateThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
@@ -229,6 +231,10 @@ public class Post extends BaseTimeEntity {
 
     public void updateMember(Member member) {
         this.member = member;
+    }
+
+    public void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
+        this.authorityOfPostStatus = authorityOfPostStatus;
     }
 
     //==비즈니스 로직==//

@@ -1,14 +1,11 @@
-package com.nameless.spin_off.repository.collections;
+package com.nameless.spin_off.repository.collection;
 
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import javax.swing.text.html.Option;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

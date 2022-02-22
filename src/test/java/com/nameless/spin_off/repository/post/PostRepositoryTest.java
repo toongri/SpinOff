@@ -1,10 +1,10 @@
 package com.nameless.spin_off.repository.post;
 
-import com.nameless.spin_off.entity.collections.CollectedPost;
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.CollectedPost;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.repository.collections.CollectedPostRepository;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectedPostRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.service.post.PostService;

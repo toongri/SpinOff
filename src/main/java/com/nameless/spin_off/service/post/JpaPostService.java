@@ -2,7 +2,7 @@ package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -14,7 +14,7 @@ import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;

@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.collections;
+package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;

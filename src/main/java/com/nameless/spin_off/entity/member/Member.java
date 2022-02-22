@@ -2,16 +2,15 @@ package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
-import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.FollowedCollection;
+import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.help.ComplainStatus;
+import com.nameless.spin_off.entity.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.*;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -141,8 +140,9 @@ public class Member extends BaseTimeEntity {
         followedCollections.add(followedCollection);
     }
 
-    public Long addComplain(Member member, Post post, Collection collection, ComplainStatus complainStatus) throws AlreadyComplainException {
-        Complain complain = Complain.createComplain(member, this, post, collection, complainStatus);
+    public Long addComplain(Member member, Long contentId, ContentTypeStatus contentTypeStatus,
+                            ComplainStatus complainStatus) throws AlreadyComplainException {
+        Complain complain = Complain.createComplain(member, this, contentId, contentTypeStatus, complainStatus);
 
         if (!this.complains.add(complain)) {
             throw new AlreadyComplainException();

@@ -1,9 +1,8 @@
 package com.nameless.spin_off.entity.comment;
 
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;

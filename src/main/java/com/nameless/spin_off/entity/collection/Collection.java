@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.collections;
+package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
@@ -115,11 +115,18 @@ public class Collection extends BaseTimeEntity {
 
     //==생성 메소드==//
     public static Collection createCollection(Member member, String title,
-                                              String content, PublicOfCollectionStatus publicOfCollectionStatus) {
+                                              String content, PublicOfCollectionStatus publicOfCollectionStatus) throws OverTitleOfCollectionException, OverContentOfCollectionException {
 
         Collection collection = new Collection();
         collection.updateMember(member);
+
+        if (title.length() > 100) {
+            throw new OverTitleOfCollectionException();
+        }
         collection.updateTitle(title);
+        if (content.length() > 500) {
+            throw new OverContentOfCollectionException();
+        }
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
         collection.updateCountToZero();

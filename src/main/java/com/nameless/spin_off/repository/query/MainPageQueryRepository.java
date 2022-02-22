@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -8,7 +8,6 @@ import com.nameless.spin_off.entity.post.Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public interface MainPageQueryRepository {

@@ -1,20 +1,15 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
-import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
-import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;

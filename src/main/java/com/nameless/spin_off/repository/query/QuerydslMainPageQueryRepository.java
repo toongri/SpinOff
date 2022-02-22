@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.*;
-import static com.nameless.spin_off.entity.collections.QCollectedPost.collectedPost;
-import static com.nameless.spin_off.entity.collections.QCollection.collection;
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
+import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;

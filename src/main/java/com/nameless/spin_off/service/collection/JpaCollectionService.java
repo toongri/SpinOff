@@ -1,11 +1,11 @@
 package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +24,12 @@ public class JpaCollectionService implements CollectionService {
 
     @Transactional()
     @Override
-    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotExistMemberException {
+    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO)
+            throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
 
         Member member = getMemberById(collectionVO.getMemberId());
-        Collection collection = Collection.createCollection(member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
+        Collection collection = Collection.createCollection(
+                member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
 
         return collectionRepository.save(collection).getId();
     }

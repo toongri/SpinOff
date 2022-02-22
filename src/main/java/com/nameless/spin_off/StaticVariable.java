@@ -1,9 +1,8 @@
 package com.nameless.spin_off;
 
-import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public final class StaticVariable {

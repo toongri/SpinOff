@@ -15,7 +15,7 @@ import java.util.List;
 
 import static com.nameless.spin_off.StaticVariable.MOST_POPULAR_HASHTAG_NUMBER;
 import static com.nameless.spin_off.StaticVariable.RELATED_SEARCH_NUMBER;
-import static com.nameless.spin_off.entity.collections.QCollection.collection;
+import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;

@@ -1,15 +1,11 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.*;
-import com.nameless.spin_off.exception.movie.NotExistMovieException;
-import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
-import com.nameless.spin_off.repository.collections.CollectionRepository;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;

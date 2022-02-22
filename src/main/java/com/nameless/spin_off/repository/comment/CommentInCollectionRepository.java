@@ -1,9 +1,7 @@
 package com.nameless.spin_off.repository.comment;
 
-import com.nameless.spin_off.entity.collections.Collection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.post.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +25,10 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
             "LEFT JOIN FETCH comment.likedCommentInCollections likedComment " +
             "WHERE comment.id = :id")
     Optional<CommentInCollection> findOneByIdWithLikedComment(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT commentInCollection FROM CommentInCollection commentInCollection " +
+            "LEFT JOIN FETCH commentInCollection.member m " +
+            "LEFT JOIN FETCH m.complains complain " +
+            "WHERE commentInCollection.id = :id")
+    Optional<CommentInCollection> findOneByIdWithComplainOfMember(@Param("id") Long id);
 }

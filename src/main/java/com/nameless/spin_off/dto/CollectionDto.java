@@ -1,10 +1,8 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.StaticVariable;
-import com.nameless.spin_off.entity.collections.CollectedPost;
-import com.nameless.spin_off.entity.collections.Collection;
-import com.nameless.spin_off.entity.collections.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.post.PostedMedia;
+import com.nameless.spin_off.entity.collection.CollectedPost;
+import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
