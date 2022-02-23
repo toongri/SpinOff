@@ -1,4 +1,4 @@
-package com.nameless.spin_off.service.member;
+package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
@@ -7,7 +7,7 @@ import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
-import com.nameless.spin_off.dto.SearchDto.RelatedSearchDto;
+import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -21,6 +21,7 @@ import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,15 +36,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaSearchServiceTest {
+class JpaSearchQueryServiceTest {
 
-    @Autowired SearchService searchService;
+    @Autowired
+    SearchQueryService searchQueryService;
     @Autowired MemberRepository memberRepository;
     @Autowired HashtagRepository hashtagRepository;
     @Autowired MovieRepository movieRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired PostRepository postRepository;
     @Autowired EntityManager em;
+    @Autowired
+    MemberService memberService;
 
     @Test
     public void 검색_삽입() throws Exception{
@@ -57,7 +61,7 @@ class JpaSearchServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long searchId = searchService.insertSearch(memberId, "dded", SearchedByMemberStatus.MEMBER);
+        Long searchId = memberService.insertSearch(memberId, "dded", SearchedByMemberStatus.MEMBER);
 
         System.out.println("멤버함수");
         Member byId = memberRepository.getById(memberId);
@@ -75,14 +79,14 @@ class JpaSearchServiceTest {
         Long memberId = memberRepository.save(member).getId();
 
         for (int i = 0; i < 10; i++) {
-            searchService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
         }
 
         em.flush();
         em.clear();
         //when
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
@@ -107,7 +111,7 @@ class JpaSearchServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
@@ -123,7 +127,7 @@ class JpaSearchServiceTest {
         Long memberId = memberRepository.save(member).getId();
 
         for (int i = 0; i < 3; i++) {
-            searchService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
         }
 
         em.flush();
@@ -131,13 +135,12 @@ class JpaSearchServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
 
         System.out.println("결과");
         //then
         assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
                 .containsExactly("2", "1", "0");
-
     }
 
     @Test
@@ -158,8 +161,8 @@ class JpaSearchServiceTest {
         Collection collection2 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.PUBLIC));
 
-        Post po = Post.buildPost().setMember(member).setTitle(keyword+"fgd").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        Post po2 = Post.buildPost().setMember(member).setTitle(keyword+"adfgf").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(member).setTitle(keyword+"fgd").setContent("").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po2 = Post.buildPost().setMember(member).setTitle(keyword+"adfgf").setContent("").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
         postRepository.save(po);
         postRepository.save(po2);
 
@@ -171,7 +174,7 @@ class JpaSearchServiceTest {
 
         //when
         System.out.println("서비스함수");
-        RelatedSearchDto result = searchService.getRelatedSearchByKeyword(keyword);
+        RelatedSearchAllDto result = searchQueryService.getRelatedSearchAllByKeyword(keyword);
 
         //then
         System.out.println("결과");
@@ -222,12 +225,59 @@ class JpaSearchServiceTest {
 
         //when
         System.out.println("서비스함수");
-        List<MostPopularHashtag> mostPopularHashtags = searchService.getMostPopularHashtag();
+        List<MostPopularHashtag> mostPopularHashtags = searchQueryService.getMostPopularHashtag();
 
         //then
         assertThat(mostPopularHashtags.stream().map(MostPopularHashtag::getId).collect(Collectors.toList()))
                 .containsExactly(hashtag4.getId(), hashtag2.getId(), hashtag6.getId(), hashtag1.getId(),
                         hashtag5.getId());
         
+    }
+
+    @Test
+    public void 연관_해시태그_출력() throws Exception{
+
+        //given
+        Hashtag hashtag1 = hashtagRepository.save(Hashtag.createHashtag("asdfa"));
+        Hashtag hashtag2 = hashtagRepository.save(Hashtag.createHashtag("asdfa"));
+        Hashtag hashtag3 = hashtagRepository.save(Hashtag.createHashtag("asdfabdf"));
+        Hashtag hashtag4 = hashtagRepository.save(Hashtag.createHashtag("asdfaweq"));
+        Hashtag hashtag5 = hashtagRepository.save(Hashtag.createHashtag("asdfabdffsd"));
+        Hashtag hashtag6 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweq"));
+        Hashtag hashtag11 = hashtagRepository.save(Hashtag.createHashtag("asdfabdffsdbds"));
+        Hashtag hashtag12 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweqqwe"));
+        Hashtag hashtag13 = hashtagRepository.save(Hashtag.createHashtag("asdfabdffsdqwrqf"));
+        Hashtag hashtag14 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweqbadf"));
+        Hashtag hashtag15 = hashtagRepository.save(Hashtag.createHashtag("asdfabdffsdasdbf"));
+        Hashtag hashtag16 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweqbasdf"));
+        String keyword = "asdf";
+
+        for (int i = 0; i < 10; i++) {
+            hashtag4.insertViewedHashtagByIp(""+i);
+            hashtag2.insertViewedHashtagByIp(""+i%8);
+            hashtag6.insertViewedHashtagByIp(""+i%6);
+            hashtag1.insertViewedHashtagByIp(""+i%4);
+            hashtag5.insertViewedHashtagByIp(""+i%2);
+            hashtag3.insertViewedHashtagByIp(""+ 0);
+            hashtag14.insertViewedHashtagByIp(""+i);
+            hashtag12.insertViewedHashtagByIp(""+i%8);
+            hashtag16.insertViewedHashtagByIp(""+i%6);
+            hashtag11.insertViewedHashtagByIp(""+i%4);
+            hashtag15.insertViewedHashtagByIp(""+i%2);
+            hashtag13.insertViewedHashtagByIp(""+ 0);
+            em.flush();
+        }
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<RelatedSearchHashtagDto> searches = searchQueryService.getRelatedSearchHashtagByKeyword(keyword);
+
+        //then
+        assertThat(searches.stream().map(RelatedSearchHashtagDto::getId).collect(Collectors.toList()))
+                .containsExactly(hashtag4.getId(), hashtag14.getId(), hashtag2.getId(), hashtag12.getId(),
+                        hashtag6.getId(), hashtag16.getId(), hashtag11.getId(), hashtag1.getId(),
+                        hashtag5.getId(), hashtag15.getId());
+
     }
 }

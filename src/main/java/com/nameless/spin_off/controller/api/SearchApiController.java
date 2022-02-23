@@ -1,15 +1,21 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
+import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
-import com.nameless.spin_off.dto.SearchDto.RelatedSearchDto;
-import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
+import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.service.member.SearchService;
+import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
+import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
+import com.nameless.spin_off.service.query.SearchQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,36 +23,41 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/search")
 public class SearchApiController {
-    private final SearchService searchService;
+    private final SearchQueryService searchQueryService;
 
-    @GetMapping("/related/keyword")
-    public SearchApiResult<RelatedSearchDto> getRelatedSearchResult(@RequestParam String keyword) {
+    @GetMapping("/related/keyword/all")
+    public SearchApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(@RequestParam String keyword)
+            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<RelatedSearchDto>(searchService.getRelatedSearchByKeyword(keyword));
+        return new SearchApiResult<RelatedSearchAllDto>(searchQueryService.getRelatedSearchAllByKeyword(keyword));
     }
 
-    @PostMapping("")
-    public SearchApiResult<Long> insertSearchByKeyword(@RequestParam String keyword, @RequestParam Long id,
-                                              @RequestParam("status")SearchedByMemberStatus searchedByMemberStatus)
-            throws NotExistMemberException {
+    @GetMapping("/related/keyword/hashtag")
+    public SearchApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(@RequestParam String keyword)
+            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<Long>(searchService.insertSearch(id, keyword, searchedByMemberStatus));
+        return new SearchApiResult<List<RelatedSearchHashtagDto>>(searchQueryService.getRelatedSearchHashtagByKeyword(keyword));
     }
 
+    @GetMapping("/related/keyword/member")
+    public SearchApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword(@RequestParam String keyword)
+            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-    @GetMapping("/last-search")
-    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMember(@RequestParam Long id) throws NotExistMemberException {
-
-        return new SearchApiResult<List<LastSearchDto>>(searchService.getLastSearchesByMember(id));
+        return new SearchApiResult<List<RelatedSearchMemberDto>>(searchQueryService.getRelatedSearchMemberByKeyword(keyword));
     }
 
 
     @GetMapping("/most-popular")
     public SearchApiResult<List<MostPopularHashtag>> getMostPopularHashtag() {
 
-        return new SearchApiResult<List<MostPopularHashtag>>(searchService.getMostPopularHashtag());
+        return new SearchApiResult<List<MostPopularHashtag>>(searchQueryService.getMostPopularHashtag());
     }
 
+    @GetMapping("/member-last")
+    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMember(@RequestParam Long id) throws NotExistMemberException {
+
+        return new SearchApiResult<List<LastSearchDto>>(searchQueryService.getLastSearchesByMember(id));
+    }
 
     @Data
     @AllArgsConstructor

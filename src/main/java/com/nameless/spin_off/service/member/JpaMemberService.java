@@ -4,11 +4,12 @@ import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +67,15 @@ public class JpaMemberService implements MemberService {
         return member.addBlockedMember(blockedMember, blockedMemberStatus);
     }
 
+    @Transactional()
+    @Override
+    public Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus) throws NotExistMemberException {
+
+        Member member = getMemberWithSearch(memberId);
+
+        return member.addSearch(content, searchedByMemberStatus);
+    }
+
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowingMember(followedMemberId);
 
@@ -86,6 +96,12 @@ public class JpaMemberService implements MemberService {
 
     private Member getMemberByIdWithBlockedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockedMember(memberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private Member getMemberWithSearch(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithSearch(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
     }

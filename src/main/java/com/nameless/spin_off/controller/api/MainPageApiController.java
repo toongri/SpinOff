@@ -3,24 +3,23 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.service.query.MainPageService;
+import com.nameless.spin_off.service.query.MainPageQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-
-import static com.nameless.spin_off.StaticVariable.POPULARITY_DATE_DURATION;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/main-page")
 public class MainPageApiController {
 
-    private final MainPageService mainPageService;
+    private final MainPageQueryService mainPageService;
 
     @GetMapping("/discovery/post/id")
     public MainPageResult<Slice<MainPagePostDto>> getMainPagePostsOrderById(

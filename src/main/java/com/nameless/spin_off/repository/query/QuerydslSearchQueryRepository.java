@@ -1,5 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
@@ -7,6 +8,7 @@ import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.*;
+import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -14,10 +16,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.nameless.spin_off.StaticVariable.MOST_POPULAR_HASHTAG_NUMBER;
-import static com.nameless.spin_off.StaticVariable.RELATED_SEARCH_NUMBER;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.member.QSearchedByMember.searchedByMember;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QPost.post;
 
@@ -28,7 +30,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RelatedSearchMemberDto> getMembersAboutKeyword(String keyword) {
+    public List<RelatedSearchMemberDto> getMembersAboutKeyword(String keyword, int length) {
 
         return jpaQueryFactory
                 .select(new QMemberDto_RelatedSearchMemberDto(
@@ -36,55 +38,55 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
                 .from(member)
                 .where(member.nickname.contains(keyword))
                 .orderBy(member.popularity.desc())
-                .limit(RELATED_SEARCH_NUMBER)
+                .limit(length)
                 .fetch();
     }
 
     @Override
-    public List<RelatedSearchPostDto> getPostsAboutKeyword(String keyword) {
+    public List<RelatedSearchPostDto> getPostsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QPostDto_RelatedSearchPostDto(
                         post.id, post.title))
                 .from(post)
                 .where(post.title.contains(keyword))
                 .orderBy(post.popularity.desc())
-                .limit(RELATED_SEARCH_NUMBER)
+                .limit(length)
                 .fetch();
     }
 
     @Override
-    public List<RelatedSearchHashtagDto> getHashtagsAboutKeyword(String keyword) {
+    public List<RelatedSearchHashtagDto> getHashtagsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QHashtagDto_RelatedSearchHashtagDto(
                         hashtag.id, hashtag.content))
                 .from(hashtag)
                 .where(hashtag.content.contains(keyword))
                 .orderBy(hashtag.popularity.desc())
-                .limit(RELATED_SEARCH_NUMBER)
+                .limit(length)
                 .fetch();
     }
 
     @Override
-    public List<RelatedSearchCollectionDto> getCollectionsAboutKeyword(String keyword) {
+    public List<RelatedSearchCollectionDto> getCollectionsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QCollectionDto_RelatedSearchCollectionDto(
                         collection.id, collection.title))
                 .from(collection)
                 .where(collection.title.contains(keyword))
                 .orderBy(collection.popularity.desc())
-                .limit(RELATED_SEARCH_NUMBER)
+                .limit(length)
                 .fetch();
     }
 
     @Override
-    public List<RelatedSearchMovieDto> getMoviesAboutKeyword(String keyword) {
+    public List<RelatedSearchMovieDto> getMoviesAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QMovieDto_RelatedSearchMovieDto(
-                        movie.id, movie.title))
+                        movie.id, movie.title, movie.imageUrl))
                 .from(movie)
                 .where(movie.title.contains(keyword))
                 .orderBy(movie.popularity.desc())
-                .limit(RELATED_SEARCH_NUMBER)
+                .limit(length)
                 .fetch();
     }
 
@@ -96,6 +98,19 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
                 .from(hashtag)
                 .orderBy(hashtag.popularity.desc())
                 .limit(MOST_POPULAR_HASHTAG_NUMBER)
+                .fetch();
+    }
+
+    @Override
+    public List<LastSearchDto> getLastSearchesByMemberId(Long id) {
+        return jpaQueryFactory
+                .select(new QSearchDto_LastSearchDto(
+                        searchedByMember.id, searchedByMember.content))
+                .from(searchedByMember)
+                .leftJoin(searchedByMember.member, member)
+                .orderBy(searchedByMember.id.desc())
+                .where(member.id.eq(id))
+                .limit(StaticVariable.LAST_SEARCH_NUMBER)
                 .fetch();
     }
 

@@ -82,15 +82,15 @@ public class Complain extends BaseTimeEntity {
 
     @Override
     public int hashCode() {
-        return Objects.hash(member, post, collection);
+        return Objects.hash(member, contentId, contentTypeStatus);
     }
 
     @Override
     public boolean equals(Object complain) {
         if (complain instanceof Complain) {
             if ((((Complain) complain).getMember().equals(member))) {
-                if (((Complain) complain).getPost() == post) {
-                    return ((Complain) complain).getCollection() == collection;
+                if (((Complain) complain).getContentId().equals(contentId)) {
+                    return ((Complain) complain).getContentTypeStatus().equals(contentTypeStatus);
                 }
             }
         }

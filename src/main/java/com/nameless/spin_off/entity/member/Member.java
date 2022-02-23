@@ -25,9 +25,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_DAYS;
+import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_SCORES;
 
 @Entity
 @Getter
@@ -282,10 +282,6 @@ public class Member extends BaseTimeEntity {
     }
 
     //==조회 로직==//
-    public List<SearchedByMember> getLastSearches() {
-        return searches.stream().limit(LAST_SEARCH_NUMBER).collect(Collectors.toList());
-    }
-
     private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {
         return ChronoUnit.DAYS
                 .between(followingMember.getCreatedDate(), currentTime) >= MEMBER_FOLLOW_COUNT_DAYS.get(j) &&

@@ -25,7 +25,7 @@ public class PostApiController {
 
     @PostMapping("")
     public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPost) throws
-            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
+            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
 
         Long postId = postService.insertPostByPostVO(createPost);
 

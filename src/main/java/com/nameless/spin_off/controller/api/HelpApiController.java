@@ -3,7 +3,11 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.entity.help.ComplainStatus;
 import com.nameless.spin_off.entity.help.ContentTypeStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.help.UnknownContentTypeException;
 import com.nameless.spin_off.exception.member.AlreadyComplainException;
+import com.nameless.spin_off.exception.member.NotExistDMException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.service.help.ComplainService;
@@ -26,7 +30,10 @@ public class HelpApiController {
     public HelpResult<Long> createComplain(
             @RequestParam("id") Long id, @RequestParam() Long contentId,
             @RequestParam() ContentTypeStatus contentTypeStatus,
-            @RequestParam("status") ComplainStatus complainStatus) throws NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException {
+            @RequestParam("status") ComplainStatus complainStatus) throws
+            NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
+            UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
+            NotExistCommentInCollectionException {
         Long complainId = complainService.insertComplain(id, contentId, contentTypeStatus, complainStatus);
 
         return new HelpResult<Long>(complainId);

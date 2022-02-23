@@ -2,6 +2,7 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
@@ -44,6 +45,13 @@ public class MemberApiController {
         return new MemberApiResult<Long>(blockId);
     }
 
+    @PostMapping("/search")
+    public MemberApiResult<Long> insertSearchByKeyword(@RequestParam String keyword, @RequestParam Long id,
+                                                       @RequestParam("status") SearchedByMemberStatus searchedByMemberStatus)
+            throws NotExistMemberException {
+
+        return new MemberApiResult<Long>(memberService.insertSearch(id, keyword, searchedByMemberStatus));
+    }
 
     @Data
     @AllArgsConstructor

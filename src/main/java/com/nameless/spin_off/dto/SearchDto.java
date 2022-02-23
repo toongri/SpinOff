@@ -5,15 +5,11 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
-import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.member.SearchedByMember;
 import com.querydsl.core.annotations.QueryProjection;
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
 import java.util.List;
 
 public class SearchDto {
@@ -24,16 +20,17 @@ public class SearchDto {
         private Long id;
         private String content;
 
-        public LastSearchDto(SearchedByMember searchedByMember) {
-            this.id = searchedByMember.getId();
-            this.content = searchedByMember.getContent();
+        @QueryProjection
+        public LastSearchDto(Long id, String content) {
+            this.id = id;
+            this.content = content;
         }
     }
 
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    public static class RelatedSearchDto {
+    public static class RelatedSearchAllDto {
         private List<RelatedSearchPostDto> posts;
         private List<RelatedSearchMovieDto> movies;
         private List<RelatedSearchHashtagDto> hashtags;

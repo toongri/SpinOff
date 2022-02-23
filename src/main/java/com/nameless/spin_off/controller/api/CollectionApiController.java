@@ -9,10 +9,6 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
-
-import static com.nameless.spin_off.StaticVariable.VIEWED_BY_IP_MINUTE;
-
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/collection")
@@ -22,7 +18,7 @@ public class CollectionApiController {
 
     @PostMapping("")
     public CollectionApiResult<Long> createCollectionOne(@RequestBody CreateCollectionVO collectionVO)
-            throws NotExistMemberException {
+            throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
         Long aLong = collectionService.insertCollectionByCollectionVO(collectionVO);
 
         return new CollectionApiResult<Long>(aLong);

@@ -1,16 +1,16 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
@@ -28,9 +28,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaMainPageServiceTest {
+class JpaMainPageQueryServiceTest {
 
-    @Autowired MainPageService mainPageService;
+    @Autowired
+    MainPageQueryService mainPageQueryService;
     @Autowired MemberRepository memberRepository;
     @Autowired HashtagRepository hashtagRepository;
     @Autowired PostRepository postRepository;
@@ -64,7 +65,7 @@ class JpaMainPageServiceTest {
 
         //when
         System.out.println("서비스");
-        List<MainPagePostDto> content = mainPageService
+        List<MainPagePostDto> content = mainPageQueryService
                 .getPostsByFollowedHashtagOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
         //then
@@ -97,7 +98,7 @@ class JpaMainPageServiceTest {
 
         //when
         System.out.println("서비스");
-        List<MainPagePostDto> content = mainPageService
+        List<MainPagePostDto> content = mainPageQueryService
                 .getPostsByFollowedMovieOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
         //then
@@ -129,7 +130,7 @@ class JpaMainPageServiceTest {
         //when
         System.out.println("서비스");
         List<MainPagePostDto> content =
-                mainPageService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
+                mainPageQueryService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
         //then
         assertThat(content.size()).isEqualTo(postList.size());
@@ -162,7 +163,7 @@ class JpaMainPageServiceTest {
         //when
         System.out.println("서비스");
         List<MainPagePostDto> content =
-                mainPageService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
+                mainPageQueryService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
 
         //then
         assertThat(content.size()).isEqualTo(postList.size() - 1);

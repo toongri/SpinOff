@@ -9,7 +9,11 @@ public final class StaticVariable {
     public static final Long VIEWED_BY_IP_MINUTE = 60L;
     public static final Integer LAST_SEARCH_NUMBER = 5;
     public static final Integer MOST_POPULAR_HASHTAG_NUMBER = 5;
-    public static final Integer RELATED_SEARCH_NUMBER = 2;
+    public static final Integer RELATED_SEARCH_ALL_NUMBER = 2;
+    public static final Integer RELATED_SEARCH_HASHTAG_NUMBER = 10;
+    public static final Integer RELATED_SEARCH_MEMBER_NUMBER = 10;
+    public static final Integer RELATED_SEARCH_KEYWORD_MAX_STR = 10;
+    public static final Integer RELATED_SEARCH_KEYWORD_MIN_STR = 2;
     public static final Double COLLECTION_SCORE_VIEW_RATES = 1.0;
     public static final Double COLLECTION_SCORE_LIKE_RATES = 0.5;
     public static final Double COLLECTION_SCORE_COMMENT_RATES = 0.3;

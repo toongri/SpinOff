@@ -6,7 +6,8 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
@@ -15,9 +16,9 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,7 +42,7 @@ public class JpaPostService implements PostService{
     @Transactional()
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException {
+            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
 
         Member member = getMemberById(postVO.getMemberId());
 

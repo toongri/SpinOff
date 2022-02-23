@@ -4,7 +4,7 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -176,7 +176,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     public Slice<Post> findPostsByFollowedHashtagsOrderByIdSliced(Pageable pageable, List<Hashtag> followedHashtags, List<Member> blockedMembers) {
 
         List<Post> posts = jpaQueryFactory
-                .select(post)
+                .selectDistinct(post)
                 .from(post)
                 .join(post.member, member).fetchJoin()
                 .join(post.postedHashtags, postedHashtag).fetchJoin()

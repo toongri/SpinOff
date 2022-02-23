@@ -13,8 +13,10 @@ public class MovieDto {
         private Long id;
         private String title;
 
+        private String imageUrl;
+
         @QueryProjection
-        public RelatedSearchMovieDto(Long id, String title) {
+        public RelatedSearchMovieDto(Long id, String title, String imageUrl) {
             this.id = id;
             this.title = title;
         }

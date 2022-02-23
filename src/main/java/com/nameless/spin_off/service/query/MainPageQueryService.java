@@ -6,9 +6,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
-import java.time.LocalDateTime;
-
-public interface MainPageService {
+public interface MainPageQueryService {
     Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId) throws NotExistMemberException;
     Slice<MainPagePostDto> getPostsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
     Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
