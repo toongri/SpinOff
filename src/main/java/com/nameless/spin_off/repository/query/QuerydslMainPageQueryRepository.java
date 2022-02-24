@@ -1,6 +1,8 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
+import com.nameless.spin_off.dto.QCollectionDto_MainPageCollectionDto;
 import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -15,7 +17,6 @@ import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.*;
 import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
@@ -89,13 +90,15 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsOrderByPopularitySliced(
+    public Slice<MainPageCollectionDto> findCollectionsOrderByPopularitySliced(
             Pageable pageable, Member user, List<Member> blockedMembers) {
 
-        List<Collection> content = jpaQueryFactory
-                .selectDistinct(collection)
+        List<MainPageCollectionDto> content = jpaQueryFactory
+                .select(new QCollectionDto_MainPageCollectionDto(
+                        collection.id, collection.title, member.id, member.nickname,
+                        collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
-                .join(collection.member, member).fetchJoin()
+                .join(collection.member, member)
                 .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC),
                         member.notIn(blockedMembers),
                         memberNotEq(user))
@@ -103,9 +106,6 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
-//                .stream()
-//                .skip(pageable.getOffset())
-//                .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
 
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
@@ -131,9 +131,6 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())
                 .fetch();
-//                .stream()
-//                .skip(pageable.getOffset())
-//                .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
 
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {
@@ -145,12 +142,14 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+    public Slice<MainPageCollectionDto> findCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
 
-        List<Collection> content = jpaQueryFactory
-                .select(collection)
+        List<MainPageCollectionDto> content = jpaQueryFactory
+                .select(new QCollectionDto_MainPageCollectionDto(
+                        collection.id, collection.title, member.id, member.nickname,
+                        collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
-                .join(collection.member, member).fetchJoin()
+                .join(collection.member, member)
                 .where(member.in(followedMembers),
                         member.notIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC))
@@ -227,21 +226,21 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
     }
 
     @Override
-    public Slice<Collection> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections, List<Member> blockedMembers) {
+    public Slice<MainPageCollectionDto> findCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, List<Collection> collections, List<Member> blockedMembers) {
 
-        List<Collection> content = jpaQueryFactory
-                .selectDistinct(collection)
+        List<MainPageCollectionDto> content = jpaQueryFactory
+                .select(new QCollectionDto_MainPageCollectionDto(
+                        collection.id, collection.title, member.id, member.nickname,
+                        collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
-                .join(collection.member, member).fetchJoin()
-                .join(collection.collectedPosts, collectedPost).fetchJoin()
-                .join(collectedPost.post, post).fetchJoin()
+                .join(collection.member, member)
+                .join(collection.collectedPosts, collectedPost)
                 .where(member.notIn(blockedMembers),
                         collection.in(collections))
                 .orderBy(collectedPost.id.desc())
-                .fetch()
-                .stream()
-                .skip(pageable.getOffset())
-                .limit(pageable.getPageSize() + 1).collect(Collectors.toList());
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
 
         boolean hasNext = false;
         if (content.size() > pageable.getPageSize()) {

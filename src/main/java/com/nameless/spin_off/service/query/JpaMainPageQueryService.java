@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionOrderByCollectedDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
@@ -98,10 +97,8 @@ public class JpaMainPageQueryService implements MainPageQueryService {
                     .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
-        Slice<Collection> collectionSlice = mainPageQueryRepository
+        return mainPageQueryRepository
                 .findCollectionsOrderByPopularitySliced(pageable, member, blockedMembers);
-
-        return collectionSlice.map(MainPageCollectionDto::new);
     }
 
     @Override
@@ -160,14 +157,12 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         List<Member> blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<Collection> membersSlice =
-                mainPageQueryRepository.findCollectionsByFollowedMemberOrderByIdSliced(pageable, followedMembers, blockedMembers);
-
-        return membersSlice.map(MainPageCollectionDto::new);
+        return mainPageQueryRepository
+                .findCollectionsByFollowedMemberOrderByIdSliced(pageable, followedMembers, blockedMembers);
     }
 
     @Override
-    public Slice<MainPageCollectionOrderByCollectedDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
+    public Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdWithFollowedCollectionAndBlockedMember(memberId);
 
@@ -176,11 +171,8 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         List<Member> blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<Collection> slice = mainPageQueryRepository
+        return mainPageQueryRepository
                 .findCollectionsByFollowedCollectionsOrderByIdSliced(pageable, followedCollections, blockedMembers);
-
-        return slice.map(MainPageCollectionOrderByCollectedDto::new);
-
     }
 
     private Member getMemberByIdWithFollowedHashtagAndBlockedMember(Long memberId) throws NotExistMemberException {

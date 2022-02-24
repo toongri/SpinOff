@@ -38,12 +38,12 @@ public class JpaSearchQueryService implements SearchQueryService {
 
     @Override
     public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.getHashtagsAboutKeyword(keyword, RELATED_SEARCH_HASHTAG_NUMBER);
+        return searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_HASHTAG_NUMBER);
     }
 
     @Override
     public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.getMembersAboutKeyword(keyword, RELATED_SEARCH_MEMBER_NUMBER);
+        return searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_MEMBER_NUMBER);
     }
 
     @Override
@@ -58,10 +58,10 @@ public class JpaSearchQueryService implements SearchQueryService {
 
     private RelatedSearchAllDto getRelatedSearchDtoByKeyword(String keyword) {
         return new RelatedSearchAllDto(
-                searchQueryRepository.getPostsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getMoviesAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getHashtagsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getMembersAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getCollectionsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER));
+                searchQueryRepository.getRelatedPostsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
+                searchQueryRepository.getRelatedMoviesAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
+                searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
+                searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
+                searchQueryRepository.getRelatedCollectionsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER));
     }
 }

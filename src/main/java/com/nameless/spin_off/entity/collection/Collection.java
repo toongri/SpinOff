@@ -3,6 +3,7 @@ package com.nameless.spin_off.entity.collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.sun.istack.NotNull;
@@ -36,6 +37,10 @@ public class Collection extends BaseTimeEntity {
     private String title;
 
     private String content;
+    private String firstThumbnail;
+    private String secondThumbnail;
+    private String thirdThumbnail;
+    private String fourthThumbnail;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
@@ -102,6 +107,7 @@ public class Collection extends BaseTimeEntity {
     }
 
     public void addCollectedPost(CollectedPost collectedPost) {
+        updateThumbnail(collectedPost.getPost());
         this.collectedPosts.add(collectedPost);
     }
 
@@ -183,20 +189,42 @@ public class Collection extends BaseTimeEntity {
         popularity = viewScore + likeScore + commentScore + followScore;
     }
 
-    private void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
+    public void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
         this.publicOfCollectionStatus = publicOfCollectionStatus;
     }
 
-    private void updateContent(String content) {
+    public void updateContent(String content) {
         this.content = content;
     }
 
-    private void updateTitle(String title) {
+    public void updateTitle(String title) {
         this.title = title;
     }
 
-    private void updateMember(Member member) {
+    public void updateMember(Member member) {
         this.member = member;
+    }
+
+    public void updateFirstThumbnail(String firstThumbnail) {
+        this.firstThumbnail = firstThumbnail;
+    }
+    public void updateSecondThumbnail(String secondThumbnail) {
+        this.secondThumbnail = secondThumbnail;
+    }
+    public void updateThirdThumbnail(String thirdThumbnail) {
+        this.thirdThumbnail = thirdThumbnail;
+    }
+    public void updateFourthThumbnail(String fourthThumbnail) {
+        this.fourthThumbnail = fourthThumbnail;
+    }
+
+    public void updateThumbnail(Post post) {
+        if (post.getThumbnailUrl() != null) {
+            fourthThumbnail = thirdThumbnail;
+            thirdThumbnail = secondThumbnail;
+            secondThumbnail = firstThumbnail;
+            firstThumbnail = post.getThumbnailUrl();
+        }
     }
 
     //==비즈니스 로직==//

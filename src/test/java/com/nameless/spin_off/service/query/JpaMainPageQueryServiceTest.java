@@ -2,7 +2,6 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionOrderByCollectedDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -38,8 +37,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class JpaMainPageQueryServiceTest {
 
-    @Autowired
-    MainPageQueryService mainPageQueryService;
+    @Autowired MainPageQueryService mainPageQueryService;
     @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired CollectionService collectionService;
@@ -301,11 +299,11 @@ class JpaMainPageQueryServiceTest {
 
         //when
         System.out.println("서비스");
-        List<MainPageCollectionOrderByCollectedDto> content =
+        List<MainPageCollectionDto> content =
                 mainPageQueryService.getCollectionsByFollowedCollectionsOrderByIdSliced(PageRequest.of(0, 6), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(MainPageCollectionOrderByCollectedDto::getThumbnailUrls).collect(Collectors.toList()))
+        assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(collectionList.get(9).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
                                 collectionList.get(9).getCollectedPosts().get(1).getPost().getThumbnailUrl()),

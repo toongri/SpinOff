@@ -1,7 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionOrderByCollectedDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.query.MainPageQueryService;
@@ -98,14 +97,14 @@ public class MainPageApiController {
     }
 
     @GetMapping("/following/collection/collection")
-    public MainPageResult<Slice<MainPageCollectionOrderByCollectedDto>> getCollectionsByFollowedCollectionsOrderByIdSliced(
+    public MainPageResult<Slice<MainPageCollectionDto>> getCollectionsByFollowedCollectionsOrderByIdSliced(
             @RequestParam("page") Integer page, @RequestParam("size") Integer size,
             @RequestParam("id") Long memberId) throws NotExistMemberException {
 
-        Slice<MainPageCollectionOrderByCollectedDto> slice = mainPageService
+        Slice<MainPageCollectionDto> slice = mainPageService
                 .getCollectionsByFollowedCollectionsOrderByIdSliced(PageRequest.of(page, size), memberId);
 
-        return new MainPageResult<Slice<MainPageCollectionOrderByCollectedDto>>(slice);
+        return new MainPageResult<Slice<MainPageCollectionDto>>(slice);
     }
 
     @Data

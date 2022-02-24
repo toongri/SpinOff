@@ -11,12 +11,12 @@ import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import java.util.List;
 
 public interface SearchQueryRepository {
-    List<RelatedSearchMemberDto> getMembersAboutKeyword(String keyword, int length);
-    List<RelatedSearchPostDto> getPostsAboutKeyword(String keyword, int length);
-    List<RelatedSearchHashtagDto> getHashtagsAboutKeyword(String keyword, int length);
-    List<RelatedSearchCollectionDto> getCollectionsAboutKeyword(String keyword, int length);
-    List<RelatedSearchMovieDto> getMoviesAboutKeyword(String keyword, int length);
+    List<RelatedSearchMemberDto> getRelatedMembersAboutKeyword(String keyword, int length);
+    List<RelatedSearchPostDto> getRelatedPostsAboutKeyword(String keyword, int length);
+    List<RelatedSearchHashtagDto> getRelatedHashtagsAboutKeyword(String keyword, int length);
+    List<RelatedSearchCollectionDto> getRelatedCollectionsAboutKeyword(String keyword, int length);
+    List<RelatedSearchMovieDto> getRelatedMoviesAboutKeyword(String keyword, int length);
     List<MostPopularHashtag> getMostPopularHashtags();
-
     List<LastSearchDto> getLastSearchesByMemberId(Long id);
+
 }

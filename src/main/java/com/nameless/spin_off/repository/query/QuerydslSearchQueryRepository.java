@@ -30,7 +30,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public List<RelatedSearchMemberDto> getMembersAboutKeyword(String keyword, int length) {
+    public List<RelatedSearchMemberDto> getRelatedMembersAboutKeyword(String keyword, int length) {
 
         return jpaQueryFactory
                 .select(new QMemberDto_RelatedSearchMemberDto(
@@ -43,7 +43,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     }
 
     @Override
-    public List<RelatedSearchPostDto> getPostsAboutKeyword(String keyword, int length) {
+    public List<RelatedSearchPostDto> getRelatedPostsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QPostDto_RelatedSearchPostDto(
                         post.id, post.title))
@@ -55,7 +55,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     }
 
     @Override
-    public List<RelatedSearchHashtagDto> getHashtagsAboutKeyword(String keyword, int length) {
+    public List<RelatedSearchHashtagDto> getRelatedHashtagsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QHashtagDto_RelatedSearchHashtagDto(
                         hashtag.id, hashtag.content))
@@ -67,7 +67,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     }
 
     @Override
-    public List<RelatedSearchCollectionDto> getCollectionsAboutKeyword(String keyword, int length) {
+    public List<RelatedSearchCollectionDto> getRelatedCollectionsAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QCollectionDto_RelatedSearchCollectionDto(
                         collection.id, collection.title))
@@ -79,7 +79,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
     }
 
     @Override
-    public List<RelatedSearchMovieDto> getMoviesAboutKeyword(String keyword, int length) {
+    public List<RelatedSearchMovieDto> getRelatedMoviesAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QMovieDto_RelatedSearchMovieDto(
                         movie.id, movie.title, movie.imageUrl))
