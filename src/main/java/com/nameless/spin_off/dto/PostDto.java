@@ -1,5 +1,6 @@
 package com.nameless.spin_off.dto;
 
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -15,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class PostDto {
@@ -44,6 +44,17 @@ public class PostDto {
         private String memberNickname;
         private String memberProfileImgUrl;
         private String thumbnailUrl;
+
+        @QueryProjection
+        public MainPagePostDto(Long postId, String title, Long memberId, String memberNickname,
+                               String memberProfileImgUrl, String thumbnailUrl) {
+            this.postId = postId;
+            this.postTitle = title;
+            this.memberId = memberId;
+            this.memberNickname = memberNickname;
+            this.memberProfileImgUrl = memberProfileImgUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
 
         public MainPagePostDto(Post post) {
             this.postId = post.getId();
@@ -79,8 +90,9 @@ public class PostDto {
         private Movie movie;
         private String thumbnailUrl;
         private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
-        private List<PostedMedia> postedMedias = new ArrayList<>();
-        private List<Hashtag> hashtags = new ArrayList<>();
+        private List<PostedMedia> postedMedias;
+        private List<Hashtag> hashtags;
+        private List<Collection> collections;
 
         public PostBuilder setMember(Member member) {
             this.member = member;
@@ -103,12 +115,17 @@ public class PostDto {
         }
 
         public PostBuilder setHashTags(List<Hashtag> hashtags) {
-            this.hashtags.addAll(hashtags);
+            this.hashtags = hashtags;
             return this;
         }
 
         public PostBuilder setPostedMedias(List<PostedMedia> postedMedia) {
-            this.postedMedias.addAll(postedMedia);
+            this.postedMedias = postedMedia;
+            return this;
+        }
+
+        public PostBuilder setCollections(List<Collection> collections) {
+            this.collections = collections;
             return this;
         }
 
@@ -123,7 +140,7 @@ public class PostDto {
         }
 
         public Post build() throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
-            return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, movie, publicOfPostStatus);
+            return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, collections, movie, publicOfPostStatus);
         }
     }
 }

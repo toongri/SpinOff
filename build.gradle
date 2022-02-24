@@ -45,7 +45,7 @@ dependencies {
 	compileOnly "org.projectlombok:lombok:${projectLombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${projectLombokVersion}"
 
-	runtimeOnly "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
+	implementation "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
 
 	//swagger 추가
 	implementation "io.springfox:springfox-swagger2:${swaggerVersion}"

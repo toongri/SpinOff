@@ -27,7 +27,7 @@ public interface CommentInCollectionRepository extends JpaRepository<CommentInCo
     Optional<CommentInCollection> findOneByIdWithLikedComment(@Param("id") Long id);
 
     @Query("SELECT DISTINCT commentInCollection FROM CommentInCollection commentInCollection " +
-            "LEFT JOIN FETCH commentInCollection.member m " +
+            "JOIN FETCH commentInCollection.member m " +
             "LEFT JOIN FETCH m.complains complain " +
             "WHERE commentInCollection.id = :id")
     Optional<CommentInCollection> findOneByIdWithComplainOfMember(@Param("id") Long id);

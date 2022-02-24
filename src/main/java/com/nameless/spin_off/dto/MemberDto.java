@@ -2,19 +2,29 @@ package com.nameless.spin_off.dto;
 
 
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.List;
 
 public class MemberDto {
 
+    @Data
+    @NoArgsConstructor
+    public static class SearchMemberDto {
+        private Long id;
+        private String profileImg;
+        private String nickname;
+        private String accountId;
+        private String bio;
+
+        @QueryProjection
+        public SearchMemberDto(Long id, String content) {
+            this.id = id;
+        }
+    }
     @Data
     @NoArgsConstructor
     public static class RelatedSearchMemberDto {

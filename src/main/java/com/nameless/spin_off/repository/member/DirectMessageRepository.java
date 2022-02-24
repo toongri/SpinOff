@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface DirectMessageRepository extends JpaRepository<DirectMessage, Long> {
 
     @Query("SELECT DISTINCT directMessage FROM DirectMessage directMessage " +
-            "LEFT JOIN FETCH directMessage.member m " +
+            "JOIN FETCH directMessage.member m " +
             "LEFT JOIN FETCH m.complains complain " +
             "WHERE directMessage.id = :id")
     Optional<DirectMessage> findOneByIdWithComplainOfMember(@Param("id") Long id);

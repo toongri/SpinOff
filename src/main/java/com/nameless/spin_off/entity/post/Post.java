@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.post;
 
-import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.PostBuilder;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
@@ -11,7 +11,10 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
-import com.nameless.spin_off.exception.post.*;
+import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
+import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
+import com.nameless.spin_off.exception.post.OverContentOfPostException;
+import com.nameless.spin_off.exception.post.OverTitleOfPostException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -96,7 +99,7 @@ public class Post extends BaseTimeEntity {
         postedMedia.updatePost(this);
     }
 
-    private List<Long> addCollectedPosts(List<Collection> collections) {
+    private List<Long> addAllCollectedPost(List<Collection> collections) {
         this.updateCollectScore(collections.size());
         List<CollectedPost> collectedPosts = new ArrayList<>();
 
@@ -155,12 +158,17 @@ public class Post extends BaseTimeEntity {
         }
     }
 
+    public void addAllPostedMedias(List<PostedMedia> postedMedias) {
+        for (PostedMedia postedMedia : postedMedias) {
+            this.addPostedMedia(postedMedia);
+        }
+    }
+
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
-                                  List<Hashtag> hashtags, List<PostedMedia> postedMedias,
+                                  List<Hashtag> hashtags, List<PostedMedia> postedMedias, List<Collection> collections,
                                   Movie movie, PublicOfPostStatus publicOfPostStatus)
-            throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException {
+            throws AlreadyPostedHashtagException, OverTitleOfPostException, OverContentOfPostException {
         Post post = new Post();
         post.updateMember(member);
 
@@ -174,10 +182,15 @@ public class Post extends BaseTimeEntity {
         post.updateContent(content);
         post.updateThumbnailUrl(thumbnailUrl);
         post.addAllPostedHashtagsByHashtags(hashtags);
-        post.updatePostedMedias(postedMedias);
+        post.addAllPostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateCountToZero();
         post.updateAuthorityOfPostStatus(AuthorityOfPostStatus.NORMAL);
+
+
+        if (!collections.isEmpty()) {
+            post.addAllCollectedPost(collections);
+        }
 
         if (movie != null)
             movie.addTaggedPosts(post);
@@ -185,8 +198,8 @@ public class Post extends BaseTimeEntity {
         return post;
     }
 
-    public static PostDto.PostBuilder buildPost() {
-        return new PostDto.PostBuilder();
+    public static PostBuilder buildPost() {
+        return new PostBuilder();
     }
 
     //==수정 메소드==//
@@ -205,12 +218,6 @@ public class Post extends BaseTimeEntity {
 
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
         this.publicOfPostStatus = publicStatus;
-    }
-
-    public void updatePostedMedias(List<PostedMedia> postedMedias) {
-        for (PostedMedia postedMedia : postedMedias) {
-            this.addPostedMedia(postedMedia);
-        }
     }
 
     public void updateThumbnailUrl(String thumbnailUrl) {
@@ -241,7 +248,7 @@ public class Post extends BaseTimeEntity {
     public List<Long> insertCollectedPostByCollections(List<Collection> collections) throws AlreadyCollectedPostException {
 
         if (isNotAlreadyCollectedPosts(collections)) {
-            return addCollectedPosts(collections);
+            return addAllCollectedPost(collections);
         } else {
             throw new AlreadyCollectedPostException();
         }

@@ -161,8 +161,14 @@ class JpaSearchQueryServiceTest {
         Collection collection2 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.PUBLIC));
 
-        Post po = Post.buildPost().setMember(member).setTitle(keyword+"fgd").setContent("").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
-        Post po2 = Post.buildPost().setMember(member).setTitle(keyword+"adfgf").setContent("").setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle(keyword+"fgd").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
+        Post po2 = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle(keyword+"adfgf").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
+
+
         postRepository.save(po);
         postRepository.save(po2);
 

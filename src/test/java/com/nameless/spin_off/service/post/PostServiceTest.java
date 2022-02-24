@@ -8,15 +8,16 @@ import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.*;
+import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
@@ -32,6 +33,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.StaticVariable.POST_LIKE_COUNT_SCORES;
+import static com.nameless.spin_off.StaticVariable.POST_SCORE_LIKE_RATES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -158,7 +161,9 @@ class PostServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
 
         em.flush();
@@ -174,7 +179,7 @@ class PostServiceTest {
         Member member = memberRepository.getById(mem.getId());
 
         //then
-        assertThat(post.getLikeScore()).isEqualTo(StaticVariable.POST_LIKE_COUNT_SCORES.get(0));
+        assertThat(post.getLikeScore()).isEqualTo(POST_LIKE_COUNT_SCORES.get(0)*POST_SCORE_LIKE_RATES);
         assertThat(post.getLikedPosts().size()).isEqualTo(1);
         assertThat(post.getLikedPosts().get(0).getMember()).isEqualTo(member);
 
@@ -186,7 +191,9 @@ class PostServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
 
         em.flush();
@@ -216,7 +223,9 @@ class PostServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
 
         em.flush();
@@ -239,7 +248,9 @@ class PostServiceTest {
         LocalDateTime now;
         Member member = Member.buildMember().build();
         memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(post);
 
         em.flush();
@@ -265,7 +276,9 @@ class PostServiceTest {
         LocalDateTime now;
         Member member = Member.buildMember().build();
         memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(post);
         now = LocalDateTime.now();
         postService.insertViewedPostByIp("00", post.getId());
@@ -293,7 +306,9 @@ class PostServiceTest {
         LocalDateTime now;
         Member member = Member.buildMember().build();
         memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(post);
         now = LocalDateTime.now();
         postService.insertViewedPostByIp("00", post.getId());
@@ -321,7 +336,9 @@ class PostServiceTest {
         LocalDateTime now;
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
         now = LocalDateTime.now();
         po.insertViewedPostByIp("00");

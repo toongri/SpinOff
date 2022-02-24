@@ -10,8 +10,8 @@ import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionExcept
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 
 import static com.nameless.spin_off.StaticVariable.COLLECTION_COMMENT_COUNT_SCORES;
+import static com.nameless.spin_off.StaticVariable.COLLECTION_SCORE_COMMENT_RATES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -62,7 +63,7 @@ class CommentInCollectionServiceTest {
         Collection newCollection = collectionRepository.getById(collection.getId());
 
         //then
-        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size());
+        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size() * COLLECTION_COMMENT_COUNT_SCORES.get(0)*COLLECTION_SCORE_COMMENT_RATES);
         assertThat(newCollection.getCommentInCollections().get(newCollection.getCommentInCollections().size() - 1)).isEqualTo(comment);
     }
 
@@ -94,7 +95,8 @@ class CommentInCollectionServiceTest {
         Collection collection = collectionRepository.getById(col.getId());
 
         //then
-        assertThat(collection.getCommentScore()).isEqualTo(collection.getCommentInCollections().size());
+        assertThat(collection.getCommentScore())
+                .isEqualTo(COLLECTION_COMMENT_COUNT_SCORES.get(0) * COLLECTION_SCORE_COMMENT_RATES * collection.getCommentInCollections().size());
         assertThat(collection.getCommentInCollections().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
         assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);
@@ -103,7 +105,8 @@ class CommentInCollectionServiceTest {
         assertThat(childComment2.getParent()).isEqualTo(parentComment);
         assertThat(collection.getCommentScore()).isEqualTo(collection.getPopularity());
         assertThat(collection.getCommentScore())
-                .isEqualTo(collection.getCommentInCollections().size() * COLLECTION_COMMENT_COUNT_SCORES.get(0));
+                .isEqualTo(collection.getCommentInCollections().size() * COLLECTION_COMMENT_COUNT_SCORES.get(0)*
+                        COLLECTION_SCORE_COMMENT_RATES);
     }
 
     @Test

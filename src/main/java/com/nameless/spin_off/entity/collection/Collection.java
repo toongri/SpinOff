@@ -167,6 +167,10 @@ public class Collection extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateCollectedPosts(List<CollectedPost> collectedPosts) {
+        this.collectedPosts = collectedPosts;
+    }
+
     public void updateCountToZero() {
         this.viewScore = 0.0;
         this.likeScore = 0.0;

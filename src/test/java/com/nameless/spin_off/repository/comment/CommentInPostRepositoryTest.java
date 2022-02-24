@@ -6,8 +6,8 @@ import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
@@ -37,7 +37,9 @@ class CommentInPostRepositoryTest {
         //given
         Member member = Member.buildMember().build();
         memberRepository.save(member);
-        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(post);
         CommentInPost parentComment = CommentInPost.createCommentInPost(member, "야스히로 라할살", null);
         post.addCommentInPost(parentComment);

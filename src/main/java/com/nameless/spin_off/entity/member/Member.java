@@ -48,6 +48,7 @@ public class Member extends BaseTimeEntity {
     private String phoneNumber;
     private String email;
     private String profileImg;
+    private String bio;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<FollowedHashtag> followedHashtags = new HashSet<>();
@@ -201,7 +202,9 @@ public class Member extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
-
+    public void updateBio(String bio) {
+        this.bio = bio;
+    }
     public void updateNickname(String nickname) {
         this.nickname = nickname;
     }

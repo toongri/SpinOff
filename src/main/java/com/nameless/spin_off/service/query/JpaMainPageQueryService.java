@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionOrderByCollectedDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
@@ -12,9 +13,7 @@ import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.MainPageQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,7 +34,6 @@ public class JpaMainPageQueryService implements MainPageQueryService {
 
     private final MainPageQueryRepository mainPageQueryRepository;
     private final MemberRepository memberRepository;
-    private final CollectionRepository collectionRepository;
 
     @Override
     public Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId) throws NotExistMemberException {
@@ -54,9 +52,10 @@ public class JpaMainPageQueryService implements MainPageQueryService {
                     .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
-        Slice<Post> postSlice = mainPageQueryRepository.findPostsOrderByIdBySliced(pageable, member, blockedMembers);
+//        Slice<Post> postSlice = mainPageQueryRepository.findPostsOrderByIdBySliced(pageable, member, blockedMembers);
 
-        return postSlice.map(MainPagePostDto::new);
+//        return postSlice.map(MainPagePostDto::new);
+        return mainPageQueryRepository.findPostsOrderByIdBySliced(pageable, member, blockedMembers);
     }
 
     @Override
@@ -77,11 +76,8 @@ public class JpaMainPageQueryService implements MainPageQueryService {
                     .map(BlockedMember::getMember).collect(Collectors.toList());
         }
 
-
-        Slice<Post> postSlice = mainPageQueryRepository
-                .findPostsOrderByPopularityAfterLocalDateTimeSliced(pageable, member, blockedMembers);
-
-        return postSlice.map(MainPagePostDto::new);
+        return mainPageQueryRepository
+                .findPostsOrderByPopularitySliced(pageable, member, blockedMembers);
     }
 
     @Override
@@ -103,7 +99,7 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         }
 
         Slice<Collection> collectionSlice = mainPageQueryRepository
-                .findCollectionsOrderByPopularityAfterLocalDateTimeSliced(pageable, member, blockedMembers);
+                .findCollectionsOrderByPopularitySliced(pageable, member, blockedMembers);
 
         return collectionSlice.map(MainPageCollectionDto::new);
     }
@@ -119,10 +115,12 @@ public class JpaMainPageQueryService implements MainPageQueryService {
                         .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.ALL))
                         .map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<Post> postsSlice = mainPageQueryRepository
+//        Slice<Post> postsSlice = mainPageQueryRepository
+//                .test(pageable, hashtags, blockedMembers);
+//
+//        return postsSlice.map(MainPagePostDto::new);
+        return mainPageQueryRepository
                 .findPostsByFollowedHashtagsOrderByIdSliced(pageable, hashtags, blockedMembers);
-
-        return postsSlice.map(MainPagePostDto::new);
     }
 
     @Override
@@ -135,10 +133,8 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         List<Member> blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<Post> moviesSlice = mainPageQueryRepository
+        return mainPageQueryRepository
                 .findPostsByFollowedMoviesOrderByIdSliced(pageable, movies, blockedMembers);
-
-        return moviesSlice.map(MainPagePostDto::new);
     }
 
     @Override
@@ -150,10 +146,8 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         List<Member> blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<Post> membersSlice =
-                mainPageQueryRepository.findPostsByFollowingMemberOrderByIdSliced(pageable, followedMembers, blockedMembers);
-
-        return membersSlice.map(MainPagePostDto::new);
+        return mainPageQueryRepository
+                .findPostsByFollowingMemberOrderByIdSliced(pageable, followedMembers, blockedMembers);
     }
 
     @Override
@@ -173,7 +167,7 @@ public class JpaMainPageQueryService implements MainPageQueryService {
     }
 
     @Override
-    public Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
+    public Slice<MainPageCollectionOrderByCollectedDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdWithFollowedCollectionAndBlockedMember(memberId);
 
@@ -185,7 +179,7 @@ public class JpaMainPageQueryService implements MainPageQueryService {
         Slice<Collection> slice = mainPageQueryRepository
                 .findCollectionsByFollowedCollectionsOrderByIdSliced(pageable, followedCollections, blockedMembers);
 
-        return slice.map(MainPageCollectionDto::new);
+        return slice.map(MainPageCollectionOrderByCollectedDto::new);
 
     }
 

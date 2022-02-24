@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.List;
 
 import static com.nameless.spin_off.entity.help.ComplainStatus.TYPE1;
 import static com.nameless.spin_off.entity.help.ContentTypeStatus.COLLECTION;
@@ -76,7 +77,9 @@ class JpaComplainServiceTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
 
         em.flush();
@@ -84,7 +87,7 @@ class JpaComplainServiceTest {
 
         //when
         System.out.println("서비스함수");
-        complainService.insertComplain(mem.getId(), po.getId(), null, TYPE1);
+        complainService.insertComplain(mem.getId(), po.getId(), POST, TYPE1);
 
         System.out.println("멤버");
         Member member = memberRepository.getById(mem2.getId());
@@ -103,9 +106,11 @@ class JpaComplainServiceTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
-        complainService.insertComplain(mem.getId(), po.getId(), null, TYPE1);
+        complainService.insertComplain(mem.getId(), po.getId(), POST, TYPE1);
 
         em.flush();
         em.clear();

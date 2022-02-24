@@ -51,6 +51,7 @@ public class JpaPostService implements PostService{
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
         Movie movie = getMovieById(postVO.getMovieId());
+        List<Collection> collections = getCollectionsByIdIn(postVO.getCollectionIds(), postVO.getMemberId());
 
         Post post =  Post.buildPost()
                 .setMember(member)
@@ -60,10 +61,9 @@ public class JpaPostService implements PostService{
                 .setMovie(movie)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
+                .setCollections(collections)
                 .build();
 
-        List<Collection> collections = getCollectionsByIdIn(postVO.getCollectionIds(), postVO.getMemberId());
-        post.insertCollectedPostByCollections(collections);
         return postRepository.save(post).getId();
     }
 

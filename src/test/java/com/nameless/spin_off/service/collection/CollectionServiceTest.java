@@ -1,9 +1,8 @@
 package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.StaticVariable;
-import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PublicOfPostStatus;
@@ -12,8 +11,8 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
@@ -25,13 +24,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.StaticVariable.COLLECTION_LIKE_COUNT_SCORES;
+import static com.nameless.spin_off.StaticVariable.COLLECTION_SCORE_LIKE_RATES;
+import static com.nameless.spin_off.entity.collection.PublicOfCollectionStatus.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -63,11 +63,9 @@ class CollectionServiceTest {
         em.clear();
 
         //when
-        CollectionDto.CreateCollectionVO createCollectionVO = new CollectionDto
-                .CreateCollectionVO(member.getId(), "", "", PublicOfCollectionStatus.PUBLIC);
-
         System.out.println("서비스 함수");
-        Long aLong = collectionService.insertCollectionByCollectionVO(createCollectionVO);
+        Long aLong = collectionService
+                .insertCollectionByCollectionVO(new CreateCollectionVO(member.getId(), "", "", PUBLIC));
         System.out.println("컬렉션 조회 함수");
         Collection collection = collectionRepository.getById(aLong);
 
@@ -82,8 +80,7 @@ class CollectionServiceTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
 
-        CollectionDto.CreateCollectionVO createCollectionVO1 = new CollectionDto
-                .CreateCollectionVO(-1L, "", "", PublicOfCollectionStatus.PUBLIC);
+        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO(-1L, "", "", PUBLIC);
         //when
 
         //then
@@ -114,7 +111,7 @@ class CollectionServiceTest {
 
         //then
 
-        assertThat(collection.getLikeScore()).isEqualTo(COLLECTION_LIKE_COUNT_SCORES.get(0) * 1.0);
+        assertThat(collection.getLikeScore()).isEqualTo(COLLECTION_LIKE_COUNT_SCORES.get(0) * COLLECTION_SCORE_LIKE_RATES * 1.0);
         assertThat(collection.getLikedCollections().size()).isEqualTo(1);
         assertThat(collection.getLikedCollections().get(0).getMember()).isEqualTo(member);
     }
@@ -332,7 +329,9 @@ class CollectionServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
@@ -368,7 +367,9 @@ class CollectionServiceTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC).build();
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);

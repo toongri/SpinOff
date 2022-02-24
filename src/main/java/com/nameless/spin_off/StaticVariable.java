@@ -65,7 +65,7 @@ public final class StaticVariable {
     public static final List<Double> MEMBER_FOLLOW_COUNT_SCORES = List.of(1.0, 0.5, 0.3, 0.1);
 
     public static final Long POPULARITY_DATE_DURATION = 2L;
-    public static final int COLLECTION_THUMBNAIL_NUMBER = 4;
+    public static final int MAINPAGE_COLLECTION_THUMBNAIL_NUMBER = 2;
 
     public static final List<PublicOfPostStatus> DEFAULT_POST_PUBLIC =
             List.of(PublicOfPostStatus.PUBLIC);

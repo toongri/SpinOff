@@ -1,9 +1,7 @@
 package com.nameless.spin_off.service.movie;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.movie.ViewedMovieByIp;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMovieException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -16,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static com.nameless.spin_off.StaticVariable.MOVIE_FOLLOW_COUNT_SCORES;
-import static com.nameless.spin_off.StaticVariable.MOVIE_SCORE_FOLLOW_RATES;
+import static com.nameless.spin_off.StaticVariable.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -55,12 +52,12 @@ class JpaMovieServiceTest {
         Movie movie3 = movieRepository.getById(mov3.getId());
 
         //then
-        assertThat(movie.getViewScore()).isEqualTo(movie.getViewedMovieByIps().size() * StaticVariable.MOVIE_VIEW_COUNT_SCORES.get(0));
-        assertThat(movie.getViewScore()).isEqualTo(10 * StaticVariable.MOVIE_VIEW_COUNT_SCORES.get(0));
-        assertThat(movie2.getViewScore()).isEqualTo(movie2.getViewedMovieByIps().size());
-        assertThat(movie2.getViewScore()).isEqualTo(2 * StaticVariable.MOVIE_VIEW_COUNT_SCORES.get(0));
-        assertThat(movie3.getViewScore()).isEqualTo(movie3.getViewedMovieByIps().size());
-        assertThat(movie3.getViewScore()).isEqualTo(3 * StaticVariable.MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie.getViewScore()).isEqualTo(movie.getViewedMovieByIps().size() * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie.getViewScore()).isEqualTo(10 * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie2.getViewScore()).isEqualTo(movie2.getViewedMovieByIps().size() * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie2.getViewScore()).isEqualTo(2 * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie3.getViewScore()).isEqualTo(movie3.getViewedMovieByIps().size() * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
+        assertThat(movie3.getViewScore()).isEqualTo(3 * MOVIE_SCORE_VIEW_RATES * MOVIE_VIEW_COUNT_SCORES.get(0));
     }
     @Test
     public void 멤버_팔로우_영화() throws Exception{
