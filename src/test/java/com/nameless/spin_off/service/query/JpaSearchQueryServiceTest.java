@@ -9,13 +9,13 @@ import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -161,10 +161,10 @@ class JpaSearchQueryServiceTest {
         Collection collection2 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.PUBLIC));
 
-        Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+        Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle(keyword+"fgd").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
-        Post po2 = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+        Post po2 = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle(keyword+"adfgf").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
 

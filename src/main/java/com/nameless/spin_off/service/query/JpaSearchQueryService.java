@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.entity.enums.search.RelatedSearchEnum.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,9 +27,9 @@ public class JpaSearchQueryService implements SearchQueryService {
     public RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword)
             throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
 
-        if (keyword.length() < RELATED_SEARCH_KEYWORD_MIN_STR) {
+        if (keyword.length() < RELATED_SEARCH_KEYWORD_MIN_STR.getValue()) {
             throw new UnderLengthRelatedKeywordException();
-        } else if (keyword.length() > RELATED_SEARCH_KEYWORD_MAX_STR) {
+        } else if (keyword.length() > RELATED_SEARCH_KEYWORD_MAX_STR.getValue()) {
             throw new OverLengthRelatedKeywordException();
         } else {
             return getRelatedSearchDtoByKeyword(keyword);
@@ -38,12 +38,12 @@ public class JpaSearchQueryService implements SearchQueryService {
 
     @Override
     public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_HASHTAG_NUMBER);
+        return searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_HASHTAG_NUMBER.getValue());
     }
 
     @Override
     public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_MEMBER_NUMBER);
+        return searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_MEMBER_NUMBER.getValue());
     }
 
     @Override
@@ -58,10 +58,10 @@ public class JpaSearchQueryService implements SearchQueryService {
 
     private RelatedSearchAllDto getRelatedSearchDtoByKeyword(String keyword) {
         return new RelatedSearchAllDto(
-                searchQueryRepository.getRelatedPostsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getRelatedMoviesAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER),
-                searchQueryRepository.getRelatedCollectionsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER));
+                searchQueryRepository.getRelatedPostsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
+                searchQueryRepository.getRelatedMoviesAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
+                searchQueryRepository.getRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
+                searchQueryRepository.getRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
+                searchQueryRepository.getRelatedCollectionsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()));
     }
 }

@@ -23,15 +23,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static com.nameless.spin_off.StaticVariable.COLLECTION_COMMENT_COUNT_SCORES;
-import static com.nameless.spin_off.StaticVariable.COLLECTION_SCORE_COMMENT_RATES;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class CommentInCollectionServiceTest {
+class JpaCommentInCollectionServiceTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
@@ -63,7 +61,7 @@ class CommentInCollectionServiceTest {
         Collection newCollection = collectionRepository.getById(collection.getId());
 
         //then
-        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size() * COLLECTION_COMMENT_COUNT_SCORES.get(0)*COLLECTION_SCORE_COMMENT_RATES);
+        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size() * 1.0 * 0.3);
         assertThat(newCollection.getCommentInCollections().get(newCollection.getCommentInCollections().size() - 1)).isEqualTo(comment);
     }
 
@@ -96,7 +94,7 @@ class CommentInCollectionServiceTest {
 
         //then
         assertThat(collection.getCommentScore())
-                .isEqualTo(COLLECTION_COMMENT_COUNT_SCORES.get(0) * COLLECTION_SCORE_COMMENT_RATES * collection.getCommentInCollections().size());
+                .isEqualTo(1.0 * 0.3 * collection.getCommentInCollections().size());
         assertThat(collection.getCommentInCollections().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
         assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);
@@ -105,8 +103,7 @@ class CommentInCollectionServiceTest {
         assertThat(childComment2.getParent()).isEqualTo(parentComment);
         assertThat(collection.getCommentScore()).isEqualTo(collection.getPopularity());
         assertThat(collection.getCommentScore())
-                .isEqualTo(collection.getCommentInCollections().size() * COLLECTION_COMMENT_COUNT_SCORES.get(0)*
-                        COLLECTION_SCORE_COMMENT_RATES);
+                .isEqualTo(collection.getCommentInCollections().size() * 1.0 * 0.3);
     }
 
     @Test

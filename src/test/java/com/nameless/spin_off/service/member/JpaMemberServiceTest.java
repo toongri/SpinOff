@@ -1,17 +1,10 @@
 package com.nameless.spin_off.service.member;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.MemberDto;
-import com.nameless.spin_off.entity.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.*;
-import com.nameless.spin_off.exception.movie.NotExistMovieException;
-import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 
-import static com.nameless.spin_off.StaticVariable.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -31,8 +23,6 @@ class JpaMemberServiceTest {
 
     @Autowired MemberService memberService;
     @Autowired MemberRepository memberRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired MovieRepository movieRepository;
     @Autowired EntityManager em;
 
     @Test
@@ -122,7 +112,7 @@ class JpaMemberServiceTest {
         assertThat(newMember.getFollowedMembers().size()).isEqualTo(1);
         assertThat(newMember.getFollowedMembers().iterator().next().getMember().getId()).isEqualTo(followedMemberId);
         assertThat(newFollowedMember.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newFollowedMember.getFollowScore()).isEqualTo(MEMBER_FOLLOW_COUNT_SCORES.get(0));
+        assertThat(newFollowedMember.getFollowScore()).isEqualTo(1.0);
     }
 
     @Test

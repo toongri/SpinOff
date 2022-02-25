@@ -5,22 +5,22 @@ import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
@@ -277,8 +277,8 @@ public class InitAddDummy {
                     int postI = (int) (Math.random() * postSize);
                     int collectionI = (int) (Math.random() * memberCollectionSize);
 
-                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
                         Collection byId = collectionRepository.getById(allByMember.get(collectionI).getId());
@@ -304,8 +304,8 @@ public class InitAddDummy {
                     content.deleteCharAt(content.length() - 1);
                     int postI = (int) (Math.random() * postSize);
 
-                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
                         commentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(),
@@ -357,8 +357,8 @@ public class InitAddDummy {
 
                     int postI = (int) (Math.random() * postSize);
 
-                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                    if (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
                         List<CommentInPost> parentsByPost = commentInPostRepository.findParentsByPost(posts.get(postI));
@@ -436,8 +436,8 @@ public class InitAddDummy {
                 for (int i = 0; i < randomI; i++) {
 
                     int i1 = (int) (Math.random() * postSize);
-                    if (posts.get(i1).getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (posts.get(i1).getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                    if (posts.get(i1).getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (posts.get(i1).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(i1).getMember())))) {
 
                         Post byId = postRepository.getById(posts.get(i1).getId());
@@ -454,8 +454,8 @@ public class InitAddDummy {
                 for (int i = 0; i < randomI; i++) {
 
                     int i1 = (int) (Math.random() * commentInPostSize);
-                    if (commentInPosts.get(i1).getPost().getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (commentInPosts.get(i1).getPost().getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                    if (commentInPosts.get(i1).getPost().getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (commentInPosts.get(i1).getPost().getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(commentInPosts.get(i1).getPost().getMember())))) {
 
                         CommentInPost byId = commentInPostRepository.getById(commentInPosts.get(i1).getId());
@@ -489,10 +489,10 @@ public class InitAddDummy {
                 for (int i = 0; i < randomI; i++) {
                     int postI = (int) (Math.random() * postSize);
 
-                    if ((posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.PRIVATE &&
+                    if ((posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.B &&
                             member.equals(posts.get(postI).getMember())) ||
-                            posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.PUBLIC ||
-                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.FOLLOWER &&
+                            posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.A ||
+                            (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
                         postService.insertViewedPostByIp(""+(int)(Math.random() * 500 * memberSize), posts.get(postI).getId());

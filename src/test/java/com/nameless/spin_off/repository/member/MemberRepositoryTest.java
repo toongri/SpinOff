@@ -1,9 +1,9 @@
 package com.nameless.spin_off.repository.member;
 
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class MemberRepositoryTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of()).build());
         }
@@ -73,7 +73,7 @@ public class MemberRepositoryTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of()).build());
         }

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.hashtag;
 
+import com.nameless.spin_off.entity.enums.ContentsTimeEnum;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.*;
 
 @Entity
 @Getter
@@ -101,7 +102,7 @@ public class Hashtag extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedHashtag followedHashtag ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = 1 * HASHTAG_FOLLOW_COUNT_SCORES.get(0);
+        double result = 0, total = HASHTAG_FOLLOW.getLatestScore();
 
         while (i > -1) {
             followedHashtag = followingMembers.get(i);
@@ -109,15 +110,15 @@ public class Hashtag extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == HASHTAG_FOLLOW_COUNT_SCORES.size() - 1) {
+                if (j == HASHTAG_FOLLOW.getScores().size() - 1) {
                     break;
                 }
-                total += HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result;
+                total += HASHTAG_FOLLOW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        followScore = (total + HASHTAG_FOLLOW_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_FOLLOW_RATES;
+        followScore = (total + HASHTAG_FOLLOW.getScores().get(j) * result) * HASHTAG_FOLLOW.getRate();
 
         updatePopularity();
     }
@@ -127,7 +128,7 @@ public class Hashtag extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedHashtagByIp viewedHashtagByIp ;
         int j = 0, i = viewedHashtagByIps.size() - 1;
-        double result = 0, total = 1 * HASHTAG_VIEW_COUNT_SCORES.get(0);
+        double result = 0, total = HASHTAG_VIEW.getLatestScore();
 
         while (i > -1) {
             viewedHashtagByIp = viewedHashtagByIps.get(i);
@@ -135,15 +136,15 @@ public class Hashtag extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == HASHTAG_VIEW_COUNT_SCORES.size() - 1) {
+                if (j == HASHTAG_VIEW.getScores().size() - 1) {
                     break;
                 }
-                total += HASHTAG_VIEW_COUNT_SCORES.get(j) * result;
+                total += HASHTAG_VIEW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        viewScore = (total + HASHTAG_VIEW_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_VIEW_RATES;
+        viewScore = (total + HASHTAG_VIEW.getScores().get(j) * result) * HASHTAG_VIEW.getRate();
 
         updatePopularity();
     }
@@ -153,7 +154,7 @@ public class Hashtag extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         PostedHashtag postedHashtag ;
         int j = 0, i = taggedPosts.size() - 1;
-        double result = 0, total = 1 * HASHTAG_POST_COUNT_SCORES.get(0);
+        double result = 0, total = HASHTAG_POST.getLatestScore();
 
         while (i > -1) {
             postedHashtag = taggedPosts.get(i);
@@ -161,15 +162,15 @@ public class Hashtag extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == HASHTAG_POST_COUNT_SCORES.size() - 1) {
+                if (j == HASHTAG_POST.getScores().size() - 1) {
                     break;
                 }
-                total += HASHTAG_POST_COUNT_SCORES.get(j) * result;
+                total += HASHTAG_POST.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        postScore = (total + HASHTAG_POST_COUNT_SCORES.get(j) * result) * HASHTAG_SCORE_POST_RATES;
+        postScore = (total + HASHTAG_POST.getScores().get(j) * result) * HASHTAG_POST.getRate();
 
         updatePopularity();
     }
@@ -187,29 +188,29 @@ public class Hashtag extends BaseTimeEntity {
             return true;
         }
         return ChronoUnit.MINUTES
-                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= ContentsTimeEnum.VIEWED_BY_IP_MINUTE.getTime();
 
     }
 
     private boolean isInTimeFollowedHashtag(LocalDateTime currentTime, FollowedHashtag followedHashtag, int j) {
         return ChronoUnit.DAYS
-                .between(followedHashtag.getCreatedDate(), currentTime) >= HASHTAG_FOLLOW_COUNT_DAYS.get(j) &&
+                .between(followedHashtag.getCreatedDate(), currentTime) >= HASHTAG_FOLLOW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(followedHashtag.getCreatedDate(), currentTime) < HASHTAG_FOLLOW_COUNT_DAYS.get(j + 1);
+                        .between(followedHashtag.getCreatedDate(), currentTime) < HASHTAG_FOLLOW.getDays().get(j + 1);
     }
 
     private boolean isInTimeViewedHashtag(LocalDateTime currentTime, ViewedHashtagByIp viewedHashtagByIp, int j) {
         return ChronoUnit.DAYS
-                .between(viewedHashtagByIp.getCreatedDate(), currentTime) >= HASHTAG_VIEW_COUNT_DAYS.get(j) &&
+                .between(viewedHashtagByIp.getCreatedDate(), currentTime) >= HASHTAG_VIEW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(viewedHashtagByIp.getCreatedDate(), currentTime) < HASHTAG_VIEW_COUNT_DAYS.get(j + 1);
+                        .between(viewedHashtagByIp.getCreatedDate(), currentTime) < HASHTAG_VIEW.getDays().get(j + 1);
     }
 
     private boolean isInTimePostedHashtag(LocalDateTime currentTime, PostedHashtag postedHashtag, int j) {
         return ChronoUnit.DAYS
-                .between(postedHashtag.getCreatedDate(), currentTime) >= HASHTAG_POST_COUNT_DAYS.get(j) &&
+                .between(postedHashtag.getCreatedDate(), currentTime) >= HASHTAG_POST.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(postedHashtag.getCreatedDate(), currentTime) < HASHTAG_POST_COUNT_DAYS.get(j + 1);
+                        .between(postedHashtag.getCreatedDate(), currentTime) < HASHTAG_POST.getDays().get(j + 1);
     }
 
 }

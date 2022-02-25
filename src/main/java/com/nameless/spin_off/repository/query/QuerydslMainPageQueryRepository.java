@@ -18,9 +18,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.nameless.spin_off.StaticVariable.*;
 import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
+import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.DEFAULT_COLLECTION_PUBLIC;
+import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.FOLLOW_COLLECTION_PUBLIC;
+import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
+import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
@@ -40,7 +43,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member).fetchJoin()
-                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
+                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
                         member.notIn(blockedMembers),
                         memberNotEq(user))
                 .offset(pageable.getOffset())
@@ -72,7 +75,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member).fetchJoin()
-                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC),
+                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
                         member.notIn(blockedMembers),
                         memberNotEq(user))
                 .offset(pageable.getOffset())
@@ -99,7 +102,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
                 .join(collection.member, member)
-                .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC),
+                .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         member.notIn(blockedMembers),
                         memberNotEq(user))
                 .orderBy(collection.popularity.desc())
@@ -126,7 +129,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.member, member)
                 .where(member.in(followedMembers),
                         member.notIn(blockedMembers),
-                        post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC))
+                        post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC.getPrivacyBound()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())
@@ -152,7 +155,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(collection.member, member)
                 .where(member.in(followedMembers),
                         member.notIn(blockedMembers),
-                        collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC))
+                        collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC.getPrivacyBound()))
                 .orderBy(collection.id.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
@@ -178,7 +181,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.postedHashtags, postedHashtag)
                 .where(postedHashtag.hashtag.in(followedHashtags),
                         member.notIn(blockedMembers),
-                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())
@@ -207,7 +210,7 @@ public class QuerydslMainPageQueryRepository implements MainPageQueryRepository 
                 .join(post.movie, movie)
                 .where(movie.in(followedMovies),
                         member.notIn(blockedMembers),
-                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC))
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize() + 1)
                 .orderBy(post.id.desc())

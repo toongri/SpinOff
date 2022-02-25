@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.movie;
 
+import com.nameless.spin_off.entity.enums.ContentsTimeEnum;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
 import lombok.AccessLevel;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.entity.enums.movie.MovieScoreEnum.*;
 
 @Entity
 @Getter
@@ -37,6 +38,9 @@ public class Movie extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedMovieByIp> viewedMovieByIps = new ArrayList<>();
+
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TaggedGenre> taggedGenres = new ArrayList<>();
 
     private Double postScore;
     private Double viewScore;
@@ -116,7 +120,7 @@ public class Movie extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedMovie followedMovie ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = 1 * MOVIE_FOLLOW_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * MOVIE_FOLLOW.getLatestScore();
 
         while (i > -1) {
             followedMovie = followingMembers.get(i);
@@ -124,15 +128,15 @@ public class Movie extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == MOVIE_FOLLOW_COUNT_SCORES.size() - 1) {
+                if (j == MOVIE_FOLLOW.getScores().size() - 1) {
                     break;
                 }
-                total += MOVIE_FOLLOW_COUNT_SCORES.get(j) * result;
+                total += MOVIE_FOLLOW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        followScore = (total + MOVIE_FOLLOW_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_FOLLOW_RATES;
+        followScore = (total + MOVIE_FOLLOW.getScores().get(j) * result) * MOVIE_FOLLOW.getRate();
 
         updatePopularity();
     }
@@ -142,7 +146,7 @@ public class Movie extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedMovieByIp viewedMovieByIp ;
         int j = 0, i = viewedMovieByIps.size() - 1;
-        double result = 0, total = 1 * MOVIE_VIEW_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * MOVIE_VIEW.getLatestScore();
 
         while (i > -1) {
             viewedMovieByIp = viewedMovieByIps.get(i);
@@ -150,15 +154,15 @@ public class Movie extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == MOVIE_VIEW_COUNT_SCORES.size() - 1) {
+                if (j == MOVIE_VIEW.getScores().size() - 1) {
                     break;
                 }
-                total += MOVIE_VIEW_COUNT_SCORES.get(j) * result;
+                total += MOVIE_VIEW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        viewScore = (total + MOVIE_VIEW_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_VIEW_RATES;
+        viewScore = (total + MOVIE_VIEW.getScores().get(j) * result) * MOVIE_VIEW.getRate();
 
         updatePopularity();
     }
@@ -168,7 +172,7 @@ public class Movie extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         Post post ;
         int j = 0, i = taggedPosts.size() - 1;
-        double result = 0, total = 1 * MOVIE_POST_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * MOVIE_POST.getLatestScore();
 
         while (i > -1) {
             post = taggedPosts.get(i);
@@ -176,15 +180,15 @@ public class Movie extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == MOVIE_POST_COUNT_SCORES.size() - 1) {
+                if (j == MOVIE_POST.getScores().size() - 1) {
                     break;
                 }
-                total += MOVIE_POST_COUNT_SCORES.get(j) * result;
+                total += MOVIE_POST.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        postScore = (total + MOVIE_POST_COUNT_SCORES.get(j) * result) * MOVIE_SCORE_POST_RATES;
+        postScore = (total + MOVIE_POST.getScores().get(j) * result) * MOVIE_POST.getRate();
 
         updatePopularity();
     }
@@ -202,28 +206,28 @@ public class Movie extends BaseTimeEntity {
             return true;
         }
         return ChronoUnit.MINUTES
-                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= ContentsTimeEnum.VIEWED_BY_IP_MINUTE.getTime();
     }
 
     private boolean isInTimeFollowedMovie(LocalDateTime currentTime, FollowedMovie followedMovie, int j) {
         return ChronoUnit.DAYS
-                .between(followedMovie.getCreatedDate(), currentTime) >= MOVIE_FOLLOW_COUNT_DAYS.get(j) &&
+                .between(followedMovie.getCreatedDate(), currentTime) >= MOVIE_FOLLOW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(followedMovie.getCreatedDate(), currentTime) < MOVIE_FOLLOW_COUNT_DAYS.get(j + 1);
+                        .between(followedMovie.getCreatedDate(), currentTime) < MOVIE_FOLLOW.getDays().get(j + 1);
     }
 
     private boolean isInTimeViewedMovie(LocalDateTime currentTime, ViewedMovieByIp viewedMovieByIp, int j) {
         return ChronoUnit.DAYS
-                .between(viewedMovieByIp.getCreatedDate(), currentTime) >= MOVIE_VIEW_COUNT_DAYS.get(j) &&
+                .between(viewedMovieByIp.getCreatedDate(), currentTime) >= MOVIE_VIEW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(viewedMovieByIp.getCreatedDate(), currentTime) < MOVIE_VIEW_COUNT_DAYS.get(j + 1);
+                        .between(viewedMovieByIp.getCreatedDate(), currentTime) < MOVIE_VIEW.getDays().get(j + 1);
     }
 
     private boolean isInTimeTaggedPost(LocalDateTime currentTime, Post post, int j) {
         return ChronoUnit.DAYS
-                .between(post.getCreatedDate(), currentTime) >= MOVIE_POST_COUNT_DAYS.get(j) &&
+                .between(post.getCreatedDate(), currentTime) >= MOVIE_POST.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(post.getCreatedDate(), currentTime) < MOVIE_POST_COUNT_DAYS.get(j + 1);
+                        .between(post.getCreatedDate(), currentTime) < MOVIE_POST.getDays().get(j + 1);
     }
 
 }

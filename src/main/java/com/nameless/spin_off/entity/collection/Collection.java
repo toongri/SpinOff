@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -18,7 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.*;
 
 @Entity
 @Getter
@@ -233,7 +235,7 @@ public class Collection extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedCollectionByIp viewedCollectionByIp;
         int j = 0, i = viewedCollectionByIps.size() - 1;
-        double result = 0, total = 1 * COLLECTION_VIEW_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * COLLECTION_VIEW.getLatestScore();
 
         while (i > -1) {
             viewedCollectionByIp = viewedCollectionByIps.get(i);
@@ -241,15 +243,15 @@ public class Collection extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == COLLECTION_VIEW_COUNT_SCORES.size() - 1) {
+                if (j == COLLECTION_VIEW.getScores().size() - 1) {
                     break;
                 }
-                total += COLLECTION_VIEW_COUNT_SCORES.get(j) * result;
+                total += COLLECTION_VIEW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        viewScore = (total + COLLECTION_VIEW_COUNT_SCORES.get(j) * result) * COLLECTION_SCORE_VIEW_RATES;
+        viewScore = (total + COLLECTION_VIEW.getScores().get(j) * result) * COLLECTION_VIEW.getRate();
         updatePopularity();
     }
 
@@ -257,7 +259,7 @@ public class Collection extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         LikedCollection likedCollection;
         int j = 0, i = likedCollections.size() - 1;
-        double result = 0, total = 1 * COLLECTION_LIKE_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * COLLECTION_LIKE.getLatestScore();
 
         while (i > -1) {
             likedCollection = likedCollections.get(i);
@@ -265,15 +267,15 @@ public class Collection extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == COLLECTION_LIKE_COUNT_SCORES.size() - 1) {
+                if (j == COLLECTION_LIKE.getScores().size() - 1) {
                     break;
                 }
-                total += COLLECTION_LIKE_COUNT_SCORES.get(j) * result;
+                total += COLLECTION_LIKE.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        likeScore = (total + COLLECTION_LIKE_COUNT_SCORES.get(j) * result) * COLLECTION_SCORE_LIKE_RATES;
+        likeScore = (total + COLLECTION_LIKE.getScores().get(j) * result) * COLLECTION_LIKE.getRate();
         updatePopularity();
     }
 
@@ -282,7 +284,7 @@ public class Collection extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         CommentInCollection commentInCollection;
         int j = 0, i = commentInCollections.size() - 1;
-        double result = 0, total = 1 * COLLECTION_COMMENT_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * COLLECTION_COMMENT.getLatestScore();
 
         while (i > -1) {
             commentInCollection = commentInCollections.get(i);
@@ -290,15 +292,15 @@ public class Collection extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == COLLECTION_COMMENT_COUNT_SCORES.size() - 1) {
+                if (j == COLLECTION_COMMENT.getScores().size() - 1) {
                     break;
                 }
-                total += COLLECTION_COMMENT_COUNT_SCORES.get(j) * result;
+                total += COLLECTION_COMMENT.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        commentScore = (total + COLLECTION_COMMENT_COUNT_SCORES.get(j) * result) * COLLECTION_SCORE_COMMENT_RATES;
+        commentScore = (total + COLLECTION_COMMENT.getScores().get(j) * result) * COLLECTION_COMMENT.getRate();
 
         updatePopularity();
     }
@@ -307,7 +309,7 @@ public class Collection extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedCollection followedCollection;
         int j = 0, i = followedCollections.size() - 1;
-        double result = 0, total = 1 * COLLECTION_FOLLOW_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * COLLECTION_FOLLOW.getLatestScore();
 
         while (i > -1) {
             followedCollection = followedCollections.get(i);
@@ -315,15 +317,15 @@ public class Collection extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == COLLECTION_FOLLOW_COUNT_SCORES.size() - 1) {
+                if (j == COLLECTION_FOLLOW.getScores().size() - 1) {
                     break;
                 }
-                total += COLLECTION_FOLLOW_COUNT_SCORES.get(j) * result;
+                total += COLLECTION_FOLLOW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        followScore = (total + COLLECTION_FOLLOW_COUNT_SCORES.get(j) * result) * COLLECTION_SCORE_FOLLOW_RATES;
+        followScore = (total + COLLECTION_FOLLOW.getScores().get(j) * result) * COLLECTION_FOLLOW.getRate();
 
         updatePopularity();
     }
@@ -363,43 +365,37 @@ public class Collection extends BaseTimeEntity {
         if (commentInCollectionId == null)
             return null;
 
-        List<CommentInCollection> commentInCollection = commentInCollections.stream()
+        return commentInCollections.stream()
                 .filter(comment -> comment.getId().equals(commentInCollectionId))
-                .collect(Collectors.toList());
-
-        if (commentInCollection.isEmpty()) {
-            throw new NotExistCommentInCollectionException();
-        } else {
-            return commentInCollection.get(0);
-        }
+                .findAny().orElseThrow(NotExistCommentInCollectionException::new);
     }
     //==조회 로직==//
     private boolean isInTimeViewedCollect(LocalDateTime currentTime, ViewedCollectionByIp viewedCollectionByIp, int j) {
         return ChronoUnit.DAYS
-                .between(viewedCollectionByIp.getCreatedDate(), currentTime) >= COLLECTION_VIEW_COUNT_DAYS.get(j) &&
+                .between(viewedCollectionByIp.getCreatedDate(), currentTime) >= COLLECTION_VIEW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(viewedCollectionByIp.getCreatedDate(), currentTime) < COLLECTION_VIEW_COUNT_DAYS.get(j + 1);
+                        .between(viewedCollectionByIp.getCreatedDate(), currentTime) < COLLECTION_VIEW.getDays().get(j + 1);
     }
 
     private boolean isInTimeLikedCollect(LocalDateTime currentTime, LikedCollection likedCollection, int j) {
         return ChronoUnit.DAYS
-                .between(likedCollection.getCreatedDate(), currentTime) >= COLLECTION_LIKE_COUNT_DAYS.get(j) &&
+                .between(likedCollection.getCreatedDate(), currentTime) >= COLLECTION_LIKE.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(likedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKE_COUNT_DAYS.get(j + 1);
+                        .between(likedCollection.getCreatedDate(), currentTime) < COLLECTION_LIKE.getDays().get(j + 1);
     }
 
     private boolean isInTimeCommentInCollect(LocalDateTime currentTime, CommentInCollection commentInCollection, int j) {
         return ChronoUnit.DAYS
-                .between(commentInCollection.getCreatedDate(), currentTime) >= COLLECTION_COMMENT_COUNT_DAYS.get(j) &&
+                .between(commentInCollection.getCreatedDate(), currentTime) >= COLLECTION_COMMENT.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(commentInCollection.getCreatedDate(), currentTime) < COLLECTION_COMMENT_COUNT_DAYS.get(j + 1);
+                        .between(commentInCollection.getCreatedDate(), currentTime) < COLLECTION_COMMENT.getDays().get(j + 1);
     }
 
     private boolean isInTimeFollowedCollect(LocalDateTime currentTime, FollowedCollection followedCollection, int j) {
         return ChronoUnit.DAYS
-                .between(followedCollection.getCreatedDate(), currentTime) >= COLLECTION_FOLLOW_COUNT_DAYS.get(j) &&
+                .between(followedCollection.getCreatedDate(), currentTime) >= COLLECTION_FOLLOW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(followedCollection.getCreatedDate(), currentTime) < COLLECTION_FOLLOW_COUNT_DAYS.get(j + 1);
+                        .between(followedCollection.getCreatedDate(), currentTime) < COLLECTION_FOLLOW.getDays().get(j + 1);
     }
     public Integer getViewSize() {
         return viewedCollectionByIps.size();
@@ -417,7 +413,7 @@ public class Collection extends BaseTimeEntity {
             return true;
         }
         return ChronoUnit.MINUTES
-                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE.getTime();
 
     }
 

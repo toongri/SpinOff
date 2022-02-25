@@ -13,18 +13,31 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchMemberDto {
+    public static class SearchPageAtAllMemberDto {
+        private Long id;
+        private String profileImg;
+        private String nickname;
+        private String accountId;
+
+        @QueryProjection
+        public SearchPageAtAllMemberDto(Long id, String profileImg, String nickname, String accountId) {
+            this.id = id;
+            this.profileImg = profileImg;
+            this.nickname = nickname;
+            this.accountId = accountId;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class SearchPageAtMemberMemberDto {
         private Long id;
         private String profileImg;
         private String nickname;
         private String accountId;
         private String bio;
-
-        @QueryProjection
-        public SearchMemberDto(Long id, String content) {
-            this.id = id;
-        }
     }
+
     @Data
     @NoArgsConstructor
     public static class RelatedSearchMemberDto {

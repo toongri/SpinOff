@@ -4,6 +4,8 @@ import com.nameless.spin_off.dto.PostDto.PostBuilder;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.enums.post.AuthorityOfPostStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
@@ -30,7 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.StaticVariable.*;
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.*;
 
 @Entity
 @Getter
@@ -277,15 +280,9 @@ public class Post extends BaseTimeEntity {
         if (commentInPostId == null)
             return null;
 
-        List<CommentInPost> commentInPost = commentInPosts.stream()
-                .filter(comment -> comment.getId().equals(commentInPostId))
-                .collect(Collectors.toList());
+        return commentInPosts.stream().filter(comment -> comment.getId().equals(commentInPostId))
+                .findAny().orElseThrow(NotExistCommentInPostException::new);
 
-        if (commentInPost.isEmpty()) {
-            throw new NotExistCommentInPostException();
-        } else {
-            return commentInPost.get(0);
-        }
     }
 
     public void updateViewScore() {
@@ -293,7 +290,7 @@ public class Post extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedPostByIp viewedPostByIp;
         int j = 0, i = viewedPostByIps.size() - 1;
-        double result = 0, total = 1 * POST_VIEW_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * POST_VIEW.getLatestScore();
 
         while (i > -1) {
             viewedPostByIp = viewedPostByIps.get(i);
@@ -301,15 +298,15 @@ public class Post extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == POST_VIEW_COUNT_SCORES.size() - 1) {
+                if (j == POST_VIEW.getScores().size() - 1) {
                     break;
                 }
-                total += POST_VIEW_COUNT_SCORES.get(j) * result;
+                total += POST_VIEW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        viewScore = (total + POST_VIEW_COUNT_SCORES.get(j) * result ) * POST_SCORE_VIEW_RATES;
+        viewScore = (total + POST_VIEW.getScores().get(j) * result ) * POST_VIEW.getRate();
         updatePopularity();
     }
 
@@ -318,7 +315,7 @@ public class Post extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         LikedPost likedPost;
         int j = 0, i = likedPosts.size() - 1;
-        double result = 0, total = 1 * POST_LIKE_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * POST_LIKE.getLatestScore();
 
         while (i > -1) {
             likedPost = likedPosts.get(i);
@@ -326,15 +323,15 @@ public class Post extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == POST_LIKE_COUNT_SCORES.size() - 1) {
+                if (j == POST_LIKE.getScores().size() - 1) {
                     break;
                 }
-                total += POST_LIKE_COUNT_SCORES.get(j) * result;
+                total += POST_LIKE.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        likeScore = (total + POST_LIKE_COUNT_SCORES.get(j) * result) * POST_SCORE_LIKE_RATES;
+        likeScore = (total + POST_LIKE.getScores().get(j) * result) * POST_LIKE.getRate();
         updatePopularity();
     }
 
@@ -343,7 +340,7 @@ public class Post extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         CommentInPost commentInPost;
         int j = 0, i = commentInPosts.size() - 1;
-        double result = 0, total = 1 * POST_COMMENT_COUNT_SCORES.get(0);
+        double result = 0, total = 1 * POST_COMMENT.getLatestScore();
 
         while (i > -1) {
             commentInPost = commentInPosts.get(i);
@@ -351,15 +348,15 @@ public class Post extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == POST_COMMENT_COUNT_SCORES.size() - 1) {
+                if (j == POST_COMMENT.getScores().size() - 1) {
                     break;
                 }
-                total += POST_COMMENT_COUNT_SCORES.get(j) * result;
+                total += POST_COMMENT.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        commentScore = (total + POST_COMMENT_COUNT_SCORES.get(j) * result) * POST_SCORE_COMMENT_RATES;
+        commentScore = (total + POST_COMMENT.getScores().get(j) * result) * POST_COMMENT.getRate();
         updatePopularity();
     }
 
@@ -368,7 +365,7 @@ public class Post extends BaseTimeEntity {
         LocalDateTime currentTime = LocalDateTime.now();
         CollectedPost collectedPost;
         int j = 0, i = collectedPosts.size() - 1;
-        double result = 0, total = listSize * POST_COLLECT_COUNT_SCORES.get(0);
+        double result = 0, total = listSize * POST_COLLECT.getLatestScore();
 
         while (i > -1) {
             collectedPost = collectedPosts.get(i);
@@ -376,15 +373,15 @@ public class Post extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == POST_COLLECT_COUNT_SCORES.size() - 1) {
+                if (j == POST_COLLECT.getScores().size() - 1) {
                     break;
                 }
-                total += POST_COLLECT_COUNT_SCORES.get(j) * result;
+                total += POST_COLLECT.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        collectionScore = (total + POST_COLLECT_COUNT_SCORES.get(j) * result) * POST_SCORE_COLLECT_RATES;
+        collectionScore = (total + POST_COLLECT.getScores().get(j) * result) * POST_COLLECT.getRate();
         updatePopularity();
     }
 
@@ -406,7 +403,7 @@ public class Post extends BaseTimeEntity {
             return true;
         }
         return ChronoUnit.MINUTES
-                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE;
+                .between(views.get(views.size() - 1).getCreatedDate(), currentTime) >= VIEWED_BY_IP_MINUTE.getTime();
     }
 
     public Boolean isNotAlreadyMemberLikePost(Member member) {
@@ -419,29 +416,29 @@ public class Post extends BaseTimeEntity {
 
     private boolean isInTimeViewedPost(LocalDateTime currentTime, ViewedPostByIp viewedPostByIp, int j) {
         return ChronoUnit.DAYS
-                .between(viewedPostByIp.getCreatedDate(), currentTime) >= POST_VIEW_COUNT_DAYS.get(j) &&
+                .between(viewedPostByIp.getCreatedDate(), currentTime) >= POST_VIEW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(viewedPostByIp.getCreatedDate(), currentTime) < POST_VIEW_COUNT_DAYS.get(j + 1);
+                        .between(viewedPostByIp.getCreatedDate(), currentTime) < POST_VIEW.getDays().get(j + 1);
     }
 
     private boolean isInTimeLikedPost(LocalDateTime currentTime, LikedPost likedPost, int j) {
         return ChronoUnit.DAYS
-                .between(likedPost.getCreatedDate(), currentTime) >= POST_LIKE_COUNT_DAYS.get(j) &&
+                .between(likedPost.getCreatedDate(), currentTime) >= POST_LIKE.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(likedPost.getCreatedDate(), currentTime) < POST_LIKE_COUNT_DAYS.get(j + 1);
+                        .between(likedPost.getCreatedDate(), currentTime) < POST_LIKE.getDays().get(j + 1);
     }
 
     private boolean isInTimeCollectedPost(LocalDateTime currentTime, CollectedPost collectedPost, int j) {
         return ChronoUnit.DAYS
-                .between(collectedPost.getCreatedDate(), currentTime) >= POST_COLLECT_COUNT_DAYS.get(j) &&
+                .between(collectedPost.getCreatedDate(), currentTime) >= POST_COLLECT.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(collectedPost.getCreatedDate(), currentTime) < POST_COLLECT_COUNT_DAYS.get(j + 1);
+                        .between(collectedPost.getCreatedDate(), currentTime) < POST_COLLECT.getDays().get(j + 1);
     }
 
     private boolean isInTimeCommentInPost(LocalDateTime currentTime, CommentInPost commentInPost, int j) {
         return ChronoUnit.DAYS
-                .between(commentInPost.getCreatedDate(), currentTime) >= POST_COMMENT_COUNT_DAYS.get(j) &&
+                .between(commentInPost.getCreatedDate(), currentTime) >= POST_COMMENT.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(commentInPost.getCreatedDate(), currentTime) < POST_COMMENT_COUNT_DAYS.get(j + 1);
+                        .between(commentInPost.getCreatedDate(), currentTime) < POST_COMMENT.getDays().get(j + 1);
     }
 }

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.member;
 
+import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;

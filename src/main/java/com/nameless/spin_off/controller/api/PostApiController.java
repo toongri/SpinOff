@@ -1,6 +1,8 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.entity.enums.EnumMapper;
+import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
@@ -22,6 +24,7 @@ import java.util.List;
 public class PostApiController {
 
     private final PostService postService;
+    private final EnumMapper enumMapper;
 
     @PostMapping("")
     public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPost) throws
@@ -59,6 +62,11 @@ public class PostApiController {
         List<Long> resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);
 
         return new PostApiResult<List<Long>>(resultId);
+    }
+
+    @GetMapping("/post-public-categories")
+    public List<EnumMapperValue> getPostPublicCategories() {
+        return enumMapper.get("PublicOfPostStatus");
     }
 
     @Data

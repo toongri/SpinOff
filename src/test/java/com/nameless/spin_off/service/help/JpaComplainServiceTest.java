@@ -1,10 +1,10 @@
 package com.nameless.spin_off.service.help;
 
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.AlreadyComplainException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -24,9 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.nameless.spin_off.entity.help.ComplainStatus.TYPE1;
-import static com.nameless.spin_off.entity.help.ContentTypeStatus.COLLECTION;
-import static com.nameless.spin_off.entity.help.ContentTypeStatus.POST;
+import static com.nameless.spin_off.entity.enums.help.ComplainStatus.TYPE1;
+import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.COLLECTION;
+import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.POST;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@Rollback(value = false)
@@ -77,7 +77,7 @@ class JpaComplainServiceTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+        Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
@@ -106,7 +106,7 @@ class JpaComplainServiceTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);

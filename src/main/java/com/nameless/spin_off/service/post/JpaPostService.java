@@ -1,6 +1,5 @@
 package com.nameless.spin_off.service.post;
 
-import com.nameless.spin_off.StaticVariable;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -27,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.nameless.spin_off.entity.enums.BanListOfContentsEnum.CANT_CONTAIN_AT_HASHTAG;
 
 @Service
 @RequiredArgsConstructor
@@ -150,7 +151,7 @@ public class JpaPostService implements PostService{
     private Optional<String> isNotContainCantChar(List<String> hashtagContents) {
 
         for (String hashtagContent : hashtagContents) {
-            for (String cantContainChar : StaticVariable.CANT_CONTAIN_AT_HASHTAG) {
+            for (String cantContainChar : CANT_CONTAIN_AT_HASHTAG.getBanList()) {
                 if (hashtagContent.contains(cantContainChar)) {
                     return Optional.of(hashtagContent);
                 }

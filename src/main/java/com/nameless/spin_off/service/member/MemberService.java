@@ -1,8 +1,8 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
-import com.nameless.spin_off.entity.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
 
 public interface MemberService {

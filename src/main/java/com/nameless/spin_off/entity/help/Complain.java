@@ -1,5 +1,7 @@
 package com.nameless.spin_off.entity.help;
 
+import com.nameless.spin_off.entity.enums.help.ComplainStatus;
+import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;

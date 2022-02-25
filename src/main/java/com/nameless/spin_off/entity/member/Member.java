@@ -3,11 +3,13 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
+import com.nameless.spin_off.entity.enums.help.ComplainStatus;
+import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.help.Complain;
-import com.nameless.spin_off.entity.help.ComplainStatus;
-import com.nameless.spin_off.entity.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -26,8 +28,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_DAYS;
-import static com.nameless.spin_off.StaticVariable.MEMBER_FOLLOW_COUNT_SCORES;
+import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER__FOLLOW;
 
 @Entity
 @Getter
@@ -257,13 +258,14 @@ public class Member extends BaseTimeEntity {
         complainCount = (long)complains.size();
         updatePopularity();
     }
+
     //==비즈니스 로직==//
     public void updateFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedMember followedMember ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = 1 * MEMBER_FOLLOW_COUNT_SCORES.get(0);
+        double result = 0, total = MEMBER__FOLLOW.getLatestScore();
 
         while (i > -1) {
             followedMember = followingMembers.get(i);
@@ -271,15 +273,15 @@ public class Member extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == MEMBER_FOLLOW_COUNT_SCORES.size() - 1) {
+                if (j == MEMBER__FOLLOW.getScores().size() - 1) {
                     break;
                 }
-                total += MEMBER_FOLLOW_COUNT_SCORES.get(j) * result;
+                total += MEMBER__FOLLOW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        followScore = total + MEMBER_FOLLOW_COUNT_SCORES.get(j) * result;
+        followScore = total + MEMBER__FOLLOW.getScores().get(j) * result;
 
         updatePopularity();
     }
@@ -287,8 +289,8 @@ public class Member extends BaseTimeEntity {
     //==조회 로직==//
     private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {
         return ChronoUnit.DAYS
-                .between(followingMember.getCreatedDate(), currentTime) >= MEMBER_FOLLOW_COUNT_DAYS.get(j) &&
+                .between(followingMember.getCreatedDate(), currentTime) >= MEMBER__FOLLOW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(followingMember.getCreatedDate(), currentTime) < MEMBER_FOLLOW_COUNT_DAYS.get(j + 1);
+                        .between(followingMember.getCreatedDate(), currentTime) < MEMBER__FOLLOW.getDays().get(j + 1);
     }
 }

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.help;
 
+import com.nameless.spin_off.entity.enums.help.InquirePublicStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.sun.istack.NotNull;

@@ -1,12 +1,12 @@
 package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PostedMedia;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.post.OverContentOfPostException;
@@ -19,6 +19,28 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 public class PostDto {
+    @Data
+    @NoArgsConstructor
+    public static class SearchPageAtAllPostDto {
+
+        private Long postId;
+        private String postTitle;
+        private Long memberId;
+        private String memberNickname;
+        private String memberProfileImgUrl;
+        private String thumbnailUrl;
+
+        @QueryProjection
+        public SearchPageAtAllPostDto(Long postId, String title, Long memberId, String memberNickname,
+                               String memberProfileImgUrl, String thumbnailUrl) {
+            this.postId = postId;
+            this.postTitle = title;
+            this.memberId = memberId;
+            this.memberNickname = memberNickname;
+            this.memberProfileImgUrl = memberProfileImgUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
 
     @Data
     @NoArgsConstructor
@@ -55,15 +77,6 @@ public class PostDto {
             this.memberProfileImgUrl = memberProfileImgUrl;
             this.thumbnailUrl = thumbnailUrl;
         }
-
-        public MainPagePostDto(Post post) {
-            this.postId = post.getId();
-            this.postTitle = post.getTitle();
-            this.memberId = post.getMember().getId();
-            this.memberNickname = post.getMember().getNickname();
-            this.memberProfileImgUrl = post.getMember().getProfileImg();
-            this.thumbnailUrl = post.getThumbnailUrl();
-        }
     }
 
     @Data
@@ -89,7 +102,7 @@ public class PostDto {
         private String content;
         private Movie movie;
         private String thumbnailUrl;
-        private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.PRIVATE;
+        private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.B;
         private List<PostedMedia> postedMedias;
         private List<Hashtag> hashtags;
         private List<Collection> collections;

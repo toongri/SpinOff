@@ -1,7 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.entity.help.ComplainStatus;
-import com.nameless.spin_off.entity.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.help.ComplainStatus;
+import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;

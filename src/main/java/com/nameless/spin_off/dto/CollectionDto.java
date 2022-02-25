@@ -1,6 +1,6 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.entity.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;

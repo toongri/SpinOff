@@ -4,12 +4,12 @@ import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.collection.PublicOfCollectionStatus.PUBLIC;
+import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.PUBLIC;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@Rollback(value = false)
@@ -65,7 +65,7 @@ class JpaMainPageQueryServiceTest {
         hashtagRepository.saveAll(hashtagList);
         for (Hashtag hashtag : hashtagList) {
             member.addFollowedHashtag(hashtag);
-            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of(hashtag)).build());
         }
@@ -102,7 +102,7 @@ class JpaMainPageQueryServiceTest {
                     new CollectionDto.CreateCollectionVO(mem.getId(), "", "", PUBLIC));
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(mem.getId()+"0")
                     .setHashTags(List.of()).setCollections(List.of(byId)).build());
@@ -110,7 +110,7 @@ class JpaMainPageQueryServiceTest {
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -120,7 +120,7 @@ class JpaMainPageQueryServiceTest {
         }
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -190,7 +190,7 @@ class JpaMainPageQueryServiceTest {
                             new CollectionDto.CreateCollectionVO(mem.getId(), "", "", PUBLIC));
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(mem.getId()+"0")
                     .setHashTags(List.of()).setCollections(List.of(byId)).build());
@@ -198,7 +198,7 @@ class JpaMainPageQueryServiceTest {
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -208,7 +208,7 @@ class JpaMainPageQueryServiceTest {
         }
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -264,7 +264,7 @@ class JpaMainPageQueryServiceTest {
             Collection byId = collectionRepository.getById(aLong);
             collectionService.insertFollowedCollectionByMemberId(member.getId(), aLong);
             collectionList.add(byId);
-            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(mem.getId()+"0")
                     .setHashTags(List.of()).setCollections(List.of(byId)).build();
@@ -274,7 +274,7 @@ class JpaMainPageQueryServiceTest {
         }
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -284,7 +284,7 @@ class JpaMainPageQueryServiceTest {
         }
 
         for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
                     .setHashTags(List.of()).setCollections(List.of(collection)).build();
@@ -337,7 +337,7 @@ class JpaMainPageQueryServiceTest {
         movieList = movieRepository.saveAll(movieList);
         for (Movie movie : movieList) {
             member.addFollowedMovie(movie);
-            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of()).setMovie(movie).build());
         }
@@ -370,7 +370,7 @@ class JpaMainPageQueryServiceTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of()).build());
         }
@@ -403,7 +403,7 @@ class JpaMainPageQueryServiceTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.PUBLIC)
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                     .setHashTags(List.of()).build());
         }

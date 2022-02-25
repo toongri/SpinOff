@@ -3,8 +3,8 @@ package com.nameless.spin_off.service.help;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.help.ComplainStatus;
-import com.nameless.spin_off.entity.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.help.ComplainStatus;
+import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.member.DirectMessage;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -28,7 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static com.nameless.spin_off.entity.help.ContentTypeStatus.*;
+import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.*;
 
 @Service
 @RequiredArgsConstructor

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static com.nameless.spin_off.StaticVariable.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -52,12 +51,12 @@ class JpaHashtagServiceTest {
         Hashtag tag3 = hashtagRepository.getById(hashtag3.getId());
 
         //then
-        assertThat(tag.getViewScore()).isEqualTo(tag.getViewedHashtagByIps().size() * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
-        assertThat(tag.getViewScore()).isEqualTo(10 * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
-        assertThat(tag2.getViewScore()).isEqualTo(tag2.getViewedHashtagByIps().size() * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
-        assertThat(tag2.getViewScore()).isEqualTo(2 * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
-        assertThat(tag3.getViewScore()).isEqualTo(tag3.getViewedHashtagByIps().size() * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
-        assertThat(tag3.getViewScore()).isEqualTo(3 * HASHTAG_VIEW_COUNT_SCORES.get(0) * HASHTAG_SCORE_VIEW_RATES);
+        assertThat(tag.getViewScore()).isEqualTo(tag.getViewedHashtagByIps().size() * 1.0 * 0.3);
+        assertThat(tag.getViewScore()).isEqualTo(10 * 1.0 * 0.3);
+        assertThat(tag2.getViewScore()).isEqualTo(tag2.getViewedHashtagByIps().size() * 1.0 * 0.3);
+        assertThat(tag2.getViewScore()).isEqualTo(2 * 1.0 * 0.3);
+        assertThat(tag3.getViewScore()).isEqualTo(tag3.getViewedHashtagByIps().size() * 1.0 * 0.3);
+        assertThat(tag3.getViewScore()).isEqualTo(3 * 1.0 * 0.3);
     }
 
 
@@ -86,7 +85,7 @@ class JpaHashtagServiceTest {
         assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
         assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
         assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newHashtag.getFollowScore()).isEqualTo(HASHTAG_FOLLOW_COUNT_SCORES.get(0) * HASHTAG_SCORE_FOLLOW_RATES);
+        assertThat(newHashtag.getFollowScore()).isEqualTo(1.0 * 0.5);
     }
 
     @Test

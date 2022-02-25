@@ -1,4 +1,4 @@
-package com.nameless.spin_off.entity.member;
+package com.nameless.spin_off.entity.enums.member;
 
 public enum PreferenceOfMemberStatus {
     TYPE1, TYPE2, TYPE3, TYPE4, TYPE5, TYPE6
