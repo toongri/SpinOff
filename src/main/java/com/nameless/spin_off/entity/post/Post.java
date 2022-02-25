@@ -188,7 +188,7 @@ public class Post extends BaseTimeEntity {
         post.addAllPostedMedias(postedMedias);
         post.updatePublicOfPostStatus(publicOfPostStatus);
         post.updateCountToZero();
-        post.updateAuthorityOfPostStatus(AuthorityOfPostStatus.NORMAL);
+        post.updateAuthorityOfPostStatus(AuthorityOfPostStatus.C);
 
 
         if (!collections.isEmpty()) {

@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.PUBLIC;
+import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@Rollback(value = false)
@@ -99,7 +99,7 @@ class JpaMainPageQueryServiceTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", PUBLIC));
+                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -187,7 +187,7 @@ class JpaMainPageQueryServiceTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                            new CollectionDto.CreateCollectionVO(mem.getId(), "", "", PUBLIC));
+                            new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -260,7 +260,7 @@ class JpaMainPageQueryServiceTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", PUBLIC));
+                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
             Collection byId = collectionRepository.getById(aLong);
             collectionService.insertFollowedCollectionByMemberId(member.getId(), aLong);
             collectionList.add(byId);
@@ -408,7 +408,7 @@ class JpaMainPageQueryServiceTest {
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);
-        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.ALL);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
 
 
         em.flush();

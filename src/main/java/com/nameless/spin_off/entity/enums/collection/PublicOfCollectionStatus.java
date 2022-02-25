@@ -1,5 +1,25 @@
 package com.nameless.spin_off.entity.enums.collection;
 
-public enum PublicOfCollectionStatus {
-    PUBLIC, PRIVATE, FOLLOWER
+import com.nameless.spin_off.entity.enums.EnumMapperType;
+
+public enum PublicOfCollectionStatus implements EnumMapperType {
+    A("PUBLIC"),
+    B("PRIVATE"),
+    C("FOLLOWER");
+
+    private final String title;
+
+    PublicOfCollectionStatus(String title) {
+        this.title = title;
+    }
+
+    @Override
+    public String getCode() {
+        return name();
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
+    }
 }

@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.help;
 
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -24,9 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.help.ComplainStatus.TYPE1;
-import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.COLLECTION;
-import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.POST;
+import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.A;
+import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.B;
 import static org.assertj.core.api.Assertions.assertThat;
 
 //@Rollback(value = false)
@@ -58,7 +58,7 @@ class JpaComplainServiceTest {
 
         //when
         System.out.println("서비스함수");
-        complainService.insertComplain(mem.getId(), col.getId(), ContentTypeStatus.COLLECTION, TYPE1);
+        complainService.insertComplain(mem.getId(), col.getId(), ContentTypeStatus.B, ComplainStatus.A);
 
         System.out.println("멤버");
         Member member = memberRepository.getById(mem2.getId());
@@ -87,7 +87,7 @@ class JpaComplainServiceTest {
 
         //when
         System.out.println("서비스함수");
-        complainService.insertComplain(mem.getId(), po.getId(), POST, TYPE1);
+        complainService.insertComplain(mem.getId(), po.getId(), A, ComplainStatus.A);
 
         System.out.println("멤버");
         Member member = memberRepository.getById(mem2.getId());
@@ -110,7 +110,7 @@ class JpaComplainServiceTest {
                 .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
-        complainService.insertComplain(mem.getId(), po.getId(), POST, TYPE1);
+        complainService.insertComplain(mem.getId(), po.getId(), A, ComplainStatus.A);
 
         em.flush();
         em.clear();
@@ -118,13 +118,13 @@ class JpaComplainServiceTest {
         //when
 
         //then
-        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), po.getId(), POST, TYPE1))
+        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), po.getId(), A, ComplainStatus.A))
                         .isInstanceOf(AlreadyComplainException.class);//.hasMessageContaining("")
-        Assertions.assertThatThrownBy(() -> complainService.insertComplain(-1L, po.getId(), POST, TYPE1))
+        Assertions.assertThatThrownBy(() -> complainService.insertComplain(-1L, po.getId(), A, ComplainStatus.A))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), -1L, POST, TYPE1))
+        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), -1L, A, ComplainStatus.A))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), -1L, COLLECTION, TYPE1))
+        Assertions.assertThatThrownBy(() -> complainService.insertComplain(mem.getId(), -1L, B, ComplainStatus.A))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
 
     }

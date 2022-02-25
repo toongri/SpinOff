@@ -153,7 +153,7 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.A);
 
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(memberId);
@@ -180,17 +180,17 @@ class JpaMemberServiceTest {
 
         //when
         System.out.println("서비스함수");
-        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL);
+        memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.A);
 
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(memberId);
 
         //then
-        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.ALL))
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.A))
                 .isInstanceOf(AlreadyBlockedMemberException.class);
-        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(-1L, blockedMemberId, BlockedMemberStatus.ALL))
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(-1L, blockedMemberId, BlockedMemberStatus.A))
                 .isInstanceOf(NotExistMemberException.class);
-        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, -1L, BlockedMemberStatus.ALL))
+        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, -1L, BlockedMemberStatus.A))
                 .isInstanceOf(NotExistMemberException.class);
     }
 

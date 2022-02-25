@@ -61,7 +61,7 @@ class JpaSearchQueryServiceTest {
 
         //when
         System.out.println("서비스함수");
-        Long searchId = memberService.insertSearch(memberId, "dded", SearchedByMemberStatus.MEMBER);
+        Long searchId = memberService.insertSearch(memberId, "dded", SearchedByMemberStatus.D);
 
         System.out.println("멤버함수");
         Member byId = memberRepository.getById(memberId);
@@ -79,7 +79,7 @@ class JpaSearchQueryServiceTest {
         Long memberId = memberRepository.save(member).getId();
 
         for (int i = 0; i < 10; i++) {
-            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
         }
 
         em.flush();
@@ -127,7 +127,7 @@ class JpaSearchQueryServiceTest {
         Long memberId = memberRepository.save(member).getId();
 
         for (int i = 0; i < 3; i++) {
-            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
         }
 
         em.flush();
@@ -157,9 +157,9 @@ class JpaSearchQueryServiceTest {
         Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", ""));
 
         Collection collection1 =
-                collectionRepository.save(Collection.createCollection(member, keyword+"fgd", "", PublicOfCollectionStatus.PUBLIC));
+                collectionRepository.save(Collection.createCollection(member, keyword+"fgd", "", PublicOfCollectionStatus.A));
         Collection collection2 =
-                collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.PUBLIC));
+                collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.A));
 
         Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle(keyword+"fgd").setContent("").setCollections(List.of()).setPostedMedias(List.of())

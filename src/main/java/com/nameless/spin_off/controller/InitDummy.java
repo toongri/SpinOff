@@ -277,8 +277,8 @@ public class InitDummy {
                         i1 = (int) (Math.random() * collections.size());
 
                     List<Member> membersByFollowingMemberId = memberRepository.findAllByFollowingMemberId(member.getId());
-                    if (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                    if (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     membersByFollowingMemberId.contains(collections.get(i1).getMember()))) {
                         Collection byId = collectionRepository.getById(collections.get(i1).getId());
                         if (byId.getFollowedCollections().stream()
@@ -373,8 +373,8 @@ public class InitDummy {
                     content.deleteCharAt(content.length() - 1);
                     int collectionI = (int) (Math.random() * collectionSize);
 
-                    if (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                    if (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(collectionI).getMember())))) {
 
                         commentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(member.getId(),
@@ -432,8 +432,8 @@ public class InitDummy {
                     content.deleteCharAt(content.length() - 1);
                     int collectionI = (int) (Math.random() * collectionSize);
 
-                    if (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                    if (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(collectionI).getMember())))) {
 
                         List<CommentInCollection> parentsByCollection =
@@ -464,8 +464,8 @@ public class InitDummy {
                 for (int i = 0; i < randomI; i++) {
 
                     int i1 = (int) (Math.random() * collectionSize);
-                    if (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                    if (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (collections.get(i1).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(i1).getMember())))) {
                         Collection byId = collectionRepository.getById(collections.get(i1).getId());
                         if (byId.getLikedCollections().stream()
@@ -517,8 +517,8 @@ public class InitDummy {
                 for (int i = 0; i < randomI; i++) {
 
                     int i1 = (int) (Math.random() * commentInCollectionSize);
-                    if (commentInCollections.get(i1).getCollection().getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (commentInCollections.get(i1).getCollection().getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                    if (commentInCollections.get(i1).getCollection().getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (commentInCollections.get(i1).getCollection().getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(commentInCollections.get(i1).getCollection().getMember())))) {
 
                         CommentInCollection byId = commentInCollectionRepository.getById(commentInCollections.get(i1).getId());
@@ -549,10 +549,10 @@ public class InitDummy {
                 for (int i = 0; i < randomI; i++) {
                     int collectionI = (int) (Math.random() * collectionSize);
 
-                    if ((collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PRIVATE &&
+                    if ((collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.B &&
                             member.equals(collections.get(collectionI).getMember())) ||
-                            collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.PUBLIC ||
-                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.FOLLOWER &&
+                            collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.A ||
+                            (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(collectionI).getMember())))) {
 
                         collectionService.insertViewedCollectionByIp(""+(int)(Math.random() * 1000),

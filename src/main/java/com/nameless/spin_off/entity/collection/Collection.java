@@ -145,7 +145,7 @@ public class Collection extends BaseTimeEntity {
 
         final String DEFAULT_COLLECTION_TITLE = "나중에 볼 컬렉션";
         final String DEFAULT_COLLECTION_CONTENT = "";
-        final PublicOfCollectionStatus DEFAULT_COLLECTION_PUBLIC_STATUS = PublicOfCollectionStatus.PRIVATE;
+        final PublicOfCollectionStatus DEFAULT_COLLECTION_PUBLIC_STATUS = PublicOfCollectionStatus.B;
 
         Collection collection = new Collection();
         collection.updateMember(member);
@@ -161,7 +161,7 @@ public class Collection extends BaseTimeEntity {
 
         final String DOCENT_COLLECTION_TITLE = "도슨트 컬렉션";
         final String DOCENT_COLLECTION_CONTENT = "";
-        final PublicOfCollectionStatus DOCENT_COLLECTION_PUBLIC_STATUS = PublicOfCollectionStatus.PUBLIC;
+        final PublicOfCollectionStatus DOCENT_COLLECTION_PUBLIC_STATUS = PublicOfCollectionStatus.A;
 
         Collection collection = new Collection();
         collection.updateMember(member);

@@ -57,8 +57,8 @@ class JpaPostServiceTest {
         memberRepository.save(member);
 
         collectionRepository.save(Collection.createDefaultCollection(member));
-        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.PUBLIC));
-        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.PUBLIC));
+        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.A));
+        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.A));
 
         List<Collection> collectionsByMember = collectionRepository.findAllByMember(member);
 

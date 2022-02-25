@@ -58,15 +58,15 @@ public class JpaComplainService implements ComplainService{
 
     private Member getComplainedMemberByContentId(Long contentId, ContentTypeStatus contentTypeStatus) throws NotExistCollectionException, NotExistPostException, UnknownContentTypeException, NotExistDMException, NotExistCommentInCollectionException, NotExistCommentInPostException {
         Member complainedMember;
-        if (contentTypeStatus == COLLECTION) {
+        if (contentTypeStatus == B) {
             complainedMember = getCollectionByIdWithComplainOfMember(contentId);
-        } else if (contentTypeStatus == POST) {
+        } else if (contentTypeStatus == A) {
             complainedMember = getPostByIdWithComplainOfMember(contentId);
-        } else if (contentTypeStatus == DM) {
+        } else if (contentTypeStatus == C) {
             complainedMember = getDMByIdWithComplainOfMember(contentId);
-        } else if (contentTypeStatus == COMMENT_IN_COLLECTION) {
+        } else if (contentTypeStatus == D) {
             complainedMember = getCommentInCollectionByIdWithComplainOfMember(contentId);
-        } else if (contentTypeStatus == COMMENT_IN_POST) {
+        } else if (contentTypeStatus == E) {
             complainedMember = getCommentInPostByIdWithComplainOfMember(contentId);
         } else {
             throw new UnknownContentTypeException();

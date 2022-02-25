@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.PUBLIC;
+import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -52,7 +52,7 @@ class JpaCollectionServiceTest {
         //when
         System.out.println("서비스 함수");
         Long aLong = collectionService
-                .insertCollectionByCollectionVO(new CreateCollectionVO(member.getId(), "", "", PUBLIC));
+                .insertCollectionByCollectionVO(new CreateCollectionVO(member.getId(), "", "", A));
         System.out.println("컬렉션 조회 함수");
         Collection collection = collectionRepository.getById(aLong);
 
@@ -67,7 +67,7 @@ class JpaCollectionServiceTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
 
-        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO(-1L, "", "", PUBLIC);
+        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO(-1L, "", "", A);
         //when
 
         //then
