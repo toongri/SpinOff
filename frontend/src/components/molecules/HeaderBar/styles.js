@@ -2,21 +2,23 @@ import styled from 'styled-components';
 
 const HeaderLeftContainer = styled.div`
   display: flex;
+  width: 25%;
+  height: 100%;
   align-items: center;
+  justify-content: center;
 `;
 
 const HeaderRightContainer = styled.div`
-  width: 30%;
+  width: 25%;
+  height: 100%;
   display: felx;
   align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
+  justify-content: center;
 `;
 
 const LogoContainer = styled.div`
-  position: absolute;
-  left: 50%;
-  margin-left: -127.5px;
+  width: 50%;
+  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;

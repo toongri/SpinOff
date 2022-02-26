@@ -7,14 +7,14 @@ const Magnifier = styled(Icon)`
 `;
 
 const SearchBarContainer = styled.div`
-  position: absolute;
+  position: fixed;
   display: flex;
   align-items: center;
-  top: 115px;
+  top: 120px;
   left: 50%;
-  width: 700px;
-  height: 70px;
-  margin-left: -350px;
+  width: 50%;
+  height: 60px;
+  margin-left: -25%;
   border-radius: 50px;
   background: rgba(255, 255, 255, 0.9);
   box-shadow: 0px 4px 10px 3px rgba(0, 0, 0, 0.25);
