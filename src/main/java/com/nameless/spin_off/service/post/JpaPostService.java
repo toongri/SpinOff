@@ -8,7 +8,6 @@ import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
-import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -43,7 +42,7 @@ public class JpaPostService implements PostService{
     @Transactional()
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO)
-            throws NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
+            throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
         Member member = getMemberById(postVO.getMemberId());
 
@@ -52,7 +51,7 @@ public class JpaPostService implements PostService{
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
         Movie movie = getMovieById(postVO.getMovieId());
-        List<Collection> collections = getCollectionsByIdIn(postVO.getCollectionIds(), postVO.getMemberId());
+        List<Collection> collections = getCollectionsByIdIn(postVO.getMemberId(), postVO.getCollectionIds());
 
         Post post =  Post.buildPost()
                 .setMember(member)
@@ -91,23 +90,25 @@ public class JpaPostService implements PostService{
     @Transactional()
     @Override
     public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotExistMemberException, NotMatchCollectionException,
+            throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
         Post post = getPostWithCollectedPost(postId);
-        List<Collection> collections = getCollectionsWithPost(memberId, collectionIds);
+        List<Collection> collections = getCollectionsByIdIn(memberId, collectionIds);
 
         return post.insertCollectedPostByCollections(collections);
     }
 
-    private List<Collection> getCollectionsWithPost(Long memberId, List<Long> collectionIds)
+    private List<Collection> getCollectionsByIdIn(Long memberId, List<Long> collectionIds)
             throws NotMatchCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdWithPost(collectionIds, memberId);
+        List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
 
-        if (collections.size() != collectionIds.size()) {
+        if (collections.stream().allMatch(collection -> collection.getMember().getId().equals(memberId))) {
+            return collections;
+        } else {
             throw new NotMatchCollectionException();
         }
-        return collections;
+
     }
 
     private Post getPostWithCollectedPost(Long postId) throws NotExistPostException {
@@ -115,15 +116,6 @@ public class JpaPostService implements PostService{
         return optionalPost.orElseThrow(NotExistPostException::new);
     }
 
-    private List<Collection> getCollectionsByIdIn(List<Long> collectionIds, Long memberId) throws NotExistCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdInAndMemberIdWithPost(collectionIds, memberId);
-
-        if (collections.size() == collectionIds.size()) {
-            return collections;
-        } else {
-            throw new NotExistCollectionException();
-        }
-    }
 
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws InCorrectHashtagContentException {
 

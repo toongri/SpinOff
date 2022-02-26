@@ -235,7 +235,7 @@ public class InitAddDummy {
                                     membersByFollowingMemberId.contains(collections.get(i1).getMember()))) {
 
                         Collection byId = collectionRepository.getById(collections.get(i1).getId());
-                        if (byId.getFollowedCollections().stream()
+                        if (byId.getFollowingMembers().stream()
                                 .noneMatch(followedCollection -> followedCollection.getMember().equals(member))) {
                             collectionService.insertFollowedCollectionByMemberId(member.getId(), collections.get(i1).getId());
                         }

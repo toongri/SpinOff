@@ -159,8 +159,8 @@ class JpaCollectionServiceTest {
         //then
 
         assertThat(collection.getFollowScore()).isEqualTo(1.0 * 1.0);
-        assertThat(collection.getFollowedCollections().size()).isEqualTo(1);
-        assertThat(collection.getFollowedCollections().get(0).getMember()).isEqualTo(member);
+        assertThat(collection.getFollowingMembers().size()).isEqualTo(1);
+        assertThat(collection.getFollowingMembers().get(0).getMember()).isEqualTo(member);
     }
 
     @Test
@@ -379,7 +379,7 @@ class JpaCollectionServiceTest {
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), 0L, ids))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), List.of(0L)))
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem.getId(), po.getId(), ids))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")

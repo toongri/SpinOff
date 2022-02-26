@@ -59,7 +59,7 @@ public class Collection extends BaseTimeEntity {
     private List<LikedCollection> likedCollections = new ArrayList<>();
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<FollowedCollection> followedCollections = new ArrayList<>();
+    private List<FollowedCollection> followingMembers = new ArrayList<>();
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
@@ -99,11 +99,11 @@ public class Collection extends BaseTimeEntity {
         return likedCollection.getId();
     }
 
-    private Long addFollowedCollectionByMember(Member member) {
+    private Long addFollowingMemberByMember(Member member) {
         FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member, this);
 
         this.updateFollowScore();
-        this.followedCollections.add(followedCollection);
+        this.followingMembers.add(followedCollection);
         member.addFollowedCollection(followedCollection);
         return followedCollection.getId();
     }
@@ -308,11 +308,11 @@ public class Collection extends BaseTimeEntity {
     public void updateFollowScore() {
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedCollection followedCollection;
-        int j = 0, i = followedCollections.size() - 1;
+        int j = 0, i = followingMembers.size() - 1;
         double result = 0, total = 1 * COLLECTION_FOLLOW.getLatestScore();
 
         while (i > -1) {
-            followedCollection = followedCollections.get(i);
+            followedCollection = followingMembers.get(i);
             if (isInTimeFollowedCollect(currentTime, followedCollection, j)) {
                 result += 1;
                 i--;
@@ -335,7 +335,7 @@ public class Collection extends BaseTimeEntity {
             throw new CantFollowOwnCollectionException();
         }
         else if (isNotAlreadyMemberFollowCollection(member)) {
-            return addFollowedCollectionByMember(member);
+            return addFollowingMemberByMember(member);
         } else {
             throw new AlreadyFollowedCollectionException();
         }
@@ -422,7 +422,7 @@ public class Collection extends BaseTimeEntity {
     }
 
     public Boolean isNotAlreadyMemberFollowCollection(Member member) {
-        return this.followedCollections.stream()
+        return this.followingMembers.stream()
                 .noneMatch(followedCollection -> followedCollection.getMember().equals(member));
     }
 }

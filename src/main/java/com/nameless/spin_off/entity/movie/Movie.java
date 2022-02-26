@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.movie;
 
 import com.nameless.spin_off.entity.enums.ContentsTimeEnum;
+import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
 import lombok.AccessLevel;
@@ -39,8 +40,17 @@ public class Movie extends BaseTimeEntity {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedMovieByIp> viewedMovieByIps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<TaggedGenre> taggedGenres = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private GenreOfMovieStatus firstGenreOfMovieStatus;
+
+    @Enumerated(EnumType.STRING)
+    private GenreOfMovieStatus secondGenreOfMovieStatus;
+
+    @Enumerated(EnumType.STRING)
+    private GenreOfMovieStatus thirdGenreOfMovieStatus;
+
+    @Enumerated(EnumType.STRING)
+    private GenreOfMovieStatus fourthGenreOfMovieStatus;
 
     private Double postScore;
     private Double viewScore;

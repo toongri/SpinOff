@@ -5,7 +5,7 @@ import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 
 public interface CollectionService {
-    Long insertCollectionByCollectionVO(CreateCollectionVO postVO) throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException;
+    Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO) throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException;
     Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException;
     Long insertViewedCollectionByIp(String ip, Long collectionId) throws NotExistCollectionException;

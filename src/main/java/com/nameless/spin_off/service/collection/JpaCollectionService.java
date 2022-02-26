@@ -61,7 +61,7 @@ public class JpaCollectionService implements CollectionService {
             throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
         Member member = getMemberById(memberId);
-        Collection collection = getCollectionByIdWithFollowedCollection(collectionId);
+        Collection collection = getCollectionByIdWithFollowingMember(collectionId);
 
         return collection.insertFollowedCollectionByMember(member);
     }
@@ -86,9 +86,9 @@ public class JpaCollectionService implements CollectionService {
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
 
-    private Collection getCollectionByIdWithFollowedCollection(Long collectionId) throws NotExistCollectionException {
+    private Collection getCollectionByIdWithFollowingMember(Long collectionId) throws NotExistCollectionException {
         Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdWithFollowedCollection(collectionId);
+                collectionRepository.findOneByIdWithFollowingMember(collectionId);
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }
