@@ -201,6 +201,7 @@ public class QuerydslSearchQueryRepository implements SearchQueryRepository{
                 .select(new QPostDto_SearchPageAtAllPostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
+                .join(post.member, member)
                 .where(post.title.contains(keyword))
                 .orderBy(post.popularity.desc())
                 .offset(pageable.getOffset())

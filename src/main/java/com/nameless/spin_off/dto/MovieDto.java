@@ -5,6 +5,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class MovieDto {
@@ -15,7 +16,7 @@ public class MovieDto {
         private Long id;
         private String title;
         private String imageUrl;
-        private List<GenreOfMovieStatus> genreOfMovieStatuses;
+        private List<GenreOfMovieStatus> genreOfMovieStatuses = new ArrayList<>();
 
         @QueryProjection
         public SearchPageAtAllMovieDto(Long id, String title, String imageUrl,
@@ -23,8 +24,13 @@ public class MovieDto {
             this.id = id;
             this.title = title;
             this.imageUrl = imageUrl;
-            genreOfMovieStatuses.add(firstGenre);
-            genreOfMovieStatuses.add(secondGenre);
+            System.out.println(firstGenre+"!@#!@#@");
+            if (firstGenre != null) {
+                genreOfMovieStatuses.add(firstGenre);
+                if (secondGenre != null) {
+                    genreOfMovieStatuses.add(secondGenre);
+                }
+            }
         }
     }
 

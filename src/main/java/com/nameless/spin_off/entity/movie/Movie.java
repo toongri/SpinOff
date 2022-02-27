@@ -79,14 +79,20 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Movie createMovie(Long id, String title, String imageUrl) {
+    public static Movie createMovie(Long id, String title, String imageUrl, GenreOfMovieStatus firstGenreOfMovieStatus,
+                                    GenreOfMovieStatus secondGenreOfMovieStatus,
+                                    GenreOfMovieStatus thirdGenreOfMovieStatus,
+                                    GenreOfMovieStatus fourthGenreOfMovieStatus) {
 
         Movie movie = new Movie();
         movie.updateId(id);
         movie.updateTitle(title);
         movie.updateImageUrl(imageUrl);
         movie.updateCountToZero();
-
+        movie.updateFirstGenreOfMovieStatus(firstGenreOfMovieStatus);
+        movie.updateSecondGenreOfMovieStatus(secondGenreOfMovieStatus);
+        movie.updateThirdGenreOfMovieStatus(thirdGenreOfMovieStatus);
+        movie.updateFourthGenreOfMovieStatus(fourthGenreOfMovieStatus);
         return movie;
     }
 
@@ -102,17 +108,26 @@ public class Movie extends BaseTimeEntity {
     public void updatePopularity() {
         this.popularity = viewScore + postScore + followScore;
     }
-
     private void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
-
     private void updateTitle(String title) {
         this.title = title;
     }
-
     private void updateId(Long id) {
         this.id = id;
+    }
+    private void updateFirstGenreOfMovieStatus(GenreOfMovieStatus firstGenreOfMovieStatus) {
+        this.firstGenreOfMovieStatus = firstGenreOfMovieStatus;
+    }
+    private void updateSecondGenreOfMovieStatus(GenreOfMovieStatus secondGenreOfMovieStatus) {
+        this.secondGenreOfMovieStatus = secondGenreOfMovieStatus;
+    }
+    private void updateThirdGenreOfMovieStatus(GenreOfMovieStatus thirdGenreOfMovieStatus) {
+        this.thirdGenreOfMovieStatus = thirdGenreOfMovieStatus;
+    }
+    private void updateFourthGenreOfMovieStatus(GenreOfMovieStatus fourthGenreOfMovieStatus) {
+        this.fourthGenreOfMovieStatus = fourthGenreOfMovieStatus;
     }
 
     //==비즈니스 로직==//

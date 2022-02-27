@@ -6,13 +6,17 @@ import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchPageAtAllMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
+import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -25,6 +29,7 @@ import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.movie.MovieService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -45,6 +50,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class JpaSearchQueryServiceTest {
 
     @Autowired SearchQueryService searchQueryService;
+    @Autowired MovieService movieService;
     @Autowired MemberRepository memberRepository;
     @Autowired HashtagRepository hashtagRepository;
     @Autowired MovieRepository movieRepository;
@@ -158,8 +164,10 @@ class JpaSearchQueryServiceTest {
         Member member2 = Member.buildMember().setNickname(keyword+"dfdf").build();
         Long memberId2 = memberRepository.save(member2).getId();
 
-        Movie mov = movieRepository.save(Movie.createMovie(0L, keyword+"asfd", ""));
-        Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", ""));
+        Movie mov = movieRepository.save(Movie.createMovie(0L, keyword+"asfd", "",
+                null, null, null, null));
+        Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", "",
+                null, null, null, null));
 
         Collection collection1 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"fgd", "", PublicOfCollectionStatus.A));
@@ -495,5 +503,211 @@ class JpaSearchQueryServiceTest {
                         0,
                         0,
                         0);
+    }
+
+    @Test
+    public void 검색_멤버_테스트() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+        }
+
+        List<Post> postList = new ArrayList<>();
+        List<Collection> collectionList = new ArrayList<>();
+        memberRepository.saveAll(memberList);
+        for (Member mem : memberList) {
+            member.addFollowedMember(mem);
+            Long aLong = collectionService.insertCollectionByCollectionVO(
+                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+            Collection byId = collectionRepository.getById(aLong);
+            collectionList.add(byId);
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setThumbnailUrl(mem.getId()+"0")
+                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+        }
+        postRepository.saveAll(postList);
+
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(3).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(4).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(5).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(6).getId(), memberList.get(7).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(6).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(6).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(3).getId(), memberList.get(6).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(4).getId(), memberList.get(6).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(5).getId(), memberList.get(6).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(5).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(5).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(3).getId(), memberList.get(5).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(4).getId(), memberList.get(5).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(4).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(4).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(3).getId(), memberList.get(4).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(3).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(3).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(2).getId());
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<SearchPageAtAllMemberDto> content = searchQueryService.getSearchPageMemberAtAllSliced(
+                keyword, PageRequest.of(0, 6)).getContent();
+        System.out.println("함수종료");
+        //then
+        assertThat(content.stream().map(SearchPageAtAllMemberDto::getId).collect(Collectors.toList()))
+                .containsExactly(
+                        memberList.get(7).getId(),
+                        memberList.get(6).getId(),
+                        memberList.get(5).getId(),
+                        memberList.get(4).getId(),
+                        memberList.get(3).getId(),
+                        memberList.get(2).getId());
+    }
+
+    @Test
+    public void 검색_영화_테스트() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Member> memberList = new ArrayList<>();
+        List<Movie> movieList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
+                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
+                    null, null));
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+        }
+
+        List<Post> postList = new ArrayList<>();
+        memberRepository.saveAll(memberList);
+        movieRepository.saveAll(movieList);
+
+        for (Member mem : memberList) {
+            member.addFollowedMember(mem);
+            Long aLong = collectionService.insertCollectionByCollectionVO(
+                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+            Collection byId = collectionRepository.getById(aLong);
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setThumbnailUrl(mem.getId()+"0")
+                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+        }
+        postRepository.saveAll(postList);
+
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(6).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<SearchPageAtAllMovieDto> content = searchQueryService.getSearchPageMovieAtAllSliced(
+                keyword, PageRequest.of(0, 6)).getContent();
+        System.out.println("함수종료");
+        //then
+        assertThat(content.stream().map(SearchPageAtAllMovieDto::getId).collect(Collectors.toList()))
+                .containsExactly(
+                        movieList.get(7).getId(),
+                        movieList.get(6).getId(),
+                        movieList.get(5).getId(),
+                        movieList.get(4).getId(),
+                        movieList.get(3).getId(),
+                        movieList.get(2).getId());
+        assertThat(content.stream().map(SearchPageAtAllMovieDto::getGenreOfMovieStatuses).collect(Collectors.toList()))
+                .containsExactly(
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
+                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C));
+    }
+
+    @Test
+    public void 검색_포스트_테스트() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+        }
+
+        List<Post> postList = new ArrayList<>();
+        memberRepository.saveAll(memberList);
+
+        for (Member mem : memberList) {
+            member.addFollowedMember(mem);
+            Long aLong = collectionService.insertCollectionByCollectionVO(
+                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+            Collection byId = collectionRepository.getById(aLong);
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setThumbnailUrl(mem.getId()+"0")
+                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+        }
+        postRepository.saveAll(postList);
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+i%2);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<SearchPageAtAllPostDto> content = searchQueryService.getSearchPagePostAtAllSliced(
+                keyword, PageRequest.of(0, 6)).getContent();
+        System.out.println("함수종료");
+        //then
+        assertThat(content.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(),
+                        postList.get(1).getId(),
+                        postList.get(2).getId(),
+                        postList.get(4).getId(),
+                        postList.get(0).getId(),
+                        postList.get(9).getId());
     }
 }

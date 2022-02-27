@@ -330,7 +330,8 @@ class JpaMainPageQueryServiceTest {
         memberRepository.save(member2);
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, " ", " "));
+            movieList.add(Movie.createMovie((long) i, " ", " ",
+                    null, null, null, null));
         }
 
         List<Post> postList = new ArrayList<>();

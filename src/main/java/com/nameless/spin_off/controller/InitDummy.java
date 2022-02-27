@@ -93,7 +93,8 @@ public class InitDummy {
             }
 
             for (int i = 0; i < arr.size(); i++) {
-                movies.add(Movie.createMovie((long) i, arr.get(i), ""));
+                movies.add(Movie.createMovie((long) i, arr.get(i), "",
+                        null, null, null, null));
             }
 
             hashtagRepository.saveAll(hashtags);
