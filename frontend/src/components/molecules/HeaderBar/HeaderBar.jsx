@@ -4,16 +4,25 @@ import {
   HeaderLeftContainer,
   HeaderRightContainer,
 } from './styles';
-import TextButton from '../../atoms/TextButton/Button';
-import { DM, Logo, Notice, Profile } from '../../atoms';
+import { DM, Logo, Notice, Profile, TextButton } from '../../atoms';
+
+const buttonStyle = {
+  fontSize: '24px',
+  fontWeight: 'bold',
+  padding: '20px',
+  color: 'white',
+  Hover: {
+    fontSize: '28px',
+  },
+};
 
 function Header() {
   const isLoggin = false;
   return (
     <>
       <HeaderLeftContainer>
-        <TextButton>도슨트</TextButton>
-        <TextButton>소셜링</TextButton>
+        <TextButton Style={buttonStyle}>도슨트</TextButton>
+        <TextButton Style={buttonStyle}>소셜링</TextButton>
       </HeaderLeftContainer>
       <LogoContainer>
         <Logo />

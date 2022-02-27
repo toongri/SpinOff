@@ -1,11 +1,10 @@
 import React from 'react';
 import propTypes from 'prop-types';
 import Button from './styles';
-import stylePropType from 'react-style-proptype';
 
-function TextButton({ onClick, type, style, children }) {
+function TextButton({ onClick, type, Style, children }) {
   return (
-    <Button style={style} onClick={onClick} type={type}>
+    <Button Style={Style} onClick={onClick} type={type}>
       {children}
     </Button>
   );
@@ -14,7 +13,7 @@ function TextButton({ onClick, type, style, children }) {
 TextButton.propTypes = {
   onClick: propTypes.func,
   type: propTypes.string,
-  style: stylePropType,
+  Style: propTypes.object,
   children: propTypes.any,
 };
 
