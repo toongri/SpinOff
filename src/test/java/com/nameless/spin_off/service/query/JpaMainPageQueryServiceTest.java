@@ -12,7 +12,6 @@ import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
-import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -22,6 +21,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -45,8 +45,71 @@ class JpaMainPageQueryServiceTest {
     @Autowired PostRepository postRepository;
     @Autowired EntityManager em;
     @Autowired MovieRepository movieRepository;
-    @Autowired FollowedMemberRepository followedMemberRepository;
     @Autowired MemberService memberService;
+
+    @Test
+    public void 발견_포스트_테스트() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Member member2 = Member.buildMember().build();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+
+
+        List<Post> postList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setHashTags(List.of()).build());
+            postList.add(save);
+            em.flush();
+        }
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+0);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<MainPagePostDto> content = mainPageQueryService
+                .getPostsSliced(
+                        PageRequest.of(0, 6,Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(),
+                        postList.get(1).getId(),
+                        postList.get(2).getId(),
+                        postList.get(4).getId(),
+                        postList.get(0).getId(),
+                        postList.get(9).getId());
+
+        content = mainPageQueryService
+                .getPostsSliced(
+                        PageRequest.of(1, 6,Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(7).getId(),
+                        postList.get(5).getId(),
+                        postList.get(6).getId(),
+                        postList.get(3).getId());
+    }
 
     @Test
     public void 팔로잉_해시태그_테스트() throws Exception{
@@ -56,30 +119,236 @@ class JpaMainPageQueryServiceTest {
         Member member2 = Member.buildMember().build();
         memberRepository.save(member);
         memberRepository.save(member2);
+
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             hashtagList.add(Hashtag.createHashtag(""+i));
         }
+        hashtagRepository.saveAll(hashtagList);
 
         List<Post> postList = new ArrayList<>();
-        hashtagRepository.saveAll(hashtagList);
         for (Hashtag hashtag : hashtagList) {
             member.addFollowedHashtag(hashtag);
-            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+            Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setHashTags(List.of(hashtag)).build());
+                    .setHashTags(hashtagList).build());
+            postList.add(save);
+
+            em.flush();
         }
-        postRepository.saveAll(postList);
-        em.flush();
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+0);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
         em.clear();
 
         //when
         System.out.println("서비스");
         List<MainPagePostDto> content = mainPageQueryService
-                .getPostsByFollowedHashtagOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
+                .getPostsByFollowedHashtagSliced(
+                        PageRequest.of(0, 6,Sort.by("popularity").descending()), member.getId()).getContent();
 
         //then
-        assertThat(content.size()).isEqualTo(postList.size());
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(),
+                        postList.get(1).getId(),
+                        postList.get(2).getId(),
+                        postList.get(4).getId(),
+                        postList.get(0).getId(),
+                        postList.get(9).getId());
+
+        content = mainPageQueryService
+                .getPostsByFollowedHashtagSliced(
+                        PageRequest.of(1, 6,Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(7).getId(),
+                        postList.get(5).getId(),
+                        postList.get(6).getId(),
+                        postList.get(3).getId());
+    }
+
+    @Test
+    public void 팔로잉_무비_테스트() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Member member2 = Member.buildMember().build();
+        memberRepository.save(member);
+        memberRepository.save(member2);
+        List<Movie> movieList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            movieList.add(Movie.createMovie((long) i, " ", " ",
+                    null, null, null, null));
+        }
+        movieList = movieRepository.saveAll(movieList);
+
+        List<Post> postList = new ArrayList<>();
+        for (Movie movie : movieList) {
+            member.addFollowedMovie(movie);
+            Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setHashTags(List.of()).setMovie(movie).build());
+            postList.add(save);
+
+            em.flush();
+        }
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+0);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<MainPagePostDto> content = mainPageQueryService.getPostsByFollowedMovieSliced(
+                PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(),
+                        postList.get(1).getId(),
+                        postList.get(2).getId(),
+                        postList.get(4).getId(),
+                        postList.get(0).getId(),
+                        postList.get(9).getId());
+
+        content = mainPageQueryService.getPostsByFollowedMovieSliced(
+                PageRequest.of(1, 6, Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(7).getId(),
+                        postList.get(5).getId(),
+                        postList.get(6).getId(),
+                        postList.get(3).getId());
+    }
+
+    @Test
+    public void 팔로잉_멤버_테스트() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().build());
+        }
+        memberRepository.saveAll(memberList);
+
+        List<Post> postList = new ArrayList<>();
+        for (Member mem : memberList) {
+            member.addFollowedMember(mem);
+            Post save = postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setHashTags(List.of()).build());
+            postList.add(save);
+            em.flush();
+        }
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+0);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<MainPagePostDto> content = mainPageQueryService.getPostsByFollowingMemberSliced(
+                PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(),
+                        postList.get(1).getId(),
+                        postList.get(2).getId(),
+                        postList.get(4).getId(),
+                        postList.get(0).getId(),
+                        postList.get(9).getId());
+
+        content = mainPageQueryService.getPostsByFollowingMemberSliced(
+                PageRequest.of(1, 6, Sort.by("popularity").descending()), member.getId()).getContent();
+
+        //then
+        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(7).getId(),
+                        postList.get(5).getId(),
+                        postList.get(6).getId(),
+                        postList.get(3).getId());
+    }
+
+    @Test
+    public void 멤버_차단_테스트() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().build());
+        }
+
+        List<Post> postList = new ArrayList<>();
+        memberRepository.saveAll(memberList);
+        for (Member mem : memberList) {
+            member.addFollowedMember(mem);
+            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setHashTags(List.of()).build());
+        }
+        postRepository.saveAll(postList);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
+
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스");
+        List<MainPagePostDto> content =
+                mainPageQueryService.getPostsByFollowingMemberSliced(PageRequest.of(0, 15), member.getId()).getContent();
+
+        //then
+        assertThat(content.size()).isEqualTo(postList.size() - 1);
     }
 
     @Test
@@ -150,9 +419,19 @@ class JpaMainPageQueryServiceTest {
         //when
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
-                mainPageQueryService.getCollectionsOrderByPopularityBySlicing(PageRequest.of(0, 6), member.getId()).getContent();
+                mainPageQueryService.getCollectionsSliced(
+                        PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
+        assertThat(content.stream().map(MainPageCollectionDto::getCollectionId).collect(Collectors.toList()))
+                .containsExactly(
+                        collectionList.get(8).getId(),
+                        collectionList.get(1).getId(),
+                        collectionList.get(2).getId(),
+                        collectionList.get(4).getId(),
+                        collectionList.get(0).getId(),
+                        collectionList.get(9).getId());
+
         assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(collectionList.get(8).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
@@ -224,7 +503,8 @@ class JpaMainPageQueryServiceTest {
         //when
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
-                mainPageQueryService.getCollectionsByFollowedMemberOrderByIdSliced(PageRequest.of(0, 6), member.getId()).getContent();
+                mainPageQueryService.getCollectionsByFollowedMemberSliced(
+                        PageRequest.of(0, 6, Sort.by("id").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
@@ -300,7 +580,8 @@ class JpaMainPageQueryServiceTest {
         //when
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
-                mainPageQueryService.getCollectionsByFollowedCollectionsOrderByIdSliced(PageRequest.of(0, 6), member.getId()).getContent();
+                mainPageQueryService.getCollectionsByFollowedCollectionsSliced(
+                        PageRequest.of(0, 6, Sort.by("id").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
@@ -319,109 +600,4 @@ class JpaMainPageQueryServiceTest {
                                 collectionList.get(4).getCollectedPosts().get(1).getPost().getThumbnailUrl())
                 );
     }
-
-    @Test
-    public void 팔로잉_무비_테스트() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Member member2 = Member.buildMember().build();
-        memberRepository.save(member);
-        memberRepository.save(member2);
-        List<Movie> movieList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, " ", " ",
-                    null, null, null, null));
-        }
-
-        List<Post> postList = new ArrayList<>();
-        movieList = movieRepository.saveAll(movieList);
-        for (Movie movie : movieList) {
-            member.addFollowedMovie(movie);
-            postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setHashTags(List.of()).setMovie(movie).build());
-        }
-        postRepository.saveAll(postList);
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스");
-        List<MainPagePostDto> content = mainPageQueryService
-                .getPostsByFollowedMovieOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
-
-        //then
-        assertThat(content.size()).isEqualTo(postList.size());
-    }
-
-    @Test
-    public void 팔로잉_멤버_테스트() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        List<Member> memberList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
-        }
-
-        List<Post> postList = new ArrayList<>();
-        memberRepository.saveAll(memberList);
-        for (Member mem : memberList) {
-            member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setHashTags(List.of()).build());
-        }
-        postRepository.saveAll(postList);
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스");
-        List<MainPagePostDto> content =
-                mainPageQueryService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
-
-        //then
-        assertThat(content.size()).isEqualTo(postList.size());
-    }
-
-    @Test
-    public void 멤버_차단_테스트() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-        List<Member> memberList = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
-        }
-
-        List<Post> postList = new ArrayList<>();
-        memberRepository.saveAll(memberList);
-        for (Member mem : memberList) {
-            member.addFollowedMember(mem);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setHashTags(List.of()).build());
-        }
-        postRepository.saveAll(postList);
-        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
-
-
-        em.flush();
-        em.clear();
-
-        //when
-        System.out.println("서비스");
-        List<MainPagePostDto> content =
-                mainPageQueryService.getPostsByFollowingMemberOrderByIdSliced(PageRequest.of(0, 15), member.getId()).getContent();
-
-        //then
-        assertThat(content.size()).isEqualTo(postList.size() - 1);
-    }
-
 }

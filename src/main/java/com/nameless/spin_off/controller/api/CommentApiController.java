@@ -1,9 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
-import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
@@ -35,7 +33,7 @@ public class CommentApiController {
 
     @PostMapping("/collection")
     public CommentApiResult<Long> createOneInCollection(
-            @RequestBody CommentDto.CreateCommentInCollectionVO commentVO)
+            @RequestBody CreateCommentInCollectionVO commentVO)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
         Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
@@ -54,7 +52,8 @@ public class CommentApiController {
     @PostMapping("/collection/like")
     public CommentApiResult<Long> createLikeOneInCollection(
             @RequestParam Long memberId, @RequestParam Long commentId)
-            throws NotExistMemberException, AlreadyLikedCommentInCollectionException, NotExistCommentInCollectionException {
+            throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
+            NotExistCommentInCollectionException {
 
         Long likedCommentId = commentInCollectionService.insertLikedCommentByMemberId(memberId, commentId);
         return new CommentApiResult<Long>(likedCommentId);

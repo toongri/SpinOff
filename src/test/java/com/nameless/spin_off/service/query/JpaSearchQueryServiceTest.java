@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -97,7 +98,7 @@ class JpaSearchQueryServiceTest {
         em.clear();
         //when
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
 
         System.out.println("결과");
         //then
@@ -122,7 +123,7 @@ class JpaSearchQueryServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
 
         System.out.println("결과");
         //then
@@ -146,7 +147,7 @@ class JpaSearchQueryServiceTest {
         //when
 
         System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMember(memberId);
+        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
 
         System.out.println("결과");
         //then
@@ -193,7 +194,7 @@ class JpaSearchQueryServiceTest {
 
         //when
         System.out.println("서비스함수");
-        RelatedSearchAllDto result = searchQueryService.getRelatedSearchAllByKeyword(keyword);
+        RelatedSearchAllDto result = searchQueryService.getRelatedSearchAllByKeyword(keyword, 5);
 
         //then
         System.out.println("결과");
@@ -244,7 +245,7 @@ class JpaSearchQueryServiceTest {
 
         //when
         System.out.println("서비스함수");
-        List<MostPopularHashtag> mostPopularHashtags = searchQueryService.getMostPopularHashtag();
+        List<MostPopularHashtag> mostPopularHashtags = searchQueryService.getMostPopularHashtagLimit(5);
 
         //then
         assertThat(mostPopularHashtags.stream().map(MostPopularHashtag::getId).collect(Collectors.toList()))
@@ -290,7 +291,7 @@ class JpaSearchQueryServiceTest {
 
         //when
         System.out.println("서비스함수");
-        List<RelatedSearchHashtagDto> searches = searchQueryService.getRelatedSearchHashtagByKeyword(keyword);
+        List<RelatedSearchHashtagDto> searches = searchQueryService.getRelatedSearchHashtagByKeyword(keyword, 5);
 
         //then
         assertThat(searches.stream().map(RelatedSearchHashtagDto::getId).collect(Collectors.toList()))
@@ -301,7 +302,7 @@ class JpaSearchQueryServiceTest {
     }
 
     @Test
-    public void 검색_컬렉션_테스트_멤버_단일_팔로우() throws Exception{
+    public void 전체검색_컬렉션_테스트_멤버_단일_팔로우() throws Exception{
         //given
         String keyword = "가나다라";
         Member member = Member.buildMember().build();
@@ -370,7 +371,7 @@ class JpaSearchQueryServiceTest {
         //when
         System.out.println("서비스");
         List<SearchPageAtAllCollectionDto> content = searchQueryService.getSearchPageCollectionAtAllSliced(
-                keyword, PageRequest.of(0, 6), member.getId()).getContent();
+                keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(SearchPageAtAllCollectionDto::getCollectionId).collect(Collectors.toList()))
@@ -401,7 +402,7 @@ class JpaSearchQueryServiceTest {
     }
 
     @Test
-    public void 검색_컬렉션_테스트_멤버_다중_팔로우() throws Exception{
+    public void 전체검색_컬렉션_테스트_멤버_다중_팔로우() throws Exception{
         //given
         String keyword = "가나다라";
         Member member = Member.buildMember().build();
@@ -475,7 +476,7 @@ class JpaSearchQueryServiceTest {
         //when
         System.out.println("서비스");
         List<SearchPageAtAllCollectionDto> content = searchQueryService.getSearchPageCollectionAtAllSliced(
-                keyword, PageRequest.of(0, 6), member.getId()).getContent();
+                keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(SearchPageAtAllCollectionDto::getCollectionId).collect(Collectors.toList()))
@@ -506,7 +507,7 @@ class JpaSearchQueryServiceTest {
     }
 
     @Test
-    public void 검색_멤버_테스트() throws Exception{
+    public void 전체검색_멤버_테스트() throws Exception{
         //given
         String keyword = "가나다라";
         Member member = Member.buildMember().build();
@@ -560,7 +561,7 @@ class JpaSearchQueryServiceTest {
         //when
         System.out.println("서비스");
         List<SearchPageAtAllMemberDto> content = searchQueryService.getSearchPageMemberAtAllSliced(
-                keyword, PageRequest.of(0, 6)).getContent();
+                keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(SearchPageAtAllMemberDto::getId).collect(Collectors.toList()))
@@ -574,7 +575,7 @@ class JpaSearchQueryServiceTest {
     }
 
     @Test
-    public void 검색_영화_테스트() throws Exception{
+    public void 전체검색_영화_테스트() throws Exception{
         //given
         String keyword = "가나다라";
         Member member = Member.buildMember().build();
@@ -632,7 +633,7 @@ class JpaSearchQueryServiceTest {
         //when
         System.out.println("서비스");
         List<SearchPageAtAllMovieDto> content = searchQueryService.getSearchPageMovieAtAllSliced(
-                keyword, PageRequest.of(0, 6)).getContent();
+                keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(SearchPageAtAllMovieDto::getId).collect(Collectors.toList()))
@@ -654,7 +655,7 @@ class JpaSearchQueryServiceTest {
     }
 
     @Test
-    public void 검색_포스트_테스트() throws Exception{
+    public void 전체검색_포스트_테스트() throws Exception{
         //given
         String keyword = "가나다라";
         Member member = Member.buildMember().build();
@@ -698,7 +699,7 @@ class JpaSearchQueryServiceTest {
         //when
         System.out.println("서비스");
         List<SearchPageAtAllPostDto> content = searchQueryService.getSearchPagePostAtAllSliced(
-                keyword, PageRequest.of(0, 6)).getContent();
+                keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()))

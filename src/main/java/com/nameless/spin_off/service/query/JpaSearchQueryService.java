@@ -15,7 +15,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
 import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.query.SearchQueryRepository;
+import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -26,17 +26,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.search.RelatedSearchEnum.*;
+import static com.nameless.spin_off.entity.enums.search.RelatedSearchEnum.RELATED_SEARCH_KEYWORD_MAX_STR;
+import static com.nameless.spin_off.entity.enums.search.RelatedSearchEnum.RELATED_SEARCH_KEYWORD_MIN_STR;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class JpaSearchQueryService implements SearchQueryService {
-    private final SearchQueryRepository searchQueryRepository;
+    private final QuerydslSearchQueryRepository searchQueryRepository;
+    private final MemberQueryRepository memberQueryRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
+    private final MovieQueryRepository movieQueryRepository;
+    private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
 
     @Override
-    public RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword)
+    public RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword, int length)
             throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
 
         if (keyword.length() < RELATED_SEARCH_KEYWORD_MIN_STR.getValue()) {
@@ -44,38 +49,40 @@ public class JpaSearchQueryService implements SearchQueryService {
         } else if (keyword.length() > RELATED_SEARCH_KEYWORD_MAX_STR.getValue()) {
             throw new OverLengthRelatedKeywordException();
         } else {
-            return getRelatedSearchDtoByKeyword(keyword);
+            return getRelatedSearchDtoByKeyword(keyword, length);
         }
     }
 
     @Override
-    public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_HASHTAG_NUMBER.getValue());
+    public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword, int length)
+            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
+        return searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, length);
     }
 
     @Override
-    public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
-        return searchQueryRepository.findRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_MEMBER_NUMBER.getValue());
+    public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword, int length)
+            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
+        return searchQueryRepository.findRelatedMembersAboutKeyword(keyword, length);
     }
 
     @Override
-    public List<MostPopularHashtag> getMostPopularHashtag() {
-        return searchQueryRepository.findMostPopularHashtags();
+    public List<MostPopularHashtag> getMostPopularHashtagLimit(int length) {
+        return searchQueryRepository.findMostPopularHashtagsLimit(length);
     }
 
     @Override
-    public List<LastSearchDto> getLastSearchesByMember(Long memberId) {
-        return searchQueryRepository.findLastSearchesByMemberId(memberId);
+    public List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) {
+        return searchQueryRepository.findLastSearchesByMemberIdLimit(memberId, length);
     }
 
     @Override
     public Slice<SearchPageAtAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable) {
-        return searchQueryRepository.findSearchPageMemberAtAllSliced(keyword, pageable);
+        return memberQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable);
     }
 
     @Override
     public Slice<SearchPageAtAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable) {
-        return searchQueryRepository.findSearchPageMovieAtAllSliced(keyword, pageable);
+        return movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable);
     }
 
     @Override
@@ -83,12 +90,12 @@ public class JpaSearchQueryService implements SearchQueryService {
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
         List<Member> followedMembers = getMembersByFollowedMemberId(memberId);
 
-        return searchQueryRepository.findSearchPageCollectionAtAllSliced(keyword, pageable, followedMembers);
+        return collectionQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable, followedMembers);
     }
 
     @Override
     public Slice<SearchPageAtAllPostDto> getSearchPagePostAtAllSliced(String keyword, Pageable pageable) {
-        return searchQueryRepository.findSearchPagePostAtAllSliced(keyword, pageable);
+        return postQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable);
     }
 
     private List<Member> getMembersByFollowedMemberId(Long memberId) throws NotExistMemberException {
@@ -101,12 +108,12 @@ public class JpaSearchQueryService implements SearchQueryService {
         }
     }
 
-    private RelatedSearchAllDto getRelatedSearchDtoByKeyword(String keyword) {
+    private RelatedSearchAllDto getRelatedSearchDtoByKeyword(String keyword, int length) {
         return new RelatedSearchAllDto(
-                searchQueryRepository.findRelatedPostsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
-                searchQueryRepository.findRelatedMoviesAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
-                searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
-                searchQueryRepository.findRelatedMembersAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()),
-                searchQueryRepository.findRelatedCollectionsAboutKeyword(keyword, RELATED_SEARCH_ALL_NUMBER.getValue()));
+                searchQueryRepository.findRelatedPostsAboutKeyword(keyword, length),
+                searchQueryRepository.findRelatedMoviesAboutKeyword(keyword, length),
+                searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, length),
+                searchQueryRepository.findRelatedMembersAboutKeyword(keyword, length),
+                searchQueryRepository.findRelatedCollectionsAboutKeyword(keyword, length));
     }
 }

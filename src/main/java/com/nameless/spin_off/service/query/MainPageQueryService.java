@@ -7,12 +7,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface MainPageQueryService {
-    Slice<MainPagePostDto> getPostsOrderById(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPagePostDto> getPostsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPageCollectionDto> getCollectionsOrderByPopularityBySlicing(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPagePostDto> getPostsByFollowedHashtagOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPagePostDto> getPostsByFollowedMovieOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPagePostDto> getPostsByFollowingMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPageCollectionDto> getCollectionsByFollowedMemberOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsOrderByIdSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPagePostDto> getPostsSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPageCollectionDto> getCollectionsSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPagePostDto> getPostsByFollowedHashtagSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPagePostDto> getPostsByFollowedMovieSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPagePostDto> getPostsByFollowingMemberSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPageCollectionDto> getCollectionsByFollowedMemberSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsSliced(Pageable pageable, Long memberId) throws NotExistMemberException;
 }

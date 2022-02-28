@@ -1,6 +1,5 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
@@ -26,37 +25,37 @@ public class SearchApiController {
     private final SearchQueryService searchQueryService;
 
     @GetMapping("/related/keyword/all")
-    public SearchApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(@RequestParam String keyword)
+    public SearchApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(
+            @RequestParam String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<RelatedSearchAllDto>(searchQueryService.getRelatedSearchAllByKeyword(keyword));
+        return new SearchApiResult<RelatedSearchAllDto>(
+                searchQueryService.getRelatedSearchAllByKeyword(keyword, length));
     }
 
     @GetMapping("/related/keyword/hashtag")
-    public SearchApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(@RequestParam String keyword)
+    public SearchApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(
+            @RequestParam String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<List<RelatedSearchHashtagDto>>(searchQueryService.getRelatedSearchHashtagByKeyword(keyword));
+        return new SearchApiResult<List<RelatedSearchHashtagDto>>(
+                searchQueryService.getRelatedSearchHashtagByKeyword(keyword, length));
     }
 
     @GetMapping("/related/keyword/member")
-    public SearchApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword(@RequestParam String keyword)
+    public SearchApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword
+            (@RequestParam String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<List<RelatedSearchMemberDto>>(searchQueryService.getRelatedSearchMemberByKeyword(keyword));
+        return new SearchApiResult<List<RelatedSearchMemberDto>>(
+                searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
     }
 
+    @GetMapping("/member-latest")
+    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMember(@RequestParam Long id, @RequestParam int length)
+            throws NotExistMemberException {
 
-    @GetMapping("/most-popular")
-    public SearchApiResult<List<MostPopularHashtag>> getMostPopularHashtag() {
-
-        return new SearchApiResult<List<MostPopularHashtag>>(searchQueryService.getMostPopularHashtag());
-    }
-
-    @GetMapping("/member-last")
-    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMember(@RequestParam Long id) throws NotExistMemberException {
-
-        return new SearchApiResult<List<LastSearchDto>>(searchQueryService.getLastSearchesByMember(id));
+        return new SearchApiResult<List<LastSearchDto>>(searchQueryService.getLastSearchesByMemberLimit(id, length));
     }
 
     @Data

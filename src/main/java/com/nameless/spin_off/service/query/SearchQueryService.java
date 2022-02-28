@@ -19,16 +19,18 @@ import java.util.List;
 
 public interface SearchQueryService {
 
-    RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
-    List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
-    List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword) throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
-    List<MostPopularHashtag> getMostPopularHashtag();
-    List<LastSearchDto> getLastSearchesByMember(Long memberId) throws NotExistMemberException;
-
+    RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword, int length)
+            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
+    List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword, int length)
+            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
+    List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword, int length)
+            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
+    List<MostPopularHashtag> getMostPopularHashtagLimit(int length);
+    List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
     Slice<SearchPageAtAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable);
     Slice<SearchPageAtAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable);
-    Slice<SearchPageAtAllCollectionDto> getSearchPageCollectionAtAllSliced(String keyword, Pageable pageable,
-                                                                            Long memberId) throws NotExistMemberException;
+    Slice<SearchPageAtAllCollectionDto> getSearchPageCollectionAtAllSliced(
+            String keyword, Pageable pageable, Long memberId) throws NotExistMemberException;
     Slice<SearchPageAtAllPostDto> getSearchPagePostAtAllSliced(String keyword, Pageable pageable);
 
 }
