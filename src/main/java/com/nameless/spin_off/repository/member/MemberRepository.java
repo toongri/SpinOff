@@ -51,6 +51,15 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOneByIdWithFollowedHashtagAndBlockedMember(@Param("id") Long id);
 
     @Query("SELECT DISTINCT m FROM Member m " +
+            "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
+            "LEFT JOIN FETCH m.followedMembers followedMember " +
+            "LEFT JOIN FETCH m.followedMovies followedMovie " +
+            "LEFT JOIN FETCH m.followedCollections followedCollection " +
+            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
+            "WHERE m.id = :id")
+    Optional<Member> findOneByIdWithFollowedContentsAndBlockedMember(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedMovies followedMovie " +
             "LEFT JOIN FETCH m.blockedMembers blockedMember " +
             "WHERE m.id = :id")

@@ -86,13 +86,30 @@ public class CollectionDto {
         @QueryProjection
         public MainPageCollectionDto(Long collectionId, String collectionTitle, Long memberId, String memberNickname,
                                      String thumbnailUrl1, String thumbnailUrl2) {
-
             this.collectionId = collectionId;
             this.collectionTitle = collectionTitle;
             this.memberId = memberId;
             this.memberNickname = memberNickname;
-            this.thumbnailUrls.add(thumbnailUrl1);
-            this.thumbnailUrls.add(thumbnailUrl2);
+            if (thumbnailUrl1 != null) {
+                this.thumbnailUrls.add(thumbnailUrl1);
+                if (thumbnailUrl2 != null) {
+                    this.thumbnailUrls.add(thumbnailUrl2);
+                }
+            }
+        }
+
+        public MainPageCollectionDto(Collection collection) {
+
+            this.collectionId = collection.getId();
+            this.collectionTitle = collection.getTitle();
+            this.memberId = collection.getMember().getId();
+            this.memberNickname = collection.getMember().getNickname();
+            if (collection.getFirstThumbnail() != null) {
+                this.thumbnailUrls.add(collection.getFirstThumbnail());
+                if (collection.getSecondThumbnail() != null) {
+                    this.thumbnailUrls.add(collection.getSecondThumbnail());
+                }
+            }
         }
     }
 

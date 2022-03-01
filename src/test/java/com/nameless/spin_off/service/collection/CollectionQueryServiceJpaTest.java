@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -321,12 +322,12 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<CollectionDto.MainPageCollectionDto> content =
+        List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsSlicedForMainPage(
                         PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(CollectionDto.MainPageCollectionDto::getCollectionId).collect(Collectors.toList()))
+        assertThat(content.stream().map(MainPageCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
                         collectionList.get(8).getId(),
                         collectionList.get(1).getId(),
@@ -335,7 +336,7 @@ public class CollectionQueryServiceJpaTest {
                         collectionList.get(0).getId(),
                         collectionList.get(9).getId());
 
-        assertThat(content.stream().map(CollectionDto.MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
+        assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(collectionList.get(8).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
                                 collectionList.get(8).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
@@ -405,12 +406,12 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<CollectionDto.MainPageCollectionDto> content =
+        List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsByFollowedMemberSlicedForMainPage(
                         PageRequest.of(0, 6, Sort.by("id").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(CollectionDto.MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
+        assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(collectionList.get(9).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
                                 collectionList.get(9).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
@@ -428,7 +429,7 @@ public class CollectionQueryServiceJpaTest {
     }
 
     @Test
-    public void 팔로잉_컬렉션_컬렉션_테스트() throws Exception{
+    public void 팔로잉_컬렉션_컬렉션_테스트() throws Exception {
 
         //given
         Member member = Member.buildMember().build();
@@ -449,7 +450,7 @@ public class CollectionQueryServiceJpaTest {
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
+                    .setThumbnailUrl(mem.getId() + "0")
                     .setHashTags(List.of()).setCollections(List.of(byId)).build();
             postRepository.save(build);
             postList.add(build);
@@ -466,41 +467,70 @@ public class CollectionQueryServiceJpaTest {
             em.flush();
         }
 
-        for (Collection collection : collectionList) {
-            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
+        List<Integer> integers = List.of(5, 9, 8, 3, 2, 4, 7, 0, 1, 6);
+
+        for (Integer integer : integers) {
+            Post build = Post.buildPost().setMember(collectionList.get(integer).getMember())
+                    .setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setThumbnailUrl(collectionList.get(integer).getMember().getId() + "2")
+                    .setHashTags(List.of()).setCollections(List.of(collectionList.get(integer))).build();
+
             postRepository.save(build);
             postList.add(build);
             em.flush();
         }
+        Post build = Post.buildPost().setMember(collectionList.get(6).getMember())
+                .setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setThumbnailUrl(collectionList.get(6).getMember().getId() + "3")
+                .setHashTags(List.of()).setCollections(List.of(collectionList.get(6))).build();
+
+        postRepository.save(build);
+        postList.add(build);
+        em.flush();
+
+
 
         collectionList = collectionRepository.findAll();
+        for (Collection collect : collectionList) {
+            System.out.println("collect.getCollectedPosts().last.getId() = "
+                    + collect.getCollectedPosts().get(collect.getCollectedPosts().size() - 1).getId());
+            System.out.println(collect.getId());
 
+        }
         em.clear();
 
         //when
         System.out.println("서비스");
-        List<CollectionDto.MainPageCollectionDto> content =
+        List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsByFollowedCollectionsSlicedForMainPage(
-                        PageRequest.of(0, 6, Sort.by("id").descending()), member.getId()).getContent();
+                        PageRequest.of(0, 6, Sort.by("lastPostUpdateTime").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(CollectionDto.MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
+        assertThat(content.stream().map(MainPageCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
-                        List.of(collectionList.get(9).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
-                                collectionList.get(9).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
-                        List.of(collectionList.get(8).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
-                                collectionList.get(8).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
+                        collectionList.get(6).getId(),
+                        collectionList.get(1).getId(),
+                        collectionList.get(0).getId(),
+                        collectionList.get(7).getId(),
+                        collectionList.get(4).getId(),
+                        collectionList.get(2).getId());
+
+        assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
+                .containsExactly(
+                        List.of(collectionList.get(6).getCollectedPosts().get(3).getPost().getThumbnailUrl(),
+                                collectionList.get(6).getCollectedPosts().get(2).getPost().getThumbnailUrl()),
+                        List.of(collectionList.get(1).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
+                                collectionList.get(1).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
+                        List.of(collectionList.get(0).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
+                                collectionList.get(0).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
                         List.of(collectionList.get(7).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
                                 collectionList.get(7).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
-                        List.of(collectionList.get(6).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
-                                collectionList.get(6).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
-                        List.of(collectionList.get(5).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
-                                collectionList.get(5).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
                         List.of(collectionList.get(4).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
-                                collectionList.get(4).getCollectedPosts().get(1).getPost().getThumbnailUrl())
+                                collectionList.get(4).getCollectedPosts().get(1).getPost().getThumbnailUrl()),
+                        List.of(collectionList.get(2).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
+                                collectionList.get(2).getCollectedPosts().get(1).getPost().getThumbnailUrl())
                 );
     }
 }

@@ -66,7 +66,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<MainPageCollectionDto> findAllByFollowedCollectionsSlicedForMainPage(
-            Pageable pageable, List<Collection> collections, List<Member> blockedMembers) {
+            Pageable pageable, List<Collection> followedCollections, List<Member> blockedMembers) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -75,7 +75,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .join(collection.member, member)
                 .where(memberNotIn(blockedMembers),
-                        collcetionIn(collections)));
+                        collectionIn(followedCollections)));
     }
 
     private Slice<SearchPageAtAllCollectionDto> MapContentToDtoForSearchPage(
@@ -92,7 +92,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     private BooleanExpression memberIn(List<Member> members) {
         return members.isEmpty() ? null : member.in(members);
     }
-    private BooleanExpression collcetionIn(List<Collection> collections) {
+    private BooleanExpression collectionIn(List<Collection> collections) {
         return collections.isEmpty() ? null : collection.in(collections);
     }
     private BooleanExpression memberNotIn(List<Member> members) {

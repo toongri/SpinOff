@@ -119,7 +119,6 @@ public class PostQueryServiceJpa implements PostQueryService{
         return Optional.of(optionalMember.orElseThrow(NotExistMemberException::new));
     }
 
-
     private Member getMemberByIdWithFollowedHashtagAndBlockedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedHashtagAndBlockedMember(memberId);
 

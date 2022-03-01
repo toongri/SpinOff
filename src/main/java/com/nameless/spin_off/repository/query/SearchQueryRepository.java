@@ -18,5 +18,4 @@ public interface SearchQueryRepository {
     List<RelatedSearchMovieDto> findRelatedMoviesAboutKeyword(String keyword, int length);
     List<MostPopularHashtag> findMostPopularHashtagsLimit(int length);
     List<LastSearchDto> findLastSearchesByMemberIdLimit(Long id, int length);
-
 }

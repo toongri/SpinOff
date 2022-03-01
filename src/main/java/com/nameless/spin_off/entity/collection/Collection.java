@@ -43,7 +43,7 @@ public class Collection extends BaseTimeEntity {
     private String secondThumbnail;
     private String thirdThumbnail;
     private String fourthThumbnail;
-
+    private LocalDateTime lastPostUpdateTime;
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
     @NotNull
@@ -110,6 +110,7 @@ public class Collection extends BaseTimeEntity {
 
     public void addCollectedPost(CollectedPost collectedPost) {
         updateThumbnail(collectedPost.getPost());
+        updateLastPostUpdateTime();
         this.collectedPosts.add(collectedPost);
     }
 
@@ -191,6 +192,9 @@ public class Collection extends BaseTimeEntity {
         popularity = viewScore + likeScore + commentScore + followScore;
     }
 
+    public void updateLastPostUpdateTime() {
+        lastPostUpdateTime = LocalDateTime.now();
+    }
     public void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
         this.publicOfCollectionStatus = publicOfCollectionStatus;
     }

@@ -23,6 +23,7 @@ public class MemberDto {
         private String nickname;
         private String accountId;
 
+        @QueryProjection
         public SearchPageAtAllMemberDto(Long id, String profileImg, String nickname, String accountId) {
             this.id = id;
             this.profileImg = profileImg;

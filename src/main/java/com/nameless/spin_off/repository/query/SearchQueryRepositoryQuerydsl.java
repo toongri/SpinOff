@@ -110,5 +110,4 @@ public class SearchQueryRepositoryQuerydsl implements SearchQueryRepository {
                 .limit(length)
                 .fetch();
     }
-
 }

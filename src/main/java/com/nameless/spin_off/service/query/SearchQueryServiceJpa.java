@@ -92,16 +92,6 @@ public class SearchQueryServiceJpa implements SearchQueryService {
                 memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, memberPageable, blockedMembers));
     }
 
-    private List<Member> getMembersByFollowedMemberId(Long memberId) throws NotExistMemberException {
-        if (memberId == null) {
-            return List.of();
-        } else {
-            Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMember(memberId);
-            return optionalMember.orElseThrow(NotExistMemberException::new)
-                    .getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
-        }
-    }
-
     private RelatedSearchAllDto getRelatedSearchDtoByKeyword(String keyword, int length) {
         return new RelatedSearchAllDto(
                 searchQueryRepository.findRelatedPostsAboutKeyword(keyword, length),

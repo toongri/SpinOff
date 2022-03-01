@@ -112,7 +112,6 @@ public class Post extends BaseTimeEntity {
             collectedPosts.add(collectedPost);
         }
         this.collectedPosts.addAll(collectedPosts);
-
         return collectedPosts.stream().map(CollectedPost::getId).collect(Collectors.toList());
     }
 
@@ -234,7 +233,6 @@ public class Post extends BaseTimeEntity {
     public void updateContent(String content) {
         this.content = content;
     }
-
     public void updateTitle(String title) {
         this.title = title;
     }
