@@ -31,7 +31,7 @@ import static com.nameless.spin_off.entity.enums.BanListOfContentsEnum.CANT_CONT
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaPostService implements PostService{
+public class PostServiceJpa implements PostService{
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;

@@ -1,14 +1,13 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtAllMovieDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -18,10 +17,10 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -32,8 +31,8 @@ import static com.nameless.spin_off.entity.enums.search.RelatedSearchEnum.RELATE
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaSearchQueryService implements SearchQueryService {
-    private final QuerydslSearchQueryRepository searchQueryRepository;
+public class SearchQueryServiceJpa implements SearchQueryService {
+    private final SearchQueryRepositoryQuerydsl searchQueryRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final CollectionQueryRepository collectionQueryRepository;
     private final MovieQueryRepository movieQueryRepository;
@@ -76,26 +75,21 @@ public class JpaSearchQueryService implements SearchQueryService {
     }
 
     @Override
-    public Slice<SearchPageAtAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable) {
-        return memberQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable);
-    }
+    public SearchAllDto getSearchPageDataAtAll(
+            String keyword, Long memberId, Pageable postPageable, Pageable collectionPageable,
+            Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-    @Override
-    public Slice<SearchPageAtAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable) {
-        return movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable);
-    }
+        Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
 
-    @Override
-    public Slice<SearchPageAtAllCollectionDto> getSearchPageCollectionAtAllSliced(
-            String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
-        List<Member> followedMembers = getMembersByFollowedMemberId(memberId);
+        List<Member> followedMembers = getFollowedMemberByMember(member);
+        List<Member> blockedMembers = getBlockedMemberByMember(member);
 
-        return collectionQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable, followedMembers);
-    }
-
-    @Override
-    public Slice<SearchPageAtAllPostDto> getSearchPagePostAtAllSliced(String keyword, Pageable pageable) {
-        return postQueryRepository.findAllSlicedSearchPageAtAll(keyword, pageable);
+        return new SearchAllDto(
+                postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, postPageable, blockedMembers),
+                collectionQueryRepository.findAllSlicedForSearchPageAtAll(
+                        keyword, collectionPageable, followedMembers, blockedMembers),
+                movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, moviePageable),
+                memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, memberPageable, blockedMembers));
     }
 
     private List<Member> getMembersByFollowedMemberId(Long memberId) throws NotExistMemberException {
@@ -115,5 +109,34 @@ public class JpaSearchQueryService implements SearchQueryService {
                 searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, length),
                 searchQueryRepository.findRelatedMembersAboutKeyword(keyword, length),
                 searchQueryRepository.findRelatedCollectionsAboutKeyword(keyword, length));
+    }
+
+    private Member getMemberByIdWithFollowedMemberAndBlockedMember(Long memberId) throws NotExistMemberException {
+        if (memberId == null) {
+            return null;
+        }
+
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMemberAndBlockedMember(memberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private List<Member> getFollowedMemberByMember(Member member) {
+        if (member != null) {
+            return member.getFollowedMembers().stream()
+                    .map(FollowedMember::getMember).collect(Collectors.toList());
+        } else{
+            return new ArrayList<>();
+        }
+    }
+
+    private List<Member> getBlockedMemberByMember(Member member) {
+        if (member != null) {
+            return member.getBlockedMembers().stream()
+                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
+                    .map(BlockedMember::getMember).collect(Collectors.toList());
+        } else{
+            return new ArrayList<>();
+        }
     }
 }

@@ -1,6 +1,7 @@
 package com.nameless.spin_off.dto;
 
 
+import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
@@ -8,6 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public class MemberDto {
 
@@ -19,7 +23,6 @@ public class MemberDto {
         private String nickname;
         private String accountId;
 
-        @QueryProjection
         public SearchPageAtAllMemberDto(Long id, String profileImg, String nickname, String accountId) {
             this.id = id;
             this.profileImg = profileImg;
@@ -36,6 +39,37 @@ public class MemberDto {
         private String nickname;
         private String accountId;
         private String bio;
+        private String followingMemberNickname;
+        private int followingNumber;
+        private List<String> thumbnailUrls = new ArrayList<>();
+
+        public SearchPageAtMemberMemberDto(Member member) {
+            this.id = member.getId();
+            this.profileImg = member.getProfileImg();
+            this.nickname = member.getNickname();
+            this.accountId = member.getAccountId();
+            this.bio = member.getBio();
+        }
+
+        public SearchPageAtMemberMemberDto(Member member, List<Member> followingMembers) {
+            this.id = member.getId();
+            this.profileImg = member.getProfileImg();
+            this.nickname = member.getNickname();
+            this.accountId = member.getAccountId();
+            this.bio = member.getBio();
+
+            List<FollowedMember> followingMembers2 = member.getFollowingMembers();
+            followingMembers2.stream()
+                    .filter(followingMember -> followingMembers.contains(followingMember.getFollowingMember()))
+                    .max(Comparator.comparing(followingMember -> followingMember.getFollowingMember().getPopularity()))
+                    .ifPresent(followingMember -> setFollowingMemberNicknameAndNumber(
+                            followingMember.getFollowingMember().getNickname(), followingMembers2.size()));
+        }
+
+        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
+            this.followingMemberNickname = nickname;
+            this.followingNumber = size - 1;
+        }
     }
 
     @Data

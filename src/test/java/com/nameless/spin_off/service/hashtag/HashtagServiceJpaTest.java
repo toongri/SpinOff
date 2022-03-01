@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaHashtagServiceTest {
+class HashtagServiceJpaTest {
 
     @Autowired HashtagService hashtagService;
     @Autowired HashtagRepository hashtagRepository;

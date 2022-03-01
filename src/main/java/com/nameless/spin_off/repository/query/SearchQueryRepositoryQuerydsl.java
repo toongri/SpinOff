@@ -23,7 +23,7 @@ import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 @RequiredArgsConstructor
-public class QuerydslSearchQueryRepository implements SearchQueryRepository {
+public class SearchQueryRepositoryQuerydsl implements SearchQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 

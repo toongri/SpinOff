@@ -31,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaCommentInPostServiceTest {
+class CommentInPostServiceJpaTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;

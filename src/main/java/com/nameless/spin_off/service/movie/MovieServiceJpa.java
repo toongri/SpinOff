@@ -16,7 +16,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaMovieService implements MovieService{
+public class MovieServiceJpa implements MovieService{
 
     private final MovieRepository movieRepository;
     private final MemberRepository memberRepository;

@@ -49,14 +49,13 @@ public class CollectionDto {
                     .filter(followedCollection -> followingMembers.contains(followedCollection.getMember()))
                     .max(Comparator.comparing(followedCollection -> followedCollection.getMember().getPopularity()))
                     .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
-                            followedCollection, followedCollections.size()));
-
+                            followedCollection.getMember().getNickname(), followedCollections.size()));
 
         }
 
-        public void setFollowingMemberNicknameAndNumber(FollowedCollection followedCollection, int size) {
-            this.followingMemberNickname = followedCollection.getMember().getNickname();
-            this.followingNumber = size;
+        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
+            this.followingMemberNickname = nickname;
+            this.followingNumber = size - 1;
         }
     }
 

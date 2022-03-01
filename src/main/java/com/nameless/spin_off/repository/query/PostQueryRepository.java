@@ -29,13 +29,16 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
-    public Slice<SearchPageAtAllPostDto> findAllSlicedSearchPageAtAll(String keyword, Pageable pageable) {
+    public Slice<SearchPageAtAllPostDto> findAllSlicedForSearchPageAtAll(
+            String keyword, Pageable pageable, List<Member> blockedMembers) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_SearchPageAtAllPostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member)
-                .where(post.title.contains(keyword)));
+                .where(
+                        post.title.contains(keyword),
+                        memberNotIn(blockedMembers)));
     }
 
     public Slice<MainPagePostDto> findAllSlicedForMainPage(Pageable pageable, Member user, List<Member> blockedMembers) {

@@ -32,7 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaComplainServiceTest {
+class ComplainServiceJpaTest {
 
     @Autowired MemberService memberService;
     @Autowired ComplainService complainService;

@@ -25,12 +25,14 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
-    public Slice<SearchPageAtAllCollectionDto> findAllSlicedSearchPageAtAll(String keyword, Pageable pageable,
-                                                                            List<Member> followedMembers) {
+    public Slice<SearchPageAtAllCollectionDto> findAllSlicedForSearchPageAtAll(
+            String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
         Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
                 .selectFrom(collection)
                 .join(collection.member, member).fetchJoin()
-                .where(collection.title.contains(keyword)));
+                .where(
+                        collection.title.contains(keyword),
+                        memberNotIn(blockedMembers)));
 
         return MapContentToDtoForSearchPage(content, followedMembers);
     }
@@ -45,7 +47,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .join(collection.member, member)
                 .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
-                        member.notIn(blockedMembers),
+                        memberNotIn(blockedMembers),
                         memberNotEq(user)));
     }
 
@@ -58,8 +60,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
                 .join(collection.member, member)
-                .where(member.in(followedMembers),
-                        member.notIn(blockedMembers),
+                .where(memberIn(followedMembers),
+                        memberNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC.getPrivacyBound())));
     }
 
@@ -72,8 +74,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
                 .join(collection.member, member)
-                .where(member.notIn(blockedMembers),
-                        collection.in(collections)));
+                .where(memberNotIn(blockedMembers),
+                        collcetionIn(collections)));
     }
 
     private Slice<SearchPageAtAllCollectionDto> MapContentToDtoForSearchPage(
@@ -89,6 +91,9 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
     private BooleanExpression memberIn(List<Member> members) {
         return members.isEmpty() ? null : member.in(members);
+    }
+    private BooleanExpression collcetionIn(List<Collection> collections) {
+        return collections.isEmpty() ? null : collection.in(collections);
     }
     private BooleanExpression memberNotIn(List<Member> members) {
         return members.isEmpty() ? null : member.notIn(members);

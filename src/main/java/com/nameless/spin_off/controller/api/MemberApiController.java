@@ -1,13 +1,17 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.dto.MemberDto.SearchPageAtMemberMemberDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.query.MemberQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -16,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
 
     @PostMapping("")
     public MemberApiResult<Long> createOne(@RequestBody CreateMemberVO createMemberVO)
@@ -51,6 +56,13 @@ public class MemberApiController {
             throws NotExistMemberException {
 
         return new MemberApiResult<Long>(memberService.insertSearch(id, keyword, searchedByMemberStatus));
+    }
+
+    @GetMapping("/search")
+    public MemberApiResult<Slice<SearchPageAtMemberMemberDto>> get(
+            @RequestParam String keyword, @RequestParam Long memberId, Pageable pageable) throws NotExistMemberException {
+        return new MemberApiResult<Slice<SearchPageAtMemberMemberDto>>(
+                memberQueryService.getSearchPageMemberAtMemberSliced(keyword, pageable, memberId));
     }
 
     @Data

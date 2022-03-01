@@ -4,7 +4,10 @@ import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.collection.CollectionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,11 +22,14 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaMemberServiceTest {
+class MemberServiceJpaTest {
 
     @Autowired MemberService memberService;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
+    @Autowired CollectionService collectionService;
+    @Autowired CollectionRepository collectionRepository;
+    @Autowired PostRepository postRepository;
 
     @Test
     public void 멤버_회원가입() throws Exception{

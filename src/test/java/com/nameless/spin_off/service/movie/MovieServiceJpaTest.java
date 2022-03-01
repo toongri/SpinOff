@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaMovieServiceTest {
+class MovieServiceJpaTest {
 
     @Autowired MovieService movieService;
     @Autowired MovieRepository movieRepository;

@@ -20,7 +20,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaMemberService implements MemberService {
+public class MemberServiceJpa implements MemberService {
 
     private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;

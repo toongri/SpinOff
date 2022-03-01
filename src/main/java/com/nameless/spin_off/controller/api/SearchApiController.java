@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
 import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
@@ -11,6 +12,8 @@ import com.nameless.spin_off.service.query.SearchQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -58,9 +61,26 @@ public class SearchApiController {
         return new SearchApiResult<List<LastSearchDto>>(searchQueryService.getLastSearchesByMemberLimit(id, length));
     }
 
+    @GetMapping("/all")
+    public SearchApiResult<SearchAllDto> getLastSearchesByMember(
+            @RequestParam String keyword, @RequestParam Long id,
+            @Qualifier("post") Pageable postPageable, @Qualifier("collection") Pageable collectionPageable,
+            @Qualifier("member") Pageable memberPageable, @Qualifier("movie") Pageable moviePageable)
+            throws NotExistMemberException {
+
+        return new SearchApiResult<SearchAllDto>(
+                searchQueryService.getSearchPageDataAtAll(
+                        keyword, id,
+                        postPageable,
+                        collectionPageable,
+                        memberPageable,
+                        moviePageable));
+    }
+
     @Data
     @AllArgsConstructor
     public static class SearchApiResult<T> {
         private T data;
     }
+
 }

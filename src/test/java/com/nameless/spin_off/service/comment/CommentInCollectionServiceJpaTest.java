@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 //@Rollback(value = false)
 @SpringBootTest
 @Transactional
-class JpaCommentInCollectionServiceTest {
+class CommentInCollectionServiceJpaTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;

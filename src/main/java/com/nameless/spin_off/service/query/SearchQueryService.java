@@ -9,6 +9,7 @@ import com.nameless.spin_off.dto.MovieDto.SearchPageAtAllMovieDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
 import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
@@ -27,10 +28,11 @@ public interface SearchQueryService {
             throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
     List<MostPopularHashtag> getMostPopularHashtagLimit(int length);
     List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
-    Slice<SearchPageAtAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable);
-    Slice<SearchPageAtAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable);
-    Slice<SearchPageAtAllCollectionDto> getSearchPageCollectionAtAllSliced(
-            String keyword, Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<SearchPageAtAllPostDto> getSearchPagePostAtAllSliced(String keyword, Pageable pageable);
+
+    SearchAllDto getSearchPageDataAtAll(String keyword, Long memberId,
+                                        Pageable postPageable,
+                                        Pageable collectionPageable,
+                                        Pageable memberPageable,
+                                        Pageable moviePageable) throws NotExistMemberException;
 
 }
