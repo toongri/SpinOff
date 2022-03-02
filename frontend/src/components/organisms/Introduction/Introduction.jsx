@@ -9,6 +9,12 @@ import {
   SideBottomContainer,
 } from './styles';
 import { TextButton } from '../../atoms';
+import { useSelector, useDispatch } from 'react-redux';
+import {
+  toggleFilter,
+  discovery,
+  following,
+} from '../../../store/ListFilter/action';
 
 const buttonStyle = {
   color: 'white',
@@ -18,16 +24,33 @@ const buttonStyle = {
 };
 
 function Introduction() {
+  const listFilter = useSelector(state => state.listFilterReducer);
+  const dispatch = useDispatch();
+
+  const Toggle = () => {
+    dispatch(toggleFilter());
+  };
+  const Discovery = () => {
+    dispatch(discovery());
+  };
+  const Following = () => {
+    dispatch(following());
+  };
+
   return (
     <Container>
       <SideContainer>
         <SideBottomContainer>
-          <TextButton Style={buttonStyle}>팔로잉</TextButton>
+          <TextButton onClick={Following} Style={buttonStyle}>
+            팔로잉
+          </TextButton>
           <Label>
             <Switch type="checkbox" />
-            <Slider />
+            <Slider onClick={Toggle} listType={listFilter} />
           </Label>
-          <TextButton Style={buttonStyle}>발견</TextButton>
+          <TextButton onClick={Discovery} Style={buttonStyle}>
+            발견
+          </TextButton>
         </SideBottomContainer>
       </SideContainer>
       <TodayDocent />

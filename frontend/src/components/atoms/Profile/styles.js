@@ -3,7 +3,7 @@ import { ReactComponent as Profile } from '../../../assets/images/profile.svg';
 
 const Icon = styled(Profile)`
   cursor: pointer;
-  padding: ${props => props.padding};
+  padding: 20px;
   fill: white;
   transition: 0.3s;
   &:hover {

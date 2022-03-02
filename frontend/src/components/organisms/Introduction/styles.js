@@ -3,6 +3,7 @@ import styled from 'styled-components';
 const Container = styled.div`
   display: flex;
   width: 100%;
+  min-width: 1000px;
   height: 500px;
   background: #000000;
 `;
@@ -41,11 +42,13 @@ const Slider = styled.span`
   transition: 0.4s;
   border: 1px solid #f9cf00;
   &::before {
+    transform: ${props =>
+      props.listType === 'discovery' ? 'translateX(35px)' : ''};
     position: absolute;
     content: '';
     height: 30px;
     width: 30px;
-    left: 4px;
+    left: 3px;
     bottom: 3px;
     background-color: #f9cf00;
     transition: 0.5s;

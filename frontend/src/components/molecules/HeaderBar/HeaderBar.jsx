@@ -4,7 +4,8 @@ import {
   HeaderLeftContainer,
   HeaderRightContainer,
 } from './styles';
-import { DM, Logo, Notice, Profile, TextButton } from '../../atoms';
+import { Notice, DM, Logo, Profile, TextButton } from '../../atoms';
+import HeaderMenuModal from '../HeaderMenuModal/HeaderMenuModal';
 
 const buttonStyle = {
   fontSize: '24px',
@@ -35,8 +36,8 @@ function Header() {
           </>
         ) : (
           <>
-            <Notice padding="20px" />
-            <DM padding="20px" />
+            <HeaderMenuModal IconType={Notice} />
+            <HeaderMenuModal IconType={DM} />
             <Profile padding="20px" />
           </>
         )}

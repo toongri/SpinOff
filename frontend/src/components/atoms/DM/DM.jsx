@@ -2,11 +2,11 @@ import React from 'react';
 import Icon from './styles';
 import propTypes from 'prop-types';
 
-function DM({ padding = '' }) {
-  return <Icon padding={padding} />;
+function DM({ onClick }) {
+  return <Icon onClick={onClick} />;
 }
 
 DM.propTypes = {
-  padding: propTypes.string,
+  onClick: propTypes.func,
 };
 export default DM;

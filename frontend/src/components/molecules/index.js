@@ -1,4 +1,5 @@
 import HeaderBar from './HeaderBar';
 import SearchBar from './SearchBar';
+import HeaderMenuModal from './HeaderMenuModal';
 
-export { HeaderBar, SearchBar };
+export { HeaderBar, SearchBar, HeaderMenuModal };

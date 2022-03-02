@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { ReactComponent as Notice } from '../../../assets/images/notice.svg';
 
 const Icon = styled(Notice)`
-  padding: ${props => props.padding};
+  padding: 20px;
   cursor: pointer;
   fill: white;
   transition: 0.3s;
@@ -13,5 +13,4 @@ const Icon = styled(Notice)`
     transition: 0.3s;
   }
 `;
-
 export default Icon;
