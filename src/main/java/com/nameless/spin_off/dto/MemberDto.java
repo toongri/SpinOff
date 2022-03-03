@@ -3,6 +3,7 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -50,6 +51,8 @@ public class MemberDto {
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();
             this.bio = member.getBio();
+
+            setThumbnails(member);
         }
 
         public SearchPageAtMemberMemberDto(Member member, List<Member> followingMembers) {
@@ -58,6 +61,7 @@ public class MemberDto {
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();
             this.bio = member.getBio();
+            setThumbnails(member);
 
             List<FollowedMember> followingMembers2 = member.getFollowingMembers();
             followingMembers2.stream()
@@ -70,6 +74,22 @@ public class MemberDto {
         public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
             this.followingMemberNickname = nickname;
             this.followingNumber = size - 1;
+        }
+
+
+        private void setThumbnails(Member member) {
+            List<Post> posts = member.getPosts();
+            int memberPostIndex = posts.size() - 1;
+            while (memberPostIndex >= 0) {
+                thumbnailUrls.add(posts.get(memberPostIndex).getThumbnailUrl());
+                if (thumbnailUrls.size() == 4) {
+                    break;
+                }
+                memberPostIndex--;
+            }
+            if (memberPostIndex == -1 && thumbnailUrls.size() % 2 == 1) {
+                thumbnailUrls.remove(thumbnailUrls.size() - 1);
+            }
         }
     }
 

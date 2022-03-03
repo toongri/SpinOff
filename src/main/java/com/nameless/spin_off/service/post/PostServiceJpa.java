@@ -103,7 +103,8 @@ public class PostServiceJpa implements PostService{
             throws NotMatchCollectionException {
         List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
 
-        if (collections.stream().allMatch(collection -> collection.getMember().getId().equals(memberId))) {
+        if (collections.size() == collectionIds.size() &&
+                collections.stream().allMatch(collection -> collection.getMember().getId().equals(memberId))) {
             return collections;
         } else {
             throw new NotMatchCollectionException();

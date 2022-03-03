@@ -9,6 +9,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,22 +26,34 @@ public class MainPageApiController {
     @GetMapping("/discovery")
     public MainPageResult<MainPageDiscoveryDto> getDiscoveryData(
             @RequestParam Long memberId,
-            @Qualifier("post") Pageable postPageable, @Qualifier("collection") Pageable collectionPageable)
+            @Qualifier("popular-post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
+                    Pageable popularPostPageable,
+            @Qualifier("latest-post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable latestPostPageable,
+            @Qualifier("collection")  @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable collectionPageable)
             throws NotExistMemberException {
 
         return new MainPageResult<MainPageDiscoveryDto>(
-                mainPageService.getDiscoveryData(postPageable, collectionPageable, memberId));
+                mainPageService.getDiscoveryData(popularPostPageable, latestPostPageable, collectionPageable, memberId));
     }
 
     @GetMapping("/following")
-    public MainPageResult<MainPageFollowDto> getDiscoveryData(
+    public MainPageResult<MainPageFollowDto> getFollowData(
             @RequestParam Long memberId,
-            @Qualifier("member") Pageable memberPageable, @Qualifier("hashtag") Pageable hashtagPageable,
-            @Qualifier("movie") Pageable moviePageable, @Qualifier("collection") Pageable collectionPageable)
+            @Qualifier("member") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable memberPageable,
+            @Qualifier("hashtag") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable hashtagPageable,
+            @Qualifier("movie") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable moviePageable,
+            @Qualifier("collection") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+                    Pageable collectionPageable)
             throws NotExistMemberException {
 
         return new MainPageResult<MainPageFollowDto>(
-                mainPageService.getFollowData(memberPageable, hashtagPageable, moviePageable, collectionPageable, memberId));
+                mainPageService.getFollowData(memberPageable, hashtagPageable, moviePageable,
+                        collectionPageable, memberId));
     }
 
 

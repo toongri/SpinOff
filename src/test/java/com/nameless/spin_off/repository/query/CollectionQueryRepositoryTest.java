@@ -1,8 +1,8 @@
-package com.nameless.spin_off.repository.member;
+package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.member.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +13,7 @@ import javax.persistence.EntityManager;
 
 @SpringBootTest
 @Transactional
-public class MemberQueryRepositoryTest {
+public class CollectionQueryRepositoryTest {
 
     @Autowired PostRepository postRepository;
     @Autowired MemberRepository memberRepository;
@@ -22,4 +22,6 @@ public class MemberQueryRepositoryTest {
     @Autowired MemberService memberService;
     @Autowired MemberQueryRepository memberQueryRepository;
     @Autowired EntityManager em;
+    @Autowired CollectionQueryRepository collectionQueryRepository;
+
 }

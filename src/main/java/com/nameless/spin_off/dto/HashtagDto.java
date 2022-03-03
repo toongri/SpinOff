@@ -33,4 +33,20 @@ public class HashtagDto {
             this.content = content;
         }
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class PopularityRelatedHashtagDto {
+
+        private Long id;
+        private String content;
+        private long quantity;
+
+        @QueryProjection
+        public PopularityRelatedHashtagDto(Long id, String content, long quantity) {
+            this.id = id;
+            this.content = content;
+            this.quantity = quantity;
+        }
+    }
 }

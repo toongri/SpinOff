@@ -172,7 +172,7 @@ public class Post extends BaseTimeEntity {
                                   Movie movie, PublicOfPostStatus publicOfPostStatus)
             throws AlreadyPostedHashtagException, OverTitleOfPostException, OverContentOfPostException {
         Post post = new Post();
-        post.updateMember(member);
+        member.addPost(post);
 
         if (title.length() > 100) {
             throw new OverTitleOfPostException();

@@ -9,7 +9,7 @@ import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.collection.NotExistCollectionException;
+import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
@@ -138,7 +138,7 @@ class PostServiceJpaTest {
 
         PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(member.getId(),
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of(), List.of(), List.of(0L));
+                List.of(), List.of(), List.of(-1L));
         //when
 
         //then
@@ -149,7 +149,7 @@ class PostServiceJpaTest {
                 .isInstanceOf(NotExistMovieException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3))
-                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
+                .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
     }
 
     @Test

@@ -17,6 +17,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 public class PostDto {
     @Data
@@ -76,6 +77,19 @@ public class PostDto {
             this.memberNickname = memberNickname;
             this.memberProfileImgUrl = memberProfileImgUrl;
             this.thumbnailUrl = thumbnailUrl;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(postId);
+        }
+
+        @Override
+        public boolean equals(Object mainPagePostDto) {
+            if (mainPagePostDto instanceof MainPagePostDto) {
+                return ((MainPagePostDto) mainPagePostDto).postId.equals(postId);
+            }
+            return false;
         }
     }
 

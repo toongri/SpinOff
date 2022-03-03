@@ -17,8 +17,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
         super(Movie.class);
     }
 
-    public Slice<SearchPageAtAllMovieDto> findAllSlicedForSearchPageAtAll(
-            String keyword, Pageable pageable) {
+    public Slice<SearchPageAtAllMovieDto> findAllSlicedForSearchPageAtAll(String keyword, Pageable pageable) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QMovieDto_SearchPageAtAllMovieDto(
                         movie.id, movie.title, movie.imageUrl,

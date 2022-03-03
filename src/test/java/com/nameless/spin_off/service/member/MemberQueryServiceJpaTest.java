@@ -1,8 +1,8 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchPageAtMemberMemberDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -68,6 +68,41 @@ public class MemberQueryServiceJpaTest {
         }
         postRepository.saveAll(postList);
 
+        for (Collection collection : collectionList) {
+            Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setThumbnailUrl(collection.getMember().getId() + "1")
+                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+            postRepository.save(build);
+            postList.add(build);
+            em.flush();
+        }
+
+        List<Integer> integers = List.of(5, 9, 8, 3, 2, 4, 7, 0, 1, 6);
+
+        for (Integer integer : integers) {
+            Post build = Post.buildPost().setMember(collectionList.get(integer).getMember())
+                    .setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setThumbnailUrl(collectionList.get(integer).getMember().getId() + "2")
+                    .setHashTags(List.of()).setCollections(List.of(collectionList.get(integer))).build();
+
+            postRepository.save(build);
+            postList.add(build);
+            em.flush();
+        }
+
+        Post build = Post.buildPost().setMember(collectionList.get(6).getMember())
+                .setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setThumbnailUrl(collectionList.get(6).getMember().getId() + "3")
+                .setHashTags(List.of()).setCollections(List.of(collectionList.get(6))).build();
+
+        postRepository.save(build);
+        postList.add(build);
+        em.flush();
+        em.clear();
+
         memberService.insertFollowedMemberByMemberId(memberList.get(1).getId(), memberList.get(7).getId());
         memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), memberList.get(7).getId());
         memberService.insertFollowedMemberByMemberId(memberList.get(3).getId(), memberList.get(7).getId());
@@ -95,11 +130,11 @@ public class MemberQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<MemberDto.SearchPageAtMemberMemberDto> content = memberQueryService.getSearchPageMemberAtMemberSliced(
+        List<SearchPageAtMemberMemberDto> content = memberQueryService.getSearchPageMemberAtMemberSliced(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(MemberDto.SearchPageAtMemberMemberDto::getId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getId).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getId(),
                         memberList.get(6).getId(),
@@ -108,7 +143,7 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(3).getId(),
                         memberList.get(2).getId());
 
-        assertThat(content.stream().map(MemberDto.SearchPageAtMemberMemberDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(6).getNickname(),
                         memberList.get(5).getNickname(),
@@ -117,7 +152,7 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(2).getNickname(),
                         memberList.get(1).getNickname());
 
-        assertThat(content.stream().map(MemberDto.SearchPageAtMemberMemberDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         6,
                         5,
@@ -125,6 +160,22 @@ public class MemberQueryServiceJpaTest {
                         3,
                         2,
                         1);
+        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getThumbnailUrls).collect(Collectors.toList()))
+                .containsExactly(
+                        List.of(memberList.get(7).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(7).getPosts().get(1).getThumbnailUrl()),
+                        List.of(memberList.get(6).getPosts().get(3).getThumbnailUrl(),
+                                memberList.get(6).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(6).getPosts().get(1).getThumbnailUrl(),
+                                memberList.get(6).getPosts().get(0).getThumbnailUrl()),
+                        List.of(memberList.get(5).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(5).getPosts().get(1).getThumbnailUrl()),
+                        List.of(memberList.get(4).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(4).getPosts().get(1).getThumbnailUrl()),
+                        List.of(memberList.get(3).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(3).getPosts().get(1).getThumbnailUrl()),
+                        List.of(memberList.get(2).getPosts().get(2).getThumbnailUrl(),
+                                memberList.get(2).getPosts().get(1).getThumbnailUrl()));
 
     }
 

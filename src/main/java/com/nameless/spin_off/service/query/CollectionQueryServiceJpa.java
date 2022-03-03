@@ -44,8 +44,8 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     }
 
     @Override
-    public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(
-            Pageable pageable, Long memberId) throws NotExistMemberException {
+    public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(Pageable pageable,
+                                                                        Long memberId) throws NotExistMemberException {
 
         Optional<Member> optionalMember = getMemberByIdWithBlockedMember(memberId);
         Member member = optionalMember.orElse(null);

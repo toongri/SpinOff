@@ -26,7 +26,6 @@ public class SearchDto {
         private Slice<SearchPageAtAllCollectionDto> collections;
         private Slice<SearchPageAtAllMovieDto> movies;
         private Slice<SearchPageAtAllMemberDto> members;
-
     }
 
     @Data

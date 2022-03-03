@@ -13,6 +13,7 @@ import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.*;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -78,12 +79,20 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<SearchedByMember> searches = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
     private Long complainCount;
     private Long blockCount;
     private Double followScore;
     private Double popularity;
 
     //==연관관계 메소드==//
+    public void addPost(Post post) {
+        posts.add(post);
+        post.updateMember(this);
+    }
+
     public Long addFollowedHashtag(Hashtag hashtag) throws AlreadyFollowedHashtagException {
         FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(this, hashtag);
 

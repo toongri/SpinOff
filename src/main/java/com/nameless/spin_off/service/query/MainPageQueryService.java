@@ -6,7 +6,9 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.data.domain.Pageable;
 
 public interface MainPageQueryService {
-    MainPageDiscoveryDto getDiscoveryData(Pageable postPageable, Pageable collectionPageable, Long memberId)
+    MainPageDiscoveryDto getDiscoveryData(Pageable popularPostPageable,
+                                          Pageable latestPostPageable,
+                                          Pageable collectionPageable, Long memberId)
             throws NotExistMemberException;
     MainPageFollowDto getFollowData(
             Pageable memberPageable, Pageable hashtagPageable,

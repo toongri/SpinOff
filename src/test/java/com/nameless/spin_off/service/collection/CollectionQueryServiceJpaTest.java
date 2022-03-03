@@ -408,7 +408,9 @@ public class CollectionQueryServiceJpaTest {
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsByFollowedMemberSlicedForMainPage(
-                        PageRequest.of(0, 6, Sort.by("id").descending()), member.getId()).getContent();
+                        PageRequest.of(0, 6, Sort.by("lastPostUpdateTime").descending()), member.getId())
+                        .getContent();
+
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(MainPageCollectionDto::getThumbnailUrls).collect(Collectors.toList()))
@@ -480,6 +482,7 @@ public class CollectionQueryServiceJpaTest {
             postList.add(build);
             em.flush();
         }
+
         Post build = Post.buildPost().setMember(collectionList.get(6).getMember())
                 .setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
@@ -493,12 +496,6 @@ public class CollectionQueryServiceJpaTest {
 
 
         collectionList = collectionRepository.findAll();
-        for (Collection collect : collectionList) {
-            System.out.println("collect.getCollectedPosts().last.getId() = "
-                    + collect.getCollectedPosts().get(collect.getCollectedPosts().size() - 1).getId());
-            System.out.println(collect.getId());
-
-        }
         em.clear();
 
         //when
