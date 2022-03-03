@@ -25,4 +25,9 @@ public class HashtagQueryServiceJpa implements HashtagQueryService {
     public List<HashtagDto.RelatedMostTaggedHashtagDto> getHashtagsByMemberIds(int length, List<Long> memberIds) {
         return hashtagQueryRepository.findAllByMemberIds(length, memberIds);
     }
+
+    @Override
+    public List<RelatedMostTaggedHashtagDto> getHashtagsByCollectionIds(int length, List<Long> collectionIds) {
+        return hashtagQueryRepository.findAllByCollectionIds(length, collectionIds);
+    }
 }

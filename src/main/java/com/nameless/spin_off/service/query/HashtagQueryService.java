@@ -8,5 +8,6 @@ public interface HashtagQueryService {
 
     List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<Long> postIds);
     List<RelatedMostTaggedHashtagDto> getHashtagsByMemberIds(int length, List<Long> memberIds);
+    List<RelatedMostTaggedHashtagDto> getHashtagsByCollectionIds(int length, List<Long> collectionIds);
 
 }

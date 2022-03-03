@@ -17,6 +17,78 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
+    public static class SearchPageAtCollectionCollectionDto {
+
+        private Long collectionId;
+        private String collectionTitle;
+        private Long memberId;
+        private String memberAccountId;
+        private List<String> thumbnailUrls = new ArrayList<>();
+        private String followingMemberNickname;
+        private int followingNumber;
+
+        public SearchPageAtCollectionCollectionDto(Collection collection) {
+
+            this.collectionId = collection.getId();
+            this.collectionTitle = collection.getTitle();
+            this.memberId = collection.getMember().getId();
+            this.memberAccountId = collection.getMember().getAccountId();
+            if (collection.getFirstThumbnail() != null) {
+                thumbnailUrls.add(collection.getFirstThumbnail());
+
+                if (collection.getSecondThumbnail() != null) {
+                    thumbnailUrls.add(collection.getSecondThumbnail());
+
+                    if (collection.getThirdThumbnail() != null) {
+                        thumbnailUrls.add(collection.getThirdThumbnail());
+
+                        if (collection.getFourthThumbnail() != null) {
+                            thumbnailUrls.add(collection.getFourthThumbnail());
+                        }
+                    }
+                }
+            }
+        }
+
+        public SearchPageAtCollectionCollectionDto(Collection collection, List<Member> followingMembers) {
+            this.collectionId = collection.getId();
+            this.collectionTitle = collection.getTitle();
+            this.memberId = collection.getMember().getId();
+            this.memberAccountId = collection.getMember().getAccountId();
+            if (collection.getFirstThumbnail() != null) {
+                thumbnailUrls.add(collection.getFirstThumbnail());
+
+                if (collection.getSecondThumbnail() != null) {
+                    thumbnailUrls.add(collection.getSecondThumbnail());
+
+                    if (collection.getThirdThumbnail() != null) {
+                        thumbnailUrls.add(collection.getThirdThumbnail());
+
+                        if (collection.getFourthThumbnail() != null) {
+                            thumbnailUrls.add(collection.getFourthThumbnail());
+                        }
+                    }
+                }
+            }
+
+            List<FollowedCollection> followedCollections = collection.getFollowingMembers();
+
+            followedCollections.stream()
+                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember()))
+                    .max(Comparator.comparing(followedCollection -> followedCollection.getMember().getPopularity()))
+                    .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
+                            followedCollection.getMember().getNickname(), followedCollections.size()));
+
+        }
+
+        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
+            this.followingMemberNickname = nickname;
+            this.followingNumber = size - 1;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class SearchPageAtAllCollectionDto {
 
         private Long collectionId;

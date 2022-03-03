@@ -2,6 +2,7 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchPageAtCollectionCollectionDto;
 import com.nameless.spin_off.dto.QCollectionDto_MainPageCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.Member;
@@ -34,7 +35,19 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
 
-        return MapContentToDtoForSearchPage(content, followedMembers);
+        return MapContentToDtoForSearchPageAtAll(content, followedMembers);
+    }
+
+    public Slice<SearchPageAtCollectionCollectionDto> findAllSlicedForSearchPageAtCollection(
+            String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+        Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
+                .selectFrom(collection)
+                .join(collection.member, member).fetchJoin()
+                .where(
+                        collection.title.contains(keyword),
+                        memberNotIn(blockedMembers)));
+
+        return MapContentToDtoForSearchPageAtCollection(content, followedMembers);
     }
 
     public Slice<MainPageCollectionDto> findAllSlicedForMainPage(
@@ -78,7 +91,16 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collectionIn(followedCollections)));
     }
 
-    private Slice<SearchPageAtAllCollectionDto> MapContentToDtoForSearchPage(
+    private Slice<SearchPageAtCollectionCollectionDto> MapContentToDtoForSearchPageAtCollection(
+            Slice<Collection> contents, List<Member> followedMembers) {
+        if (followedMembers.isEmpty()) {
+            return contents.map(SearchPageAtCollectionCollectionDto::new);
+        } else {
+            return contents.map(content -> new SearchPageAtCollectionCollectionDto(content, followedMembers));
+        }
+    }
+
+    private Slice<SearchPageAtAllCollectionDto> MapContentToDtoForSearchPageAtAll(
             Slice<Collection> contents, List<Member> followedMembers) {
         if (followedMembers.isEmpty()) {
             return contents.map(SearchPageAtAllCollectionDto::new);

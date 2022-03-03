@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchPageAtCollectionCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -42,6 +43,20 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         return collectionQueryRepository
                 .findAllSlicedForSearchPageAtAll(keyword, pageable, followedMembers, blockedMembers);
     }
+
+    @Override
+    public Slice<SearchPageAtCollectionCollectionDto> getSearchPageCollectionAtCollectionSliced(
+            String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
+
+        Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
+
+        List<Member> followedMembers = getFollowedMemberByMember(member);
+        List<Member> blockedMembers = getBlockedMemberByMember(member);
+
+        return collectionQueryRepository
+                .findAllSlicedForSearchPageAtCollection(keyword, pageable, followedMembers, blockedMembers);
+    }
+
 
     @Override
     public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(Pageable pageable,

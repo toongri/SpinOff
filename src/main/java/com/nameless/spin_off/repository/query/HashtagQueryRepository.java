@@ -10,8 +10,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
+import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class HashtagQueryRepository extends Querydsl4RepositorySupport {
@@ -44,6 +47,25 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
                 .from(postedHashtag)
                 .join(postedHashtag.hashtag, hashtag)
                 .where(postedHashtag.post.member.id.in(memberIds))
+                .groupBy(postedHashtag.hashtag)
+                .orderBy(postedHashtag.hashtag.count().desc(), hashtag.popularity.desc())
+                .limit(length)
+                .fetch();
+    }
+
+
+    public List<RelatedMostTaggedHashtagDto> findAllByCollectionIds(int length, List<Long> collectionIds) {
+        NumberPath<Long> aliasQuantity = Expressions.numberPath(Long.class, "quantity");
+
+        return getQueryFactory()
+                .select(new QHashtagDto_RelatedMostTaggedHashtagDto(
+                        hashtag.id, hashtag.content))
+                .from(collection)
+                .join(collection.collectedPosts, collectedPost)
+                .join(collectedPost.post, post)
+                .join(post.postedHashtags, postedHashtag)
+                .join(postedHashtag.hashtag, hashtag)
+                .where(collection.id.in(collectionIds))
                 .groupBy(postedHashtag.hashtag)
                 .orderBy(postedHashtag.hashtag.count().desc(), hashtag.popularity.desc())
                 .limit(length)

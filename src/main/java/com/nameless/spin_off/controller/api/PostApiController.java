@@ -16,6 +16,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -72,10 +74,18 @@ public class PostApiController {
         return enumMapper.get("PublicOfPostStatus");
     }
 
+    @GetMapping("/search/hashtag/first")
+    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPageFirst(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam Long memberId, @RequestParam List<String> hashtagContents) {
+        return postQueryService.getPostsByHashtagsSlicedForSearchPageFirst(pageable, hashtagContents, memberId);
+    }
+
     @GetMapping("/search/hashtag")
-    public PostApiSearchResult getfd(Pageable pageable, @RequestParam Long memberId,
-                                     @RequestParam List<String> hashtagContents) {
-        return postQueryService.getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId);
+    public PostApiResult getPostsByHashtagsSlicedForSearchPage(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam Long memberId, @RequestParam List<String> hashtagContents) {
+        return new PostApiResult(postQueryService.getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId));
     }
 
     @Data

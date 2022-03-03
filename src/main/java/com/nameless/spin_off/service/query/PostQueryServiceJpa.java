@@ -4,6 +4,7 @@ import com.nameless.spin_off.controller.api.PostApiController.PostApiSearchResul
 import com.nameless.spin_off.dto.HashtagDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
+import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -106,7 +107,7 @@ public class PostQueryServiceJpa implements PostQueryService{
     }
 
     @Override
-    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPage(
+    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPageFirst(
             Pageable pageable, List<String> hashtagContent, Long memberId) {
 
         List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
@@ -114,6 +115,16 @@ public class PostQueryServiceJpa implements PostQueryService{
         return new PostApiSearchResult(
                 postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers),
                 hashtags.stream().map(HashtagDto.RelatedMostTaggedHashtagDto::new).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(
+            Pageable pageable, List<String> hashtagContent, Long memberId) {
+
+        List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
+        blockedMembers = memberRepository.findAllByBlockingMemberId(memberId);
+
+        return postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers);
     }
 
     private List<Member> getBlockedMemberByMember(Member member) {

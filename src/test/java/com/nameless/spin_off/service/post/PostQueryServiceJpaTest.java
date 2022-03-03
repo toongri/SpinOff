@@ -541,7 +541,7 @@ public class PostQueryServiceJpaTest {
         //when
         System.out.println("서비스");
         PostApiSearchResult<Slice<SearchPageAtHashtagPostDto>, List<RelatedMostTaggedHashtagDto>> result =
-                postQueryService.getPostsByHashtagsSlicedForSearchPage(
+                postQueryService.getPostsByHashtagsSlicedForSearchPageFirst(
                 PageRequest.of(0, 4, Sort.by("popularity").descending()),
                 List.of("9", "6", "5"), member.getId());
         List<SearchPageAtHashtagPostDto> content = result.getData().getContent();
