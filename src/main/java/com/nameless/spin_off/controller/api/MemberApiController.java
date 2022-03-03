@@ -79,7 +79,7 @@ public class MemberApiController {
     @GetMapping("/search/first")
     public MemberApiSearchResult getSearchPageMemberAtMemberSlicedFirst(
             @RequestParam String keyword, @RequestParam Long memberId, @RequestParam int hashtagLength,
-            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)Pageable pageable)
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
         Slice<SearchPageAtMemberMemberDto> members =

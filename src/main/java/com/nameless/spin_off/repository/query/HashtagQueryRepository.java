@@ -4,8 +4,6 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.QHashtagDto_RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.NumberPath;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,6 +12,7 @@ import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPo
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
+import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
@@ -24,7 +23,6 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public List<RelatedMostTaggedHashtagDto> findAllByPostIds(int length, List<Long> postIds) {
-        NumberPath<Long> aliasQuantity = Expressions.numberPath(Long.class, "quantity");
 
         return getQueryFactory()
                 .select(new QHashtagDto_RelatedMostTaggedHashtagDto(
@@ -39,7 +37,6 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public List<RelatedMostTaggedHashtagDto> findAllByMemberIds(int length, List<Long> memberIds) {
-        NumberPath<Long> aliasQuantity = Expressions.numberPath(Long.class, "quantity");
 
         return getQueryFactory()
                 .select(new QHashtagDto_RelatedMostTaggedHashtagDto(
@@ -55,7 +52,6 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
 
 
     public List<RelatedMostTaggedHashtagDto> findAllByCollectionIds(int length, List<Long> collectionIds) {
-        NumberPath<Long> aliasQuantity = Expressions.numberPath(Long.class, "quantity");
 
         return getQueryFactory()
                 .select(new QHashtagDto_RelatedMostTaggedHashtagDto(
@@ -66,6 +62,22 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
                 .join(post.postedHashtags, postedHashtag)
                 .join(postedHashtag.hashtag, hashtag)
                 .where(collection.id.in(collectionIds))
+                .groupBy(postedHashtag.hashtag)
+                .orderBy(postedHashtag.hashtag.count().desc(), hashtag.popularity.desc())
+                .limit(length)
+                .fetch();
+    }
+
+    public List<RelatedMostTaggedHashtagDto> findAllByMovieIds(int length, List<Long> movieIds) {
+
+        return getQueryFactory()
+                .select(new QHashtagDto_RelatedMostTaggedHashtagDto(
+                        hashtag.id, hashtag.content))
+                .from(movie)
+                .join(movie.taggedPosts, post)
+                .join(post.postedHashtags, postedHashtag)
+                .join(postedHashtag.hashtag, hashtag)
+                .where(movie.id.in(movieIds))
                 .groupBy(postedHashtag.hashtag)
                 .orderBy(postedHashtag.hashtag.count().desc(), hashtag.popularity.desc())
                 .limit(length)

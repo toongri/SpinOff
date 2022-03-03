@@ -109,7 +109,7 @@ public class MovieQueryRepositoryTest {
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(MovieDto.SearchPageAtAllMovieDto::getId).collect(Collectors.toList()))
+        assertThat(content.stream().map(MovieDto.SearchPageAtAllMovieDto::getMovieId).collect(Collectors.toList()))
                 .containsExactly(
                         movieList.get(7).getId(),
                         movieList.get(6).getId(),

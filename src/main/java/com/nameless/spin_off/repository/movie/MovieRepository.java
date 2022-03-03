@@ -20,4 +20,9 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "LEFT JOIN FETCH movie.followingMembers followingMember " +
             "WHERE movie.id = :id")
     Optional<Movie> findOneByIdWithFollowingMember(@Param("id") Long id);
+
+    @Query("SELECT DISTINCT movie FROM Movie movie " +
+            "LEFT JOIN FETCH movie.taggedPosts taggedPost " +
+            "WHERE movie.id = :id")
+    Optional<Movie> findOneByIdWithTaggedPost(@Param("id") Long id);
 }
