@@ -1,6 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.HashtagDto.PopularityRelatedHashtagDto;
+import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
@@ -69,7 +69,7 @@ public class SearchApiController {
     }
 
     @GetMapping("/all/first")
-    public SearchApiResultFirst<SearchAllDto, List<PopularityRelatedHashtagDto>> getLastSearchesByMemberFirst(
+    public SearchApiResultFirst<SearchAllDto, List<RelatedMostTaggedHashtagDto>> getLastSearchesByMemberFirst(
             @RequestParam String keyword, @RequestParam Long id, @RequestParam int length,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
@@ -84,11 +84,8 @@ public class SearchApiController {
         SearchAllDto data = searchQueryService.getSearchPageDataAtAll(keyword, id,
                 postPageable, collectionPageable, memberPageable, moviePageable);
 
-        List<PopularityRelatedHashtagDto> hashtags = hashtagQueryService.getHashtagsByPostIds(
-                length,
-                data.getPosts().stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()));
-
-        return new SearchApiResultFirst<SearchAllDto, List<PopularityRelatedHashtagDto>>(data,hashtags);
+        return new SearchApiResultFirst<SearchAllDto, List<RelatedMostTaggedHashtagDto>>(
+                data,getHashtagsByPostIds(length, data.getPosts().getContent()));
     }
 
     @GetMapping("/all/")
@@ -125,4 +122,9 @@ public class SearchApiController {
         private F hashtags;
     }
 
+    private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<SearchPageAtAllPostDto> data) {
+        return hashtagQueryService.getHashtagsByPostIds(
+                length,
+                data.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()));
+    }
 }

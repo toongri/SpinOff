@@ -36,7 +36,7 @@ public class MemberDto {
     @Data
     @NoArgsConstructor
     public static class SearchPageAtMemberMemberDto {
-        private Long id;
+        private Long memberId;
         private String profileImg;
         private String nickname;
         private String accountId;
@@ -46,7 +46,7 @@ public class MemberDto {
         private List<String> thumbnailUrls = new ArrayList<>();
 
         public SearchPageAtMemberMemberDto(Member member) {
-            this.id = member.getId();
+            this.memberId = member.getId();
             this.profileImg = member.getProfileImg();
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();
@@ -56,7 +56,7 @@ public class MemberDto {
         }
 
         public SearchPageAtMemberMemberDto(Member member, List<Member> followingMembers) {
-            this.id = member.getId();
+            this.memberId = member.getId();
             this.profileImg = member.getProfileImg();
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();

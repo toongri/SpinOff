@@ -134,7 +134,7 @@ public class MemberQueryServiceJpaTest {
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getMemberId).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getId(),
                         memberList.get(6).getId(),

@@ -36,14 +36,14 @@ public class HashtagDto {
 
     @Data
     @NoArgsConstructor
-    public static class PopularityRelatedHashtagDto {
+    public static class RelatedMostTaggedHashtagDto {
 
         private Long id;
         private String content;
         private long quantity;
 
         @QueryProjection
-        public PopularityRelatedHashtagDto(Long id, String content, long quantity) {
+        public RelatedMostTaggedHashtagDto(Long id, String content, long quantity) {
             this.id = id;
             this.content = content;
             this.quantity = quantity;
