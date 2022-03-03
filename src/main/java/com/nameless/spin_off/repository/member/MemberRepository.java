@@ -89,4 +89,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.id = :id " +
             "ORDER BY search.id DESC")
     Optional<Member> findOneByIdWithSearchOrderBySearches(@Param("id") Long id);
+
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.blockingMembers blockingMembers " +
+            "WHERE blockingMembers.blockingMember.id = :id")
+    List<Member> findAllByBlockingMemberId(@Param("id") Long id);
 }

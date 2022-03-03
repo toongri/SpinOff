@@ -9,6 +9,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MovieDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class SearchPageAtMovieMovieDto {
+
+        private Long id;
+        private String title;
+        private String imageUrl;
+
+        @QueryProjection
+        public SearchPageAtMovieMovieDto(Long id, String title, String imageUrl) {
+            this.id = id;
+            this.title = title;
+            this.imageUrl = imageUrl;
+        }
+    }
+
     @Data
     @NoArgsConstructor
     public static class SearchPageAtAllMovieDto {
@@ -24,7 +41,6 @@ public class MovieDto {
             this.id = id;
             this.title = title;
             this.imageUrl = imageUrl;
-            System.out.println(firstGenre+"!@#!@#@");
             if (firstGenre != null) {
                 genreOfMovieStatuses.add(firstGenre);
                 if (secondGenre != null) {

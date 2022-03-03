@@ -1,5 +1,6 @@
 package com.nameless.spin_off.dto;
 
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -40,13 +41,15 @@ public class HashtagDto {
 
         private Long id;
         private String content;
-        private long quantity;
 
         @QueryProjection
-        public RelatedMostTaggedHashtagDto(Long id, String content, long quantity) {
+        public RelatedMostTaggedHashtagDto(Long id, String content) {
             this.id = id;
             this.content = content;
-            this.quantity = quantity;
+        }
+        public RelatedMostTaggedHashtagDto(Hashtag hashtag) {
+            this.id = hashtag.getId();
+            this.content = hashtag.getContent();
         }
     }
 }

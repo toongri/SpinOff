@@ -25,4 +25,13 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
                 .from(movie)
                 .where(movie.title.contains(keyword)));
     }
+
+    public Slice<SearchPageAtAllMovieDto> findAllSlicedForSearchPageAtMovie(String keyword, Pageable pageable) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QMovieDto_SearchPageAtAllMovieDto(
+                        movie.id, movie.title, movie.imageUrl,
+                        movie.firstGenreOfMovieStatus, movie.secondGenreOfMovieStatus))
+                .from(movie)
+                .where(movie.title.contains(keyword)));
+    }
 }

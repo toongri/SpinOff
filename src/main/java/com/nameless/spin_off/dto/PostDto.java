@@ -20,6 +20,30 @@ import java.util.List;
 import java.util.Objects;
 
 public class PostDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class SearchPageAtHashtagPostDto {
+
+        private Long postId;
+        private String postTitle;
+        private Long memberId;
+        private String memberNickname;
+        private String memberProfileImgUrl;
+        private String thumbnailUrl;
+
+        @QueryProjection
+        public SearchPageAtHashtagPostDto(Long postId, String title, Long memberId, String memberNickname,
+                                      String memberProfileImgUrl, String thumbnailUrl) {
+            this.postId = postId;
+            this.postTitle = title;
+            this.memberId = memberId;
+            this.memberNickname = memberNickname;
+            this.memberProfileImgUrl = memberProfileImgUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
+
     @Data
     @NoArgsConstructor
     public static class SearchPageAtAllPostDto {

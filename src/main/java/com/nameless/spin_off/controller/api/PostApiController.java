@@ -11,9 +11,11 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
+import com.nameless.spin_off.service.query.PostQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,6 +27,7 @@ public class PostApiController {
 
     private final PostService postService;
     private final EnumMapper enumMapper;
+    private final PostQueryService postQueryService;
 
     @PostMapping("")
     public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPost) throws
@@ -69,9 +72,22 @@ public class PostApiController {
         return enumMapper.get("PublicOfPostStatus");
     }
 
+    @GetMapping("/search/hashtag")
+    public PostApiSearchResult getfd(Pageable pageable, @RequestParam Long memberId,
+                                     @RequestParam List<String> hashtagContents) {
+        return postQueryService.getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId);
+    }
+
     @Data
     @AllArgsConstructor
     public static class PostApiResult<T> {
         private T data;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class PostApiSearchResult<T, F> {
+        private T data;
+        private F hashtags;
     }
 }

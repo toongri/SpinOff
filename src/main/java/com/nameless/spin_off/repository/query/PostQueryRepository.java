@@ -2,8 +2,10 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
+import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
 import com.nameless.spin_off.dto.QPostDto_SearchPageAtAllPostDto;
+import com.nameless.spin_off.dto.QPostDto_SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -92,6 +94,19 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .from(post)
                 .join(post.member, member)
                 .where(postedMovieIn(followedMovies),
+                        memberNotIn(blockedMembers),
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
+    }
+
+    public Slice<SearchPageAtHashtagPostDto> findAllByHashtagsSlicedForSearchPage(
+            Pageable pageable, List<Hashtag> hashtags, List<Member> blockedMembers) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .selectDistinct(new QPostDto_SearchPageAtHashtagPostDto(
+                        post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
+                .from(post)
+                .join(post.member, member)
+                .join(post.postedHashtags, postedHashtag)
+                .where(postedHashtag.hashtag.in(hashtags),
                         memberNotIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }

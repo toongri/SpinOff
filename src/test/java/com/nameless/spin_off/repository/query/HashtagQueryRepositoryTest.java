@@ -30,7 +30,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class HashtagQueryRepositoryTest {
 
-
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
     @Autowired CollectionRepository collectionRepository;
@@ -175,15 +174,6 @@ public class HashtagQueryRepositoryTest {
                         hashtagList.get(4).getId(),
                         hashtagList.get(5).getId());
 
-        assertThat(content.stream().map(HashtagDto.RelatedMostTaggedHashtagDto::getQuantity).collect(Collectors.toList()))
-                .containsExactly(
-                        10L,
-                        9L,
-                        8L,
-                        7L,
-                        6L,
-                        5L);
-
     }
 
     @Test
@@ -325,14 +315,6 @@ public class HashtagQueryRepositoryTest {
                         hashtagList.get(4).getId(),
                         hashtagList.get(5).getId());
 
-        assertThat(content.stream().map(HashtagDto.RelatedMostTaggedHashtagDto::getQuantity).collect(Collectors.toList()))
-                .containsExactly(
-                        10L,
-                        9L,
-                        8L,
-                        7L,
-                        6L,
-                        5L);
 
     }
 }

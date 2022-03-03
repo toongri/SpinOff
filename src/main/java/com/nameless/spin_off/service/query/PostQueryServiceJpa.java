@@ -1,5 +1,7 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.controller.api.PostApiController.PostApiSearchResult;
+import com.nameless.spin_off.dto.HashtagDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -11,6 +13,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +34,8 @@ public class PostQueryServiceJpa implements PostQueryService{
 
     private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
+    private final HashtagRepository hashtagRepository;
+    private List<Member> blockedMembers;
 
     @Override
     public Slice<SearchPageAtAllPostDto> getPostsSlicedForSearchPagePostAtAll(
@@ -38,7 +43,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         Optional<Member> optionalMember = getMemberByIdWithBlockedMember(memberId);
 
-        List<Member> blockedMembers = getBlockedMemberByMember(optionalMember.orElse(null));
+        blockedMembers = getBlockedMemberByMember(optionalMember.orElse(null));
 
         return postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable, blockedMembers);
     }
@@ -50,7 +55,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         Optional<Member> optionalMember = getMemberByIdWithBlockedMember(memberId);
 
         Member member = optionalMember.orElse(null);
-        List<Member> blockedMembers = getBlockedMemberByMember(member);
+        blockedMembers = getBlockedMemberByMember(member);
 
         return postQueryRepository.findAllSlicedForMainPage(pageable, member, blockedMembers);
     }
@@ -63,7 +68,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         List<Hashtag> hashtags =
                 member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
-        List<Member> blockedMembers = member.getBlockedMembers().stream()
+        blockedMembers = member.getBlockedMembers().stream()
                 .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
                 .map(BlockedMember::getMember).collect(Collectors.toList());
 
@@ -79,7 +84,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         List<Movie> movies =
                 member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
-        List<Member> blockedMembers =
+        blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
         return postQueryRepository
@@ -93,11 +98,22 @@ public class PostQueryServiceJpa implements PostQueryService{
         Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
         List<Member> followedMembers =
                 member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
-        List<Member> blockedMembers =
+        blockedMembers =
                 member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
 
         return postQueryRepository
                 .findAllByFollowingMemberSlicedForMainPage(pageable, followedMembers, blockedMembers);
+    }
+
+    @Override
+    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPage(
+            Pageable pageable, List<String> hashtagContent, Long memberId) {
+
+        List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
+        blockedMembers = memberRepository.findAllByBlockingMemberId(memberId);
+        return new PostApiSearchResult(
+                postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers),
+                hashtags.stream().map(HashtagDto.RelatedMostTaggedHashtagDto::new).collect(Collectors.toList()));
     }
 
     private List<Member> getBlockedMemberByMember(Member member) {
