@@ -2,8 +2,8 @@ package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtCollectionCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -112,7 +112,7 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtAllCollectionDto> content = collectionQueryService
+        List<SearchAllCollectionDto> content = collectionQueryService
                 .getSearchPageCollectionAtAllSliced(
                         keyword,
                         PageRequest.of(0, 6, Sort.by("popularity").descending()),
@@ -121,7 +121,7 @@ public class CollectionQueryServiceJpaTest {
 
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getCollectionId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
                         collectionList.get(8).getId(),
                         collectionList.get(1).getId(),
@@ -130,7 +130,7 @@ public class CollectionQueryServiceJpaTest {
                         collectionList.get(0).getId(),
                         collectionList.get(9).getId());
 
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(5).getNickname(),
                         null,
@@ -138,7 +138,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         0,
                         0,
@@ -222,7 +222,7 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtAllCollectionDto> content = collectionQueryService
+        List<SearchAllCollectionDto> content = collectionQueryService
                 .getSearchPageCollectionAtAllSliced(
                         keyword,
                         PageRequest.of(0, 6, Sort.by("popularity").descending()),
@@ -230,7 +230,7 @@ public class CollectionQueryServiceJpaTest {
                 .getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getCollectionId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
                         collectionList.get(8).getId(),
                         collectionList.get(1).getId(),
@@ -239,7 +239,7 @@ public class CollectionQueryServiceJpaTest {
                         collectionList.get(0).getId(),
                         collectionList.get(9).getId());
 
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getNickname(),
                         memberList.get(5).getNickname(),
@@ -247,7 +247,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchPageAtAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         2,
                         0,
@@ -325,7 +325,7 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtCollectionCollectionDto> content = collectionQueryService
+        List<SearchCollectionDto> content = collectionQueryService
                 .getSearchPageCollectionAtCollectionSliced(
                         keyword,
                         PageRequest.of(0, 6, Sort.by("popularity").descending()),
@@ -334,7 +334,7 @@ public class CollectionQueryServiceJpaTest {
 
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getCollectionId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
                         collectionList.get(8).getId(),
                         collectionList.get(1).getId(),
@@ -343,7 +343,7 @@ public class CollectionQueryServiceJpaTest {
                         collectionList.get(0).getId(),
                         collectionList.get(9).getId());
 
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(5).getNickname(),
                         null,
@@ -351,7 +351,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         0,
                         0,
@@ -435,7 +435,7 @@ public class CollectionQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtCollectionCollectionDto> content = collectionQueryService
+        List<SearchCollectionDto> content = collectionQueryService
                 .getSearchPageCollectionAtCollectionSliced(
                         keyword,
                         PageRequest.of(0, 6, Sort.by("popularity").descending()),
@@ -443,7 +443,7 @@ public class CollectionQueryServiceJpaTest {
                 .getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getCollectionId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getCollectionId).collect(Collectors.toList()))
                 .containsExactly(
                         collectionList.get(8).getId(),
                         collectionList.get(1).getId(),
@@ -452,7 +452,7 @@ public class CollectionQueryServiceJpaTest {
                         collectionList.get(0).getId(),
                         collectionList.get(9).getId());
 
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getNickname(),
                         memberList.get(5).getNickname(),
@@ -460,7 +460,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchPageAtCollectionCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         2,
                         0,

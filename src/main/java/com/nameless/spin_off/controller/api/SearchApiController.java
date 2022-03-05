@@ -1,76 +1,83 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
+import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
 import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
-import com.nameless.spin_off.service.query.HashtagQueryService;
-import com.nameless.spin_off.service.query.SearchQueryService;
+import com.nameless.spin_off.service.query.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/search")
 public class SearchApiController {
     private final SearchQueryService searchQueryService;
-    private final HashtagQueryService hashtagQueryService;
+    private final CollectionQueryService collectionQueryService;
+    private final PostQueryService postQueryService;
+    private final MemberQueryService memberQueryService;
+    private final MovieQueryService movieQueryService;
 
-    @GetMapping("/related/keyword/all")
+    @GetMapping("/related/all/{keyword}")
     public SearchApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(
-            @RequestParam String keyword, @RequestParam int length)
+            @PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<RelatedSearchAllDto>(
+        return new SearchApiResult<>(
                 searchQueryService.getRelatedSearchAllByKeyword(keyword, length));
     }
 
-    @GetMapping("/related/keyword/hashtag")
+    @GetMapping("/related/hashtag/{keyword}")
     public SearchApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(
-            @RequestParam String keyword, @RequestParam int length)
+            @PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<List<RelatedSearchHashtagDto>>(
+        return new SearchApiResult<>(
                 searchQueryService.getRelatedSearchHashtagByKeyword(keyword, length));
     }
 
-    @GetMapping("/related/keyword/member")
+    @GetMapping("/related/member/{keyword}")
     public SearchApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword
-            (@RequestParam String keyword, @RequestParam int length)
+            (@PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<List<RelatedSearchMemberDto>>(
+        return new SearchApiResult<>(
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
     }
 
-    @GetMapping("/member-latest")
-    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(@RequestParam Long id, @RequestParam int length)
+    @GetMapping("/member-latest/{memberId}")
+    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(
+            @PathVariable Long memberId, @RequestParam int length)
             throws NotExistMemberException {
 
-        return new SearchApiResult<List<LastSearchDto>>(searchQueryService.getLastSearchesByMemberLimit(id, length));
+        return new SearchApiResult<>(searchQueryService.getLastSearchesByMemberLimit(memberId, length));
     }
 
-    @GetMapping("/all/first")
-    public SearchApiResultFirst<SearchAllDto, List<RelatedMostTaggedHashtagDto>> getLastSearchesByMemberFirst(
-            @RequestParam String keyword, @RequestParam Long id, @RequestParam int length,
+    @GetMapping("/all/{keyword}/first")
+    public SearchApiResult<SearchFirstDto<SearchAllDto>> getLastSearchesByMemberFirst(
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
             @Qualifier("collection") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
@@ -81,16 +88,14 @@ public class SearchApiController {
                     Pageable moviePageable)
             throws NotExistMemberException {
 
-        SearchAllDto data = searchQueryService.getSearchPageDataAtAll(keyword, id,
-                postPageable, collectionPageable, memberPageable, moviePageable);
-
-        return new SearchApiResultFirst<SearchAllDto, List<RelatedMostTaggedHashtagDto>>(
-                data,getHashtagsByPostIds(length, data.getPosts().getContent()));
+        return new SearchApiResult<>(
+                searchQueryService.getSearchPageDataAtAllFirst(keyword, memberId, length,
+                        postPageable, collectionPageable, memberPageable, moviePageable));
     }
 
-    @GetMapping("/all/")
+    @GetMapping("/all/{keyword}")
     public SearchApiResult<SearchAllDto> getLastSearchesByMember(
-            @RequestParam String keyword, @RequestParam Long id,
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
             @Qualifier("collection") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
@@ -101,30 +106,153 @@ public class SearchApiController {
                     Pageable moviePageable)
             throws NotExistMemberException {
 
-        return new SearchApiResult<SearchAllDto>(
+        return new SearchApiResult<>(
                 searchQueryService.getSearchPageDataAtAll(
-                        keyword, id,
+                        keyword, memberId,
                         postPageable,
                         collectionPageable,
                         memberPageable,
                         moviePageable));
     }
 
+    @GetMapping("/all/hashtag/first")
+    public SearchApiResult<SearchFirstDto<Slice<SearchPageAtHashtagPostDto>>> getAllByHashtagFirst(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long memberId,
+            @RequestParam List<String> hashtagContents, @RequestParam int length) {
+
+        log.info("getAllByHashtagFirst");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("hashtagContents : {}", hashtagContents);
+        log.info("length : {}", length);
+
+
+        return new SearchApiResult<>(postQueryService
+                .getPostsByHashtagsSlicedForSearchPageFirst(pageable, hashtagContents, memberId, length));
+    }
+
+    @GetMapping("/all/hashtag")
+    public SearchApiResult<Slice<SearchPageAtHashtagPostDto>> getAllByHashtag(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) Long memberId, @RequestParam List<String> hashtagContents) {
+
+        log.info("getAllByHashtag");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("hashtagContents : {}", hashtagContents);
+
+        return new SearchApiResult<>(postQueryService
+                .getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId));
+    }
+
+    @GetMapping("/movie/{keyword}/first")
+    public SearchApiResult<SearchFirstDto<SearchMovieFirstDto>> getMovieByKeyword(
+            @PathVariable String keyword, @RequestParam int length,
+            @PageableDefault(sort = "popularity", direction  = Sort.Direction.DESC) Pageable pageable)
+            throws NotExistMovieException {
+
+        log.info("getMovieByKeyword");
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
+
+        return new SearchApiResult<>(movieQueryService.getSearchPageMovieAtMovieSlicedFirst(keyword, pageable, length));
+    }
+
+    @GetMapping("/movie/{keyword}")
+    public SearchApiResult<Slice<SearchMovieDto>> getMovieByKeyword(
+            @PathVariable String keyword,
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        log.info("getMovieByKeyword");
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+
+        return new SearchApiResult<>(
+                movieQueryService.getSearchPageMovieAtMovieSliced(keyword, pageable));
+    }
+
+    @GetMapping("/member/{keyword}/first")
+    public SearchApiResult<SearchFirstDto<Slice<SearchMemberDto>>> getMemberByKeywordFirst(
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length,
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
+            throws NotExistMemberException {
+
+        log.info("getMemberByKeywordFirst");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
+
+        return new SearchApiResult<>(
+                memberQueryService.getSearchPageMemberAtMemberSlicedFirst(keyword, pageable, memberId, length));
+    }
+
+    @GetMapping("/member/{keyword}")
+    public SearchApiResult<Slice<SearchMemberDto>> getMemberByKeyword(
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId,
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
+            throws NotExistMemberException {
+
+        log.info("getMemberByKeyword");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+
+        return new SearchApiResult<>(
+                memberQueryService.getSearchPageMemberAtMemberSliced(keyword, pageable, memberId));
+    }
+
+    @GetMapping("/collection/{keyword}/first")
+    public SearchApiResult<SearchFirstDto<Slice<SearchCollectionDto>>> getCollectionByKeywordFirst(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length)
+            throws NotExistMemberException {
+
+        log.info("getCollectionByKeywordFirst");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
+
+        return new SearchApiResult<>(collectionQueryService
+                .getSearchPageCollectionAtCollectionSlicedFirst(keyword, pageable, memberId, length));
+    }
+
+    @GetMapping("/collection/{keyword}")
+    public SearchApiResult<Slice<SearchCollectionDto>> getCollectionByKeyword(
+            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable String keyword, @RequestParam(required = false) Long memberId) throws NotExistMemberException {
+
+        log.info("getCollectionByKeyword");
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+        log.info("keyword : {}", keyword);
+
+        return new SearchApiResult<>(
+                collectionQueryService.getSearchPageCollectionAtCollectionSliced(keyword, pageable, memberId));
+    }
+
     @Data
     @AllArgsConstructor
     public static class SearchApiResult<T> {
         private T data;
-    }
-    @Data
-    @AllArgsConstructor
-    public static class SearchApiResultFirst<T, F> {
-        private T data;
-        private F hashtags;
-    }
-
-    private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<SearchPageAtAllPostDto> data) {
-        return hashtagQueryService.getHashtagsByPostIds(
-                length,
-                data.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()));
     }
 }

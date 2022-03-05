@@ -11,17 +11,15 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
-import com.nameless.spin_off.service.query.PostQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/post")
@@ -29,75 +27,77 @@ public class PostApiController {
 
     private final PostService postService;
     private final EnumMapper enumMapper;
-    private final PostQueryService postQueryService;
 
     @PostMapping("")
-    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPost) throws
-            NotExistMemberException, NotExistMovieException, NotExistCollectionException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
+    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPostVO) throws
+            NotExistMemberException, NotExistMovieException, NotExistCollectionException,
+            InCorrectHashtagContentException, AlreadyPostedHashtagException,
+            AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException,
+            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
-        Long postId = postService.insertPostByPostVO(createPost);
+        log.info("createOne");
+        log.info("memberId : {}", createPostVO.getMemberId());
+        log.info("title : {}", createPostVO.getTitle());
+        log.info("content : {}", createPostVO.getContent());
+        log.info("movieId : {}", createPostVO.getMovieId());
+        log.info("thumbnailUrl : {}", createPostVO.getThumbnailUrl());
+        log.info("publicOfPostStatus : {}", createPostVO.getPublicOfPostStatus());
+        log.info("hashtagContents : {}", createPostVO.getHashtagContents());
+        log.info("mediaUrls : {}", createPostVO.getMediaUrls());
+        log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
-        return new PostApiResult<Long>(postId);
+        return new PostApiResult<>(postService.insertPostByPostVO(createPostVO));
     }
 
-    @PostMapping("/like")
-    public PostApiResult<Long> createLikeOne(@RequestParam Long memberId, @RequestParam Long postId)
+    @PostMapping("/{postId}/like/{memberId}")
+    public PostApiResult<Long> createLikeOne(
+            @PathVariable Long memberId, @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        Long resultId = postService.insertLikedPostByMemberId(memberId, postId);
+        log.info("createLikeOne");
+        log.info("memberId : {}", memberId);
+        log.info("postId : {}", postId);
 
-        return new PostApiResult<Long>(resultId);
+        return new PostApiResult<>(postService.insertLikedPostByMemberId(memberId, postId));
     }
 
-    @PostMapping("/view")
-    public PostApiResult<Long> createViewOne(@RequestParam String ip, @RequestParam Long postId)
+    @PostMapping("/{postId}/view/{ip}")
+    public PostApiResult<Long> createViewOne(
+            @PathVariable String ip, @PathVariable Long postId)
             throws NotExistPostException {
 
-        Long resultId = postService.insertViewedPostByIp(ip, postId);
+        log.info("createViewOne");
+        log.info("postId : {}", postId);
+        log.info("ip : {}", ip);
 
-        return new PostApiResult<Long>(resultId);
+        return new PostApiResult<>(postService.insertViewedPostByIp(ip, postId));
     }
 
-    @PostMapping("/collections")
+    @PostMapping("/{postId}/collections/{memberId}")
     public PostApiResult<List<Long>> createCollectedAll(
-            @RequestParam Long memberId, @RequestParam Long postId, @RequestParam List<Long> collectionIds)
+            @PathVariable Long memberId, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        List<Long> resultId = postService.insertCollectedPosts(memberId, postId, collectionIds);
+        log.info("createCollectedAll");
+        log.info("postId : {}", postId);
+        log.info("memberId : {}", memberId);
+        log.info("collectionIds : {}", collectionIds);
 
-        return new PostApiResult<List<Long>>(resultId);
+        return new PostApiResult<>(postService.insertCollectedPosts(memberId, postId, collectionIds));
     }
 
     @GetMapping("/post-public-categories")
     public List<EnumMapperValue> getPostPublicCategories() {
+
+        log.info("getPostPublicCategories");
+
         return enumMapper.get("PublicOfPostStatus");
-    }
-
-    @GetMapping("/search/hashtag/first")
-    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPageFirst(
-            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam Long memberId, @RequestParam List<String> hashtagContents) {
-        return postQueryService.getPostsByHashtagsSlicedForSearchPageFirst(pageable, hashtagContents, memberId);
-    }
-
-    @GetMapping("/search/hashtag")
-    public PostApiResult getPostsByHashtagsSlicedForSearchPage(
-            @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam Long memberId, @RequestParam List<String> hashtagContents) {
-        return new PostApiResult(postQueryService.getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId));
     }
 
     @Data
     @AllArgsConstructor
     public static class PostApiResult<T> {
         private T data;
-    }
-
-    @Data
-    @AllArgsConstructor
-    public static class PostApiSearchResult<T, F> {
-        private T data;
-        private F hashtags;
     }
 }

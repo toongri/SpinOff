@@ -1,8 +1,8 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtMemberMemberDto;
+import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -130,11 +130,11 @@ public class MemberQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtMemberMemberDto> content = memberQueryService.getSearchPageMemberAtMemberSliced(
+        List<SearchMemberDto> content = memberQueryService.getSearchPageMemberAtMemberSliced(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getMemberId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMemberDto::getMemberId).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getId(),
                         memberList.get(6).getId(),
@@ -143,7 +143,7 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(3).getId(),
                         memberList.get(2).getId());
 
-        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getFollowingMemberNickname).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMemberDto::getFollowingMemberNickname).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(6).getNickname(),
                         memberList.get(5).getNickname(),
@@ -152,7 +152,7 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(2).getNickname(),
                         memberList.get(1).getNickname());
 
-        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMemberDto::getFollowingNumber).collect(Collectors.toList()))
                 .containsExactly(
                         6,
                         5,
@@ -160,7 +160,7 @@ public class MemberQueryServiceJpaTest {
                         3,
                         2,
                         1);
-        assertThat(content.stream().map(SearchPageAtMemberMemberDto::getThumbnailUrls).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMemberDto::getThumbnailUrls).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(memberList.get(7).getPosts().get(2).getThumbnailUrl(),
                                 memberList.get(7).getPosts().get(1).getThumbnailUrl()),
@@ -234,11 +234,11 @@ public class MemberQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtAllMemberDto> content = memberQueryService.getSearchPageMemberAtAllSliced(
+        List<MemberDto.SearchAllMemberDto> content = memberQueryService.getSearchPageMemberAtAllSliced(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtAllMemberDto::getId).collect(Collectors.toList()))
+        assertThat(content.stream().map(MemberDto.SearchAllMemberDto::getId).collect(Collectors.toList()))
                 .containsExactly(
                         memberList.get(7).getId(),
                         memberList.get(6).getId(),

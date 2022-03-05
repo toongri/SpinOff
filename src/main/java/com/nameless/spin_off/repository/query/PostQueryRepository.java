@@ -22,6 +22,7 @@ import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POS
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
@@ -67,13 +68,15 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member)
-                .where(memberIn(followedMembers),
+                .where(
+                        memberIn(followedMembers),
                         memberNotIn(blockedMembers),
                         post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPagePostDto> findAllByFollowedHashtagsSlicedForMainPage(
-            Pageable pageable, List<Hashtag> followedHashtags, List<Member> blockedMembers) {
+            Pageable pageable, List<Movie> followedMovies, List<Member> followedMembers,
+            List<Hashtag> followedHashtags, List<Member> blockedMembers) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .selectDistinct(new QPostDto_MainPagePostDto(
@@ -81,19 +84,26 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .from(post)
                 .join(post.member, member)
                 .join(post.postedHashtags, postedHashtag)
-                .where(postedHashtagIn(followedHashtags),
+                .leftJoin(post.movie, movie)
+                .where(
+                        postedMovieNotIn(followedMovies),
+                        memberNotIn(followedMembers),
+                        postedHashtagIn(followedHashtags),
                         memberNotIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPagePostDto> findAllByFollowedMoviesSlicedForMainPage(
-            Pageable pageable, List<Movie> followedMovies, List<Member> blockedMembers) {
+            Pageable pageable, List<Movie> followedMovies, List<Member> followedMembers,
+            List<Member> blockedMembers) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member)
-                .where(postedMovieIn(followedMovies),
+                .where(
+                        memberNotIn(followedMembers),
+                        postedMovieIn(followedMovies),
                         memberNotIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
@@ -123,7 +133,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     private BooleanExpression postedMovieIn(List<Movie> movies) {
         return movies.isEmpty() ? null : post.movie.in(movies);
     }
+    private BooleanExpression postedMovieNotIn(List<Movie> movies) {
+        return movies.isEmpty() ? null : post.movie.notIn(movies).or(post.movie.isNull());
+    }
     private BooleanExpression postedHashtagIn(List<Hashtag> hashtags) {
         return hashtags.isEmpty() ? null : postedHashtag.hashtag.in(hashtags);
+    }
+    private BooleanExpression postedHashtagNotIn(List<Hashtag> hashtags) {
+        return hashtags.isEmpty() ? null : postedHashtag.hashtag.notIn(hashtags).or(post.postedHashtags.isEmpty());
     }
 }

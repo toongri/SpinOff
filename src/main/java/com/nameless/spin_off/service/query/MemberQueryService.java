@@ -1,13 +1,18 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtMemberMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface MemberQueryService {
-    Slice<SearchPageAtMemberMemberDto> getSearchPageMemberAtMemberSliced(
+    Slice<SearchMemberDto> getSearchPageMemberAtMemberSliced(
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException;
-    Slice<SearchPageAtAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable, Long memberId) throws NotExistMemberException;
+    Slice<SearchAllMemberDto> getSearchPageMemberAtAllSliced(String keyword, Pageable pageable, Long memberId)
+            throws NotExistMemberException;
+
+    SearchFirstDto<Slice<SearchMemberDto>> getSearchPageMemberAtMemberSlicedFirst(
+            String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
 }

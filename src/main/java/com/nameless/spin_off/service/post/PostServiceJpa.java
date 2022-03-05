@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.post.PostScoreEnum;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -22,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -169,7 +171,9 @@ public class PostServiceJpa implements PostService{
     }
 
     private Post getPostByIdWithViewedIp(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdWithViewedByIp(postId);
+        Optional<Post> optionalPost = postRepository
+                .findOneByIdWithViewedByIp(
+                        postId, LocalDateTime.now().minusDays(PostScoreEnum.POST_VIEW.getLatestDay()));
 
         return optionalPost.orElseThrow(NotExistPostException::new);
     }

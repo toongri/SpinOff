@@ -1,10 +1,11 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.controller.api.MovieApiController.MovieSearchResult;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtAllMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtMovieMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtMovieMovieFirstDto;
+import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -30,33 +31,33 @@ public class MovieQueryServiceJpa implements MovieQueryService{
     private final HashtagQueryRepository hashtagQueryRepository;
 
     @Override
-    public Slice<SearchPageAtAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable) {
+    public Slice<SearchAllMovieDto> getSearchPageMovieAtAllSliced(String keyword, Pageable pageable) {
         return movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable);
     }
 
     @Override
-    public Slice<SearchPageAtMovieMovieDto> getSearchPageMovieAtMovieSliced(String keyword, Pageable pageable) {
+    public Slice<SearchMovieDto> getSearchPageMovieAtMovieSliced(String keyword, Pageable pageable) {
         return movieQueryRepository.findAllSlicedForSearchPageAtMovie(keyword, pageable);
     }
 
     @Override
-    public MovieSearchResult getSearchPageMovieAtMovieSlicedFirst(String keyword, Pageable pageable, int length)
+    public SearchFirstDto<SearchMovieFirstDto> getSearchPageMovieAtMovieSlicedFirst(String keyword, Pageable pageable, int length)
             throws NotExistMovieException {
 
-        Slice<SearchPageAtMovieMovieDto> movies =
+        Slice<SearchMovieDto> movies =
                 movieQueryRepository.findAllSlicedForSearchPageAtMovie(keyword, pageable);
 
-        SearchPageAtMovieMovieFirstDto first = getMovieForSearchPageFirst(movies);
+        SearchMovieAboutFirstMovieDto first = getMovieForSearchPageFirst(movies);
 
         List<RelatedMostTaggedHashtagDto> hashtags = hashtagQueryRepository.findAllByMovieIds(
                 length, movies.getContent().stream()
-                        .map(SearchPageAtMovieMovieDto::getMovieId)
+                        .map(SearchMovieDto::getMovieId)
                         .collect(Collectors.toList()));
 
-        return new MovieSearchResult(first, movies, hashtags);
+        return new SearchFirstDto<>(new SearchMovieFirstDto(first, movies), hashtags);
     }
 
-    private SearchPageAtMovieMovieFirstDto getMovieForSearchPageFirst(Slice<SearchPageAtMovieMovieDto> movies)
+    private SearchMovieAboutFirstMovieDto getMovieForSearchPageFirst(Slice<SearchMovieDto> movies)
             throws NotExistMovieException {
 
         if (!movies.isEmpty()) {
@@ -65,7 +66,7 @@ public class MovieQueryServiceJpa implements MovieQueryService{
 
             Movie movie = optionalMovie.orElseThrow(NotExistMovieException::new);
 
-            return new SearchPageAtMovieMovieFirstDto(movie);
+            return new SearchMovieAboutFirstMovieDto(movie);
 
         } else {
             return null;

@@ -4,24 +4,36 @@ import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNAIL_NUMBER;
+
 public class MovieDto {
 
     @Data
+    @AllArgsConstructor
+    public static class SearchMovieFirstDto {
+
+        SearchMovieAboutFirstMovieDto firstMovie;
+        Slice<SearchMovieDto> movies;
+    }
+
+    @Data
     @NoArgsConstructor
-    public static class SearchPageAtMovieMovieFirstDto {
+    public static class SearchMovieAboutFirstMovieDto {
 
         private Long movieId;
         private String title;
         private String imageUrl;
         private List<String> thumbnails = new ArrayList<>();
 
-        public SearchPageAtMovieMovieFirstDto(Movie movie) {
+        public SearchMovieAboutFirstMovieDto(Movie movie) {
             movieId = movie.getId();
             title = movie.getTitle();
             imageUrl = movie.getImageUrl();
@@ -32,7 +44,7 @@ public class MovieDto {
                     thumbnails.add(taggedPost.getThumbnailUrl());
                 }
 
-                if (thumbnails.size() == 10) {
+                if (thumbnails.size() == MOVIE_SEARCH_THUMBNAIL_NUMBER.getValue()) {
                     break;
                 }
             }
@@ -41,14 +53,14 @@ public class MovieDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtMovieMovieDto {
+    public static class SearchMovieDto {
 
         private Long movieId;
         private String title;
         private String imageUrl;
 
         @QueryProjection
-        public SearchPageAtMovieMovieDto(Long movieId, String title, String imageUrl) {
+        public SearchMovieDto(Long movieId, String title, String imageUrl) {
             this.movieId = movieId;
             this.title = title;
             this.imageUrl = imageUrl;
@@ -57,7 +69,7 @@ public class MovieDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtAllMovieDto {
+    public static class SearchAllMovieDto {
 
         private Long movieId;
         private String title;
@@ -65,8 +77,8 @@ public class MovieDto {
         private List<GenreOfMovieStatus> genreOfMovieStatuses = new ArrayList<>();
 
         @QueryProjection
-        public SearchPageAtAllMovieDto(Long movieId, String title, String imageUrl,
-                                       GenreOfMovieStatus firstGenre, GenreOfMovieStatus secondGenre) {
+        public SearchAllMovieDto(Long movieId, String title, String imageUrl,
+                                 GenreOfMovieStatus firstGenre, GenreOfMovieStatus secondGenre) {
             this.movieId = movieId;
             this.title = title;
             this.imageUrl = imageUrl;

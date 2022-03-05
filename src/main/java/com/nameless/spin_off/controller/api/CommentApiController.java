@@ -14,8 +14,10 @@ import com.nameless.spin_off.service.comment.CommentInPostService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/comment")
@@ -27,8 +29,14 @@ public class CommentApiController {
     @PostMapping("/post")
     public CommentApiResult<Long> createOneInPost(@RequestBody CreateCommentInPostVO commentVO)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
-        Long commentInPostId = commentInPostService.insertCommentInPostByCommentVO(commentVO);
-        return new CommentApiResult<Long>(commentInPostId);
+
+        log.info("createOneInPost");
+        log.info("memberId : {}", commentVO.getMemberId());
+        log.info("postId : {}", commentVO.getPostId());
+        log.info("parentId : {}", commentVO.getParentId());
+        log.info("content : {}", commentVO.getContent());
+
+        return new CommentApiResult<>(commentInPostService.insertCommentInPostByCommentVO(commentVO));
     }
 
     @PostMapping("/collection")
@@ -36,27 +44,39 @@ public class CommentApiController {
             @RequestBody CreateCommentInCollectionVO commentVO)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
+        log.info("createOneInCollection");
+        log.info("memberId : {}", commentVO.getMemberId());
+        log.info("collectionId : {}", commentVO.getCollectionId());
+        log.info("parentId : {}", commentVO.getParentId());
+        log.info("content : {}", commentVO.getContent());
+
         Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
-        return new CommentApiResult<Long>(commentId);
+        return new CommentApiResult<>(commentId);
     }
 
-    @PostMapping("/post/like")
+    @PostMapping("/post/{commentId}/like/{memberId}")
     public CommentApiResult<Long> createLikeOneInPost(
-            @RequestParam Long memberId, @RequestParam Long commentId)
+            @PathVariable Long memberId, @PathVariable Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        Long likedCommentId = commentInPostService.insertLikedCommentByMemberId(memberId, commentId);
-        return new CommentApiResult<Long>(likedCommentId);
+        log.info("createLikeOneInPost");
+        log.info("memberId : {}", memberId);
+        log.info("commentId : {}", commentId);
+
+        return new CommentApiResult<>(commentInPostService.insertLikedCommentByMemberId(memberId, commentId));
     }
 
-    @PostMapping("/collection/like")
+    @PostMapping("/collection/{commentId}/like/{memberId}")
     public CommentApiResult<Long> createLikeOneInCollection(
-            @RequestParam Long memberId, @RequestParam Long commentId)
+            @PathVariable Long memberId, @PathVariable Long commentId)
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
             NotExistCommentInCollectionException {
 
-        Long likedCommentId = commentInCollectionService.insertLikedCommentByMemberId(memberId, commentId);
-        return new CommentApiResult<Long>(likedCommentId);
+        log.info("createLikeOneInCollection");
+        log.info("memberId : {}", memberId);
+        log.info("commentId : {}", commentId);
+
+        return new CommentApiResult<>(commentInCollectionService.insertLikedCommentByMemberId(memberId, commentId));
     }
 
     @Data

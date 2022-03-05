@@ -32,4 +32,7 @@ public enum MovieScoreEnum {
     public Double getLatestScore() {
         return scores.get(0);
     }
+    public Long getLatestDay() {
+        return days.get(days.size() - 1);
+    }
 }

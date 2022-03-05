@@ -3,6 +3,7 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.MainPageDto;
+import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
@@ -145,7 +146,7 @@ class MainPageQueryServiceJpaTest {
             collectionList.get(0).insertViewedCollectionByIp(""+i%6);
             collectionList.get(1).insertViewedCollectionByIp(""+i%9);
             collectionList.get(2).insertViewedCollectionByIp(""+i%8);
-            collectionList.get(3).insertViewedCollectionByIp(""+i%2);
+            collectionList.get(3).insertViewedCollectionByIp(""+0);
             collectionList.get(4).insertViewedCollectionByIp(""+i%7);
             collectionList.get(5).insertViewedCollectionByIp(""+i%3);
             collectionList.get(6).insertViewedCollectionByIp(""+i%2);
@@ -180,23 +181,28 @@ class MainPageQueryServiceJpaTest {
                 member.getId());
         System.out.println("함수종료");
         //then
-        List<MainPagePostDto> content = discoveryData.getPosts();
+        List<MainPagePostDto> ids = discoveryData.getPostsById().getContent();
+        List<MainPagePostDto> popularities = discoveryData.getPostsByPopular().getContent();
         List<MainPageCollectionDto> content1 = discoveryData.getCollections().getContent();
 
-        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
-                .containsOnly(
+        assertThat(ids.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
                         postList.get(19).getId(), postList.get(18).getId(), postList.get(17).getId(),
-                        postList.get(15).getId(), postList.get(14).getId(), postList.get(16).getId(),
-                        postList.get(13).getId(), postList.get(12).getId(), postList.get(9).getId(),
-                        postList.get(8).getId(), postList.get(7).getId(), postList.get(5).getId(),
-                        postList.get(4).getId(), postList.get(2).getId(), postList.get(1).getId(),
-                        postList.get(0).getId(), postList.get(6).getId());
+                        postList.get(16).getId(), postList.get(15).getId(), postList.get(14).getId(),
+                        postList.get(13).getId(), postList.get(12).getId());
 
-        assertThat(content.size()).isEqualTo(17);
+        assertThat(popularities.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(8).getId(), postList.get(1).getId(), postList.get(2).getId(),
+                        postList.get(4).getId(), postList.get(0).getId(), postList.get(9).getId(),
+                        postList.get(7).getId(), postList.get(5).getId(), postList.get(6).getId());
 
-        assertThat(discoveryData.getSliceOfLatestPost().isFirst()).isTrue();
-        assertThat(discoveryData.getSliceOfLatestPost().isLast()).isFalse();
-        assertThat(discoveryData.getSliceOfLatestPost().isHasNext()).isTrue();
+        assertThat(ids.size()).isEqualTo(8);
+        assertThat(popularities.size()).isEqualTo(9);
+
+        assertThat(discoveryData.getPostsByPopular().isFirst()).isTrue();
+        assertThat(discoveryData.getPostsByPopular().isLast()).isFalse();
+        assertThat(discoveryData.getPostsByPopular().hasNext()).isTrue();
         assertThat(content1.stream().map(MainPageCollectionDto::getCollectionId).findAny().get())
                 .isEqualTo(collectionList.get(8).getId());
 
@@ -310,36 +316,48 @@ class MainPageQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        MainPageDto.MainPageFollowDto followData = mainPageQueryService.getFollowData(
-                PageRequest.of(0, 9, Sort.by("id").descending()),
-                PageRequest.of(0, 6, Sort.by("id").descending()),
-                PageRequest.of(0, 6, Sort.by("id").descending()),
+        MainPageFollowDto followData = mainPageQueryService.getFollowData(
+                PageRequest.of(0, 5, Sort.by("id").descending()),
+                PageRequest.of(0, 3, Sort.by("id").descending()),
+                PageRequest.of(0, 3, Sort.by("id").descending()),
                 PageRequest.of(0, 1, Sort.by("id").descending()),
                 member.getId());
         System.out.println("함수종료");
+
         //then
-        List<MainPagePostDto> content = followData.getPosts();
+        List<MainPagePostDto> followedHashtag = followData.getPostsByFollowedHashtag().getContent();
+        List<MainPagePostDto> followedMember = followData.getPostsByFollowedMember().getContent();
+        List<MainPagePostDto> followedMovie = followData.getPostsByFollowedMovie().getContent();
         List<MainPageCollectionDto> content1 = followData.getCollections().getContent();
 
-        assertThat(content.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
-                .containsOnly(
-                        postList.get(0).getId(), postList.get(3).getId(), postList.get(4).getId(),
-                        postList.get(5).getId(), postList.get(10).getId(), postList.get(13).getId(),
-                        postList.get(14).getId(), postList.get(15).getId(), postList.get(6).getId(),
-                        postList.get(8).getId(), postList.get(9).getId(), postList.get(2).getId());
+        assertThat(followedMember.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(15).getId(), postList.get(14).getId(), postList.get(13).getId(),
+                        postList.get(10).getId(), postList.get(5).getId());
 
-        assertThat(content.size()).isEqualTo(12);
+        assertThat(followedMovie.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(9).getId(), postList.get(8).getId(), postList.get(6).getId());
 
-        assertThat(followData.getSliceOfFollowingHashtag().isFirst()).isTrue();
-        assertThat(followData.getSliceOfFollowingHashtag().isLast()).isTrue();
-        assertThat(followData.getSliceOfFollowingHashtag().isHasNext()).isFalse();
+        assertThat(followedHashtag.stream().map(MainPagePostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(
+                        postList.get(2).getId());
+
+        assertThat(followData.getPostsByFollowedMember().isFirst()).isTrue();
+        assertThat(followData.getPostsByFollowedMember().isLast()).isFalse();
+        assertThat(followData.getPostsByFollowedMember().hasNext()).isTrue();
+
+        assertThat(followData.getPostsByFollowedHashtag().isFirst()).isTrue();
+        assertThat(followData.getPostsByFollowedHashtag().isLast()).isTrue();
+        assertThat(followData.getPostsByFollowedHashtag().hasNext()).isFalse();
+
         assertThat(content1.stream().map(MainPageCollectionDto::getCollectionId).findAny().get())
                 .isEqualTo(collectionList.get(5).getId());
 
         followData = mainPageQueryService.getFollowData(
-                PageRequest.of(1, 9, Sort.by("id").descending()),
-                PageRequest.of(1, 6, Sort.by("id").descending()),
-                PageRequest.of(1, 6, Sort.by("id").descending()),
+                PageRequest.of(1, 5, Sort.by("id").descending()),
+                PageRequest.of(1, 3, Sort.by("id").descending()),
+                PageRequest.of(1, 3, Sort.by("id").descending()),
                 PageRequest.of(1, 1, Sort.by("id").descending()),
                 member.getId());
         content1 = followData.getCollections().getContent();

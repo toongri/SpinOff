@@ -18,14 +18,14 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtAllMemberDto {
+    public static class SearchAllMemberDto {
         private Long id;
         private String profileImg;
         private String nickname;
         private String accountId;
 
         @QueryProjection
-        public SearchPageAtAllMemberDto(Long id, String profileImg, String nickname, String accountId) {
+        public SearchAllMemberDto(Long id, String profileImg, String nickname, String accountId) {
             this.id = id;
             this.profileImg = profileImg;
             this.nickname = nickname;
@@ -35,7 +35,7 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtMemberMemberDto {
+    public static class SearchMemberDto {
         private Long memberId;
         private String profileImg;
         private String nickname;
@@ -45,7 +45,7 @@ public class MemberDto {
         private int followingNumber;
         private List<String> thumbnailUrls = new ArrayList<>();
 
-        public SearchPageAtMemberMemberDto(Member member) {
+        public SearchMemberDto(Member member) {
             this.memberId = member.getId();
             this.profileImg = member.getProfileImg();
             this.nickname = member.getNickname();
@@ -55,7 +55,7 @@ public class MemberDto {
             setThumbnails(member);
         }
 
-        public SearchPageAtMemberMemberDto(Member member, List<Member> followingMembers) {
+        public SearchMemberDto(Member member, List<Member> followingMembers) {
             this.memberId = member.getId();
             this.profileImg = member.getProfileImg();
             this.nickname = member.getNickname();

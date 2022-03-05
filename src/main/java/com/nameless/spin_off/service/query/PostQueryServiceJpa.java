@@ -1,10 +1,10 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.controller.api.PostApiController.PostApiSearchResult;
-import com.nameless.spin_off.dto.HashtagDto;
+import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -37,6 +37,9 @@ public class PostQueryServiceJpa implements PostQueryService{
     private final MemberRepository memberRepository;
     private final HashtagRepository hashtagRepository;
     private List<Member> blockedMembers;
+    private List<Member> followedMembers;
+    private List<Hashtag> hashtags;
+    private List<Movie> movies;
 
     @Override
     public Slice<SearchPageAtAllPostDto> getPostsSlicedForSearchPagePostAtAll(
@@ -65,31 +68,29 @@ public class PostQueryServiceJpa implements PostQueryService{
     public Slice<MainPagePostDto> getPostsByFollowedHashtagSlicedForMainPage(
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
-        Member member = getMemberByIdWithFollowedHashtagAndBlockedMember(memberId);
-
-        List<Hashtag> hashtags =
-                member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
-        blockedMembers = member.getBlockedMembers().stream()
-                .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
-                .map(BlockedMember::getMember).collect(Collectors.toList());
+        Member member = getMemberByIdWithFollowedContentsAndBlockedMember(memberId);
+        setMemberInfoByMember(member);
+        movies = member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
+        hashtags = member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
 
         return postQueryRepository
-                .findAllByFollowedHashtagsSlicedForMainPage(pageable, hashtags, blockedMembers);
+                .findAllByFollowedHashtagsSlicedForMainPage(pageable,
+                        movies, followedMembers, hashtags, blockedMembers);
     }
+
 
     @Override
     public Slice<MainPagePostDto> getPostsByFollowedMovieSlicedForMainPage(
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
-        Member member = getMemberByIdWithFollowedMovieAndBlockedMember(memberId);
+        Member member = getMemberByIdWithFollowedMovieAndBlockedAndFollowedMember(memberId);
+        setMemberInfoByMember(member);
 
-        List<Movie> movies =
-                member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
-        blockedMembers =
-                member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+        movies = member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
 
         return postQueryRepository
-                .findAllByFollowedMoviesSlicedForMainPage(pageable, movies, blockedMembers);
+                .findAllByFollowedMoviesSlicedForMainPage(pageable,
+                        movies, followedMembers, blockedMembers);
     }
 
     @Override
@@ -97,31 +98,29 @@ public class PostQueryServiceJpa implements PostQueryService{
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
-        List<Member> followedMembers =
-                member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
-        blockedMembers =
-                member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
+        setMemberInfoByMember(member);
 
         return postQueryRepository
-                .findAllByFollowingMemberSlicedForMainPage(pageable, followedMembers, blockedMembers);
+                .findAllByFollowingMemberSlicedForMainPage(pageable,
+                        followedMembers, blockedMembers);
     }
 
     @Override
-    public PostApiSearchResult getPostsByHashtagsSlicedForSearchPageFirst(
-            Pageable pageable, List<String> hashtagContent, Long memberId) {
+    public SearchFirstDto<Slice<SearchPageAtHashtagPostDto>> getPostsByHashtagsSlicedForSearchPageFirst(
+            Pageable pageable, List<String> hashtagContent, Long memberId, int length) {
 
-        List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
+        hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
         blockedMembers = memberRepository.findAllByBlockingMemberId(memberId);
-        return new PostApiSearchResult(
+        return new SearchFirstDto<>(
                 postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers),
-                hashtags.stream().map(HashtagDto.RelatedMostTaggedHashtagDto::new).collect(Collectors.toList()));
+                hashtags.stream().map(RelatedMostTaggedHashtagDto::new).limit(length).collect(Collectors.toList()));
     }
 
     @Override
     public Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(
             Pageable pageable, List<String> hashtagContent, Long memberId) {
 
-        List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
+        hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
         blockedMembers = memberRepository.findAllByBlockingMemberId(memberId);
 
         return postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers);
@@ -146,21 +145,28 @@ public class PostQueryServiceJpa implements PostQueryService{
         return Optional.of(optionalMember.orElseThrow(NotExistMemberException::new));
     }
 
-    private Member getMemberByIdWithFollowedHashtagAndBlockedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedHashtagAndBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithFollowedMovieAndBlockedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMovieAndBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
     private Member getMemberByIdWithFollowedMemberAndBlockedMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMemberAndBlockedMember(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private Member getMemberByIdWithFollowedContentsAndBlockedMember(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedContentsAndBlockedMember(memberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private Member getMemberByIdWithFollowedMovieAndBlockedAndFollowedMember(Long memberId) throws NotExistMemberException {
+        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMovieAndBlockedAndFollowedMember(memberId);
+
+        return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private void setMemberInfoByMember(Member member) {
+        followedMembers =
+                member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
+        blockedMembers =
+                member.getBlockedMembers().stream().map(BlockedMember::getMember).collect(Collectors.toList());
     }
 }

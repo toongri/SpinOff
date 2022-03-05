@@ -1,10 +1,10 @@
 package com.nameless.spin_off.service.post;
 
-import com.nameless.spin_off.controller.api.PostApiController.PostApiSearchResult;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
@@ -540,10 +540,10 @@ public class PostQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        PostApiSearchResult<Slice<SearchPageAtHashtagPostDto>, List<RelatedMostTaggedHashtagDto>> result =
+        SearchFirstDto<Slice<SearchPageAtHashtagPostDto>> result =
                 postQueryService.getPostsByHashtagsSlicedForSearchPageFirst(
                 PageRequest.of(0, 4, Sort.by("popularity").descending()),
-                List.of("9", "6", "5"), member.getId());
+                List.of("9", "6", "5"), member.getId(), 10);
         List<SearchPageAtHashtagPostDto> content = result.getData().getContent();
         List<RelatedMostTaggedHashtagDto> hashtags = result.getHashtags();
         System.out.println("함수종료");

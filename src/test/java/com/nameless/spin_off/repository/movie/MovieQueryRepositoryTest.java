@@ -105,11 +105,11 @@ public class MovieQueryRepositoryTest {
 
         //when
         System.out.println("서비스");
-        List<MovieDto.SearchPageAtAllMovieDto> content = movieQueryRepository.findAllSlicedForSearchPageAtAll(
+        List<MovieDto.SearchAllMovieDto> content = movieQueryRepository.findAllSlicedForSearchPageAtAll(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(MovieDto.SearchPageAtAllMovieDto::getMovieId).collect(Collectors.toList()))
+        assertThat(content.stream().map(MovieDto.SearchAllMovieDto::getMovieId).collect(Collectors.toList()))
                 .containsExactly(
                         movieList.get(7).getId(),
                         movieList.get(6).getId(),
@@ -117,7 +117,7 @@ public class MovieQueryRepositoryTest {
                         movieList.get(4).getId(),
                         movieList.get(3).getId(),
                         movieList.get(2).getId());
-        assertThat(content.stream().map(MovieDto.SearchPageAtAllMovieDto::getGenreOfMovieStatuses).collect(Collectors.toList()))
+        assertThat(content.stream().map(MovieDto.SearchAllMovieDto::getGenreOfMovieStatuses).collect(Collectors.toList()))
                 .containsExactly(
                         List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
                         List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),

@@ -11,7 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
+
+import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -73,8 +76,9 @@ public class CollectionServiceJpa implements CollectionService {
     }
 
     private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdWithViewedByIp(collectionId);
+        Optional<Collection> optionalCollection = collectionRepository
+                .findOneByIdWithViewedByIp(
+                        collectionId, LocalDateTime.now().minusDays(COLLECTION_VIEW.getLatestDay()));
 
         return optionalCollection.orElseThrow(NotExistCollectionException::new);
     }

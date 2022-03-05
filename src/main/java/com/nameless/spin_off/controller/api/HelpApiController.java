@@ -14,11 +14,10 @@ import com.nameless.spin_off.service.help.ComplainService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/help")
@@ -26,17 +25,22 @@ public class HelpApiController {
 
     private final ComplainService complainService;
 
-    @PostMapping("/complain")
-    public HelpResult<Long> createComplain(
-            @RequestParam("id") Long id, @RequestParam() Long contentId,
-            @RequestParam() ContentTypeStatus contentTypeStatus,
+    @PostMapping("{memberId}/complain")
+    public HelpResult<Long> createOne(
+            @PathVariable Long memberId, @RequestParam() Long contentId,
+            @RequestParam ContentTypeStatus contentTypeStatus,
             @RequestParam("status") ComplainStatus complainStatus) throws
             NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
             UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
             NotExistCommentInCollectionException {
-        Long complainId = complainService.insertComplain(id, contentId, contentTypeStatus, complainStatus);
 
-        return new HelpResult<Long>(complainId);
+        log.info("createOne");
+        log.info("memberId : {}", memberId);
+        log.info("contentId : {}", contentId);
+        log.info("contentTypeStatus : {}", contentTypeStatus);
+        log.info("complainStatus : {}", complainStatus);
+
+        return new HelpResult<>(complainService.insertComplain(memberId, contentId, contentTypeStatus, complainStatus));
     }
 
     @Data

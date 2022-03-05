@@ -3,8 +3,6 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageDiscoveryDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
-import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.dto.SliceDto.ContentLessSliceDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -44,28 +42,18 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
     private List<Member> blockedMembers;
 
     @Override
-    public MainPageDiscoveryDto getDiscoveryData(Pageable popularPostPageable,
-                                                 Pageable latestPostPageable,
+    public MainPageDiscoveryDto getDiscoveryData(Pageable popularPostPageable, Pageable latestPostPageable,
                                                  Pageable collectionPageable, Long memberId)
             throws NotExistMemberException {
 
         Optional<Member> optionalMember = getMemberByIdWithBlockedMember(memberId);
-
         Member member = optionalMember.orElse(null);
-        blockedMembers = getBlockedMemberByMember(member);
-        Slice<MainPagePostDto> popularPostList =
-                postQueryRepository.findAllSlicedForMainPage(popularPostPageable, member, blockedMembers);
-        Slice<MainPagePostDto> latestPostList =
-                postQueryRepository.findAllSlicedForMainPage(latestPostPageable, member, blockedMembers);
 
-        List<MainPagePostDto> content = new ArrayList<>(popularPostList.getContent());
-        content.addAll(latestPostList.getContent());
-        List<MainPagePostDto> posts = content.stream().distinct().collect(Collectors.toList());
+        blockedMembers = getBlockedMemberByMember(member);
 
         return new MainPageDiscoveryDto(
-                posts,
-                new ContentLessSliceDto<>(popularPostList),
-                new ContentLessSliceDto<>(latestPostList),
+                postQueryRepository.findAllSlicedForMainPage(popularPostPageable, member, blockedMembers),
+                postQueryRepository.findAllSlicedForMainPage(latestPostPageable, member, blockedMembers),
                 collectionQueryRepository.findAllSlicedForMainPage(collectionPageable, member, blockedMembers));
     }
 
@@ -81,32 +69,24 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
                 .map(FollowedCollection::getCollection).collect(Collectors.toList());
         followedMembers =
                 member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
-        List<Movie> movies = member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
-        List<Hashtag> hashtags = member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
+        List<Movie> movies =
+                member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
+        List<Hashtag> hashtags =
+                member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
 
         blockedMembers = member.getBlockedMembers().stream()
                 .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
                 .map(BlockedMember::getMember).collect(Collectors.toList());
 
-        Slice<MainPagePostDto> followingMembers = postQueryRepository
-                .findAllByFollowingMemberSlicedForMainPage(memberPageable, followedMembers, blockedMembers);
-        Slice<MainPagePostDto> followingHashtags = postQueryRepository
-                .findAllByFollowedHashtagsSlicedForMainPage(hashtagPageable, hashtags, blockedMembers);
-        Slice<MainPagePostDto> followingMovies = postQueryRepository
-                .findAllByFollowedMoviesSlicedForMainPage(moviePageable, movies, blockedMembers);
-
-        List<MainPagePostDto> content = new ArrayList<>(followingMembers.getContent());
-        content.addAll(followingHashtags.getContent());
-        content.addAll(followingMovies.getContent());
-        List<MainPagePostDto> posts = content.stream().distinct().collect(Collectors.toList());
-
         Slice<MainPageCollectionDto> collections = getMainPageCollectionList(collectionPageable);
 
         return new MainPageFollowDto(
-                posts,
-                new ContentLessSliceDto<>(followingMembers),
-                new ContentLessSliceDto<>(followingHashtags),
-                new ContentLessSliceDto<>(followingMovies),
+                postQueryRepository.findAllByFollowingMemberSlicedForMainPage(memberPageable,
+                        followedMembers, blockedMembers),
+                postQueryRepository.findAllByFollowedHashtagsSlicedForMainPage(hashtagPageable,
+                        movies, followedMembers, hashtags, blockedMembers),
+                postQueryRepository.findAllByFollowedMoviesSlicedForMainPage(moviePageable,
+                         movies, followedMembers, blockedMembers),
                 collections);
     }
 

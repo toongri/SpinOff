@@ -1,12 +1,12 @@
 package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.dto.CollectionDto.RelatedSearchCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtAllMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.querydsl.core.annotations.QueryProjection;
@@ -21,11 +21,18 @@ public class SearchDto {
 
     @Data
     @AllArgsConstructor
+    public static class SearchFirstDto<T> {
+        private T data;
+        private List<RelatedMostTaggedHashtagDto> hashtags;
+    }
+
+    @Data
+    @AllArgsConstructor
     public static class SearchAllDto {
         private Slice<SearchPageAtAllPostDto> posts;
-        private Slice<SearchPageAtAllCollectionDto> collections;
-        private Slice<SearchPageAtAllMovieDto> movies;
-        private Slice<SearchPageAtAllMemberDto> members;
+        private Slice<SearchAllCollectionDto> collections;
+        private Slice<MovieDto.SearchAllMovieDto> movies;
+        private Slice<SearchAllMemberDto> members;
     }
 
     @Data

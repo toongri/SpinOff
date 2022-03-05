@@ -17,7 +17,7 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtCollectionCollectionDto {
+    public static class SearchCollectionDto {
 
         private Long collectionId;
         private String collectionTitle;
@@ -27,7 +27,7 @@ public class CollectionDto {
         private String followingMemberNickname;
         private int followingNumber;
 
-        public SearchPageAtCollectionCollectionDto(Collection collection) {
+        public SearchCollectionDto(Collection collection) {
 
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
@@ -50,7 +50,7 @@ public class CollectionDto {
             }
         }
 
-        public SearchPageAtCollectionCollectionDto(Collection collection, List<Member> followingMembers) {
+        public SearchCollectionDto(Collection collection, List<Member> followingMembers) {
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
             this.memberId = collection.getMember().getId();
@@ -89,7 +89,7 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
-    public static class SearchPageAtAllCollectionDto {
+    public static class SearchAllCollectionDto {
 
         private Long collectionId;
         private String collectionTitle;
@@ -99,7 +99,7 @@ public class CollectionDto {
         private String followingMemberNickname;
         private int followingNumber;
 
-        public SearchPageAtAllCollectionDto(Collection collection) {
+        public SearchAllCollectionDto(Collection collection) {
 
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
@@ -108,7 +108,7 @@ public class CollectionDto {
             this.thumbnailUrl = collection.getFirstThumbnail();
         }
 
-        public SearchPageAtAllCollectionDto(Collection collection, List<Member> followingMembers) {
+        public SearchAllCollectionDto(Collection collection, List<Member> followingMembers) {
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
             this.memberId = collection.getMember().getId();

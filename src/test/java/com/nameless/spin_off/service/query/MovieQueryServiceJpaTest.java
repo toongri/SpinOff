@@ -1,10 +1,11 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.controller.api.MovieApiController.MovieSearchResult;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtMovieMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchPageAtMovieMovieFirstDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
@@ -24,7 +25,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,11 +112,11 @@ class MovieQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        List<SearchPageAtMovieMovieDto> content = movieQueryService.getSearchPageMovieAtMovieSliced(
+        List<SearchMovieDto> content = movieQueryService.getSearchPageMovieAtMovieSliced(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending())).getContent();
         System.out.println("함수종료");
         //then
-        assertThat(content.stream().map(SearchPageAtMovieMovieDto::getMovieId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMovieDto::getMovieId).collect(Collectors.toList()))
                 .containsExactly(
                         movieList.get(7).getId(),
                         movieList.get(6).getId(),
@@ -322,18 +322,18 @@ class MovieQueryServiceJpaTest {
 
         //when
         System.out.println("서비스");
-        MovieSearchResult<Slice<SearchPageAtMovieMovieDto>, List<RelatedMostTaggedHashtagDto>> result =
-                movieQueryService.getSearchPageMovieAtMovieSlicedFirst(
+        SearchFirstDto<SearchMovieFirstDto> result = movieQueryService.getSearchPageMovieAtMovieSlicedFirst(
                 keyword, PageRequest.of(0, 6, Sort.by("popularity").descending()), 6);
+
         List<RelatedMostTaggedHashtagDto> hashtags = result.getHashtags();
-        Slice<SearchPageAtMovieMovieDto> data = result.getData();
-        List<SearchPageAtMovieMovieDto> content = data.getContent();
-        SearchPageAtMovieMovieFirstDto firstMovie = result.getFirstMovie();
+        SearchMovieFirstDto data = result.getData();
+        List<SearchMovieDto> content = data.getMovies().getContent();
+        SearchMovieAboutFirstMovieDto firstMovie = data.getFirstMovie();
 
 
         System.out.println("함수종료");
 
-        assertThat(content.stream().map(SearchPageAtMovieMovieDto::getMovieId).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMovieDto::getMovieId).collect(Collectors.toList()))
                 .containsExactly(
                         movieList.get(7).getId(),
                         movieList.get(6).getId(),

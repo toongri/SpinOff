@@ -9,10 +9,12 @@ import com.nameless.spin_off.service.query.SearchQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/hashtag")
@@ -21,27 +23,36 @@ public class HashtagApiController {
     private final HashtagService hashtagService;
     private final SearchQueryService searchQueryService;
 
-    @PostMapping("/view")
-    public HashtagResult<Long> createViewOne(@RequestBody String ip, @RequestBody Long postId)
+    @PostMapping("/{hashtagId}/view/{ip}")
+    public HashtagResult<Long> createViewOne(@PathVariable String ip, @PathVariable Long hashtagId)
             throws NotExistHashtagException {
-        Long aLong = hashtagService.insertViewedHashtagByIp(ip, postId);
 
-        return new HashtagResult<Long>(aLong);
+        log.info("createViewOne");
+        log.info("hashtagId : {}", hashtagId);
+        log.info("ip : {}", ip);
+
+        return new HashtagResult<>(hashtagService.insertViewedHashtagByIp(ip, hashtagId));
     }
 
-    @PostMapping("/follow")
-    public HashtagResult<Long> createFollowOne(@RequestParam Long memberId, @RequestParam Long hashtagId)
+    @PostMapping("/{hashtagId}/follow/{memberId}")
+    public HashtagResult<Long> createFollowOne(@PathVariable Long memberId, @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
-        Long likedHashtagId = hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
 
-        return new HashtagResult<Long>(likedHashtagId);
+        log.info("createFollowOne");
+        log.info("hashtagId : {}", hashtagId);
+        log.info("memberId : {}", memberId);
+
+        return new HashtagResult<>(hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId));
     }
 
 
     @GetMapping("/most-popular")
     public HashtagResult<List<MostPopularHashtag>> getMostPopularHashtag(@RequestParam int length) {
 
-        return new HashtagResult<List<MostPopularHashtag>>(searchQueryService.getMostPopularHashtagLimit(length));
+        log.info("getMostPopularHashtag");
+        log.info("length : {}", length);
+
+        return new HashtagResult<>(searchQueryService.getMostPopularHashtagLimit(length));
     }
 
     @Data

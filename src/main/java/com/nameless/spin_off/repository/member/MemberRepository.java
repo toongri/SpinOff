@@ -61,9 +61,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedMovies followedMovie " +
+            "LEFT JOIN FETCH m.followedMembers followedMember " +
             "LEFT JOIN FETCH m.blockedMembers blockedMember " +
             "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedMovieAndBlockedMember(@Param("id") Long id);
+    Optional<Member> findOneByIdWithFollowedMovieAndBlockedAndFollowedMember(@Param("id") Long id);
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedMembers followedMember " +

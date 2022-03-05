@@ -1,8 +1,9 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtAllCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchPageAtCollectionCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
+import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -12,6 +13,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
+import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -30,9 +32,10 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
 
     private final CollectionQueryRepository collectionQueryRepository;
     private final MemberRepository memberRepository;
+    private final HashtagQueryRepository hashtagQueryRepository;
 
     @Override
-    public Slice<SearchPageAtAllCollectionDto> getSearchPageCollectionAtAllSliced(
+    public Slice<SearchAllCollectionDto> getSearchPageCollectionAtAllSliced(
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
@@ -45,7 +48,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     }
 
     @Override
-    public Slice<SearchPageAtCollectionCollectionDto> getSearchPageCollectionAtCollectionSliced(
+    public Slice<SearchCollectionDto> getSearchPageCollectionAtCollectionSliced(
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
@@ -55,6 +58,22 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
 
         return collectionQueryRepository
                 .findAllSlicedForSearchPageAtCollection(keyword, pageable, followedMembers, blockedMembers);
+    }
+
+    @Override
+    public SearchFirstDto<Slice<SearchCollectionDto>> getSearchPageCollectionAtCollectionSlicedFirst(
+            String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException {
+
+        Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
+
+        List<Member> followedMembers = getFollowedMemberByMember(member);
+        List<Member> blockedMembers = getBlockedMemberByMember(member);
+        Slice<SearchCollectionDto> collections = collectionQueryRepository
+                .findAllSlicedForSearchPageAtCollection(keyword, pageable, followedMembers, blockedMembers);
+
+        return new SearchFirstDto<>(
+                collections, hashtagQueryRepository.findAllByCollectionIds(length, collections.stream()
+                .map(SearchCollectionDto::getCollectionId).collect(Collectors.toList())));
     }
 
 

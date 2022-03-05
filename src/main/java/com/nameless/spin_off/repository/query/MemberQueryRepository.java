@@ -1,8 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.MemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchPageAtMemberMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.QMemberDto_SearchPageAtAllMemberDto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
@@ -22,7 +21,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
-    public Slice<SearchPageAtAllMemberDto> findAllSlicedForSearchPageAtAll(
+    public Slice<MemberDto.SearchAllMemberDto> findAllSlicedForSearchPageAtAll(
             String keyword, Pageable pageable, List<Member> blockedMembers) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QMemberDto_SearchPageAtAllMemberDto(
@@ -32,7 +31,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                         memberNotIn(blockedMembers)));
     }
 
-    public Slice<SearchPageAtMemberMemberDto> findAllSlicedForSearchPageAtMember(
+    public Slice<SearchMemberDto> findAllSlicedForSearchPageAtMember(
             String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
 
         Slice<Member> content = applySlicing(pageable, contentQuery -> contentQuery
@@ -43,12 +42,12 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         return MapContentToDtoForSearchPage(content, followedMembers);
     }
 
-    private Slice<SearchPageAtMemberMemberDto> MapContentToDtoForSearchPage(
+    private Slice<SearchMemberDto> MapContentToDtoForSearchPage(
             Slice<Member> contents, List<Member> followedMembers) {
         if (followedMembers.isEmpty()) {
-            return contents.map(SearchPageAtMemberMemberDto::new);
+            return contents.map(SearchMemberDto::new);
         } else {
-            return contents.map(content -> new MemberDto.SearchPageAtMemberMemberDto(content, followedMembers));
+            return contents.map(content -> new SearchMemberDto(content, followedMembers));
         }
     }
 
