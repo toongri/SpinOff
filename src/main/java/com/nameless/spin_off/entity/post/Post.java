@@ -33,6 +33,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.post.PostContentLimitEnum.CONTENT_LENGTH_MAX;
+import static com.nameless.spin_off.entity.enums.post.PostContentLimitEnum.TITLE_LENGTH_MAX;
 import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.*;
 
 @Entity
@@ -174,11 +176,11 @@ public class Post extends BaseTimeEntity {
         Post post = new Post();
         member.addPost(post);
 
-        if (title.length() > 100) {
+        if (title.length() > TITLE_LENGTH_MAX.getValue()) {
             throw new OverTitleOfPostException();
         }
         post.updateTitle(title);
-        if (content.length() > 500) {
+        if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
             throw new OverContentOfPostException();
         }
         post.updateContent(content);

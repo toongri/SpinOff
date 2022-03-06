@@ -16,7 +16,7 @@ public interface PostService {
     Long insertPostByPostVO(PostDto.CreatePostVO postVO)
             throws NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
-            AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException;
+            AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException;
     Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException;
     Long insertViewedPostByIp(String ip, Long postId)

@@ -7,7 +7,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PostedMedia;
-import com.nameless.spin_off.exception.post.AlreadyPAuthorityOfPostStatusException;
+import com.nameless.spin_off.exception.post.AlreadyAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.post.OverContentOfPostException;
 import com.nameless.spin_off.exception.post.OverTitleOfPostException;
@@ -190,7 +190,7 @@ public class PostDto {
             return this;
         }
 
-        public Post build() throws AlreadyPostedHashtagException, AlreadyPAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
+        public Post build() throws AlreadyPostedHashtagException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
             return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, collections, movie, publicOfPostStatus);
         }
     }

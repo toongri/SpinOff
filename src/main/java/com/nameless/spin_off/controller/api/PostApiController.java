@@ -32,7 +32,7 @@ public class PostApiController {
     public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPostVO) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
-            AlreadyCollectedPostException, AlreadyPAuthorityOfPostStatusException,
+            AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
             OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
         log.info("createOne");

@@ -7,7 +7,8 @@ public enum ContentTypeStatus implements EnumMapperType {
     B("COLLECTION"),
     C("DM"),
     D("COMMENT_IN_COLLECTION"),
-    E("COMMENT_IN_POST");
+    E("COMMENT_IN_POST"),
+    F("MEMBER");
 
     private final String title;
 

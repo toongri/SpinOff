@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.collection.CollectionContentLimitEnum.CONTENT_LENGTH_MAX;
+import static com.nameless.spin_off.entity.enums.collection.CollectionContentLimitEnum.TITLE_LENGTH_MAX;
 import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.*;
 
 @Entity
@@ -129,11 +131,11 @@ public class Collection extends BaseTimeEntity {
         Collection collection = new Collection();
         collection.updateMember(member);
 
-        if (title.length() > 100) {
+        if (title.length() > TITLE_LENGTH_MAX.getValue()) {
             throw new OverTitleOfCollectionException();
         }
         collection.updateTitle(title);
-        if (content.length() > 500) {
+        if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
             throw new OverContentOfCollectionException();
         }
         collection.updateContent(content);
