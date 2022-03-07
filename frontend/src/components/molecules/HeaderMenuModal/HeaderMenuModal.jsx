@@ -12,9 +12,9 @@ function HeaderMenuModal({ IconType }) {
     });
   };
   useEffect(() => {
-    window.addEventListener('click', handleClickedOutside);
+    window.addEventListener('mousedown', handleClickedOutside);
     return () => {
-      window.removeEventListener('click', handleClickedOutside);
+      window.removeEventListener('mousedown', handleClickedOutside);
     };
   }, []);
   const iconClicked = () => {

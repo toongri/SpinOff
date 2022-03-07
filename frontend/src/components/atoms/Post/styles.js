@@ -18,7 +18,11 @@ const PostCaption = styled.figcaption`
 
 const PostImage = styled.img`
   border-radius: 30px;
-  width: 100%;
+  border: 0;
+  height: auto;
+  min-height: 150px;
+  max-width: 100%;
+  vertical-align: middle;
 `;
 
 export { PostContainer, PostCaption, PostImage };

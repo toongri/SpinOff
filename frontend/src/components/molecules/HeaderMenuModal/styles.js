@@ -5,7 +5,10 @@ const IconContainer = styled.div`
 `;
 
 const ModalContainer = styled.div`
-  display: ${props => (props?.isOpened ? '' : 'none')};
+  //display: ${props => (props?.isOpened ? '' : 'none')};
+  visibility: ${props => (props.isOpened ? 'visible' : 'hidden')};
+  opacity: ${props => (props.isOpened ? '0.9' : '0')};
+  transition: 0.3s;
   position: absolute;
   width: 300px;
   height: 400px;
@@ -14,7 +17,6 @@ const ModalContainer = styled.div`
   background: #ffffff;
   box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   border-radius: 30px;
-  opacity: 0.9;
   z-index: 1;
 `;
 
@@ -31,6 +33,7 @@ const UnreadMessage = styled.div`
   padding: 10px;
   font-size: 18px;
   background: #f24860;
+  user-select: none;
 `;
 
 export { IconContainer, ModalContainer, UnreadMessage };

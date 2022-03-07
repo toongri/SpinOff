@@ -14,11 +14,11 @@ const SideContainer = styled.div`
 
 const SideBottomContainer = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   height: 50px;
   width: 100%;
-  margin: auto 0 30% 0;
+  margin: auto 0 75px 0;
 `;
 
 const Label = styled.label`

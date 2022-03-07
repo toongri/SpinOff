@@ -12,8 +12,8 @@ const IndicatorContainer = styled.ul`
 const IndicatorList = styled.li`
   display: inline-block;
   border-radius: 50%;
-  background: #fff;
-  opacity: ${props => (props.index === props.indicator * 1 ? '1' : '0.5')};
+  background: ${props =>
+    props.index === props.indicator * 1 ? '#fff' : '#2800EE'};
   position: relative;
   top: 0;
   cursor: pointer;

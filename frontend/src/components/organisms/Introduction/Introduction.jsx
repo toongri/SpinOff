@@ -18,7 +18,7 @@ import {
 
 const buttonStyle = {
   color: 'white',
-  padding: '0 20px',
+  padding: '0 15px',
   fontWeight: 'bold',
   fontSize: '20px',
 };
