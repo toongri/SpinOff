@@ -2,12 +2,12 @@ import React from 'react';
 import Icon from './styles';
 import propTypes from 'prop-types';
 
-function Notice({ padding = '' }) {
-  return <Icon padding={padding} />;
+function Notice({ onClick }) {
+  return <Icon onClick={onClick} />;
 }
 
 Notice.propTypes = {
-  padding: propTypes.string,
+  onClick: propTypes.func,
 };
 
 export default Notice;

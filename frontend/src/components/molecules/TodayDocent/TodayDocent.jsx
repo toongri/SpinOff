@@ -15,7 +15,7 @@ const buttonStyle = {
   color: 'white',
   display: 'block',
   margin: '20px auto',
-  padding: '10px 50px',
+  padding: '10px 20px',
   fontWeight: 'bold',
 };
 

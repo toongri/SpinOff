@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import { ReactComponent as Message } from '../../../assets/images/message.svg';
 
 const Icon = styled(Message)`
-  padding: ${props => props.padding};
+  padding: 20px;
   cursor: pointer;
   fill: white;
   transition: 0.3s;

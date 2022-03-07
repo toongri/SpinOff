@@ -5,6 +5,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
+  min-width: 1000px;
   height: 150px;
   left: 0px;
   top: 0px;
@@ -12,4 +13,4 @@ const Container = styled.div`
   z-index: 1;
 `;
 
-export default Container;
+export { Container };
