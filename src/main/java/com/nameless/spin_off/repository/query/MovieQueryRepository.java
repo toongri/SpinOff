@@ -2,8 +2,8 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
-import com.nameless.spin_off.dto.QMovieDto_SearchPageAtAllMovieDto;
-import com.nameless.spin_off.dto.QMovieDto_SearchPageAtMovieMovieDto;
+import com.nameless.spin_off.dto.QMovieDto_SearchAllMovieDto;
+import com.nameless.spin_off.dto.QMovieDto_SearchMovieDto;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +21,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public Slice<SearchAllMovieDto> findAllSlicedForSearchPageAtAll(String keyword, Pageable pageable) {
         return applySlicing(pageable, contentQuery -> contentQuery
-                .select(new QMovieDto_SearchPageAtAllMovieDto(
+                .select(new QMovieDto_SearchAllMovieDto(
                         movie.id, movie.title, movie.imageUrl,
                         movie.firstGenreOfMovieStatus, movie.secondGenreOfMovieStatus))
                 .from(movie)
@@ -30,7 +30,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public Slice<MovieDto.SearchMovieDto> findAllSlicedForSearchPageAtMovie(String keyword, Pageable pageable) {
         return applySlicing(pageable, contentQuery -> contentQuery
-                .select(new QMovieDto_SearchPageAtMovieMovieDto(
+                .select(new QMovieDto_SearchMovieDto(
                         movie.id, movie.title, movie.imageUrl))
                 .from(movie)
                 .where(movie.title.contains(keyword)));

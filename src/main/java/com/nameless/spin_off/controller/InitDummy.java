@@ -104,58 +104,58 @@ public class InitDummy {
             //멤버 생성
             createMemberVOs.add(new CreateMemberVO("jitndk", "abcdefg",
                     "지수아", "SooAh", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("fpxldmswl12", "abcdefg",
                     "이은지", "onegoldsky", LocalDate.of(1998, 2, 26),
-                    "fpxldmswl12@gmail.com", null));
+                    "fpxldmswl12@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("hyeongyungim7", "abcdefg",
                     "김형윤", "yun", LocalDate.of(1996, 9, 20),
-                    "hyeongyungim7@gmail.com", null));
+                    "hyeongyungim7@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("jhkim03284", "abcdefg",
                     "김준형", "퉁그리", LocalDate.of(1994, 9, 23),
-                    "jhkim03284@gmail.com", null));
+                    "jhkim03284@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("jhkimkkk0923", "abcdefg",
                     "김준형", "toongri", LocalDate.of(1994, 9, 26),
-                    "jhkimkkk0923@naver.com", null));
+                    "jhkimkkk0923@naver.com"));
             createMemberVOs.add(new CreateMemberVO("fdfdfdd1", "abcdefg",
                     "지수아", "투루투루퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("nasdf23", "abcdefg",
                     "이은지", "t00ngri", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("nadfdf341", "abcdefg",
                     "김준형", "투투투퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("arr11235", "abcdefg",
                     "김준형", "투퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("nzxcv123", "abcdefg",
                     "김준형", "퉁투퉁퉁퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("bnasdf123", "abcdefg",
                     "김준형", "앵그리퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("fafb123", "abcdefg",
                     "김준형", "쏘앵그리퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("nzdsf123", "abcdefg",
                     "김준형", "엉터리퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("fdfagh123", "abcdefg",
                     "김준형", "mc퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("zxcbvger123", "abcdefg",
                     "김준형", "투두두두두퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("qtdfd22", "abcdefg",
                     "김준형", "퉁퉁퉁퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("hfdg33", "abcdefg",
                     "김준형", "퉁퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
             createMemberVOs.add(new CreateMemberVO("xnbff3323", "abcdefg",
                     "김준형", "퉁기덕퉁그리", LocalDate.of(1998, 2, 26),
-                    "jitndk@gmail.com", null));
+                    "jitndk@gmail.com"));
 
             for (CreateMemberVO createMemberVO : createMemberVOs) {
                 Long aLong = memberService.insertMemberByMemberVO(createMemberVO);

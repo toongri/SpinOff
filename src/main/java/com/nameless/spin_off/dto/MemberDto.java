@@ -113,17 +113,13 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
-    @NoArgsConstructor
     public static class CreateMemberVO {
-
         private String accountId;
         private String accountPw;
         private String name;
         private String nickname;
         private LocalDate birth;
         private String email;
-
-        private String profileImg;
     }
 
     public static class MemberBuilder {
@@ -131,11 +127,13 @@ public class MemberDto {
         private String accountId;
         private String accountPw;
         private String name;
-        private String nickname = null;
+        private String nickname;
         private LocalDate birth;
         private String phoneNumber;
         private String email;
-        private String profileImg = null;
+        private String googleEmail;
+        private String kakaoEmail;
+        private String naverEmail;
 
         public MemberBuilder setAccountId(String accountId) {
             this.accountId = accountId;
@@ -172,13 +170,24 @@ public class MemberDto {
             return this;
         }
 
-        public MemberBuilder setProfileImg(String profileImg) {
-            this.profileImg = profileImg;
+        public MemberBuilder setGoogleEmail(String googleEmail) {
+            this.googleEmail = googleEmail;
+            return this;
+        }
+
+        public MemberBuilder setNaverEmail(String naverEmail) {
+            this.naverEmail = naverEmail;
+            return this;
+        }
+
+        public MemberBuilder setKakaoEmail(String kakaoEmail) {
+            this.kakaoEmail = kakaoEmail;
             return this;
         }
 
         public Member build() {
-            return Member.createMember(accountId, accountPw, nickname, profileImg, name, birth, phoneNumber, email);
+            return Member.createMember(accountId, accountPw, nickname,name, birth, phoneNumber, email,
+                    googleEmail, naverEmail, kakaoEmail);
         }
     }
 }

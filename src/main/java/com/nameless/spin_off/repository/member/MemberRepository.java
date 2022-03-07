@@ -10,6 +10,11 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
+    Optional<Member> findByGoogleEmail(String googleEmail);
+    Optional<Member> findByNaverEmail(String naverEmail);
+    Optional<Member> findByKakaoEmail(String kakaoEmail);
+    Optional<Member> findByNickname(String nickname);
+
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
             "WHERE m.id = :id")

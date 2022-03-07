@@ -6,6 +6,7 @@ build/
 !**/src/test/**/build/
 generated
 application.yml
+application-oauth.yml
 
 ### STS ###
 .apt_generated

@@ -104,7 +104,7 @@ public class InitAddDummy {
                 String nickname = arr.get((int) (Math.random() * randomSize)) + "" + arr.get((int) (Math.random() * randomSize));
                 String email = arr.get((int) (Math.random() * randomSize)) + arr.get((int) (Math.random() * randomSize)) + "@" + arr.get((int) (Math.random() * randomSize)) + ".com";
                 if (all.stream().noneMatch(mem -> mem.getAccountId().equals(accountId) && mem.getNickname().equals(nickname)))
-                    createMemberVOs.add(new CreateMemberVO(accountId, accountPw, name, nickname, LocalDate.now(), email, null));
+                    createMemberVOs.add(new CreateMemberVO(accountId, accountPw, name, nickname, LocalDate.now(), email));
             }
 
             for (CreateMemberVO createMemberVO : createMemberVOs) {

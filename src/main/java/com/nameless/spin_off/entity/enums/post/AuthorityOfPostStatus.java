@@ -5,7 +5,7 @@ import com.nameless.spin_off.entity.enums.EnumMapperType;
 public enum AuthorityOfPostStatus implements EnumMapperType {
     A("ADMIN"),
     B("DOCENT"),
-    C("NORMAL");
+    C("USER");
 
     private final String title;
 

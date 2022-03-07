@@ -30,7 +30,6 @@ public class MemberApiController {
         log.info("nickname : {}", createMemberVO.getNickname());
         log.info("birth : {}", createMemberVO.getBirth());
         log.info("email : {}", createMemberVO.getEmail());
-        log.info("profileImg : {}", createMemberVO.getProfileImg());
 
         return new MemberApiResult<>(memberService.insertMemberByMemberVO(createMemberVO));
     }

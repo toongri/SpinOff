@@ -1,10 +1,11 @@
 package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
@@ -40,9 +41,7 @@ public class Member extends BaseTimeEntity {
     @Column(name="member_id")
     private Long id;
 
-    @NotNull
     private String accountId;
-    @NotNull
     private String accountPw;
     private String name;
     private String nickname;
@@ -51,6 +50,18 @@ public class Member extends BaseTimeEntity {
     private String email;
     private String profileImg;
     private String bio;
+    private Long complainCount;
+    private Long blockCount;
+    private Double followScore;
+    private Double popularity;
+    private String googleEmail;
+    private String naverEmail;
+    private String kakaoEmail;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "authority_of_member_status")
+    @NotNull
+    private AuthorityOfMemberStatus authorityOfMemberStatus;
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<FollowedHashtag> followedHashtags = new HashSet<>();
@@ -81,11 +92,6 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Post> posts = new ArrayList<>();
-
-    private Long complainCount;
-    private Long blockCount;
-    private Double followScore;
-    private Double popularity;
 
     //==연관관계 메소드==//
     public void addPost(Post post) {
@@ -172,8 +178,9 @@ public class Member extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Member createMember(String accountId, String accountPw, String nickname, String profileImg,
-                                      String name, LocalDate birth, String phoneNumber, String email) {
+    public static Member createMember(String accountId, String accountPw, String nickname,
+                                      String name, LocalDate birth, String phoneNumber, String email,
+                                      String googleEmail, String naverEmail, String kakaoEmail) {
 
         Member member = new Member();
         member.updateAccountId(accountId);
@@ -183,8 +190,11 @@ public class Member extends BaseTimeEntity {
         member.updatePhoneNumber(phoneNumber);
         member.updateEmail(email);
         member.updateNickname(nickname);
-        member.updateProfileImg(profileImg);
         member.updateCountToZero();
+        member.updateAuthorityOfMemberStatusToUser();
+        member.updateGoogleEmail(googleEmail);
+        member.updateNaverEmail(naverEmail);
+        member.updateKakaoEmail(kakaoEmail);
 
         return member;
     }
@@ -193,22 +203,20 @@ public class Member extends BaseTimeEntity {
 
         Member member = new Member();
 
-        member.updateAccountId(createMemberVO.getAccountId());
-        member.updateAccountPw(createMemberVO.getAccountPw());
-        member.updateBirth(createMemberVO.getBirth());
-        member.updateEmail(createMemberVO.getEmail());
-        member.updateName(createMemberVO.getName());
-        member.updateNickname(createMemberVO.getNickname());
-        member.updateCountToZero();
+        Member.buildMember()
+                .setNickname(createMemberVO.getNickname())
+                .setEmail(createMemberVO.getEmail())
+                .setAccountId(createMemberVO.getAccountId())
+                .setAccountPw(createMemberVO.getAccountPw())
+                .setBirth(createMemberVO.getBirth())
+                .setName(createMemberVO.getName())
+                .build();
 
-        if (createMemberVO.getProfileImg() != null) {
-            member.updateProfileImg(createMemberVO.getProfileImg());
-        }
         return member;
     }
 
-    public static MemberDto.MemberBuilder buildMember() {
-        return new MemberDto.MemberBuilder();
+    public static MemberBuilder buildMember() {
+        return new MemberBuilder();
     }
 
     //==수정 메소드==//
@@ -249,6 +257,23 @@ public class Member extends BaseTimeEntity {
 
     public void updatePopularity() {
         this.popularity = followScore - complainCount - blockCount;
+    }
+
+    public void updateAuthorityOfMemberStatus(AuthorityOfMemberStatus authorityOfMemberStatus) {
+        this.authorityOfMemberStatus = authorityOfMemberStatus;
+    }
+    public void updateGoogleEmail(String googleEmail) {
+        this.googleEmail = googleEmail;
+    }
+    public void updateNaverEmail(String naverEmail) {
+        this.naverEmail = naverEmail;
+    }
+    public void updateKakaoEmail(String kakaoEmail) {
+        this.kakaoEmail = kakaoEmail;
+    }
+
+    public void updateAuthorityOfMemberStatusToUser() {
+        this.authorityOfMemberStatus = AuthorityOfMemberStatus.C;
     }
 
     public void updateCountToZero() {

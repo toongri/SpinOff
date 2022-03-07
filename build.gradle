@@ -41,12 +41,13 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springFrameworkBootVersion}"
 	developmentOnly "org.springframework.boot:spring-boot-devtools:${springFrameworkBootVersion}"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:${springFrameworkBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-oauth2-client:${springFrameworkBootVersion}"
 
 	compileOnly "org.projectlombok:lombok:${projectLombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${projectLombokVersion}"
 
 	implementation "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
-
+	implementation "org.apache.commons:commons-lang3:3.0"
 	//swagger 추가
 	implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
 	implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"
