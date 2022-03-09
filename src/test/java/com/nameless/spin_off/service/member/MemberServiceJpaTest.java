@@ -42,12 +42,11 @@ class MemberServiceJpaTest {
         String email = "cc";
         String profileImg = null;
 
-        MemberDto.CreateMemberVO createMemberVO = new MemberDto
-                .CreateMemberVO(accountId, accountPw, name, nickname,
+        MemberDto.MemberRegisterRequestDto memberRegisterRequestDto = new MemberDto.MemberRegisterRequestDto(accountId, accountPw, name, nickname,
                 birth, email, profileImg);
 
         //when
-        Long aLong = memberService.insertMemberByMemberVO(createMemberVO);
+        Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
 
         //then
         Member member = memberRepository.getById(aLong);
@@ -72,24 +71,23 @@ class MemberServiceJpaTest {
         String email = "cc";
         String profileImg = null;
 
-        MemberDto.CreateMemberVO createMemberVO = new MemberDto
-                .CreateMemberVO(accountId, accountPw, name, nickname,
+        MemberDto.MemberRegisterRequestDto memberRegisterRequestDto = new MemberDto.MemberRegisterRequestDto(accountId, accountPw, name, nickname,
                 birth, email, profileImg);
 
         //when
-        Long aLong = memberService.insertMemberByMemberVO(createMemberVO);
+        Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
 
         //then
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(createMemberVO))
+        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
                 .isInstanceOf(AlreadyAccountIdException.class);
 
-        createMemberVO.setNickname("");
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(createMemberVO))
+        memberRegisterRequestDto.setNickname("");
+        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
                 .isInstanceOf(AlreadyAccountIdException.class);
 
-        createMemberVO.setNickname(nickname);
-        createMemberVO.setAccountId("");
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(createMemberVO))
+        memberRegisterRequestDto.setNickname(nickname);
+        memberRegisterRequestDto.setAccountId("");
+        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
                 .isInstanceOf(AlreadyNicknameException.class);
     }
 

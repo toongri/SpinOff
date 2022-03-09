@@ -1,16 +1,19 @@
 package com.nameless.spin_off.service.member;
 
-import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.config.jwt.JwtTokenProvider;
+import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterResponseDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.movie.MovieRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,27 +27,52 @@ public class MemberServiceJpa implements MemberService {
 
     private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;
-    private final HashtagRepository hashtagRepository;
-    private final MovieRepository movieRepository;
+    private final JwtTokenProvider jwtTokenProvider;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional()
     @Override
-    public Long insertMemberByMemberVO(CreateMemberVO memberVO) throws AlreadyAccountIdException, AlreadyNicknameException {
+    public Long insertMemberByMemberVO(MemberRegisterRequestDto memberVO) throws AlreadyAccountIdException, AlreadyNicknameException {
 
-        List<Member> memberList = memberRepository
-                .findAllByAccountIdOrNickname(memberVO.getAccountId(), memberVO.getNickname());
+        validateDuplicate(memberVO.getAccountId(), memberVO.getNickname());
 
-        if (memberList.isEmpty()) {
-            Member member = memberRepository.save(Member.createMemberByCreateVO(memberVO));
-            collectionRepository.save(Collection.createDefaultCollection(member));
-            return member.getId();
+        Member member = memberRepository.save(Member.createMemberByCreateVO(memberVO));
+        collectionRepository.save(Collection.createDefaultCollection(member));
+        return member.getId();
+    }
+
+    @Transactional()
+    @Override
+    public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
+            throws AlreadyAccountIdException, AlreadyNicknameException {
+        validateDuplicate(requestDto.getAccountId(), requestDto.getNickname());
+
+        Member member = memberRepository.save(Member.buildMember()
+                .setNickname(requestDto.getNickname())
+                .setEmail(requestDto.getEmail())
+                .setAccountId(requestDto.getAccountId())
+                .setAccountPw(passwordEncoder.encode(requestDto.getAccountPw()))
+                .setBirth(requestDto.getBirth())
+                .setName(requestDto.getName())
+                .build());
+
+        return MemberRegisterResponseDto.builder()
+                .id(member.getId())
+                .accountId(member.getAccountId())
+                .build();
+    }
+
+    @Override
+    public MemberLoginResponseDto loginMember(MemberDto.MemberLoginRequestDto requestDto) {
+        Member member =
+                memberRepository.findByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
+
+        if (!passwordEncoder.matches(requestDto.getAccountPw(), member.getAccountPw())) {
+            throw new LoginFailureException();
         } else {
-            if (memberList.stream().noneMatch(member -> member.getAccountId().equals(memberVO.getAccountId()))) {
-                throw new AlreadyNicknameException();
-            } else {
-                throw new AlreadyAccountIdException();
-            }
+            return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()));
         }
+
     }
 
     @Transactional()
@@ -74,6 +102,17 @@ public class MemberServiceJpa implements MemberService {
         Member member = getMemberWithSearch(memberId);
 
         return member.addSearch(content, searchedByMemberStatus);
+    }
+
+    private void validateDuplicate(String accountId, String nickname) {
+
+        List<Member> memberList = memberRepository
+                .findAllByAccountIdOrNickname(accountId, nickname);
+        if (memberList.stream().noneMatch(member -> member.getAccountId().equals(accountId))) {
+            throw new AlreadyNicknameException();
+        } else {
+            throw new AlreadyAccountIdException();
+        }
     }
 
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {

@@ -4,6 +4,7 @@ import com.nameless.spin_off.entity.member.Member;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.util.Map;
 
 @Getter
@@ -12,13 +13,18 @@ public class OAuthAttributes {
     private String nameAttributeKey;
     private String email;
     private String name;
+    private LocalDate birthday;
+    private String phoneNumber;
 
     @Builder
-    public OAuthAttributes(Map<String, Object> attributes, String name, String nameAttributeKey, String email) {
+    public OAuthAttributes(Map<String, Object> attributes, String name, String nameAttributeKey, String email,
+                           LocalDate birthday, String phoneNumber) {
         this.attributes = attributes;
         this.nameAttributeKey = nameAttributeKey;
         this.name = name;
         this.email = email;
+        this.birthday = birthday;
+        this.phoneNumber = phoneNumber;
     }
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName,
@@ -30,6 +36,11 @@ public class OAuthAttributes {
         return OAuthAttributes.builder()
                 .name((String) attributes.get("name"))
                 .email((String) attributes.get("email"))
+//                .birthday(((Date) attributes.get("birthdays")).toInstant() // Date -> Instant
+//                                .atZone(ZoneId.systemDefault()) // Instant -> ZonedDateTime
+//                                .toLocalDate())
+                .birthday((LocalDate) attributes.get("birthdays"))
+                .phoneNumber((String) attributes.get("phoneNumber"))
                 .attributes(attributes)
                 .nameAttributeKey(userNameAttributeName)
                 .build();

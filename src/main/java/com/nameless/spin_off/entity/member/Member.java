@@ -1,7 +1,7 @@
 package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
 import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
@@ -58,10 +58,11 @@ public class Member extends BaseTimeEntity {
     private String naverEmail;
     private String kakaoEmail;
 
+    @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
     @Column(name = "authority_of_member_status")
     @NotNull
-    private AuthorityOfMemberStatus authorityOfMemberStatus;
+    private Set<AuthorityOfMemberStatus> roles = new HashSet<>();
 
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private Set<FollowedHashtag> followedHashtags = new HashSet<>();
@@ -191,7 +192,7 @@ public class Member extends BaseTimeEntity {
         member.updateEmail(email);
         member.updateNickname(nickname);
         member.updateCountToZero();
-        member.updateAuthorityOfMemberStatusToUser();
+        member.updateRolesToUser();
         member.updateGoogleEmail(googleEmail);
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
@@ -199,17 +200,17 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    public static Member createMemberByCreateVO(CreateMemberVO createMemberVO) {
+    public static Member createMemberByCreateVO(MemberRegisterRequestDto memberRegisterRequestDto) {
 
         Member member = new Member();
 
         Member.buildMember()
-                .setNickname(createMemberVO.getNickname())
-                .setEmail(createMemberVO.getEmail())
-                .setAccountId(createMemberVO.getAccountId())
-                .setAccountPw(createMemberVO.getAccountPw())
-                .setBirth(createMemberVO.getBirth())
-                .setName(createMemberVO.getName())
+                .setNickname(memberRegisterRequestDto.getNickname())
+                .setEmail(memberRegisterRequestDto.getEmail())
+                .setAccountId(memberRegisterRequestDto.getAccountId())
+                .setAccountPw(memberRegisterRequestDto.getAccountPw())
+                .setBirth(memberRegisterRequestDto.getBirth())
+                .setName(memberRegisterRequestDto.getName())
                 .build();
 
         return member;
@@ -259,21 +260,24 @@ public class Member extends BaseTimeEntity {
         this.popularity = followScore - complainCount - blockCount;
     }
 
-    public void updateAuthorityOfMemberStatus(AuthorityOfMemberStatus authorityOfMemberStatus) {
-        this.authorityOfMemberStatus = authorityOfMemberStatus;
+    public void updateRoles(Set<AuthorityOfMemberStatus> roles) {
+        this.roles = roles;
     }
-    public void updateGoogleEmail(String googleEmail) {
+    public Member updateGoogleEmail(String googleEmail) {
         this.googleEmail = googleEmail;
+        return this;
     }
-    public void updateNaverEmail(String naverEmail) {
+    public Member updateNaverEmail(String naverEmail) {
         this.naverEmail = naverEmail;
+        return this;
     }
-    public void updateKakaoEmail(String kakaoEmail) {
+    public Member updateKakaoEmail(String kakaoEmail) {
         this.kakaoEmail = kakaoEmail;
+        return this;
     }
 
-    public void updateAuthorityOfMemberStatusToUser() {
-        this.authorityOfMemberStatus = AuthorityOfMemberStatus.C;
+    public void updateRolesToUser() {
+        this.roles.add(AuthorityOfMemberStatus.C);
     }
 
     public void updateCountToZero() {

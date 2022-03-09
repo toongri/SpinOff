@@ -2,7 +2,7 @@ package com.nameless.spin_off.controller;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
@@ -79,7 +79,7 @@ public class InitAddDummy {
         @Transactional()
         public void init() throws Exception {
 
-            List<CreateMemberVO> createMemberVOs = new ArrayList<>();
+            List<MemberRegisterRequestDto> memberRegisterRequestDtos = new ArrayList<>();
             List<Post> posts = new ArrayList<>();
             List<Collection> collections = new ArrayList<>();
             List<FollowedMember> followedMembers = new ArrayList<>();
@@ -104,11 +104,11 @@ public class InitAddDummy {
                 String nickname = arr.get((int) (Math.random() * randomSize)) + "" + arr.get((int) (Math.random() * randomSize));
                 String email = arr.get((int) (Math.random() * randomSize)) + arr.get((int) (Math.random() * randomSize)) + "@" + arr.get((int) (Math.random() * randomSize)) + ".com";
                 if (all.stream().noneMatch(mem -> mem.getAccountId().equals(accountId) && mem.getNickname().equals(nickname)))
-                    createMemberVOs.add(new CreateMemberVO(accountId, accountPw, name, nickname, LocalDate.now(), email));
+                    memberRegisterRequestDtos.add(new MemberRegisterRequestDto(accountId, accountPw, name, nickname, LocalDate.now(), email));
             }
 
-            for (CreateMemberVO createMemberVO : createMemberVOs) {
-                memberService.insertMemberByMemberVO(createMemberVO);
+            for (MemberRegisterRequestDto memberRegisterRequestDto : memberRegisterRequestDtos) {
+                memberService.insertMemberByMemberVO(memberRegisterRequestDto);
             }
             List<Member> members = memberRepository.findAll();
             int memberSize = members.size();

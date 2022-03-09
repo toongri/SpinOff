@@ -15,6 +15,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findByKakaoEmail(String kakaoEmail);
     Optional<Member> findByNickname(String nickname);
 
+    Optional<Member> findByAccountId(String accountId);
+
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
             "WHERE m.id = :id")

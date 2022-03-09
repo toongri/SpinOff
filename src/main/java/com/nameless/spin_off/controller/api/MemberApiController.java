@@ -1,6 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
@@ -20,18 +20,18 @@ public class MemberApiController {
     private final MemberService memberService;
 
     @PostMapping("")
-    public MemberApiResult<Long> createOne(@RequestBody CreateMemberVO createMemberVO)
+    public MemberApiResult<Long> createOne(@RequestBody MemberRegisterRequestDto memberRegisterRequestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
 
         log.info("createOne");
-        log.info("accountId : {}", createMemberVO.getAccountId());
-        log.info("accountPw : {}", createMemberVO.getAccountPw());
-        log.info("name : {}", createMemberVO.getName());
-        log.info("nickname : {}", createMemberVO.getNickname());
-        log.info("birth : {}", createMemberVO.getBirth());
-        log.info("email : {}", createMemberVO.getEmail());
+        log.info("accountId : {}", memberRegisterRequestDto.getAccountId());
+        log.info("accountPw : {}", memberRegisterRequestDto.getAccountPw());
+        log.info("name : {}", memberRegisterRequestDto.getName());
+        log.info("nickname : {}", memberRegisterRequestDto.getNickname());
+        log.info("birth : {}", memberRegisterRequestDto.getBirth());
+        log.info("email : {}", memberRegisterRequestDto.getEmail());
 
-        return new MemberApiResult<>(memberService.insertMemberByMemberVO(createMemberVO));
+        return new MemberApiResult<>(memberService.insertMemberByMemberVO(memberRegisterRequestDto));
     }
 
     @PostMapping("/{followedMemberId}/follow/{memberId}")

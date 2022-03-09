@@ -2,7 +2,7 @@ package com.nameless.spin_off.controller;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.MemberDto.CreateMemberVO;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
@@ -75,7 +75,7 @@ public class InitDummy {
         @Transactional()
         public void init() throws Exception {
 
-            List<CreateMemberVO> createMemberVOs = new ArrayList<>();
+            List<MemberRegisterRequestDto> memberRegisterRequestDtos = new ArrayList<>();
             List<Member> members = new ArrayList<>();
             List<Post> posts = new ArrayList<>();
             List<Collection> collections = new ArrayList<>();
@@ -102,63 +102,63 @@ public class InitDummy {
             int movieSize = movies.size();
 
             //멤버 생성
-            createMemberVOs.add(new CreateMemberVO("jitndk", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("jitndk", "abcdefg",
                     "지수아", "SooAh", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("fpxldmswl12", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("fpxldmswl12", "abcdefg",
                     "이은지", "onegoldsky", LocalDate.of(1998, 2, 26),
                     "fpxldmswl12@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("hyeongyungim7", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("hyeongyungim7", "abcdefg",
                     "김형윤", "yun", LocalDate.of(1996, 9, 20),
                     "hyeongyungim7@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("jhkim03284", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("jhkim03284", "abcdefg",
                     "김준형", "퉁그리", LocalDate.of(1994, 9, 23),
                     "jhkim03284@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("jhkimkkk0923", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("jhkimkkk0923", "abcdefg",
                     "김준형", "toongri", LocalDate.of(1994, 9, 26),
                     "jhkimkkk0923@naver.com"));
-            createMemberVOs.add(new CreateMemberVO("fdfdfdd1", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("fdfdfdd1", "abcdefg",
                     "지수아", "투루투루퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("nasdf23", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("nasdf23", "abcdefg",
                     "이은지", "t00ngri", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("nadfdf341", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("nadfdf341", "abcdefg",
                     "김준형", "투투투퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("arr11235", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("arr11235", "abcdefg",
                     "김준형", "투퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("nzxcv123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("nzxcv123", "abcdefg",
                     "김준형", "퉁투퉁퉁퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("bnasdf123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("bnasdf123", "abcdefg",
                     "김준형", "앵그리퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("fafb123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("fafb123", "abcdefg",
                     "김준형", "쏘앵그리퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("nzdsf123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("nzdsf123", "abcdefg",
                     "김준형", "엉터리퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("fdfagh123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("fdfagh123", "abcdefg",
                     "김준형", "mc퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("zxcbvger123", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("zxcbvger123", "abcdefg",
                     "김준형", "투두두두두퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("qtdfd22", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("qtdfd22", "abcdefg",
                     "김준형", "퉁퉁퉁퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("hfdg33", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("hfdg33", "abcdefg",
                     "김준형", "퉁퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
-            createMemberVOs.add(new CreateMemberVO("xnbff3323", "abcdefg",
+            memberRegisterRequestDtos.add(new MemberRegisterRequestDto("xnbff3323", "abcdefg",
                     "김준형", "퉁기덕퉁그리", LocalDate.of(1998, 2, 26),
                     "jitndk@gmail.com"));
 
-            for (CreateMemberVO createMemberVO : createMemberVOs) {
-                Long aLong = memberService.insertMemberByMemberVO(createMemberVO);
+            for (MemberRegisterRequestDto memberRegisterRequestDto : memberRegisterRequestDtos) {
+                Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
                 members.add(memberRepository.getById(aLong));
             }
 

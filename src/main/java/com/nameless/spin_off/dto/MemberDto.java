@@ -2,10 +2,10 @@ package com.nameless.spin_off.dto;
 
 
 import com.nameless.spin_off.entity.member.FollowedMember;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +15,27 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MemberDto {
+    @Data
+    @AllArgsConstructor
+    public static class MemberLoginRequestDto {
+        private String accountId;
+        private String accountPw;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MemberLoginResponseDto {
+        private Long id;
+        private String token;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @Builder
+    public static class MemberRegisterResponseDto {
+        private Long id;
+        private String accountId;
+    }
 
     @Data
     @NoArgsConstructor
@@ -113,7 +134,7 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
-    public static class CreateMemberVO {
+    public static class MemberRegisterRequestDto {
         private String accountId;
         private String accountPw;
         private String name;
