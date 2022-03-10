@@ -26,8 +26,8 @@ const SearchBarContainer = styled(Common)`
 
 const SearchBarModal = styled(Common)`
   //display: ${props => (props.focused ? '' : 'none')};
-  visibility: ${props => (props.focused ? 'visible' : 'hidden')};
-  opacity: ${props => (props.focused ? '0.9' : '0')};
+  visibility: ${props => (props?.focused ? 'visible' : 'hidden')};
+  opacity: ${props => (props?.focused ? '0.9' : '0')};
   transition: 0.3s;
   top: 150px;
   height: 500px;

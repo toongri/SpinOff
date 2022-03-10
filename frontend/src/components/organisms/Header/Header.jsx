@@ -1,6 +1,7 @@
 import React from 'react';
 import { Container } from './styles';
-import { HeaderBar, SearchBar } from '../../molecules';
+import { SearchBar } from '../../molecules';
+import { HeaderBar } from '..';
 
 function Header() {
   return (

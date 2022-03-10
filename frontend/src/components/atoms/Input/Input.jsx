@@ -2,11 +2,11 @@ import React from 'react';
 import InputArea from './styles';
 import propTypes from 'prop-types';
 
-function Input({ style = {}, value, onChange, onFocus }) {
+function Input({ Style = {}, value, onChange, onFocus }) {
   //console.log(style);
   return (
     <InputArea
-      Style={style}
+      Style={Style}
       value={value}
       onChange={onChange}
       onFocus={onFocus}
@@ -15,7 +15,7 @@ function Input({ style = {}, value, onChange, onFocus }) {
 }
 
 Input.propTypes = {
-  style: propTypes.object,
+  Style: propTypes.object,
   value: propTypes.string,
   onChange: propTypes.func,
   onFocus: propTypes.func,

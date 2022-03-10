@@ -1,12 +1,13 @@
 import React, { useEffect, useRef } from 'react';
 import { Magnifier, SearchBarContainer, SearchBarModal } from './styles';
 import { Input } from '../../atoms';
-import { useInput, useFocus } from './Hooks';
+import { useInput, useFocus } from '../../../Hooks';
 
 function SearchBar() {
-  const style = {
-    backGround: 'rgba(255, 255, 255, 0.8)',
+  const inputStyle = {
+    width: '100%',
     padding: '13px 15px',
+    backGround: 'transparent',
   };
   const searchHook = useInput('');
   const { focused, setFocused, onFocus } = useFocus(false);
@@ -30,7 +31,7 @@ function SearchBar() {
       <SearchBarModal focused={focused}>asd</SearchBarModal>
       <SearchBarContainer>
         <Magnifier />
-        <Input style={style} {...searchHook} onFocus={onFocus} />
+        <Input Style={inputStyle} {...searchHook} onFocus={onFocus} />
       </SearchBarContainer>
     </div>
   );

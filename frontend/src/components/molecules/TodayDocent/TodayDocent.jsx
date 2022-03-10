@@ -46,7 +46,8 @@ function TodayDocent() {
           />
         </Image>
         <RecommendMessage>
-          추천하는 도슨트 컨텐츠 지금 읽어 보세요
+          추천하는 도슨트 컨텐츠 <br />
+          지금 읽어 보세요
           <NormalButton Style={buttonStyle}>
             오늘의 도슨트 보러가기
           </NormalButton>
