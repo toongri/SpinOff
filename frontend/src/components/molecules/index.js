@@ -1,5 +1,6 @@
-import HeaderBar from './HeaderBar';
 import SearchBar from './SearchBar';
 import HeaderMenuModal from './HeaderMenuModal';
+import Post from './Post';
+import SignForm from './SignForm';
 
-export { HeaderBar, SearchBar, HeaderMenuModal };
+export { SearchBar, HeaderMenuModal, Post, SignForm };

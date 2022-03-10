@@ -5,7 +5,8 @@ import {
   HeaderRightContainer,
 } from './styles';
 import { Notice, DM, Logo, Profile, TextButton } from '../../atoms';
-import HeaderMenuModal from '../HeaderMenuModal/HeaderMenuModal';
+import { HeaderMenuModal } from '../../molecules';
+import { SignInUpModal } from '..';
 
 const buttonStyle = {
   fontSize: '24px',
@@ -18,7 +19,7 @@ const buttonStyle = {
 };
 
 function Header() {
-  const isLoggin = false;
+  const isLoggin = true;
   return (
     <>
       <HeaderLeftContainer>
@@ -31,8 +32,7 @@ function Header() {
       <HeaderRightContainer>
         {isLoggin ? (
           <>
-            <TextButton>로그인</TextButton>
-            <TextButton>회원가입</TextButton>
+            <SignInUpModal />
           </>
         ) : (
           <>

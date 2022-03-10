@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Container } from './styles';
-import Post from '../../atoms/Post';
+import { Post } from '../../molecules';
 
 function Masonry() {
   const dummy = [
