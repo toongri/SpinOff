@@ -1,0 +1,13 @@
+{
+  "properties": [
+    {
+      "name": "spring.jwt.secretKey",
+      "type": "java.lang.String",
+      "description": "Description for spring.jwt.secretKey."
+    },
+    {
+      "name": "spring.social.kakao.kakao.client_id",
+      "type": "java.lang.String",
+      "description": "Description for spring.social.kakao.kakao.client_id."
+    }
+  ] }

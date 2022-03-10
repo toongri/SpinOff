@@ -57,6 +57,7 @@ public class Member extends BaseTimeEntity {
     private String googleEmail;
     private String naverEmail;
     private String kakaoEmail;
+    private String refreshToken;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -192,7 +193,7 @@ public class Member extends BaseTimeEntity {
         member.updateEmail(email);
         member.updateNickname(nickname);
         member.updateCountToZero();
-        member.updateRolesToUser();
+        member.addRolesToUser();
         member.updateGoogleEmail(googleEmail);
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
@@ -260,9 +261,14 @@ public class Member extends BaseTimeEntity {
         this.popularity = followScore - complainCount - blockCount;
     }
 
-    public void updateRoles(Set<AuthorityOfMemberStatus> roles) {
-        this.roles = roles;
+    public void addRole(AuthorityOfMemberStatus role) {
+        this.roles.add(role);
     }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
+    }
+
     public Member updateGoogleEmail(String googleEmail) {
         this.googleEmail = googleEmail;
         return this;
@@ -276,7 +282,7 @@ public class Member extends BaseTimeEntity {
         return this;
     }
 
-    public void updateRolesToUser() {
+    public void addRolesToUser() {
         this.roles.add(AuthorityOfMemberStatus.C);
     }
 

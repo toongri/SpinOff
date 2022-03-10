@@ -17,6 +17,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByAccountId(String accountId);
 
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.roles role " +
+            "WHERE m.accountId = :accountId")
+    Optional<Member> findByAccountIdWithRoles(@Param("accountId") String accountId);
+
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
             "WHERE m.id = :id")

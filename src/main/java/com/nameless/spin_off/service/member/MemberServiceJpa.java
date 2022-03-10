@@ -1,18 +1,20 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
-import com.nameless.spin_off.dto.MemberDto;
-import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterResponseDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -62,17 +65,37 @@ public class MemberServiceJpa implements MemberService {
                 .build();
     }
 
+    @Transactional
     @Override
-    public MemberLoginResponseDto loginMember(MemberDto.MemberLoginRequestDto requestDto) {
+    public MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto) {
         Member member =
                 memberRepository.findByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
 
         if (!passwordEncoder.matches(requestDto.getAccountPw(), member.getAccountPw())) {
             throw new LoginFailureException();
         } else {
-            return new MemberLoginResponseDto(member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()));
+            member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
+            return new MemberLoginResponseDto(
+                    member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()), member.getRefreshToken());
         }
+    }
 
+    @Transactional
+    @Override
+    public TokenResponseDto reIssue(TokenRequestDto requestDto) {
+        if (!jwtTokenProvider.validateTokenExpiration(requestDto.getRefreshToken())) {
+            throw new InvalidRefreshTokenException();
+        }
+        Member member = findMemberByToken(requestDto);
+
+        if (!member.getRefreshToken().equals(requestDto.getRefreshToken())) {
+            throw new InvalidRefreshTokenException();
+        }
+        String accessToken = jwtTokenProvider.createToken(member.getAccountId());
+        String refreshToken = jwtTokenProvider.createRefreshToken();
+        member.updateRefreshToken(refreshToken);
+
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 
     @Transactional()
@@ -104,15 +127,60 @@ public class MemberServiceJpa implements MemberService {
         return member.addSearch(content, searchedByMemberStatus);
     }
 
+    private String getRandomNickname() {
+        String randomNickname = RandomStringUtils.randomAlphabetic(8);
+
+        Optional<Member> member = memberRepository.findByNickname(randomNickname);
+
+        while (member.isPresent()) {
+            randomNickname = RandomStringUtils.randomAlphabetic(8);
+            member = memberRepository.findByNickname(randomNickname);
+        }
+        log.info("randomNickname : {}", randomNickname);
+        return randomNickname;
+    }
+
+    private String getRandomAccountId() {
+        String randomAccountId = RandomStringUtils.randomAlphabetic(8);
+
+        Optional<Member> member = memberRepository.findByNickname(randomAccountId);
+
+        while (member.isPresent()) {
+            randomAccountId = RandomStringUtils.randomAlphabetic(8);
+            member = memberRepository.findByNickname(randomAccountId);
+        }
+        log.info("randomNickname : {}", randomAccountId);
+        return randomAccountId;
+    }
+
+    private Optional<Member> findByEmailAndProvider(String email, String provider) {
+        if (provider.equals("naver")) {
+            return memberRepository.findByNaverEmail(email);
+        } else if (provider.equals("kakao")) {
+            return memberRepository.findByKakaoEmail(email);
+        } else {
+            return memberRepository.findByGoogleEmail(email);
+        }
+    }
+
     private void validateDuplicate(String accountId, String nickname) {
 
         List<Member> memberList = memberRepository
                 .findAllByAccountIdOrNickname(accountId, nickname);
-        if (memberList.stream().noneMatch(member -> member.getAccountId().equals(accountId))) {
+        if (memberList.isEmpty()) {
+
+        } else if (memberList.stream().anyMatch(member -> member.getAccountId().equals(accountId))) {
             throw new AlreadyNicknameException();
         } else {
             throw new AlreadyAccountIdException();
         }
+    }
+
+    public Member findMemberByToken(TokenRequestDto requestDto) {
+        Authentication auth = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+        String accountId = userDetails.getUsername();
+        return memberRepository.findByAccountId(accountId).orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {

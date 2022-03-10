@@ -1,4 +1,4 @@
-package com.nameless.spin_off.exception.security;
+package com.nameless.spin_off.config.AuthenticationEntryPoint;
 
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
@@ -10,6 +10,7 @@ import java.io.IOException;
 
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
+    //인증요청
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {

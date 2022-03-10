@@ -6,6 +6,7 @@ buildscript {
 		swaggerVersion = "2.9.2"
 		p6spyVersion = "1.8.0"
 		mariaDBVersion = "2.7.5"
+		gsonVersion = "2.8.9"
 	}
 }
 
@@ -51,6 +52,7 @@ dependencies {
 	implementation "org.apache.commons:commons-lang3:3.0" //
 
 	implementation 'io.jsonwebtoken:jjwt:0.9.1' //jwt
+	implementation "com.google.code.gson:gson:${gsonVersion}"//gson
 	//swagger 추가
 	implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
 	implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"

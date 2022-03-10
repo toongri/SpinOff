@@ -1,15 +1,15 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.MemberDto.MemberLoginRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterResponseDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -26,9 +26,15 @@ public class SignApiController {
         return getResult(responseDto);
     }
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public SignResult<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto requestDto) {
         MemberLoginResponseDto responseDto = memberService.loginMember(requestDto);
+        return getResult(responseDto);
+    }
+
+    @PostMapping("/reissue")
+    public SignResult<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
+        TokenResponseDto responseDto = memberService.reIssue(tokenRequestDto);
         return getResult(responseDto);
     }
 
