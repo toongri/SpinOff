@@ -53,6 +53,7 @@ dependencies {
 
 	implementation 'io.jsonwebtoken:jjwt:0.9.1' //jwt
 	implementation "com.google.code.gson:gson:${gsonVersion}"//gson
+	implementation 'org.springframework.boot:spring-boot-starter-web' //smtp
 	//swagger 추가
 	implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
 	implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"

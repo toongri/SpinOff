@@ -2,7 +2,7 @@ package com.nameless.spin_off.exception.security;
 
 public class InvalidRefreshTokenException extends RuntimeException{
     public InvalidRefreshTokenException() {
-        super();
+        super("토큰이 유효하지 않습니다.");
     }
 
     public InvalidRefreshTokenException(String message) {

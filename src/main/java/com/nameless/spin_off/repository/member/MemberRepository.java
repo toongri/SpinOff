@@ -10,13 +10,23 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
-    Optional<Member> findByGoogleEmail(String googleEmail);
-    Optional<Member> findByNaverEmail(String naverEmail);
-    Optional<Member> findByKakaoEmail(String kakaoEmail);
     Optional<Member> findByNickname(String nickname);
-
     Optional<Member> findByAccountId(String accountId);
 
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.roles role " +
+            "WHERE m.googleEmail = :googleEmail")
+    Optional<Member> findByGoogleEmailWithRoles(@Param("googleEmail") String googleEmail);
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.roles role " +
+            "WHERE m.naverEmail = :naverEmail")
+    Optional<Member> findByNaverEmailWithRoles(@Param("naverEmail") String naverEmail);
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.roles role " +
+            "WHERE m.kakaoEmail = :kakaoEmail")
+    Optional<Member> findByKakaoEmailWithRoles(@Param("kakaoEmail") String kakaoEmail);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +
@@ -59,12 +69,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedHashtagAndBlockedMember(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
             "LEFT JOIN FETCH m.followedMembers followedMember " +
             "LEFT JOIN FETCH m.followedMovies followedMovie " +
             "LEFT JOIN FETCH m.followedCollections followedCollection " +
@@ -97,13 +101,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "LEFT JOIN FETCH m.searches " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithSearch(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.searches search " +
-            "WHERE m.id = :id " +
-            "ORDER BY search.id DESC")
-    Optional<Member> findOneByIdWithSearchOrderBySearches(@Param("id") Long id);
-
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.blockingMembers blockingMembers " +

@@ -1,11 +1,13 @@
 package com.nameless.spin_off.config.auth;
 
 import com.nameless.spin_off.config.auth.dto.OAuth2Attribute;
+import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -15,8 +17,9 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
+        log.debug("loadUser start");
         OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new DefaultOAuth2UserService();
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest);
 
@@ -34,36 +38,49 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
+        log.debug("registrationId: {}", registrationId);
+        log.debug("userNameAttributeName: {}", userNameAttributeName);
+
         OAuth2Attribute oAuth2Attribute =
                 OAuth2Attribute.of(registrationId, userNameAttributeName, oAuth2User.getAttributes());
 
-        log.info("{}", oAuth2Attribute);
+        log.info("oAuth2Attribute: {}", oAuth2Attribute.toString());
 
-        saveMember(registrationId, oAuth2Attribute);
+        Member member = getMember(registrationId, oAuth2Attribute);
+        log.debug("loadUser end");
 
         return new DefaultOAuth2User(
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_USER")),
-                oAuth2Attribute.getAttributes(), oAuth2Attribute.getAttributeKey());
+                getGrantedAuthorities(member),
+                oAuth2Attribute.getAttributes(),
+                oAuth2Attribute.getAttributeKey());
     }
 
-    private Member saveMember(String registrationId, OAuth2Attribute attributes) {
+    private Set<GrantedAuthority> getGrantedAuthorities(Member member) {
+        Set<GrantedAuthority> authorities = new LinkedHashSet<>();
 
-        return memberRepository.save(getMember(registrationId, attributes));
+        for (AuthorityOfMemberStatus role : member.getRoles()) {
+            authorities.add(new SimpleGrantedAuthority(role.getKey()));
+        }
+        return authorities;
     }
+
     private Member getMember(String registrationId, OAuth2Attribute attributes) {
 
         if ("naver".equals(registrationId)) {
             return memberRepository
-                    .findByNaverEmail(attributes.getEmail())
-                    .orElseGet(() -> attributes.toNaverEntity(getRandomNickname(), getAccountId()));
+                    .findByNaverEmailWithRoles(attributes.getEmail())
+                    .orElseGet(() ->
+                            memberRepository.save(attributes.toNaverEntity(getRandomNickname(), getAccountId())));
         } else if ("kakao".equals(registrationId)) {
             return memberRepository
-                    .findByKakaoEmail(attributes.getEmail())
-                    .orElseGet(() -> attributes.toKakaoEntity(getRandomNickname(), getAccountId()));
+                    .findByKakaoEmailWithRoles(attributes.getEmail())
+                    .orElseGet(() ->
+                            memberRepository.save(attributes.toKakaoEntity(getRandomNickname(), getAccountId())));
         } else {
             return memberRepository
-                    .findByGoogleEmail(attributes.getEmail())
-                    .orElseGet(() -> attributes.toGoogleEntity(getRandomNickname(), getAccountId()));
+                    .findByGoogleEmailWithRoles(attributes.getEmail())
+                    .orElseGet(() ->
+                            memberRepository.save(attributes.toGoogleEntity(getRandomNickname(), getAccountId())));
         }
     }
 

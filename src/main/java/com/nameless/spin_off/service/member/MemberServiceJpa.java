@@ -12,7 +12,6 @@ import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -125,42 +124,6 @@ public class MemberServiceJpa implements MemberService {
         Member member = getMemberWithSearch(memberId);
 
         return member.addSearch(content, searchedByMemberStatus);
-    }
-
-    private String getRandomNickname() {
-        String randomNickname = RandomStringUtils.randomAlphabetic(8);
-
-        Optional<Member> member = memberRepository.findByNickname(randomNickname);
-
-        while (member.isPresent()) {
-            randomNickname = RandomStringUtils.randomAlphabetic(8);
-            member = memberRepository.findByNickname(randomNickname);
-        }
-        log.info("randomNickname : {}", randomNickname);
-        return randomNickname;
-    }
-
-    private String getRandomAccountId() {
-        String randomAccountId = RandomStringUtils.randomAlphabetic(8);
-
-        Optional<Member> member = memberRepository.findByNickname(randomAccountId);
-
-        while (member.isPresent()) {
-            randomAccountId = RandomStringUtils.randomAlphabetic(8);
-            member = memberRepository.findByNickname(randomAccountId);
-        }
-        log.info("randomNickname : {}", randomAccountId);
-        return randomAccountId;
-    }
-
-    private Optional<Member> findByEmailAndProvider(String email, String provider) {
-        if (provider.equals("naver")) {
-            return memberRepository.findByNaverEmail(email);
-        } else if (provider.equals("kakao")) {
-            return memberRepository.findByKakaoEmail(email);
-        } else {
-            return memberRepository.findByGoogleEmail(email);
-        }
     }
 
     private void validateDuplicate(String accountId, String nickname) {

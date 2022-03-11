@@ -33,34 +33,33 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
+        log.debug("onAuthenticationSuccess start");
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
         SocialMemberDto socialMemberDto = userRequestMapper.toDto(oAuth2User);
 
-        Member member = getAccountId(socialMemberDto.getEmail());
-
-        // 최초 로그인이라면 회원가입 처리를 한다.
+        Member member = getMemberByEmail(socialMemberDto.getEmail());
         member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
-
 
         TokenResponseDto token =
                 new TokenResponseDto(jwtTokenProvider.createToken(member.getAccountId()), member.getRefreshToken());
         log.info("{}", token);
 
+        log.debug("onAuthenticationSuccess end");
         writeTokenResponse(response, token);
     }
 
-    private Member getAccountId(String email) {
+    private Member getMemberByEmail(String email) {
         String provider = email.substring(email.indexOf("@") + 1, email.indexOf("."));
 
         if ("naver".equals(provider)) {
             return memberRepository
-                    .findByNaverEmail(email).get();
+                    .findByNaverEmailWithRoles(email).get();
         } else if ("kakao".equals(provider)) {
             return memberRepository
-                    .findByKakaoEmail(email).get();
+                    .findByKakaoEmailWithRoles(email).get();
         } else {
             return memberRepository
-                    .findByGoogleEmail(email).get();
+                    .findByGoogleEmailWithRoles(email).get();
         }
     }
 

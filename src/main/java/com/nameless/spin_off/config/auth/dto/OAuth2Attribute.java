@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.HashMap;
 import java.util.Map;
 
 @ToString
@@ -45,8 +44,6 @@ public class OAuth2Attribute {
     }
 
     private static OAuth2Attribute ofKakao(String attributeKey, Map<String, Object> attributes) {
-        System.out.println("####################");
-        System.out.println(attributes.toString());
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
         Map<String, Object> kakaoProfile = (Map<String, Object>) kakaoAccount.get("profile");
 
@@ -70,17 +67,6 @@ public class OAuth2Attribute {
                 .attributes(response)
                 .attributeKey(attributeKey)
                 .build();
-    }
-
-    public Map<String, Object> convertToMap() {
-        Map<String, Object> map = new HashMap<>();
-        map.put("id", attributeKey);
-        map.put("key", attributeKey);
-        map.put("name", name);
-        map.put("email", email);
-        map.put("picture", picture);
-
-        return map;
     }
 
     public Member toGoogleEntity(String nickname, String accountId) {
