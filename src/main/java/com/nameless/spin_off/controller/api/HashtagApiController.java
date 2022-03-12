@@ -31,7 +31,7 @@ public class HashtagApiController {
         log.info("hashtagId : {}", hashtagId);
         log.info("ip : {}", ip);
 
-        return new HashtagResult<>(hashtagService.insertViewedHashtagByIp(ip, hashtagId));
+        return getResult(hashtagService.insertViewedHashtagByIp(ip, hashtagId));
     }
 
     @PostMapping("/{hashtagId}/follow/{memberId}")
@@ -42,7 +42,7 @@ public class HashtagApiController {
         log.info("hashtagId : {}", hashtagId);
         log.info("memberId : {}", memberId);
 
-        return new HashtagResult<>(hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId));
+        return getResult(hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId));
     }
 
 
@@ -52,12 +52,18 @@ public class HashtagApiController {
         log.info("getMostPopularHashtag");
         log.info("length : {}", length);
 
-        return new HashtagResult<>(searchQueryService.getMostPopularHashtagLimit(length));
+        return getResult(searchQueryService.getMostPopularHashtagLimit(length));
     }
 
     @Data
     @AllArgsConstructor
     public static class HashtagResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> HashtagResult<T> getResult(T data) {
+        return new HashtagResult<>(data, true, "0", "성공");
     }
 }

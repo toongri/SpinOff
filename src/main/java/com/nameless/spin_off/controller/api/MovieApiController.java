@@ -29,7 +29,7 @@ public class MovieApiController {
         log.info("movieId : {}", movieId);
         log.info("ip : {}", ip);
 
-        return new MovieResult<>(movieService.insertViewedMovieByIp(ip, movieId));
+        return getResult(movieService.insertViewedMovieByIp(ip, movieId));
     }
 
     @PostMapping("/{movieId}/follow/{memberId}")
@@ -41,12 +41,18 @@ public class MovieApiController {
         log.info("memberId : {}", memberId);
         log.info("movieId : {}", movieId);
 
-        return new MovieResult<>(movieService.insertFollowedMovieByMovieId(memberId, movieId));
+        return getResult(movieService.insertFollowedMovieByMovieId(memberId, movieId));
     }
 
     @Data
     @AllArgsConstructor
     public static class MovieResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> MovieResult<T> getResult(T data) {
+        return new MovieResult<>(data, true, "0", "성공");
     }
 }

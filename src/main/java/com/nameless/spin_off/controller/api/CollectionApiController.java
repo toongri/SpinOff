@@ -28,7 +28,7 @@ public class CollectionApiController {
         log.info("content : {}", collectionVO.getContent());
         log.info("publicOfCollectionStatus : {}", collectionVO.getPublicOfCollectionStatus());
 
-        return new CollectionApiResult<>(collectionService.insertCollectionByCollectionVO(collectionVO));
+        return getResult(collectionService.insertCollectionByCollectionVO(collectionVO));
     }
 
     @PostMapping("/{collectionId}/like/{memberId}")
@@ -40,7 +40,7 @@ public class CollectionApiController {
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", memberId);
 
-        return new CollectionApiResult<>(collectionService.insertLikedCollectionByMemberId(memberId, collectionId));
+        return getResult(collectionService.insertLikedCollectionByMemberId(memberId, collectionId));
     }
 
     @PostMapping("/{collectionId}/view/{ip}")
@@ -51,7 +51,7 @@ public class CollectionApiController {
         log.info("collectionId : {}", collectionId);
         log.info("ip : {}", ip);
 
-        return new CollectionApiResult<>(collectionService.insertViewedCollectionByIp(ip, collectionId));
+        return getResult(collectionService.insertViewedCollectionByIp(ip, collectionId));
     }
 
     @PostMapping("/{collectionId}/follow/{memberId}")
@@ -63,12 +63,18 @@ public class CollectionApiController {
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", memberId);
 
-        return new CollectionApiResult<>(collectionService.insertFollowedCollectionByMemberId(memberId, collectionId));
+        return getResult(collectionService.insertFollowedCollectionByMemberId(memberId, collectionId));
     }
 
     @Data
     @AllArgsConstructor
     public static class CollectionApiResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> CollectionApiResult<T> getResult(T data) {
+        return new CollectionApiResult<>(data, true, "0", "성공");
     }
 }

@@ -46,7 +46,7 @@ public class PostApiController {
         log.info("mediaUrls : {}", createPostVO.getMediaUrls());
         log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
-        return new PostApiResult<>(postService.insertPostByPostVO(createPostVO));
+        return getResult(postService.insertPostByPostVO(createPostVO));
     }
 
     @PostMapping("/{postId}/like/{memberId}")
@@ -58,7 +58,7 @@ public class PostApiController {
         log.info("memberId : {}", memberId);
         log.info("postId : {}", postId);
 
-        return new PostApiResult<>(postService.insertLikedPostByMemberId(memberId, postId));
+        return getResult(postService.insertLikedPostByMemberId(memberId, postId));
     }
 
     @PostMapping("/{postId}/view/{ip}")
@@ -70,7 +70,7 @@ public class PostApiController {
         log.info("postId : {}", postId);
         log.info("ip : {}", ip);
 
-        return new PostApiResult<>(postService.insertViewedPostByIp(ip, postId));
+        return getResult(postService.insertViewedPostByIp(ip, postId));
     }
 
     @PostMapping("/{postId}/collections/{memberId}")
@@ -84,7 +84,7 @@ public class PostApiController {
         log.info("memberId : {}", memberId);
         log.info("collectionIds : {}", collectionIds);
 
-        return new PostApiResult<>(postService.insertCollectedPosts(memberId, postId, collectionIds));
+        return getResult(postService.insertCollectedPosts(memberId, postId, collectionIds));
     }
 
     @GetMapping("/post-public-categories")
@@ -99,5 +99,11 @@ public class PostApiController {
     @AllArgsConstructor
     public static class PostApiResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> PostApiResult<T> getResult(T data) {
+        return new PostApiResult<>(data, true, "0", "성공");
     }
 }

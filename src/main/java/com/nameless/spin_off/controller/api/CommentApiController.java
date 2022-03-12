@@ -36,7 +36,7 @@ public class CommentApiController {
         log.info("parentId : {}", commentVO.getParentId());
         log.info("content : {}", commentVO.getContent());
 
-        return new CommentApiResult<>(commentInPostService.insertCommentInPostByCommentVO(commentVO));
+        return getResult(commentInPostService.insertCommentInPostByCommentVO(commentVO));
     }
 
     @PostMapping("/collection")
@@ -51,7 +51,7 @@ public class CommentApiController {
         log.info("content : {}", commentVO.getContent());
 
         Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO);
-        return new CommentApiResult<>(commentId);
+        return getResult(commentId);
     }
 
     @PostMapping("/post/{commentId}/like/{memberId}")
@@ -63,7 +63,7 @@ public class CommentApiController {
         log.info("memberId : {}", memberId);
         log.info("commentId : {}", commentId);
 
-        return new CommentApiResult<>(commentInPostService.insertLikedCommentByMemberId(memberId, commentId));
+        return getResult(commentInPostService.insertLikedCommentByMemberId(memberId, commentId));
     }
 
     @PostMapping("/collection/{commentId}/like/{memberId}")
@@ -76,12 +76,18 @@ public class CommentApiController {
         log.info("memberId : {}", memberId);
         log.info("commentId : {}", commentId);
 
-        return new CommentApiResult<>(commentInCollectionService.insertLikedCommentByMemberId(memberId, commentId));
+        return getResult(commentInCollectionService.insertLikedCommentByMemberId(memberId, commentId));
     }
 
     @Data
     @AllArgsConstructor
     public static class CommentApiResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> CommentApiResult<T> getResult(T data) {
+        return new CommentApiResult<>(data, true, "0", "성공");
     }
 }

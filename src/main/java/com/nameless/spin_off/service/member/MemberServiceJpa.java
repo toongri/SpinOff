@@ -4,12 +4,19 @@ import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.entity.enums.member.EmailLinkageProviderStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.member.EmailAuth;
+import com.nameless.spin_off.entity.member.EmailLinkage;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.member.EmailAuthRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
+import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -18,8 +25,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -31,12 +40,17 @@ public class MemberServiceJpa implements MemberService {
     private final CollectionRepository collectionRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
+    private final EmailAuthQueryRepository emailAuthQueryRepository;
+    private final EmailLinkageQueryRepository emailLinkageQueryRepository;
+    private final EmailAuthRepository emailAuthRepository;
+    private final EmailService emailService;
 
     @Transactional()
     @Override
-    public Long insertMemberByMemberVO(MemberRegisterRequestDto memberVO) throws AlreadyAccountIdException, AlreadyNicknameException {
+    public Long insertMemberByMemberVO(MemberRegisterRequestDto memberVO)
+            throws AlreadyAccountIdException, AlreadyNicknameException {
 
-        validateDuplicate(memberVO.getAccountId(), memberVO.getNickname());
+        validateDuplicate(memberVO.getAccountId(), memberVO.getNickname(), memberVO.getEmail());
 
         Member member = memberRepository.save(Member.createMemberByCreateVO(memberVO));
         collectionRepository.save(Collection.createDefaultCollection(member));
@@ -47,7 +61,14 @@ public class MemberServiceJpa implements MemberService {
     @Override
     public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
-        validateDuplicate(requestDto.getAccountId(), requestDto.getNickname());
+        validateDuplicate(requestDto.getAccountId(), requestDto.getNickname(), requestDto.getEmail());
+
+        EmailAuth emailAuth = emailAuthRepository.save(EmailAuth.builder()
+                .email(requestDto.getEmail())
+                .authToken(UUID.randomUUID().toString())
+                .expired(false)
+                .provider(EmailAuthProviderStatus.A)
+                .build());
 
         Member member = memberRepository.save(Member.buildMember()
                 .setNickname(requestDto.getNickname())
@@ -58,6 +79,7 @@ public class MemberServiceJpa implements MemberService {
                 .setName(requestDto.getName())
                 .build());
 
+        emailService.sendForRegister(emailAuth.getEmail(), emailAuth.getAuthToken());
         return MemberRegisterResponseDto.builder()
                 .id(member.getId())
                 .accountId(member.getAccountId())
@@ -66,12 +88,46 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
+    public void confirmEmail(EmailAuthRequestDto requestDto) {
+        EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
+                requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now(), EmailAuthProviderStatus.A)
+                .orElseThrow(NotExistEmailAuthTokenException::new);
+        Member member =
+                memberRepository.findOneByEmail(requestDto.getEmail()).orElseThrow(NotExistMemberException::new);
+        emailAuth.useToken();
+        member.updateEmailAuth(true);
+    }
+
+    @Transactional
+    @Override
+    public void emailLinkage(EmailLinkageRequestDto requestDto, EmailLinkageProviderStatus provider) {
+        EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
+                        requestDto.getAccountId(), requestDto.getAuthToken(), LocalDateTime.now(), provider)
+                .orElseThrow(NotExistEmailAuthTokenException::new);
+        Member member =
+                memberRepository
+                        .findOneByAccountId(requestDto.getAccountId()).orElseThrow(NotExistMemberException::new);
+        emailLinkage.useToken();
+        if (provider == EmailLinkageProviderStatus.A) {
+            member.updateGoogleEmail(requestDto.getEmail());
+        } else if (provider == EmailLinkageProviderStatus.B) {
+            member.updateNaverEmail(requestDto.getEmail());
+        } else {
+            member.updateKakaoEmail(requestDto.getEmail());
+        }
+    }
+
+    @Transactional
+    @Override
     public MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto) {
         Member member =
-                memberRepository.findByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
+                memberRepository.findOneByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
 
         if (!passwordEncoder.matches(requestDto.getAccountPw(), member.getAccountPw())) {
             throw new LoginFailureException();
+
+        } else if (!member.getEmailAuth()) {
+            throw new EmailNotAuthenticatedException();
         } else {
             member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
             return new MemberLoginResponseDto(
@@ -126,16 +182,18 @@ public class MemberServiceJpa implements MemberService {
         return member.addSearch(content, searchedByMemberStatus);
     }
 
-    private void validateDuplicate(String accountId, String nickname) {
+    private void validateDuplicate(String accountId, String nickname, String email) {
 
         List<Member> memberList = memberRepository
-                .findAllByAccountIdOrNickname(accountId, nickname);
+                .findAllByAccountIdOrNicknameOrEmail(accountId, nickname, email);
         if (memberList.isEmpty()) {
 
         } else if (memberList.stream().anyMatch(member -> member.getAccountId().equals(accountId))) {
+            throw new AlreadyAccountIdException();
+        } else if (memberList.stream().anyMatch(member -> member.getNickname().equals(nickname))) {
             throw new AlreadyNicknameException();
         } else {
-            throw new AlreadyAccountIdException();
+            throw new AlreadyEmailException();
         }
     }
 
@@ -143,7 +201,7 @@ public class MemberServiceJpa implements MemberService {
         Authentication auth = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String accountId = userDetails.getUsername();
-        return memberRepository.findByAccountId(accountId).orElseThrow(NotExistMemberException::new);
+        return memberRepository.findOneByAccountId(accountId).orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {

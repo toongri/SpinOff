@@ -58,6 +58,7 @@ public class Member extends BaseTimeEntity {
     private String naverEmail;
     private String kakaoEmail;
     private String refreshToken;
+    private Boolean emailAuth;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -182,7 +183,7 @@ public class Member extends BaseTimeEntity {
     //==생성 메소드==//
     public static Member createMember(String accountId, String accountPw, String nickname,
                                       String name, LocalDate birth, String phoneNumber, String email,
-                                      String googleEmail, String naverEmail, String kakaoEmail) {
+                                      String googleEmail, String naverEmail, String kakaoEmail, Boolean emailAuth) {
 
         Member member = new Member();
         member.updateAccountId(accountId);
@@ -197,9 +198,11 @@ public class Member extends BaseTimeEntity {
         member.updateGoogleEmail(googleEmail);
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
+        member.updateEmailAuth(emailAuth);
 
         return member;
     }
+
 
     public static Member createMemberByCreateVO(MemberRegisterRequestDto memberRegisterRequestDto) {
 
@@ -267,6 +270,10 @@ public class Member extends BaseTimeEntity {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
+    }
+
+    public void updateEmailAuth(Boolean emailAuth) {
+        this.emailAuth = emailAuth;
     }
 
     public Member updateGoogleEmail(String googleEmail) {

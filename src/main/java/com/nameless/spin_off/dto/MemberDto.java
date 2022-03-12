@@ -19,6 +19,32 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
+    public static class EmailAuthRequestDto {
+        private String email;
+        private String authToken;
+
+        public EmailAuthRequestDto(String email, String authToken) {
+            this.email = email;
+            this.authToken = authToken;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class EmailLinkageRequestDto {
+        private String email;
+        private String accountId;
+        private String authToken;
+
+        public EmailLinkageRequestDto(String email, String accountId, String authToken) {
+            this.email = email;
+            this.accountId = accountId;
+            this.authToken = authToken;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class SocialMemberDto {
         private String email;
         private String name;
@@ -37,6 +63,15 @@ public class MemberDto {
     public static class TokenResponseDto {
         String accessToken;
         String refreshToken;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class OauthResponseDto {
+        Boolean isSuccess;
+        String code;
+        String message;
+        TokenResponseDto data;
     }
 
     @Data
@@ -190,6 +225,7 @@ public class MemberDto {
         private String googleEmail;
         private String kakaoEmail;
         private String naverEmail;
+        private Boolean emailAuth = false;
 
         public MemberBuilder setAccountId(String accountId) {
             this.accountId = accountId;
@@ -241,9 +277,14 @@ public class MemberDto {
             return this;
         }
 
+        public MemberBuilder setEmailAuth(Boolean emailAuth) {
+            this.emailAuth = emailAuth;
+            return this;
+        }
+
         public Member build() {
             return Member.createMember(accountId, accountPw, nickname,name, birth, phoneNumber, email,
-                    googleEmail, naverEmail, kakaoEmail);
+                    googleEmail, naverEmail, kakaoEmail, emailAuth);
         }
     }
 }

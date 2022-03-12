@@ -3,6 +3,7 @@ package com.nameless.spin_off.config;
 import com.nameless.spin_off.config.AccessDeniedHandler.CustomAccessDeniedHandler;
 import com.nameless.spin_off.config.AuthenticationEntryPoint.CustomAuthenticationEntryPoint;
 import com.nameless.spin_off.config.auth.CustomOAuth2UserService;
+import com.nameless.spin_off.config.auth.OAuth2FailureHandler;
 import com.nameless.spin_off.config.auth.OAuth2SuccessHandler;
 import com.nameless.spin_off.config.jwt.JwtAuthenticationFilter;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
@@ -24,6 +25,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final CustomOAuth2UserService oAuth2UserService;
     private final JwtTokenProvider jwtTokenProvider;
     private final OAuth2SuccessHandler successHandler;
+    private final OAuth2FailureHandler failureHandler;
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -49,6 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
                 .and()
                     .oauth2Login()
+                        .failureHandler(failureHandler)
                         .successHandler(successHandler)
                         .userInfoEndpoint().userService(oAuth2UserService);
 

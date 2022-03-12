@@ -3,6 +3,7 @@ package com.nameless.spin_off.config.auth;
 import com.nameless.spin_off.config.auth.dto.OAuth2Attribute;
 import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.exception.member.AlreadyAuthEmailException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -66,6 +67,8 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
     private Member getMember(String registrationId, OAuth2Attribute attributes) {
 
+        isAlreadyAuth(attributes.getEmail(), registrationId);
+
         if ("naver".equals(registrationId)) {
             return memberRepository
                     .findByNaverEmailWithRoles(attributes.getEmail())
@@ -81,6 +84,29 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                     .findByGoogleEmailWithRoles(attributes.getEmail())
                     .orElseGet(() ->
                             memberRepository.save(attributes.toGoogleEntity(getRandomNickname(), getAccountId())));
+        }
+    }
+
+    private void isAlreadyAuth(String email, String registrationId) {
+
+        Optional<Member> optionalMember = memberRepository.findByEmailWithRoles(email);
+        if (optionalMember.isPresent()) {
+            if ("naver".equals(registrationId)) {
+                if (optionalMember.get().getNaverEmail() == null) {
+                    throw new AlreadyAuthEmailException(
+                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                }
+            } else if ("kakao".equals(registrationId)) {
+                if (optionalMember.get().getKakaoEmail() == null) {
+                    throw new AlreadyAuthEmailException(
+                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                }
+            } else {
+                if (optionalMember.get().getGoogleEmail() == null) {
+                    throw new AlreadyAuthEmailException(
+                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                }
+            }
         }
     }
 
@@ -100,7 +126,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     private String getAccountId() {
         String randomAccountId = RandomStringUtils.randomAlphabetic(8);
 
-        Optional<Member> member = memberRepository.findByAccountId(randomAccountId);
+        Optional<Member> member = memberRepository.findOneByAccountId(randomAccountId);
 
         while (member.isPresent()) {
             randomAccountId = RandomStringUtils.randomAlphabetic(8);

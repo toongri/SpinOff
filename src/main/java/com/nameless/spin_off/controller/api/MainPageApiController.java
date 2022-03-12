@@ -50,7 +50,7 @@ public class MainPageApiController {
         log.info("collectionPageable.getPageSize() : {}", collectionPageable.getPageSize());
         log.info("collectionPageable.getSort() : {}", collectionPageable.getSort());
 
-        return new MainPageResult<>(
+        return getResult(
                 mainPageService.getDiscoveryData(popularPostPageable, latestPostPageable, collectionPageable, memberId));
     }
 
@@ -85,7 +85,7 @@ public class MainPageApiController {
         log.info("collectionPageable.getPageSize() : {}", collectionPageable.getPageSize());
         log.info("collectionPageable.getSort() : {}", collectionPageable.getSort());
 
-        return new MainPageResult<>(
+        return getResult(
                 mainPageService.getFollowData(memberPageable, hashtagPageable, moviePageable,
                         collectionPageable, memberId));
     }
@@ -94,6 +94,12 @@ public class MainPageApiController {
     @AllArgsConstructor
     public static class MainPageResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> MainPageResult<T> getResult(T data) {
+        return new MainPageResult<>(data, true, "0", "성공");
     }
 
 }

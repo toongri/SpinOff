@@ -1,15 +1,13 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.MemberDto.*;
+import com.nameless.spin_off.entity.enums.member.EmailLinkageProviderStatus;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -23,6 +21,13 @@ public class SignApiController {
     public SignResult<MemberRegisterResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) {
         MemberRegisterResponseDto responseDto = memberService.registerMember(requestDto);
 
+        log.info("register");
+        log.info("accountId : {}", requestDto.getAccountId());
+        log.info("accountPw : {}", requestDto.getAccountPw());
+        log.info("name : {}", requestDto.getName());
+        log.info("nickname : {}", requestDto.getNickname());
+        log.info("birth : {}", requestDto.getBirth());
+        log.info("email : {}", requestDto.getEmail());
         return getResult(responseDto);
     }
 
@@ -38,13 +43,39 @@ public class SignApiController {
         return getResult(responseDto);
     }
 
+    @GetMapping("/confirm-email")
+    public SignResult<String> confirmEmail(@ModelAttribute EmailAuthRequestDto requestDto) {
+        memberService.confirmEmail(requestDto);
+        return getResult("인증이 완료되었습니다.");
+    }
+
+    @GetMapping("/linkage-email/naver")
+    public SignResult<String> linkageEmailNaver(@ModelAttribute EmailLinkageRequestDto requestDto) {
+        memberService.emailLinkage(requestDto, EmailLinkageProviderStatus.B);
+        return getResult("연동이 완료되었습니다.");
+    }
+
+    @GetMapping("/linkage-email/kakao")
+    public SignResult<String> linkageEmailKakao(@ModelAttribute EmailLinkageRequestDto requestDto) {
+        memberService.emailLinkage(requestDto, EmailLinkageProviderStatus.C);
+        return getResult("연동이 완료되었습니다.");
+    }
+
+    @GetMapping("/linkage-email/google")
+    public SignResult<String> linkageEmailGoogle(@ModelAttribute EmailLinkageRequestDto requestDto) {
+        memberService.emailLinkage(requestDto, EmailLinkageProviderStatus.A);
+        return getResult("연동이 완료되었습니다.");
+    }
+
     @Data
     @AllArgsConstructor
     public static class SignResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
     }
     public <T> SignResult<T> getResult(T data) {
-
-        return new SignResult<>(data);
+        return new SignResult<>(data, true, "0", "성공");
     }
 }

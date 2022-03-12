@@ -16,7 +16,7 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResult> userExHandler(RuntimeException e) {
         log.error("[exceptionHandler] ex", e);
-        ErrorResult errorResult = new ErrorResult("BAD", e.getMessage());
+        ErrorResult errorResult = new ErrorResult(false, "BAD", e.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
@@ -24,6 +24,6 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ErrorResult exHandler(Exception e) {
         log.error("[exceptionHandler] ex", e);
-        return new ErrorResult("EX", "내부 오류");
+        return new ErrorResult(false, "EX", "내부 오류");
     }
 }

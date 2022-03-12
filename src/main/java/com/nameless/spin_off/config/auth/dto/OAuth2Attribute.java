@@ -73,25 +73,30 @@ public class OAuth2Attribute {
         return Member.buildMember()
                 .setAccountId(accountId)
                 .setName(name)
+                .setEmail(email)
                 .setGoogleEmail(email)
                 .setNickname(nickname)
+                .setEmailAuth(true)
                 .build();
-
     }
     public Member toKakaoEntity(String nickname, String accountId) {
         return Member.buildMember()
                 .setAccountId(accountId)
                 .setName(name)
+                .setEmail(email)
                 .setKakaoEmail(email)
                 .setNickname(nickname)
+                .setEmailAuth(true)
                 .build();
     }
     public Member toNaverEntity(String nickname, String accountId) {
         return Member.buildMember()
                 .setAccountId(accountId)
                 .setName(name)
+                .setEmail(email)
                 .setNaverEmail(email)
                 .setNickname(nickname)
+                .setEmailAuth(true)
                 .build();
     }
 }

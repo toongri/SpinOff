@@ -45,7 +45,7 @@ public class SearchApiController {
             @PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<>(
+        return getResult(
                 searchQueryService.getRelatedSearchAllByKeyword(keyword, length));
     }
 
@@ -54,7 +54,7 @@ public class SearchApiController {
             @PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<>(
+        return getResult(
                 searchQueryService.getRelatedSearchHashtagByKeyword(keyword, length));
     }
 
@@ -63,7 +63,7 @@ public class SearchApiController {
             (@PathVariable String keyword, @RequestParam int length)
             throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
 
-        return new SearchApiResult<>(
+        return getResult(
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
     }
 
@@ -72,7 +72,7 @@ public class SearchApiController {
             @PathVariable Long memberId, @RequestParam int length)
             throws NotExistMemberException {
 
-        return new SearchApiResult<>(searchQueryService.getLastSearchesByMemberLimit(memberId, length));
+        return getResult(searchQueryService.getLastSearchesByMemberLimit(memberId, length));
     }
 
     @GetMapping("/all/{keyword}/first")
@@ -88,7 +88,7 @@ public class SearchApiController {
                     Pageable moviePageable)
             throws NotExistMemberException {
 
-        return new SearchApiResult<>(
+        return getResult(
                 searchQueryService.getSearchPageDataAtAllFirst(keyword, memberId, length,
                         postPageable, collectionPageable, memberPageable, moviePageable));
     }
@@ -106,7 +106,7 @@ public class SearchApiController {
                     Pageable moviePageable)
             throws NotExistMemberException {
 
-        return new SearchApiResult<>(
+        return getResult(
                 searchQueryService.getSearchPageDataAtAll(
                         keyword, memberId,
                         postPageable,
@@ -130,7 +130,7 @@ public class SearchApiController {
         log.info("length : {}", length);
 
 
-        return new SearchApiResult<>(postQueryService
+        return getResult(postQueryService
                 .getPostsByHashtagsSlicedForSearchPageFirst(pageable, hashtagContents, memberId, length));
     }
 
@@ -146,7 +146,7 @@ public class SearchApiController {
         log.info("pageable.getSort() : {}", pageable.getSort());
         log.info("hashtagContents : {}", hashtagContents);
 
-        return new SearchApiResult<>(postQueryService
+        return getResult(postQueryService
                 .getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, memberId));
     }
 
@@ -163,7 +163,7 @@ public class SearchApiController {
         log.info("keyword : {}", keyword);
         log.info("length : {}", length);
 
-        return new SearchApiResult<>(movieQueryService.getSearchPageMovieAtMovieSlicedFirst(keyword, pageable, length));
+        return getResult(movieQueryService.getSearchPageMovieAtMovieSlicedFirst(keyword, pageable, length));
     }
 
     @GetMapping("/movie/{keyword}")
@@ -177,7 +177,7 @@ public class SearchApiController {
         log.info("pageable.getSort() : {}", pageable.getSort());
         log.info("keyword : {}", keyword);
 
-        return new SearchApiResult<>(
+        return getResult(
                 movieQueryService.getSearchPageMovieAtMovieSliced(keyword, pageable));
     }
 
@@ -195,7 +195,7 @@ public class SearchApiController {
         log.info("keyword : {}", keyword);
         log.info("length : {}", length);
 
-        return new SearchApiResult<>(
+        return getResult(
                 memberQueryService.getSearchPageMemberAtMemberSlicedFirst(keyword, pageable, memberId, length));
     }
 
@@ -212,7 +212,7 @@ public class SearchApiController {
         log.info("pageable.getSort() : {}", pageable.getSort());
         log.info("keyword : {}", keyword);
 
-        return new SearchApiResult<>(
+        return getResult(
                 memberQueryService.getSearchPageMemberAtMemberSliced(keyword, pageable, memberId));
     }
 
@@ -230,7 +230,7 @@ public class SearchApiController {
         log.info("keyword : {}", keyword);
         log.info("length : {}", length);
 
-        return new SearchApiResult<>(collectionQueryService
+        return getResult(collectionQueryService
                 .getSearchPageCollectionAtCollectionSlicedFirst(keyword, pageable, memberId, length));
     }
 
@@ -246,7 +246,7 @@ public class SearchApiController {
         log.info("pageable.getSort() : {}", pageable.getSort());
         log.info("keyword : {}", keyword);
 
-        return new SearchApiResult<>(
+        return getResult(
                 collectionQueryService.getSearchPageCollectionAtCollectionSliced(keyword, pageable, memberId));
     }
 
@@ -254,5 +254,11 @@ public class SearchApiController {
     @AllArgsConstructor
     public static class SearchApiResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> SearchApiResult<T> getResult(T data) {
+        return new SearchApiResult<>(data, true, "0", "성공");
     }
 }

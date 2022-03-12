@@ -1,9 +1,10 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
-import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
+import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,21 +20,6 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
-    @PostMapping("")
-    public MemberApiResult<Long> createOne(@RequestBody MemberRegisterRequestDto memberRegisterRequestDto)
-            throws AlreadyAccountIdException, AlreadyNicknameException {
-
-        log.info("createOne");
-        log.info("accountId : {}", memberRegisterRequestDto.getAccountId());
-        log.info("accountPw : {}", memberRegisterRequestDto.getAccountPw());
-        log.info("name : {}", memberRegisterRequestDto.getName());
-        log.info("nickname : {}", memberRegisterRequestDto.getNickname());
-        log.info("birth : {}", memberRegisterRequestDto.getBirth());
-        log.info("email : {}", memberRegisterRequestDto.getEmail());
-
-        return new MemberApiResult<>(memberService.insertMemberByMemberVO(memberRegisterRequestDto));
-    }
-
     @PostMapping("/{followedMemberId}/follow/{memberId}")
     public MemberApiResult<Long> createFollowOne(
             @PathVariable Long memberId, @PathVariable Long followedMemberId)
@@ -43,7 +29,7 @@ public class MemberApiController {
         log.info("memberId : {}", memberId);
         log.info("followedMemberId : {}", followedMemberId);
 
-        return new MemberApiResult<>(memberService.insertFollowedMemberByMemberId(memberId, followedMemberId));
+        return getResult(memberService.insertFollowedMemberByMemberId(memberId, followedMemberId));
     }
 
     @PostMapping("/{blockedMemberId}/block/{memberId}")
@@ -57,7 +43,7 @@ public class MemberApiController {
         log.info("blockedMemberId : {}", blockedMemberId);
         log.info("blockedMemberStatus : {}", blockedMemberStatus);
 
-        return new MemberApiResult<>(memberService
+        return getResult(memberService
                 .insertBlockedMemberByMemberId(memberId, blockedMemberId, blockedMemberStatus));
     }
 
@@ -72,12 +58,18 @@ public class MemberApiController {
         log.info("keyword : {}", keyword);
         log.info("searchedByMemberStatus : {}", searchedByMemberStatus);
 
-        return new MemberApiResult<>(memberService.insertSearch(memberId, keyword, searchedByMemberStatus));
+        return getResult(memberService.insertSearch(memberId, keyword, searchedByMemberStatus));
     }
 
     @Data
     @AllArgsConstructor
     public static class MemberApiResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> MemberApiResult<T> getResult(T data) {
+        return new MemberApiResult<>(data, true, "0", "성공");
     }
 }

@@ -3,6 +3,7 @@ package com.nameless.spin_off.config.auth;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameless.spin_off.config.auth.dto.UserRequestMapper;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
+import com.nameless.spin_off.dto.MemberDto.OauthResponseDto;
 import com.nameless.spin_off.dto.MemberDto.SocialMemberDto;
 import com.nameless.spin_off.dto.MemberDto.TokenResponseDto;
 import com.nameless.spin_off.entity.member.Member;
@@ -66,13 +67,15 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private void writeTokenResponse(HttpServletResponse response, TokenResponseDto token)
             throws IOException {
         response.setContentType("text/html;charset=UTF-8");
-
-        response.addHeader("accessToken", token.getAccessToken());
-        response.addHeader("refreshToken", token.getRefreshToken());
+        response.addHeader("isSuccess", String.valueOf(true));
+        response.addHeader("code", "0");
+        response.addHeader("message", "성공");
+        response.addHeader("data", String.valueOf(token));
         response.setContentType("application/json;charset=UTF-8");
 
         var writer = response.getWriter();
-        writer.println(objectMapper.writeValueAsString(token));
+        writer.println(objectMapper.writeValueAsString(new OauthResponseDto(
+                true, "0", "성공", token)));
         writer.flush();
     }
 }

@@ -40,12 +40,18 @@ public class HelpApiController {
         log.info("contentTypeStatus : {}", contentTypeStatus);
         log.info("complainStatus : {}", complainStatus);
 
-        return new HelpResult<>(complainService.insertComplain(memberId, contentId, contentTypeStatus, complainStatus));
+        return getResult(complainService.insertComplain(memberId, contentId, contentTypeStatus, complainStatus));
     }
 
     @Data
     @AllArgsConstructor
     public static class HelpResult<T> {
         private T data;
+        Boolean isSuccess;
+        String code;
+        String message;
+    }
+    public <T> HelpResult<T> getResult(T data) {
+        return new HelpResult<>(data, true, "0", "성공");
     }
 }

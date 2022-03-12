@@ -11,7 +11,7 @@ import java.util.Optional;
 public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByNickname(String nickname);
-    Optional<Member> findByAccountId(String accountId);
+    Optional<Member> findOneByAccountId(String accountId);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +
@@ -22,6 +22,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "LEFT JOIN FETCH m.roles role " +
             "WHERE m.naverEmail = :naverEmail")
     Optional<Member> findByNaverEmailWithRoles(@Param("naverEmail") String naverEmail);
+
+
+    @Query("SELECT m FROM Member m " +
+            "LEFT JOIN FETCH m.roles role " +
+            "WHERE m.email = :email")
+    Optional<Member> findByEmailWithRoles(@Param("email") String email);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +
@@ -95,12 +101,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowedCollectionAndBlockedMember(@Param("id") Long id);
 
-    List<Member> findAllByAccountIdOrNickname(String accountId, String nickname);
+    List<Member> findAllByAccountIdOrNicknameOrEmail(String accountId, String nickname, String email);
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.searches " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithSearch(@Param("id") Long id);
+
+    Optional<Member> findOneByEmail(String email);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.blockingMembers blockingMembers " +
