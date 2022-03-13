@@ -1,6 +1,5 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.enums.member.EmailLinkageProviderStatus;
 import com.nameless.spin_off.entity.member.EmailLinkage;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -19,15 +18,16 @@ public class EmailLinkageQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     public Optional<EmailLinkage> findValidLinkageByEmail(
-            String accountId, String authToken, LocalDateTime currentTime, EmailLinkageProviderStatus provider) {
+            String accountId, String email,
+            String authToken, LocalDateTime currentTime) {
         EmailLinkage firstEmailLinkage = jpaQueryFactory
                 .selectFrom(emailLinkage)
                 .where(
                         emailLinkage.accountId.eq(accountId),
+                        emailLinkage.email.eq(email),
                         emailLinkage.authToken.eq(authToken),
                         emailLinkage.expireDate.goe(currentTime),
-                        emailLinkage.expired.eq(false),
-                        emailLinkage.provider.eq(provider))
+                        emailLinkage.expired.eq(false))
                 .orderBy(emailLinkage.id.desc())
                 .fetchFirst();
 

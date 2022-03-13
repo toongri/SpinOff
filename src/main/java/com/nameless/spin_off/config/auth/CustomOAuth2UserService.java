@@ -22,6 +22,9 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.KAKAO;
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.NAVER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -69,12 +72,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         isAlreadyAuth(attributes.getEmail(), registrationId);
 
-        if ("naver".equals(registrationId)) {
+        if (NAVER.getValue().equals(registrationId)) {
             return memberRepository
                     .findByNaverEmailWithRoles(attributes.getEmail())
                     .orElseGet(() ->
                             memberRepository.save(attributes.toNaverEntity(getRandomNickname(), getAccountId())));
-        } else if ("kakao".equals(registrationId)) {
+        } else if (KAKAO.getValue().equals(registrationId)) {
             return memberRepository
                     .findByKakaoEmailWithRoles(attributes.getEmail())
                     .orElseGet(() ->
@@ -91,12 +94,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
 
         Optional<Member> optionalMember = memberRepository.findByEmailWithRoles(email);
         if (optionalMember.isPresent()) {
-            if ("naver".equals(registrationId)) {
+            if (NAVER.getValue().equals(registrationId)) {
                 if (optionalMember.get().getNaverEmail() == null) {
                     throw new AlreadyAuthEmailException(
                             "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
                 }
-            } else if ("kakao".equals(registrationId)) {
+            } else if (KAKAO.getValue().equals(registrationId)) {
                 if (optionalMember.get().getKakaoEmail() == null) {
                     throw new AlreadyAuthEmailException(
                             "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");

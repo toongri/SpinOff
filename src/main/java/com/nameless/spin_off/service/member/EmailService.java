@@ -25,7 +25,21 @@ public class EmailService {
         smm.setFrom(userEmail);
         smm.setTo(email);
         smm.setSubject("회원가입 이메일 인증");
-        smm.setText("http://localhost:8080/api/sign/confirm-email?email="+email+"&authToken="+authToken);
+        smm.setText("http://localhost:8080/api/sign/confirm-email?email=" + email + "&authToken=" + authToken);
+
+        javaMailSender.send(smm);
+    }
+
+    @Async
+    public void sendForLinkageEmail(String email, String authToken, String accountId) {
+
+        SimpleMailMessage smm = new SimpleMailMessage();
+
+        smm.setFrom(userEmail);
+        smm.setTo(email);
+        smm.setSubject("이메일 연동 인증");
+        smm.setText("http://localhost:8080/api/sign/linkage-email/check?email="
+                + email + "&authToken=" + authToken + "&accountId=" + accountId);
 
         javaMailSender.send(smm);
     }

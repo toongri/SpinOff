@@ -21,6 +21,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.KAKAO;
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.NAVER;
+
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -52,10 +55,10 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private Member getMemberByEmail(String email) {
         String provider = email.substring(email.indexOf("@") + 1, email.indexOf("."));
 
-        if ("naver".equals(provider)) {
+        if (NAVER.getValue().equals(provider)) {
             return memberRepository
                     .findByNaverEmailWithRoles(email).get();
-        } else if ("kakao".equals(provider)) {
+        } else if (KAKAO.getValue().equals(provider)) {
             return memberRepository
                     .findByKakaoEmailWithRoles(email).get();
         } else {

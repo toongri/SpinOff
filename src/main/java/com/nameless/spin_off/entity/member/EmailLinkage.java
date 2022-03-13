@@ -1,14 +1,15 @@
 package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.entity.enums.member.EmailLinkageProviderStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.time.LocalDateTime;
 
 @Entity
@@ -23,20 +24,17 @@ public class EmailLinkage extends BaseTimeEntity {
     private Long id;
 
     private String accountId;
+    private String email;
     private String authToken;
     private Boolean expired;
     private LocalDateTime expireDate;
 
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private EmailLinkageProviderStatus provider;
-
     @Builder
-    public EmailLinkage(String accountId, String authToken, Boolean expired, EmailLinkageProviderStatus provider) {
+    public EmailLinkage(String accountId, String email, String authToken, Boolean expired) {
         this.accountId = accountId;
+        this.email = email;
         this.authToken = authToken;
         this.expired = expired;
-        this.provider = provider;
         this.expireDate = LocalDateTime.now().plusMinutes(MAX_EXPIRE_TIME);
     }
 

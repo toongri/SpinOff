@@ -31,12 +31,24 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
-    public static class EmailLinkageRequestDto {
+    public static class EmailLinkageUpdateRequestDto {
+        private String email;
+        private String accountId;
+
+        public EmailLinkageUpdateRequestDto(String email, String accountId) {
+            this.email = email;
+            this.accountId = accountId;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class EmailLinkageCheckRequestDto {
         private String email;
         private String accountId;
         private String authToken;
 
-        public EmailLinkageRequestDto(String email, String accountId, String authToken) {
+        public EmailLinkageCheckRequestDto(String email, String accountId, String authToken) {
             this.email = email;
             this.accountId = accountId;
             this.authToken = authToken;

@@ -30,7 +30,7 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
 
         log.error("[exceptionHandler] ex", exception);
 

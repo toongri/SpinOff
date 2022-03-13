@@ -12,6 +12,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     Optional<Member> findByNickname(String nickname);
     Optional<Member> findOneByAccountId(String accountId);
+    Optional<Member> findOneByGoogleEmail(String googleEmail);
+    Optional<Member> findOneByNaverEmail(String naverEmail);
+    Optional<Member> findOneByKakaoEmail(String kakaoEmail);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +

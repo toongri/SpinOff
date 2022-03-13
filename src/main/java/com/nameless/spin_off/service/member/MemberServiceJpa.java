@@ -5,7 +5,6 @@ import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
-import com.nameless.spin_off.entity.enums.member.EmailLinkageProviderStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.EmailLinkage;
@@ -14,6 +13,7 @@ import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.EmailAuthRepository;
+import com.nameless.spin_off.repository.member.EmailLinkageRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
 import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -43,6 +45,7 @@ public class MemberServiceJpa implements MemberService {
     private final EmailAuthQueryRepository emailAuthQueryRepository;
     private final EmailLinkageQueryRepository emailLinkageQueryRepository;
     private final EmailAuthRepository emailAuthRepository;
+    private final EmailLinkageRepository emailLinkageRepository;
     private final EmailService emailService;
 
     @Transactional()
@@ -50,7 +53,7 @@ public class MemberServiceJpa implements MemberService {
     public Long insertMemberByMemberVO(MemberRegisterRequestDto memberVO)
             throws AlreadyAccountIdException, AlreadyNicknameException {
 
-        validateDuplicate(memberVO.getAccountId(), memberVO.getNickname(), memberVO.getEmail());
+        validateDuplicateAtRegister(memberVO.getAccountId(), memberVO.getNickname(), memberVO.getEmail());
 
         Member member = memberRepository.save(Member.createMemberByCreateVO(memberVO));
         collectionRepository.save(Collection.createDefaultCollection(member));
@@ -61,7 +64,7 @@ public class MemberServiceJpa implements MemberService {
     @Override
     public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
-        validateDuplicate(requestDto.getAccountId(), requestDto.getNickname(), requestDto.getEmail());
+        validateDuplicateAtRegister(requestDto.getAccountId(), requestDto.getNickname(), requestDto.getEmail());
 
         EmailAuth emailAuth = emailAuthRepository.save(EmailAuth.builder()
                 .email(requestDto.getEmail())
@@ -100,21 +103,40 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public void emailLinkage(EmailLinkageRequestDto requestDto, EmailLinkageProviderStatus provider) {
+    public void emailLinkageCheck(EmailLinkageCheckRequestDto requestDto) {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
-                        requestDto.getAccountId(), requestDto.getAuthToken(), LocalDateTime.now(), provider)
+                        requestDto.getAccountId(), requestDto.getEmail(),
+                        requestDto.getAuthToken(), LocalDateTime.now())
                 .orElseThrow(NotExistEmailAuthTokenException::new);
+
         Member member =
                 memberRepository
                         .findOneByAccountId(requestDto.getAccountId()).orElseThrow(NotExistMemberException::new);
+
+        String provider = getProviderByEmail(requestDto.getEmail());
+
         emailLinkage.useToken();
-        if (provider == EmailLinkageProviderStatus.A) {
+
+        if (GOOGLE.getValue().equals(provider)) {
             member.updateGoogleEmail(requestDto.getEmail());
-        } else if (provider == EmailLinkageProviderStatus.B) {
+        } else if (NAVER.getValue().equals(provider)) {
             member.updateNaverEmail(requestDto.getEmail());
         } else {
             member.updateKakaoEmail(requestDto.getEmail());
         }
+    }
+
+    @Override
+    public void emailLinkageUpdate(EmailLinkageUpdateRequestDto requestDto) {
+        validateDuplicateAtLinkage(requestDto.getEmail());
+
+        emailLinkageRepository.save(EmailLinkage.builder()
+                .email(requestDto.getEmail())
+                .accountId(requestDto.getAccountId())
+                .authToken(UUID.randomUUID().toString())
+                .expired(false)
+                .build());
+
     }
 
     @Transactional
@@ -182,7 +204,7 @@ public class MemberServiceJpa implements MemberService {
         return member.addSearch(content, searchedByMemberStatus);
     }
 
-    private void validateDuplicate(String accountId, String nickname, String email) {
+    private void validateDuplicateAtRegister(String accountId, String nickname, String email) {
 
         List<Member> memberList = memberRepository
                 .findAllByAccountIdOrNicknameOrEmail(accountId, nickname, email);
@@ -195,6 +217,28 @@ public class MemberServiceJpa implements MemberService {
         } else {
             throw new AlreadyEmailException();
         }
+    }
+
+    private void validateDuplicateAtLinkage(String email) {
+
+        String provider = getProviderByEmail(email);
+        Optional<Member> optionalMember;
+
+        if (NAVER.getValue().equals(provider)) {
+            optionalMember = memberRepository.findOneByNaverEmail(email);
+        } else if (KAKAO.getValue().equals(provider)) {
+            optionalMember = memberRepository.findOneByKakaoEmail(email);
+        } else {
+            optionalMember = memberRepository.findOneByGoogleEmail(email);
+        }
+
+        if (optionalMember.isPresent()) {
+            throw new AlreadyLinkageEmailException();
+        }
+    }
+
+    private String getProviderByEmail(String email) {
+        return email.substring(email.indexOf("@") + 1, email.indexOf("."));
     }
 
     public Member findMemberByToken(TokenRequestDto requestDto) {
