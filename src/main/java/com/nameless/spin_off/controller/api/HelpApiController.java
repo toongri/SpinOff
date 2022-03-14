@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -15,7 +16,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -25,9 +29,9 @@ public class HelpApiController {
 
     private final ComplainService complainService;
 
-    @PostMapping("{memberId}/complain")
+    @PostMapping("/complain")
     public HelpResult<Long> createOne(
-            @PathVariable Long memberId, @RequestParam() Long contentId,
+            @LoginMemberId Long memberId, @RequestParam() Long contentId,
             @RequestParam ContentTypeStatus contentTypeStatus,
             @RequestParam("status") ComplainStatus complainStatus) throws
             NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,

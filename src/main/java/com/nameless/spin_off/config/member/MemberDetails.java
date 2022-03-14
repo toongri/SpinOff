@@ -9,12 +9,14 @@ import java.util.List;
 
 public class MemberDetails implements UserDetails {
 
+    private Long id;
     private String accountId;
     private String accountPw;
     List<GrantedAuthority> authorities;
 
     @Builder
-    public MemberDetails(String accountId, String accountPw, List<GrantedAuthority> authorities) {
+    public MemberDetails(Long id, String accountId, String accountPw, List<GrantedAuthority> authorities) {
+        this.id = id;
         this.accountId = accountId;
         this.accountPw = accountPw;
         this.authorities = authorities;
@@ -33,6 +35,10 @@ public class MemberDetails implements UserDetails {
     @Override
     public String getUsername() {
         return accountId;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     @Override

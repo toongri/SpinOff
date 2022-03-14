@@ -28,9 +28,10 @@ public class JpaCommentInPostService implements CommentInPostService {
 
     @Transactional()
     @Override
-    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO) throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
+    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId)
+            throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
 
-        Member member = getMemberById(commentVO.getMemberId());
+        Member member = getMemberById(memberId);
         Post post = getPostById(commentVO.getPostId());
         CommentInPost parent = post.getParentCommentById(commentVO.getParentId());
 

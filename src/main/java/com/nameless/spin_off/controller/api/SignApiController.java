@@ -1,16 +1,12 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.dto.MemberDto.*;
-import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
-import com.nameless.spin_off.exception.member.NotCorrectEmailRequest;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
 
 @Slf4j
 @RestController
@@ -56,41 +52,6 @@ public class SignApiController {
     public SignResult<String> linkageEmail(@ModelAttribute EmailLinkageCheckRequestDto requestDto) {
         memberService.emailLinkageCheck(requestDto);
         return getResult("연동이 완료되었습니다.");
-    }
-
-    @GetMapping("/linkage-email/naver")
-    public SignResult<String> linkageEmailNaver(@RequestBody EmailLinkageUpdateRequestDto requestDto) {
-        if (isNotCorrectEmail(requestDto.getEmail(), NAVER)) {
-            throw new NotCorrectEmailRequest();
-        }
-        memberService.emailLinkageUpdate(requestDto);
-        return getResult("메일을 확인하여 주시기 바랍니다.");
-    }
-
-    @GetMapping("/linkage-email/kakao")
-    public SignResult<String> linkageEmailKakao(@RequestBody EmailLinkageUpdateRequestDto requestDto) {
-        if (isNotCorrectEmail(requestDto.getEmail(), KAKAO)) {
-            throw new NotCorrectEmailRequest();
-        }
-        memberService.emailLinkageUpdate(requestDto);
-        return getResult("메일을 확인하여 주시기 바랍니다.");
-    }
-
-    @GetMapping("/linkage-email/google")
-    public SignResult<String> linkageEmailGoogle(@RequestBody EmailLinkageUpdateRequestDto requestDto) {
-        if (isNotCorrectEmail(requestDto.getEmail(), GOOGLE)) {
-            throw new NotCorrectEmailRequest();
-        }
-        memberService.emailLinkageUpdate(requestDto);
-        return getResult("메일을 확인하여 주시기 바랍니다.");
-    }
-
-    private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {
-        return !getProviderByEmail(email).equals(provider.getValue());
-    }
-
-    private String getProviderByEmail(String email) {
-        return email.substring(email.indexOf("@") + 1, email.indexOf("."));
     }
 
     @Data

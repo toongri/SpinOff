@@ -27,10 +27,10 @@ public class CollectionServiceJpa implements CollectionService {
 
     @Transactional()
     @Override
-    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO)
+    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO, Long memberId)
             throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
 
-        Member member = getMemberById(collectionVO.getMemberId());
+        Member member = getMemberById(memberId);
         Collection collection = Collection.createCollection(
                 member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
 

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -19,20 +20,21 @@ public class CollectionApiController {
     private final CollectionService collectionService;
 
     @PostMapping("")
-    public CollectionApiResult<Long> createOne(@RequestBody CreateCollectionVO collectionVO)
+    public CollectionApiResult<Long> createOne(
+            @LoginMemberId Long memberId, @RequestBody CreateCollectionVO collectionVO)
             throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
 
         log.info("createOne");
-        log.info("memberId : {}", collectionVO.getMemberId());
+        log.info("memberId : {}", memberId);
         log.info("title : {}", collectionVO.getTitle());
         log.info("content : {}", collectionVO.getContent());
         log.info("publicOfCollectionStatus : {}", collectionVO.getPublicOfCollectionStatus());
 
-        return getResult(collectionService.insertCollectionByCollectionVO(collectionVO));
+        return getResult(collectionService.insertCollectionByCollectionVO(collectionVO, memberId));
     }
 
-    @PostMapping("/{collectionId}/like/{memberId}")
-    public CollectionApiResult<Long> createLikeOne(@PathVariable Long collectionId, @PathVariable Long memberId)
+    @PostMapping("/{collectionId}/like")
+    public CollectionApiResult<Long> createLikeOne(@PathVariable Long collectionId, @LoginMemberId Long memberId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
@@ -54,8 +56,8 @@ public class CollectionApiController {
         return getResult(collectionService.insertViewedCollectionByIp(ip, collectionId));
     }
 
-    @PostMapping("/{collectionId}/follow/{memberId}")
-    public CollectionApiResult<Long> createFollowOne(@PathVariable Long memberId, @PathVariable Long collectionId)
+    @PostMapping("/{collectionId}/follow")
+    public CollectionApiResult<Long> createFollowOne(@LoginMemberId Long memberId, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,
             NotExistCollectionException, CantFollowOwnCollectionException {
 

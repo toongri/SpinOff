@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMovieException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -32,9 +33,9 @@ public class MovieApiController {
         return getResult(movieService.insertViewedMovieByIp(ip, movieId));
     }
 
-    @PostMapping("/{movieId}/follow/{memberId}")
+    @PostMapping("/{movieId}/follow")
     public MovieResult<Long> createFollowOne(
-            @PathVariable Long memberId, @PathVariable Long movieId)
+            @LoginMemberId Long memberId, @PathVariable Long movieId)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
         log.info("createFollowOne");

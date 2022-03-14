@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.dto.MainPageDto.MainPageDiscoveryDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -14,7 +15,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -27,7 +27,7 @@ public class MainPageApiController {
 
     @GetMapping("/discovery")
     public MainPageResult<MainPageDiscoveryDto> getDiscoveryData(
-            @RequestParam(required = false) Long memberId,
+            @LoginMemberId Long memberId,
             @Qualifier("popular_post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable popularPostPageable,
             @Qualifier("latest_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
@@ -56,7 +56,7 @@ public class MainPageApiController {
 
     @GetMapping("/following")
     public MainPageResult<MainPageFollowDto> getFollowData(
-            @RequestParam Long memberId,
+            @LoginMemberId Long memberId,
             @Qualifier("member_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
                     Pageable memberPageable,
             @Qualifier("hashtag_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)

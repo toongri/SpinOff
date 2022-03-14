@@ -28,6 +28,7 @@ public class MemberDetailsService implements UserDetailsService {
         Member member = memberRepository.findByAccountIdWithRoles(accountId).orElseThrow(NotExistMemberException::new);
         log.info("member.getRoles() : {}", member.getRoles().toString());
         return MemberDetails.builder()
+                .id(member.getId())
                 .accountId(member.getAccountId())
                 .accountPw(member.getAccountPw())
                 .authorities(member.getRoles().stream()

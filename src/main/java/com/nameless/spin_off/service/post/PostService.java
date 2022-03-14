@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface PostService {
 
-    Long insertPostByPostVO(PostDto.CreatePostVO postVO)
+    Long insertPostByPostVO(PostDto.CreatePostVO postVO, Long memberId)
             throws NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException;

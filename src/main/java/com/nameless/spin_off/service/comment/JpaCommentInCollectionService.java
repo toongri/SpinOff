@@ -28,10 +28,10 @@ public class JpaCommentInCollectionService implements CommentInCollectionService
 
     @Transactional()
     @Override
-    public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO)
+    public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
-        Member member = getMemberById(commentVO.getMemberId());
+        Member member = getMemberById(memberId);
         Collection collection = getCollectionById(commentVO.getCollectionId());
         CommentInCollection parent = collection.getParentCommentById(commentVO.getParentId());
 

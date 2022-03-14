@@ -17,7 +17,7 @@ public interface MemberService {
     void confirmEmail(EmailAuthRequestDto requestDto);
     void emailLinkageCheck(EmailLinkageCheckRequestDto requestDto);
 
-    void emailLinkageUpdate(EmailLinkageUpdateRequestDto requestDto);
+    void emailLinkageUpdate(String email, String accountId);
 
     Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId) throws NotExistMemberException, AlreadyFollowedMemberException;
     Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;

@@ -139,10 +139,9 @@ public class InitAddDummy {
                     content.deleteCharAt(content.length() - 1);
 
                     collections.add(collectionRepository.getById(collectionService.insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO(
-                            members.get((int)(Math.random() * members.size())).getId(),
                             title.toString(),
                             content.toString(),
-                            PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]))));
+                            PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]), members.get((int)(Math.random() * members.size())).getId())));
                 }
 
                 //글 생성
@@ -171,11 +170,11 @@ public class InitAddDummy {
                     if (dd == 99) {
                         movieId = null;
                     }
-                    posts.add(postRepository.getById(postService.insertPostByPostVO(new PostDto.CreatePostVO(member.getId(), title.toString(), content.toString(),
+                    posts.add(postRepository.getById(postService.insertPostByPostVO(new PostDto.CreatePostVO(title.toString(), content.toString(),
                             movieId, null,
                             PublicOfPostStatus.values()[(int) (Math.random() * PublicOfPostStatus.values().length)],
                             newHashtagContentList,
-                            List.of(), List.of()))));
+                            List.of(), List.of()), member.getId())));
                 }
             }
 
@@ -308,9 +307,9 @@ public class InitAddDummy {
                             (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
-                        commentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(),
+                        commentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
                                 posts.get(postI).getId(),
-                                null, content.toString()))));
+                                null, content.toString()), member.getId())));
                     }
                 }
 
@@ -332,9 +331,9 @@ public class InitAddDummy {
                             (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(collectionI).getMember())))) {
 
-                        commentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(member.getId(),
+                        commentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
                                 collections.get(collectionI).getId(),
-                                null, content.toString()))));
+                                null, content.toString()), member.getId())));
                     }
                 }
             }
@@ -367,9 +366,9 @@ public class InitAddDummy {
                         if (!parentsByPost.isEmpty()) {
                             parentId = parentsByPost.get((int) (Math.random() * parentsByPost.size())).getId();
                         }
-                        childCommentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(),
+                        childCommentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
                                 posts.get(postI).getId(),
-                                parentId, content.toString()))));
+                                parentId, content.toString()), member.getId())));
                     }
                 }
 
@@ -399,9 +398,9 @@ public class InitAddDummy {
                             parentId = parentsByCollection.get((int) (Math.random() * parentsByCollection.size())).getId();
                         }
 
-                        childCommentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(member.getId(),
+                        childCommentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
                                 collections.get(collectionI).getId(),
-                                parentId, content.toString()))));
+                                parentId, content.toString()), member.getId())));
                     }
                 }
             }

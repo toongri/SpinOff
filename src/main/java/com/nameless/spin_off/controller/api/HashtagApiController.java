@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedHashtagException;
@@ -34,8 +35,8 @@ public class HashtagApiController {
         return getResult(hashtagService.insertViewedHashtagByIp(ip, hashtagId));
     }
 
-    @PostMapping("/{hashtagId}/follow/{memberId}")
-    public HashtagResult<Long> createFollowOne(@PathVariable Long memberId, @PathVariable Long hashtagId)
+    @PostMapping("/{hashtagId}/follow")
+    public HashtagResult<Long> createFollowOne(@LoginMemberId Long memberId, @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
 
         log.info("createFollowOne");

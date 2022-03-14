@@ -165,19 +165,19 @@ public class InitDummy {
             //글 생성
             List<CreateCollectionVO> createCollectionVOs = new ArrayList<>();
 
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "감성쓰", "갬성스러운 컬렉션이에유", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "spinoff레퍼런스", "개인레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "졸작프로젝트", "졸작레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "spinoff", "레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "스트릿", "멋있는 옷", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "영감", "내게 영감을 주는 것들", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "독립영화", "독립영화 컬렉션", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "상업영화", "상업영화 너무 달아~~~", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "그거 진심이였어?", "이걸 드라이브를 진짜가네 아ㅋㅋ", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
-            createCollectionVOs.add(new CreateCollectionVO(members.get((int)(Math.random() * members.size())).getId(), "퉁그리", "퉁그리 퉁그리 퉁그리 퉁그리", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("감성쓰", "갬성스러운 컬렉션이에유", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("spinoff레퍼런스", "개인레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("졸작프로젝트", "졸작레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("spinoff", "레퍼런스", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("스트릿", "멋있는 옷", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("영감", "내게 영감을 주는 것들", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("독립영화", "독립영화 컬렉션", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("상업영화", "상업영화 너무 달아~~~", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("그거 진심이였어?", "이걸 드라이브를 진짜가네 아ㅋㅋ", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
+            createCollectionVOs.add(new CreateCollectionVO("퉁그리", "퉁그리 퉁그리 퉁그리 퉁그리", PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]));
 
             for (CreateCollectionVO createCollectionVO : createCollectionVOs) {
-                collections.add(collectionRepository.getById(collectionService.insertCollectionByCollectionVO(createCollectionVO)));
+                collections.add(collectionRepository.getById(collectionService.insertCollectionByCollectionVO(createCollectionVO, members.get((int)(Math.random() * members.size())).getId())));
             }
 
             int newPostNumber, newPostTitleLength, newPostHashtagNumber;
@@ -204,10 +204,10 @@ public class InitDummy {
                     content.deleteCharAt(content.length() - 1);
 
                     collections.add(collectionRepository.getById(collectionService.insertCollectionByCollectionVO(new CreateCollectionVO(
-                            members.get((int)(Math.random() * members.size())).getId(),
                             title.toString(),
                             content.toString(),
-                            PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]))));
+                            PublicOfCollectionStatus.values()[(int) (Math.random() * PublicOfCollectionStatus.values().length)]),
+                            members.get((int)(Math.random() * members.size())).getId())));
                 }
 
                 //글 생성
@@ -236,11 +236,11 @@ public class InitDummy {
                     if (dd == 99) {
                         movieId = null;
                     }
-                    posts.add(postRepository.getById(postService.insertPostByPostVO(new PostDto.CreatePostVO(member.getId(), title.toString(), content.toString(),
+                    posts.add(postRepository.getById(postService.insertPostByPostVO(new PostDto.CreatePostVO(title.toString(), content.toString(),
                             movieId, null,
                             PublicOfPostStatus.values()[(int) (Math.random() * PublicOfPostStatus.values().length)],
                             newHashtagContentList,
-                            List.of(), List.of()))));
+                            List.of(), List.of()), member.getId())));
                 }
             }
 
@@ -354,9 +354,9 @@ public class InitDummy {
                             (posts.get(postI).getPublicOfPostStatus() == PublicOfPostStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(posts.get(postI).getMember())))) {
 
-                        commentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(),
+                        commentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
                                 posts.get(postI).getId(),
-                                null, content.toString()))));
+                                null, content.toString()), member.getId())));
                     }
                 }
 
@@ -378,9 +378,9 @@ public class InitDummy {
                             (collections.get(collectionI).getPublicOfCollectionStatus() == PublicOfCollectionStatus.C &&
                                     member.getFollowedMembers().stream().anyMatch(followedMember -> followedMember.getMember().equals(collections.get(collectionI).getMember())))) {
 
-                        commentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(member.getId(),
+                        commentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
                                 collections.get(collectionI).getId(),
-                                null, content.toString()))));
+                                null, content.toString()), member.getId())));
                     }
                 }
             }
@@ -413,9 +413,9 @@ public class InitDummy {
                         if (!parentsByPost.isEmpty()) {
                             parentId = parentsByPost.get((int) (Math.random() * parentsByPost.size())).getId();
                         }
-                        childCommentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(member.getId(),
+                        childCommentInPosts.add(commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
                                 posts.get(postI).getId(),
-                                parentId, content.toString()))));
+                                parentId, content.toString()), member.getId())));
                     }
                 }
 
@@ -445,9 +445,9 @@ public class InitDummy {
                             parentId = parentsByCollection.get((int) (Math.random() * parentsByCollection.size())).getId();
                         }
 
-                        childCommentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(member.getId(),
+                        childCommentInCollections.add(commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
                                 collections.get(collectionI).getId(),
-                                parentId, content.toString()))));
+                                parentId, content.toString()), member.getId())));
                     }
                 }
             }

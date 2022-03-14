@@ -121,8 +121,6 @@ public class PostDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreatePostVO {
-
-        private Long memberId;
         private String title;
         private String content;
         private Long movieId;

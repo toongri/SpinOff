@@ -9,8 +9,6 @@ public class CommentDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateCommentInPostVO {
-
-        private Long memberId;
         private Long postId;
         private Long parentId;
         private String content;
@@ -20,8 +18,6 @@ public class CommentDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateCommentInCollectionVO {
-
-        private Long memberId;
         private Long collectionId;
         private Long parentId;
         private String content;

@@ -191,7 +191,6 @@ public class CollectionDto {
     @NoArgsConstructor
     public static class CreateCollectionVO {
 
-        private Long memberId;
         private String title;
         private String content;
         private PublicOfCollectionStatus publicOfCollectionStatus;

@@ -1,9 +1,14 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMember;
+import com.nameless.spin_off.config.auth.LoginMemberId;
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
+import com.nameless.spin_off.exception.member.NotCorrectEmailRequest;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.member.MemberService;
 import lombok.AllArgsConstructor;
@@ -11,6 +16,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
 
 @Slf4j
 @RestController
@@ -20,9 +27,9 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
-    @PostMapping("/{followedMemberId}/follow/{memberId}")
+    @PostMapping("/{followedMemberId}/follow")
     public MemberApiResult<Long> createFollowOne(
-            @PathVariable Long memberId, @PathVariable Long followedMemberId)
+            @LoginMemberId Long memberId, @PathVariable Long followedMemberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
         log.info("createFollowOne");
@@ -32,9 +39,9 @@ public class MemberApiController {
         return getResult(memberService.insertFollowedMemberByMemberId(memberId, followedMemberId));
     }
 
-    @PostMapping("/{blockedMemberId}/block/{memberId}")
+    @PostMapping("/{blockedMemberId}/block")
     public MemberApiResult<Long> createBlockOne(
-            @PathVariable Long memberId, @PathVariable Long blockedMemberId,
+            @LoginMemberId Long memberId, @PathVariable Long blockedMemberId,
             @RequestParam BlockedMemberStatus blockedMemberStatus)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
@@ -47,9 +54,9 @@ public class MemberApiController {
                 .insertBlockedMemberByMemberId(memberId, blockedMemberId, blockedMemberStatus));
     }
 
-    @PostMapping("/{memberId}/search/{keyword}")
+    @PostMapping("/search/{keyword}")
     public MemberApiResult<Long> insertSearchByKeyword(
-            @PathVariable String keyword, @PathVariable Long memberId,
+            @PathVariable String keyword, @LoginMemberId Long memberId,
             @RequestParam("status") SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException {
 
@@ -59,6 +66,41 @@ public class MemberApiController {
         log.info("searchedByMemberStatus : {}", searchedByMemberStatus);
 
         return getResult(memberService.insertSearch(memberId, keyword, searchedByMemberStatus));
+    }
+
+    @PostMapping("/linkage-email/naver")
+    public MemberApiResult<String> linkageEmailNaver(@RequestParam String email, @LoginMember MemberDetails member) {
+        if (isNotCorrectEmail(email, NAVER)) {
+            throw new NotCorrectEmailRequest();
+        }
+        memberService.emailLinkageUpdate(email, member.getUsername());
+        return getResult("메일을 확인하여 주시기 바랍니다.");
+    }
+
+    @PostMapping("/linkage-email/kakao")
+    public MemberApiResult<String> linkageEmailKakao(@RequestParam String email, @LoginMember MemberDetails member) {
+        if (isNotCorrectEmail(email, KAKAO)) {
+            throw new NotCorrectEmailRequest();
+        }
+        memberService.emailLinkageUpdate(email, member.getUsername());
+        return getResult("메일을 확인하여 주시기 바랍니다.");
+    }
+
+    @PostMapping("/linkage-email/google")
+    public MemberApiResult<String> linkageEmailGoogle(@RequestParam String email, @LoginMember MemberDetails member) {
+        if (isNotCorrectEmail(email, GOOGLE)) {
+            throw new NotCorrectEmailRequest();
+        }
+        memberService.emailLinkageUpdate(email, member.getUsername());
+        return getResult("메일을 확인하여 주시기 바랍니다.");
+    }
+
+    private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {
+        return !getProviderByEmail(email).equals(provider.getValue());
+    }
+
+    private String getProviderByEmail(String email) {
+        return email.substring(email.indexOf("@") + 1, email.indexOf("."));
     }
 
     @Data

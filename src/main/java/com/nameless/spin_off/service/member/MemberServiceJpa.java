@@ -126,17 +126,19 @@ public class MemberServiceJpa implements MemberService {
         }
     }
 
+    @Transactional
     @Override
-    public void emailLinkageUpdate(EmailLinkageUpdateRequestDto requestDto) {
-        validateDuplicateAtLinkage(requestDto.getEmail());
+    public void emailLinkageUpdate(String email, String accountId) {
+        validateDuplicateAtLinkage(email);
 
-        emailLinkageRepository.save(EmailLinkage.builder()
-                .email(requestDto.getEmail())
-                .accountId(requestDto.getAccountId())
+        EmailLinkage emailAuth = emailLinkageRepository.save(EmailLinkage.builder()
+                .email(email)
+                .accountId(accountId)
                 .authToken(UUID.randomUUID().toString())
                 .expired(false)
                 .build());
 
+        emailService.sendForLinkageEmail(emailAuth.getEmail(), emailAuth.getAuthToken(), emailAuth.getAccountId());
     }
 
     @Transactional

@@ -2,7 +2,7 @@ package com.nameless.spin_off.exception.member;
 
 public class NotExistEmailAuthTokenException extends RuntimeException{
     public NotExistEmailAuthTokenException() {
-        super();
+        super("해당 이메일 인증이 존재하지 않습니다.");
     }
 
     public NotExistEmailAuthTokenException(String message) {

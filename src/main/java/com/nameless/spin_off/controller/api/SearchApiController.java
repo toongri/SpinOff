@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
@@ -67,9 +68,9 @@ public class SearchApiController {
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
     }
 
-    @GetMapping("/member-latest/{memberId}")
+    @GetMapping("/member-latest")
     public SearchApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(
-            @PathVariable Long memberId, @RequestParam int length)
+            @LoginMemberId Long memberId, @RequestParam int length)
             throws NotExistMemberException {
 
         return getResult(searchQueryService.getLastSearchesByMemberLimit(memberId, length));
@@ -77,7 +78,7 @@ public class SearchApiController {
 
     @GetMapping("/all/{keyword}/first")
     public SearchApiResult<SearchFirstDto<SearchAllDto>> getLastSearchesByMemberFirst(
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length,
+            @PathVariable String keyword, @LoginMemberId Long memberId, @RequestParam int length,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
             @Qualifier("collection") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
@@ -95,7 +96,7 @@ public class SearchApiController {
 
     @GetMapping("/all/{keyword}")
     public SearchApiResult<SearchAllDto> getLastSearchesByMember(
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId,
+            @PathVariable String keyword, @LoginMemberId Long memberId,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
             @Qualifier("collection") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
@@ -118,7 +119,7 @@ public class SearchApiController {
     @GetMapping("/all/hashtag/first")
     public SearchApiResult<SearchFirstDto<Slice<SearchPageAtHashtagPostDto>>> getAllByHashtagFirst(
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false) Long memberId,
+            @LoginMemberId Long memberId,
             @RequestParam List<String> hashtagContents, @RequestParam int length) {
 
         log.info("getAllByHashtagFirst");
@@ -137,7 +138,7 @@ public class SearchApiController {
     @GetMapping("/all/hashtag")
     public SearchApiResult<Slice<SearchPageAtHashtagPostDto>> getAllByHashtag(
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestParam(required = false) Long memberId, @RequestParam List<String> hashtagContents) {
+            @LoginMemberId Long memberId, @RequestParam List<String> hashtagContents) {
 
         log.info("getAllByHashtag");
         log.info("memberId : {}", memberId);
@@ -183,7 +184,7 @@ public class SearchApiController {
 
     @GetMapping("/member/{keyword}/first")
     public SearchApiResult<SearchFirstDto<Slice<SearchMemberDto>>> getMemberByKeywordFirst(
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length,
+            @PathVariable String keyword, @LoginMemberId Long memberId, @RequestParam int length,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
@@ -201,7 +202,7 @@ public class SearchApiController {
 
     @GetMapping("/member/{keyword}")
     public SearchApiResult<Slice<SearchMemberDto>> getMemberByKeyword(
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId,
+            @PathVariable String keyword, @LoginMemberId Long memberId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
@@ -219,7 +220,7 @@ public class SearchApiController {
     @GetMapping("/collection/{keyword}/first")
     public SearchApiResult<SearchFirstDto<Slice<SearchCollectionDto>>> getCollectionByKeywordFirst(
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId, @RequestParam int length)
+            @PathVariable String keyword, @LoginMemberId Long memberId, @RequestParam int length)
             throws NotExistMemberException {
 
         log.info("getCollectionByKeywordFirst");
@@ -237,7 +238,7 @@ public class SearchApiController {
     @GetMapping("/collection/{keyword}")
     public SearchApiResult<Slice<SearchCollectionDto>> getCollectionByKeyword(
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
-            @PathVariable String keyword, @RequestParam(required = false) Long memberId) throws NotExistMemberException {
+            @PathVariable String keyword, @LoginMemberId Long memberId) throws NotExistMemberException {
 
         log.info("getCollectionByKeyword");
         log.info("memberId : {}", memberId);

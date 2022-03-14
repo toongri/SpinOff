@@ -43,17 +43,17 @@ public class PostServiceJpa implements PostService{
 
     @Transactional()
     @Override
-    public Long insertPostByPostVO(CreatePostVO postVO)
+    public Long insertPostByPostVO(CreatePostVO postVO, Long memberId)
             throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
-        Member member = getMemberById(postVO.getMemberId());
+        Member member = getMemberById(memberId);
 
         List<PostedMedia> postedMedia = PostedMedia.createPostedMedias(postVO.getMediaUrls());
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
         Movie movie = getMovieById(postVO.getMovieId());
-        List<Collection> collections = getCollectionsByIdIn(postVO.getMemberId(), postVO.getCollectionIds());
+        List<Collection> collections = getCollectionsByIdIn(memberId, postVO.getCollectionIds());
 
         Post post =  Post.buildPost()
                 .setMember(member)

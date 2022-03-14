@@ -1,5 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
+import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
@@ -29,14 +30,14 @@ public class PostApiController {
     private final EnumMapper enumMapper;
 
     @PostMapping("")
-    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPostVO) throws
+    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPostVO, @LoginMemberId Long memberId) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
             OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
         log.info("createOne");
-        log.info("memberId : {}", createPostVO.getMemberId());
+        log.info("memberId : {}", memberId);
         log.info("title : {}", createPostVO.getTitle());
         log.info("content : {}", createPostVO.getContent());
         log.info("movieId : {}", createPostVO.getMovieId());
@@ -46,12 +47,12 @@ public class PostApiController {
         log.info("mediaUrls : {}", createPostVO.getMediaUrls());
         log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
-        return getResult(postService.insertPostByPostVO(createPostVO));
+        return getResult(postService.insertPostByPostVO(createPostVO, memberId));
     }
 
-    @PostMapping("/{postId}/like/{memberId}")
+    @PostMapping("/{postId}/like")
     public PostApiResult<Long> createLikeOne(
-            @PathVariable Long memberId, @PathVariable Long postId)
+            @LoginMemberId Long memberId, @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         log.info("createLikeOne");
@@ -73,9 +74,9 @@ public class PostApiController {
         return getResult(postService.insertViewedPostByIp(ip, postId));
     }
 
-    @PostMapping("/{postId}/collections/{memberId}")
+    @PostMapping("/{postId}/collections")
     public PostApiResult<List<Long>> createCollectedAll(
-            @PathVariable Long memberId, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
+            @LoginMemberId Long memberId, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 

@@ -4,6 +4,7 @@ import com.nameless.spin_off.controller.exhandler.ErrorResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingRequestValueException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,13 @@ public class ExControllerAdvice {
     public ResponseEntity<ErrorResult> userExHandler(RuntimeException e) {
         log.error("[exceptionHandler] ex", e);
         ErrorResult errorResult = new ErrorResult(false, "BAD", e.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> requestHandler(MissingRequestValueException e) {
+        log.error("[exceptionHandler] ex", e);
+        ErrorResult errorResult = new ErrorResult(false, "BAD", "파라미터 부족");
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
