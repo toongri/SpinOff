@@ -58,3 +58,7 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+
+org:
+  gradle:
+    daemon: false
