@@ -7,6 +7,7 @@ buildscript {
 		p6spyVersion = "1.8.0"
 		mariaDBVersion = "2.7.5"
 		gsonVersion = "2.8.9"
+		H2Version = "1.4.200"
 	}
 }
 
@@ -45,10 +46,10 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-oauth2-client:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-security:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-mail:${springFrameworkBootVersion}"
-
 	compileOnly "org.projectlombok:lombok:${projectLombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${projectLombokVersion}"
 
+	implementation "com.h2database:h2:${H2Version}"
 	implementation "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
 	implementation "org.apache.commons:commons-lang3:3.0" //
 

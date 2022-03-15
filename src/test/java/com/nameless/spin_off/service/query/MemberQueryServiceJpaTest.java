@@ -34,8 +34,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class MemberQueryServiceJpaTest {
 
-    @Autowired
-    MemberService memberService;
+    @Autowired MemberService memberService;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;

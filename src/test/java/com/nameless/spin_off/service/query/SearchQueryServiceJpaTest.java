@@ -21,8 +21,10 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
+import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +52,8 @@ class SearchQueryServiceJpaTest {
     @Autowired EntityManager em;
     @Autowired MemberService memberService;
     @Autowired CollectionService collectionService;
+    @Autowired PostService postService;
+    @Autowired HashtagService hashtagService;
 
     @Test
     public void 검색_삽입() throws Exception{
@@ -83,15 +87,21 @@ class SearchQueryServiceJpaTest {
         Member member2 = Member.buildMember().setNickname(keyword+"dfdf").build();
         Long memberId2 = memberRepository.save(member2).getId();
 
+        memberService.insertFollowedMemberByMemberId(memberId2, memberId);
+
         Movie mov = movieRepository.save(Movie.createMovie(0L, keyword+"asfd", "",
                 null, null, null, null));
         Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", "",
                 null, null, null, null));
 
+        movieService.insertViewedMovieByIp("aa", mov.getId());
+
         Collection collection1 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"fgd", "", PublicOfCollectionStatus.A));
         Collection collection2 =
                 collectionRepository.save(Collection.createCollection(member, keyword+"215ww", "", PublicOfCollectionStatus.A));
+
+        collectionService.insertViewedCollectionByIp("aa", collection1.getId());
 
         Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle(keyword+"fgd").setContent("").setCollections(List.of()).setPostedMedias(List.of())
@@ -100,12 +110,15 @@ class SearchQueryServiceJpaTest {
                 .setTitle(keyword+"adfgf").setContent("").setCollections(List.of()).setPostedMedias(List.of())
                 .setHashTags(List.of()).build();
 
-
         postRepository.save(po);
         postRepository.save(po2);
 
+        postService.insertViewedPostByIp("aa", po.getId());
+
         Hashtag hashtag = hashtagRepository.save(Hashtag.createHashtag("asdfa" + keyword));
         Hashtag hashtag2 = hashtagRepository.save(Hashtag.createHashtag("asdfa" + keyword));
+
+        hashtagService.insertViewedHashtagByIp("aa", hashtag.getId());
 
         em.flush();
         em.clear();
@@ -191,23 +204,22 @@ class SearchQueryServiceJpaTest {
         Hashtag hashtag16 = hashtagRepository.save(Hashtag.createHashtag("asdffdfaweqbasdf"));
         String keyword = "asdf";
 
-        for (int i = 0; i < 10; i++) {
-            hashtag4.insertViewedHashtagByIp(""+i);
-            hashtag2.insertViewedHashtagByIp(""+i%8);
-            hashtag6.insertViewedHashtagByIp(""+i%6);
-            hashtag1.insertViewedHashtagByIp(""+i%4);
-            hashtag5.insertViewedHashtagByIp(""+i%2);
-            hashtag3.insertViewedHashtagByIp(""+ 0);
-            hashtag14.insertViewedHashtagByIp(""+i);
-            hashtag12.insertViewedHashtagByIp(""+i%8);
-            hashtag16.insertViewedHashtagByIp(""+i%6);
-            hashtag11.insertViewedHashtagByIp(""+i%4);
-            hashtag15.insertViewedHashtagByIp(""+i%2);
+        for (int i = 0; i < 12; i++) {
+            hashtag4.insertViewedHashtagByIp(""+i%12);
+            hashtag2.insertViewedHashtagByIp(""+i%10);
+            hashtag6.insertViewedHashtagByIp(""+i%8);
+            hashtag1.insertViewedHashtagByIp(""+i%6);
+            hashtag5.insertViewedHashtagByIp(""+i%4);
+            hashtag3.insertViewedHashtagByIp(""+i%2);
+            hashtag14.insertViewedHashtagByIp(""+i%11);
+            hashtag12.insertViewedHashtagByIp(""+i%9);
+            hashtag16.insertViewedHashtagByIp(""+i%7);
+            hashtag11.insertViewedHashtagByIp(""+i%5);
+            hashtag15.insertViewedHashtagByIp(""+i%3);
             hashtag13.insertViewedHashtagByIp(""+ 0);
             em.flush();
         }
         em.clear();
-
         //when
         System.out.println("서비스함수");
         List<RelatedSearchHashtagDto> searches = searchQueryService.getRelatedSearchHashtagByKeyword(keyword, 10);
@@ -216,7 +228,7 @@ class SearchQueryServiceJpaTest {
         //then
         assertThat(searches.stream().map(RelatedSearchHashtagDto::getId).collect(Collectors.toList()))
                 .containsExactly(hashtag4.getId(), hashtag14.getId(), hashtag2.getId(), hashtag12.getId(),
-                        hashtag6.getId(), hashtag16.getId(), hashtag11.getId(), hashtag1.getId(),
+                        hashtag6.getId(), hashtag16.getId(), hashtag1.getId(), hashtag11.getId(),
                         hashtag5.getId(), hashtag15.getId());
 
     }

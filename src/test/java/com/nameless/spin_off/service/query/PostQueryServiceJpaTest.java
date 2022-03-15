@@ -116,7 +116,7 @@ public class PostQueryServiceJpaTest {
                         postList.get(3).getId());
     }
 
-    @Test
+    //마리아디비에서만 함수사용가능
     public void 팔로잉_해시태그_테스트() throws Exception{
 
         //given
@@ -418,7 +418,7 @@ public class PostQueryServiceJpaTest {
                         postList.get(9).getId());
     }
 
-    @Test
+    //마리아디비에서만 함수사용가능
     public void 해시태그_검색() throws Exception{
         //given
         String keyword = "가나다라";
