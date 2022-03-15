@@ -206,9 +206,7 @@ public class Member extends BaseTimeEntity {
 
     public static Member createMemberByCreateVO(MemberRegisterRequestDto memberRegisterRequestDto) {
 
-        Member member = new Member();
-
-        Member.buildMember()
+        return Member.buildMember()
                 .setNickname(memberRegisterRequestDto.getNickname())
                 .setEmail(memberRegisterRequestDto.getEmail())
                 .setAccountId(memberRegisterRequestDto.getAccountId())
@@ -216,8 +214,6 @@ public class Member extends BaseTimeEntity {
                 .setBirth(memberRegisterRequestDto.getBirth())
                 .setName(memberRegisterRequestDto.getName())
                 .build();
-
-        return member;
     }
 
     public static MemberBuilder buildMember() {

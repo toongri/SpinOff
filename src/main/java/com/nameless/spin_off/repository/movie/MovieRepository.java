@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +13,8 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT DISTINCT movie FROM Movie movie " +
             "LEFT JOIN FETCH movie.viewedMovieByIps viewedMovieByip " +
-            "WHERE movie.id = :id And viewedMovieByip.createdDate >= :time")
-    Optional<Movie> findOneByIdWithViewedByIp(@Param("id") Long id, @Param("time") LocalDateTime time);
+            "WHERE movie.id = :id")
+    Optional<Movie> findOneByIdWithViewedByIp(@Param("id") Long id);
 
     @Query("SELECT DISTINCT movie FROM Movie movie " +
             "LEFT JOIN FETCH movie.followingMembers followingMember " +

@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -17,8 +16,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
 
     @Query("SELECT DISTINCT post FROM Post post " +
             "LEFT JOIN FETCH post.viewedPostByIps viewdPostByIp " +
-            "WHERE post.id = :id And viewdPostByIp.createdDate >= :time")
-    Optional<Post> findOneByIdWithViewedByIp(@Param("id") Long id, @Param("time") LocalDateTime time);
+            "WHERE post.id = :id")
+    Optional<Post> findOneByIdWithViewedByIp(@Param("id") Long id);
 
     @Query("SELECT DISTINCT post FROM Post post " +
             "LEFT JOIN FETCH post.commentInPosts comment " +

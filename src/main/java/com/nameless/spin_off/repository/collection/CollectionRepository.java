@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,8 +28,8 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.viewedCollectionByIps viewedCollectionByIp " +
-            "WHERE collection.id = :id And viewedCollectionByIp.createdDate >= :time")
-    Optional<Collection> findOneByIdWithViewedByIp(@Param("id") Long id, @Param("time") LocalDateTime time);
+            "WHERE collection.id = :id")
+    Optional<Collection> findOneByIdWithViewedByIp(@Param("id") Long id);
 
     @Query("SELECT DISTINCT collection FROM Collection collection " +
             "LEFT JOIN FETCH collection.commentInCollections comment " +

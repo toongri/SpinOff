@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
-
-import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +57,7 @@ public class JpaHashtagService implements HashtagService{
     public Hashtag getHashtagByIdWithViewedByIp(Long hashtagId) throws NotExistHashtagException {
 
         Optional<Hashtag> optionalHashtag = hashtagRepository
-                .findOneByIdWithViewedByIp(hashtagId, LocalDateTime.now().minusDays(HASHTAG_VIEW.getLatestDay()));
+                .findOneByIdWithViewedByIp(hashtagId);
 
         return optionalHashtag.orElseThrow(NotExistHashtagException::new);
     }

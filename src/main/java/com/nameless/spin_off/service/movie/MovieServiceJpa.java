@@ -1,6 +1,5 @@
 package com.nameless.spin_off.service.movie;
 
-import com.nameless.spin_off.entity.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMovieException;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Service
@@ -56,8 +54,7 @@ public class MovieServiceJpa implements MovieService{
 
     private Movie getMovieByIdWithViewedIp(Long movieId) throws NotExistMovieException {
         Optional<Movie> optionalMovie = movieRepository
-                .findOneByIdWithViewedByIp(
-                        movieId, LocalDateTime.now().minusDays(MovieScoreEnum.MOVIE_VIEW.getLatestDay()));
+                .findOneByIdWithViewedByIp(movieId);
 
         return optionalMovie.orElseThrow(NotExistMovieException::new);
     }

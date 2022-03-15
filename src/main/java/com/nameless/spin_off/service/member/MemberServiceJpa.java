@@ -48,7 +48,7 @@ public class MemberServiceJpa implements MemberService {
     private final EmailLinkageRepository emailLinkageRepository;
     private final EmailService emailService;
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertMemberByMemberVO(MemberRegisterRequestDto memberVO)
             throws AlreadyAccountIdException, AlreadyNicknameException {
@@ -60,7 +60,7 @@ public class MemberServiceJpa implements MemberService {
         return member.getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {

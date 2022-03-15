@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,8 +13,8 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
 
     @Query("SELECT DISTINCT hashtag FROM Hashtag hashtag " +
             "LEFT JOIN FETCH hashtag.viewedHashtagByIps viewedHashtagByip " +
-            "WHERE hashtag.id = :id And viewedHashtagByip.createdDate >= :time")
-    Optional<Hashtag> findOneByIdWithViewedByIp(@Param("id") Long id, @Param("time") LocalDateTime time);
+            "WHERE hashtag.id = :id")
+    Optional<Hashtag> findOneByIdWithViewedByIp(@Param("id") Long id);
 
     @Query("SELECT DISTINCT hashtag FROM Hashtag hashtag " +
             "LEFT JOIN FETCH hashtag.followingMembers followingMember " +

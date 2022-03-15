@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.member;
 
-import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
@@ -42,12 +42,12 @@ class MemberServiceJpaTest {
         String email = "cc";
         String profileImg = null;
 
-        MemberDto.MemberRegisterRequestDto memberRegisterRequestDto = new MemberDto.MemberRegisterRequestDto(accountId, accountPw, name, nickname,
-                birth, email);
-
+        MemberRegisterRequestDto memberRegisterRequestDto =
+                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email);
         //when
         Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
 
+        em.flush();
         //then
         Member member = memberRepository.getById(aLong);
 
@@ -71,11 +71,12 @@ class MemberServiceJpaTest {
         String email = "cc";
         String profileImg = null;
 
-        MemberDto.MemberRegisterRequestDto memberRegisterRequestDto = new MemberDto.MemberRegisterRequestDto(accountId, accountPw, name, nickname,
-                birth, email);
+        MemberRegisterRequestDto memberRegisterRequestDto =
+                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email);
 
         //when
         Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
+        em.flush();
 
         //then
         assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
