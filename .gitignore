@@ -5,8 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 generated
-application.yml
 application-oauth.yml
+application-db.yml
+application-local.yml
 
 ### STS ###
 .apt_generated
