@@ -56,7 +56,11 @@ class CommentInCollectionServiceJpaTest {
 
         //when
         System.out.println("서비스함수");
-        CommentInCollection comment = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(member.getId(), collection.getId(), null, "야스히로 라할살")));
+        CommentInCollection comment = commentInCollectionRepository
+                .getById(
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(
+                                new CreateCommentInCollectionVO(
+                                        collection.getId(), null, "야스히로 라할살"), member.getId()));
         System.out.println("컬렉션업로드");
         Collection newCollection = collectionRepository.getById(collection.getId());
 
@@ -81,10 +85,18 @@ class CommentInCollectionServiceJpaTest {
 
         //when
         System.out.println("서비스함수1");
-        CommentInCollection childComment1 = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "요지스타 라할살")));
+        CommentInCollection childComment1 =
+                commentInCollectionRepository.getById(
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(
+                                new CreateCommentInCollectionVO(
+                                        col.getId(), parent.getId(), "요지스타 라할살"), mem.getId()));
 
         System.out.println("서비스함수2");
-        CommentInCollection childComment2 = commentInCollectionRepository.getById(commentInCollectionService.insertCommentInCollectionByCommentVO(new CreateCommentInCollectionVO(mem.getId(), col.getId(), parent.getId(), "슈퍼스타검흰 라할살")));
+        CommentInCollection childComment2 =
+                commentInCollectionRepository.getById(
+                        commentInCollectionService.insertCommentInCollectionByCommentVO(
+                                new CreateCommentInCollectionVO(
+                                        col.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
 
         System.out.println("부모댓글업로드");
         CommentInCollection parentComment = commentInCollectionRepository.findById(parent.getId()).get();
@@ -116,22 +128,25 @@ class CommentInCollectionServiceJpaTest {
         collectionRepository.save(col);
 
         CreateCommentInCollectionVO commentInCollectionVO1 =
-                new CreateCommentInCollectionVO(0L, 0L, 0L, "");
+                new CreateCommentInCollectionVO(0L, 0L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO2 =
-                new CreateCommentInCollectionVO(mem.getId(), 0L, 0L, "");
+                new CreateCommentInCollectionVO(0L, 0L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO3 =
-                new CreateCommentInCollectionVO(mem.getId(), col.getId(), 0L, "");
+                new CreateCommentInCollectionVO(col.getId(), 0L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO1))
+        assertThatThrownBy(() -> commentInCollectionService
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO1, 0L))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO2))
+        assertThatThrownBy(() -> commentInCollectionService
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO2, mem.getId()))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(commentInCollectionVO3))
+        assertThatThrownBy(() -> commentInCollectionService
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId()))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
     }

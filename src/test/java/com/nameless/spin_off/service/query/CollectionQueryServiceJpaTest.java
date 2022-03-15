@@ -1,4 +1,4 @@
-package com.nameless.spin_off.service.collection;
+package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
@@ -11,9 +11,9 @@ import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
-import com.nameless.spin_off.service.query.CollectionQueryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,7 +39,8 @@ public class CollectionQueryServiceJpaTest {
     @Autowired CollectionRepository collectionRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
-    @Autowired CollectionService collectionService;
+    @Autowired
+    CollectionService collectionService;
     @Autowired CollectionQueryService collectionQueryService;
     @Autowired MemberService memberService;
 
@@ -60,7 +61,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -165,7 +166,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -273,7 +274,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -378,7 +379,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -489,7 +490,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
+                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -587,7 +588,7 @@ public class CollectionQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
+                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -663,7 +664,7 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), "", "", A));
+                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionService.insertFollowedCollectionByMemberId(member.getId(), aLong);
             collectionList.add(byId);

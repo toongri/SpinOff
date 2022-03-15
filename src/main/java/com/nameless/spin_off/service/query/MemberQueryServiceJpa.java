@@ -3,6 +3,7 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
@@ -12,6 +13,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
+import com.nameless.spin_off.repository.query.SearchQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,6 +30,7 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class MemberQueryServiceJpa implements MemberQueryService {
     private final MemberQueryRepository memberQueryRepository;
+    private final SearchQueryRepository searchQueryRepository;
     private final MemberRepository memberRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
     List<Member> followedMembers;
@@ -69,6 +72,11 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         blockedMembers = getBlockedMemberByMember(member);
 
         return memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable, blockedMembers);
+    }
+
+    @Override
+    public List<SearchDto.LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) {
+        return searchQueryRepository.findLastSearchesByMemberIdLimit(memberId, length);
     }
 
     private List<Member> getFollowedMemberByMember(Member member) {

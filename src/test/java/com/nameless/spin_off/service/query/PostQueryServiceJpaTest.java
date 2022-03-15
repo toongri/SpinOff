@@ -1,4 +1,4 @@
-package com.nameless.spin_off.service.post;
+package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
@@ -19,8 +19,6 @@ import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.member.MemberService;
-import com.nameless.spin_off.service.query.MainPageQueryService;
-import com.nameless.spin_off.service.query.PostQueryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -379,7 +377,7 @@ public class PostQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())

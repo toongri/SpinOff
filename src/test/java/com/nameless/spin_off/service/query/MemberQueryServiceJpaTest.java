@@ -1,9 +1,11 @@
-package com.nameless.spin_off.service.member;
+package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -11,7 +13,7 @@ import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
-import com.nameless.spin_off.service.query.MemberQueryService;
+import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -32,7 +34,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 public class MemberQueryServiceJpaTest {
 
-    @Autowired MemberService memberService;
+    @Autowired
+    MemberService memberService;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
@@ -58,7 +61,7 @@ public class MemberQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -197,7 +200,7 @@ public class MemberQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -246,5 +249,78 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(4).getId(),
                         memberList.get(3).getId(),
                         memberList.get(2).getId());
+    }
+
+
+    @Test
+    public void 최근검색출력() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+
+        for (int i = 0; i < 10; i++) {
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
+        }
+
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수");
+        List<SearchDto.LastSearchDto> lastSearchesByMember = memberQueryService.getLastSearchesByMemberLimit(memberId, 5);
+
+        System.out.println("결과");
+        //then
+        assertThat(lastSearchesByMember.stream().map(SearchDto.LastSearchDto::getContent).collect(Collectors.toList()))
+                .containsExactly("9", "8", "7", "6", "5");
+
+    }
+
+    @Test
+    public void 최근검색출력_검색기록이_없으면() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+
+//        for (int i = 0; i < 10; i++) {
+//            searchService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
+//        }
+
+        em.flush();
+        em.clear();
+        //when
+
+        System.out.println("서비스함수");
+        List<SearchDto.LastSearchDto> lastSearchesByMember = memberQueryService.getLastSearchesByMemberLimit(memberId, 5);
+
+        System.out.println("결과");
+        //then
+        assertThat(lastSearchesByMember.stream().map(SearchDto.LastSearchDto::getContent).collect(Collectors.toList()))
+                .containsExactly();
+    }
+
+    @Test
+    public void 최근검색출력_검색기록이_적으면() throws Exception{
+
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+
+        for (int i = 0; i < 3; i++) {
+            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
+        }
+
+        em.flush();
+        em.clear();
+        //when
+
+        System.out.println("서비스함수");
+        List<SearchDto.LastSearchDto> lastSearchesByMember = memberQueryService.getLastSearchesByMemberLimit(memberId, 5);
+
+        System.out.println("결과");
+        //then
+        assertThat(lastSearchesByMember.stream().map(SearchDto.LastSearchDto::getContent).collect(Collectors.toList()))
+                .containsExactly("2", "1", "0");
     }
 }

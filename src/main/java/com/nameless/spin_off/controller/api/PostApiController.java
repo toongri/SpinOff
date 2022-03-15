@@ -62,18 +62,6 @@ public class PostApiController {
         return getResult(postService.insertLikedPostByMemberId(memberId, postId));
     }
 
-    @PostMapping("/{postId}/view/{ip}")
-    public PostApiResult<Long> createViewOne(
-            @PathVariable String ip, @PathVariable Long postId)
-            throws NotExistPostException {
-
-        log.info("createViewOne");
-        log.info("postId : {}", postId);
-        log.info("ip : {}", ip);
-
-        return getResult(postService.insertViewedPostByIp(ip, postId));
-    }
-
     @PostMapping("/{postId}/collections")
     public PostApiResult<List<Long>> createCollectedAll(
             @LoginMemberId Long memberId, @PathVariable Long postId, @RequestParam List<Long> collectionIds)

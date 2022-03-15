@@ -84,11 +84,11 @@ class PostServiceJpaTest {
 
         //when
 
-        PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(member.getId(),
+        PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of("형윤이", "형윤이?"), List.of(), collectionIds);
 
-        Long aLong = postService.insertPostByPostVO(createPostVO);
+        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
         Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
 
         Double postCollectionCount = post1.getCollectionScore();
@@ -128,27 +128,27 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
 
-        PostDto.CreatePostVO createPostVO1 = new PostDto.CreatePostVO(0L,
+        PostDto.CreatePostVO createPostVO1 = new PostDto.CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of());
 
-        PostDto.CreatePostVO createPostVO2 = new PostDto.CreatePostVO(member.getId(),
+        PostDto.CreatePostVO createPostVO2 = new PostDto.CreatePostVO(
                 "알라리숑", "얄라리얄라", 0L, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of());
 
-        PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(member.getId(),
+        PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of(-1L));
         //when
 
         //then
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO1))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO1, 0L))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2, member.getId()))
                 .isInstanceOf(NotExistMovieException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3, member.getId()))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
     }
 

@@ -24,17 +24,6 @@ public class HashtagApiController {
     private final HashtagService hashtagService;
     private final SearchQueryService searchQueryService;
 
-    @PostMapping("/{hashtagId}/view/{ip}")
-    public HashtagResult<Long> createViewOne(@PathVariable String ip, @PathVariable Long hashtagId)
-            throws NotExistHashtagException {
-
-        log.info("createViewOne");
-        log.info("hashtagId : {}", hashtagId);
-        log.info("ip : {}", ip);
-
-        return getResult(hashtagService.insertViewedHashtagByIp(ip, hashtagId));
-    }
-
     @PostMapping("/{hashtagId}/follow")
     public HashtagResult<Long> createFollowOne(@LoginMemberId Long memberId, @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {

@@ -3,7 +3,6 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
-import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
@@ -23,7 +22,6 @@ public interface SearchQueryService {
     List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword, int length)
             throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException;
     List<MostPopularHashtag> getMostPopularHashtagLimit(int length);
-    List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
 
     SearchAllDto getSearchPageDataAtAll(String keyword, Long memberId,
                                         Pageable postPageable,

@@ -6,7 +6,6 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
-import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
@@ -72,78 +71,6 @@ class SearchQueryServiceJpaTest {
         //then
         assertThat(byId.getSearches().size()).isEqualTo(1);
         assertThat(byId.getSearches().get(0).getContent()).isEqualTo("dded");
-    }
-    
-    @Test
-    public void 최근검색출력() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-
-        for (int i = 0; i < 10; i++) {
-            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
-        }
-
-        em.flush();
-        em.clear();
-        //when
-        System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
-
-        System.out.println("결과");
-        //then
-        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
-                .containsExactly("9", "8", "7", "6", "5");
-
-    }
-
-    @Test
-    public void 최근검색출력_검색기록이_없으면() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-
-//        for (int i = 0; i < 10; i++) {
-//            searchService.insertSearch(memberId, i+"", SearchedByMemberStatus.MEMBER);
-//        }
-
-        em.flush();
-        em.clear();
-        //when
-
-        System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
-
-        System.out.println("결과");
-        //then
-        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
-                .containsExactly();
-    }
-
-    @Test
-    public void 최근검색출력_검색기록이_적으면() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        Long memberId = memberRepository.save(member).getId();
-
-        for (int i = 0; i < 3; i++) {
-            memberService.insertSearch(memberId, i+"", SearchedByMemberStatus.D);
-        }
-
-        em.flush();
-        em.clear();
-        //when
-
-        System.out.println("서비스함수");
-        List<LastSearchDto> lastSearchesByMember = searchQueryService.getLastSearchesByMemberLimit(memberId, 5);
-
-        System.out.println("결과");
-        //then
-        assertThat(lastSearchesByMember.stream().map(LastSearchDto::getContent).collect(Collectors.toList()))
-                .containsExactly("2", "1", "0");
     }
 
     @Test

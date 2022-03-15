@@ -22,17 +22,6 @@ public class MovieApiController {
 
     private final MovieService movieService;
 
-    @PostMapping("/{movieId}/view/{ip}")
-    public MovieResult<Long> createViewOne(
-            @PathVariable String ip, @PathVariable Long movieId) throws NotExistMovieException {
-
-        log.info("createViewOne");
-        log.info("movieId : {}", movieId);
-        log.info("ip : {}", ip);
-
-        return getResult(movieService.insertViewedMovieByIp(ip, movieId));
-    }
-
     @PostMapping("/{movieId}/follow")
     public MovieResult<Long> createFollowOne(
             @LoginMemberId Long memberId, @PathVariable Long movieId)

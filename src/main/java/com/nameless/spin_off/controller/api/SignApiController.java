@@ -48,7 +48,7 @@ public class SignApiController {
         return getResult("인증이 완료되었습니다.");
     }
 
-    @GetMapping("/linkage-email/check")
+    @GetMapping("/linkage-email")
     public SignResult<String> linkageEmail(@ModelAttribute EmailLinkageCheckRequestDto requestDto) {
         memberService.emailLinkageCheck(requestDto);
         return getResult("연동이 완료되었습니다.");

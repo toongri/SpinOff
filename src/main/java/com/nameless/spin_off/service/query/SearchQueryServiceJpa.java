@@ -5,7 +5,6 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
-import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
@@ -72,11 +71,6 @@ public class SearchQueryServiceJpa implements SearchQueryService {
     @Override
     public List<MostPopularHashtag> getMostPopularHashtagLimit(int length) {
         return searchQueryRepository.findMostPopularHashtagsLimit(length);
-    }
-
-    @Override
-    public List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) {
-        return searchQueryRepository.findLastSearchesByMemberIdLimit(memberId, length);
     }
 
     @Override

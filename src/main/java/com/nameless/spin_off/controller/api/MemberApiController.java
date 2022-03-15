@@ -3,6 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
@@ -11,11 +12,14 @@ import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotCorrectEmailRequest;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.query.MemberQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
 
@@ -26,6 +30,7 @@ import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.
 public class MemberApiController {
 
     private final MemberService memberService;
+    private final MemberQueryService memberQueryService;
 
     @PostMapping("/{followedMemberId}/follow")
     public MemberApiResult<Long> createFollowOne(
@@ -93,6 +98,14 @@ public class MemberApiController {
         }
         memberService.emailLinkageUpdate(email, member.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
+    }
+
+    @GetMapping("/member-latest")
+    public MemberApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(
+            @LoginMemberId Long memberId, @RequestParam int length)
+            throws NotExistMemberException {
+
+        return getResult(memberQueryService.getLastSearchesByMemberLimit(memberId, length));
     }
 
     private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {

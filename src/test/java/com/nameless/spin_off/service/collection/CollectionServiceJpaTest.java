@@ -52,7 +52,7 @@ class CollectionServiceJpaTest {
         //when
         System.out.println("서비스 함수");
         Long aLong = collectionService
-                .insertCollectionByCollectionVO(new CreateCollectionVO(member.getId(), "", "", A));
+                .insertCollectionByCollectionVO(new CreateCollectionVO("", "", A), member.getId());
         System.out.println("컬렉션 조회 함수");
         Collection collection = collectionRepository.getById(aLong);
 
@@ -67,11 +67,11 @@ class CollectionServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
 
-        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO(-1L, "", "", A);
+        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO("", "", A);
         //when
 
         //then
-        assertThatThrownBy(() -> collectionService.insertCollectionByCollectionVO(createCollectionVO1))
+        assertThatThrownBy(() -> collectionService.insertCollectionByCollectionVO(createCollectionVO1, -1L))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
     }
 

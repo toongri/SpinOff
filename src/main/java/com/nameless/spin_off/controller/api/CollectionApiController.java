@@ -45,17 +45,6 @@ public class CollectionApiController {
         return getResult(collectionService.insertLikedCollectionByMemberId(memberId, collectionId));
     }
 
-    @PostMapping("/{collectionId}/view/{ip}")
-    public CollectionApiResult<Long> createViewOne(@PathVariable String ip, @PathVariable Long collectionId)
-            throws NotExistCollectionException {
-
-        log.info("createViewOne");
-        log.info("collectionId : {}", collectionId);
-        log.info("ip : {}", ip);
-
-        return getResult(collectionService.insertViewedCollectionByIp(ip, collectionId));
-    }
-
     @PostMapping("/{collectionId}/follow")
     public CollectionApiResult<Long> createFollowOne(@LoginMemberId Long memberId, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,

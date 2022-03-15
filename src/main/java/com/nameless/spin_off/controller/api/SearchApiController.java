@@ -8,7 +8,6 @@ import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
-import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
@@ -66,14 +65,6 @@ public class SearchApiController {
 
         return getResult(
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
-    }
-
-    @GetMapping("/member-latest")
-    public SearchApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(
-            @LoginMemberId Long memberId, @RequestParam int length)
-            throws NotExistMemberException {
-
-        return getResult(searchQueryService.getLastSearchesByMemberLimit(memberId, length));
     }
 
     @GetMapping("/all/{keyword}/first")

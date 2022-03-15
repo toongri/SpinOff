@@ -60,7 +60,8 @@ class CommentInPostServiceJpaTest {
 
         //when
         System.out.println("서비스함수");
-        Long commentId = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), null, "야스히로 라할살"));
+        Long commentId = commentInPostService.insertCommentInPostByCommentVO(
+                new CommentDto.CreateCommentInPostVO(po.getId(), null, "야스히로 라할살"), mem.getId());
 
         System.out.println("포스트업로드");
         Post post = postRepository.findById(po.getId()).get();
@@ -87,10 +88,16 @@ class CommentInPostServiceJpaTest {
         //when
 
         System.out.println("서비스함수1");
-        CommentInPost childComment1 = commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "요지스타 라할살")));
+        CommentInPost childComment1 = commentInPostRepository.getById(
+                commentInPostService.insertCommentInPostByCommentVO(
+                        new CommentDto.CreateCommentInPostVO(
+                                po.getId(), parent.getId(), "요지스타 라할살"), mem.getId()));
 
         System.out.println("서비스함수2");
-        CommentInPost childComment2 = commentInPostRepository.getById(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(mem.getId(), po.getId(), parent.getId(), "슈퍼스타검흰 라할살")));
+        CommentInPost childComment2 = commentInPostRepository.getById(
+                commentInPostService.insertCommentInPostByCommentVO(
+                        new CommentDto.CreateCommentInPostVO(
+                                po.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
 
         System.out.println("부모댓글업로드");
         CommentInPost parentComment = commentInPostRepository.findById(parent.getId()).get();
@@ -123,20 +130,20 @@ class CommentInPostServiceJpaTest {
         postRepository.save(post);
 
         CommentDto.CreateCommentInPostVO commentInPostVO1 =
-                new CommentDto.CreateCommentInPostVO(0L, 0L, 0L, "");
+                new CommentDto.CreateCommentInPostVO(0L, 0L, "");
         CommentDto.CreateCommentInPostVO commentInPostVO2 =
-                new CommentDto.CreateCommentInPostVO(mem.getId(), 0L, 0L, "");
+                new CommentDto.CreateCommentInPostVO(0L, 0L, "");
         CommentDto.CreateCommentInPostVO commentInPostVO3 =
-                new CommentDto.CreateCommentInPostVO(mem.getId(), post.getId(), 0L, "");
+                new CommentDto.CreateCommentInPostVO(post.getId(), 0L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO1))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO1, 0L))
                 .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2, mem.getId()))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3, mem.getId()))
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
     }
 

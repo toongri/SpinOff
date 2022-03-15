@@ -82,7 +82,7 @@ class MainPageQueryServiceJpaTest {
         List<Collection> collectionList = new ArrayList<>();
         for (Member mem : memberList) {
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A) ,mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -238,7 +238,7 @@ class MainPageQueryServiceJpaTest {
         List<Collection> collectionList = new ArrayList<>();
         for (Member mem : memberList) {
             Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(mem.getId(), keyword + mem.getId(), "", A));
+                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
