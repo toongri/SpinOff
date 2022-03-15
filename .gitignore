@@ -8,6 +8,9 @@ generated
 application-oauth.yml
 application-db.yml
 application-local.yml
+InitDummy.java
+InitAddDummy.java
+InitLocal.java
 
 ### STS ###
 .apt_generated
