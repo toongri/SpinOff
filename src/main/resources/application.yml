@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: oauth, db, local
+    include: oauth, real
   jpa:
     open-in-view: false
     hibernate:
