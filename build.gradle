@@ -19,6 +19,10 @@ plugins {
 	id 'java'
 }
 
+jar {
+	enabled = false
+}
+
 group = 'com.nameless'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
