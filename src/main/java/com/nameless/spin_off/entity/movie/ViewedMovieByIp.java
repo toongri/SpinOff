@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class ViewedMovieByIp extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="viewed_movie_by_ip_id")
     private Long id;
 

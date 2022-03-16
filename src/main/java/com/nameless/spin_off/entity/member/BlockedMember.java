@@ -16,7 +16,7 @@ import java.util.Objects;
 public class BlockedMember extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="blocked_member_id")
     private Long id;
 

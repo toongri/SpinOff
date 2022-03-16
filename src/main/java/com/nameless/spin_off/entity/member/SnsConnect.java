@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class SnsConnect extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="sns_connect_id")
     private Long id;
 

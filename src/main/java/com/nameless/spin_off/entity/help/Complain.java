@@ -18,7 +18,7 @@ import java.util.Objects;
 public class Complain extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="faq_id")
     private Long id;
 

@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class SearchedByMember extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="searched_by_member_id")
     private Long id;
 

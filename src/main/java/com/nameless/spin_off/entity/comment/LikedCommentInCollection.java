@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class LikedCommentInCollection extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="liked_comment_in_collection_id")
     private Long id;
 

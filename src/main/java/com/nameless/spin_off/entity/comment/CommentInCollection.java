@@ -19,7 +19,7 @@ import java.util.List;
 public class CommentInCollection extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="comment_in_collection_id")
     private Long id;
 

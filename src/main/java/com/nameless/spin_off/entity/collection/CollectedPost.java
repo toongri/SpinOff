@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class CollectedPost extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="collected_post_id")
     private Long id;
 

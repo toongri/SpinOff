@@ -29,7 +29,8 @@ import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Collection extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="collection_id")
     private Long id;
 

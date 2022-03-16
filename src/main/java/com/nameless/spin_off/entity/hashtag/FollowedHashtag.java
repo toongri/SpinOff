@@ -17,7 +17,7 @@ import java.util.Objects;
 public class FollowedHashtag extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "followed_hashtag_id")
     private Long id;
 

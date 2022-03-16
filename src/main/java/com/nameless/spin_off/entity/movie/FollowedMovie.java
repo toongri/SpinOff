@@ -17,7 +17,7 @@ import java.util.Objects;
 public class FollowedMovie extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="followed_movie_id")
     private Long id;
 

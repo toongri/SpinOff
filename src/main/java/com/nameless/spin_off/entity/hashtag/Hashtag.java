@@ -21,7 +21,7 @@ import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.*;
 public class Hashtag extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="hashtag_id")
     private Long id;
 

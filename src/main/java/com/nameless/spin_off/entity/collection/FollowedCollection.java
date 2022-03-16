@@ -16,7 +16,7 @@ import java.util.Objects;
 public class FollowedCollection extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="followed_collection_id")
     private Long id;
 

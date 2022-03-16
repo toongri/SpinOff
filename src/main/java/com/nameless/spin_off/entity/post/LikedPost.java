@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class LikedPost extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="liked_post_id")
     private Long id;
 

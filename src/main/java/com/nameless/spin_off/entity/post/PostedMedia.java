@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 public class PostedMedia extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="posted_media_id")
     private Long id;
 

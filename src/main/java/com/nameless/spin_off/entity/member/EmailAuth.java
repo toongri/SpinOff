@@ -19,7 +19,7 @@ public class EmailAuth extends BaseTimeEntity {
     private static final Long MAX_EXPIRE_TIME = 5L;
 
     @Id
-    @GeneratedValue()
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "email_auth_id")
     private Long id;
 

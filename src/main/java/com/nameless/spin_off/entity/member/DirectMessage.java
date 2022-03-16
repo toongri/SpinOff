@@ -14,7 +14,7 @@ import javax.persistence.*;
 public class DirectMessage extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="direct_message_id")
     private Long id;
 

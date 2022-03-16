@@ -37,7 +37,8 @@ import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER__
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseTimeEntity {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="member_id")
     private Long id;
 

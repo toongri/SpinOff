@@ -15,7 +15,7 @@ import javax.persistence.*;
 public class PreferenceOfMember extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="preference_of_member_id")
     private Long id;
 

@@ -16,7 +16,7 @@ import javax.persistence.*;
 public class ViewedHashtagByIp extends BaseTimeEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="viewed_hashtag_by_ip_id")
     private Long id;
 
