@@ -116,7 +116,6 @@ public class PostQueryServiceJpaTest {
                         postList.get(3).getId());
     }
 
-    //마리아디비에서만 함수사용가능
     public void 팔로잉_해시태그_테스트() throws Exception{
 
         //given
