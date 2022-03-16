@@ -25,6 +25,7 @@ jar {
 
 bootJar{
 	archivesBaseName = 'SpinOff'
+	archiveFileName = 'SpinOff.jar'
 }
 
 group = 'com.nameless'
