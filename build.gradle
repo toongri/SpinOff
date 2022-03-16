@@ -50,8 +50,11 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-oauth2-client:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-security:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-mail:${springFrameworkBootVersion}"
+	implementation "org.springframework.boot:spring-boot-maven-plugin:${springFrameworkBootVersion}"
+
 	compileOnly "org.projectlombok:lombok:${projectLombokVersion}"
 	annotationProcessor "org.projectlombok:lombok:${projectLombokVersion}"
+
 
 	implementation "com.h2database:h2:${H2Version}"
 	implementation "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
