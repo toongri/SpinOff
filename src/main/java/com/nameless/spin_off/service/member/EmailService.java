@@ -17,6 +17,9 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String userEmail;
 
+    @Value("${spring.domain}")
+    private String domain;
+
     @Async
     public void sendForRegister(String email, String authToken) {
 
@@ -25,7 +28,7 @@ public class EmailService {
         smm.setFrom(userEmail);
         smm.setTo(email);
         smm.setSubject("회원가입 이메일 인증");
-        smm.setText("http://localhost:8080/api/sign/confirm-email?email=" + email + "&authToken=" + authToken);
+        smm.setText(domain+"/api/sign/confirm-email?email=" + email + "&authToken=" + authToken);
 
         javaMailSender.send(smm);
     }
