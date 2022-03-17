@@ -1,10 +1,8 @@
 spring:
   profiles:
-    include: oauth, real
+    include: oauth, local
   jpa:
     open-in-view: false
-    hibernate:
-      ddl-auto: none
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDB103Dialect
