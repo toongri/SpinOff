@@ -43,7 +43,7 @@ class MemberServiceJpaTest {
         String profileImg = null;
 
         MemberRegisterRequestDto memberRegisterRequestDto =
-                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email);
+                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email, null);
         //when
         Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
 
@@ -72,7 +72,7 @@ class MemberServiceJpaTest {
         String profileImg = null;
 
         MemberRegisterRequestDto memberRegisterRequestDto =
-                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email);
+                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email, null);
 
         //when
         Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
