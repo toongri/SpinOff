@@ -26,7 +26,7 @@ public class EmailLinkageQueryRepository {
                         emailLinkage.accountId.eq(accountId),
                         emailLinkage.email.eq(email),
                         emailLinkage.authToken.eq(authToken),
-                        emailLinkage.expireDate.goe(currentTime),
+                        emailLinkage.createdDate.after(currentTime),
                         emailLinkage.expired.eq(false))
                 .orderBy(emailLinkage.id.desc())
                 .fetchFirst();

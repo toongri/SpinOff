@@ -81,8 +81,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
 
     private List<Member> getFollowedMemberByMember(Member member) {
         if (member != null) {
-            return member.getFollowedMembers().stream()
-                    .map(FollowedMember::getMember).collect(Collectors.toList());
+            return member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
         } else{
             return new ArrayList<>();
         }

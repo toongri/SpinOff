@@ -42,16 +42,35 @@ public class SignApiController {
         return getResult(responseDto);
     }
 
-    @GetMapping("/confirm-email")
-    public SignResult<String> confirmEmail(@ModelAttribute EmailAuthRequestDto requestDto) {
-        memberService.confirmEmail(requestDto);
-        return getResult("인증이 완료되었습니다.");
+    @PostMapping("/auth-email")
+    public SignResult<Boolean> authEmail(@RequestParam String email) {
+        return getResult(memberService.sendEmailAuth(email));
+    }
+
+    @PostMapping("/confirm-email")
+    public SignResult<Boolean> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
+        return getResult(memberService.confirmEmail(requestDto));
     }
 
     @GetMapping("/linkage-email")
     public SignResult<String> linkageEmail(@ModelAttribute EmailLinkageCheckRequestDto requestDto) {
         memberService.checkEmailLinkage(requestDto);
         return getResult("연동이 완료되었습니다.");
+    }
+
+    @GetMapping("/check-duplicate/email")
+    public SignResult<Boolean> checkDuplicateEmail(String email) {
+        return getResult(memberService.checkDuplicateEmail(email));
+    }
+
+    @GetMapping("/check-duplicate/nickname")
+    public SignResult<Boolean> checkDuplicateNickname(String nickname) {
+        return getResult(memberService.checkDuplicateNickname(nickname));
+    }
+
+    @GetMapping("/check-duplicate/accountId")
+    public SignResult<Boolean> checkDuplicateAccountId(String accountId) {
+        return getResult(memberService.checkDuplicateAccountId(accountId));
     }
 
     @Data

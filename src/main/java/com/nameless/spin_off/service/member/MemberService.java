@@ -14,11 +14,19 @@ public interface MemberService {
             throws AlreadyAccountIdException, AlreadyNicknameException;
     MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto);
     TokenResponseDto reIssue(TokenRequestDto requestDto);
-    void confirmEmail(EmailAuthRequestDto requestDto);
+    boolean confirmEmail(EmailAuthRequestDto requestDto);
     void checkEmailLinkage(EmailLinkageCheckRequestDto requestDto);
     void updateEmailLinkage(String email, String accountId);
     int updateAllPopularity();
-    Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId) throws NotExistMemberException, AlreadyFollowedMemberException;
-    Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
-    Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus) throws NotExistMemberException;
+    Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
+            throws NotExistMemberException, AlreadyFollowedMemberException;
+    Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus)
+            throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
+    Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus)
+            throws NotExistMemberException;
+    boolean sendEmailAuth(String email)
+            throws AlreadyAccountIdException, AlreadyNicknameException;
+    boolean checkDuplicateEmail(String email);
+    boolean checkDuplicateNickname(String email);
+    boolean checkDuplicateAccountId(String email);
 }

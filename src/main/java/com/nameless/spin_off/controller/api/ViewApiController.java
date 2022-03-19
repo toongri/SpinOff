@@ -6,6 +6,7 @@ import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.hashtag.HashtagService;
+import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
 import com.nameless.spin_off.service.post.PostService;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ public class ViewApiController {
     private final CollectionService collectionService;
     private final HashtagService hashtagService;
     private final MovieService movieService;
+    private final MemberService memberService;
 
     @PostMapping("/post/{postId}/view/{ip}")
     public ViewApiResult<Long> createPostOne(
@@ -71,6 +73,19 @@ public class ViewApiController {
         log.info("ip : {}", ip);
 
         return getResult(collectionService.insertViewedCollectionByIp(ip, collectionId));
+    }
+
+    @PostMapping("/contents/popularity")
+    public ViewApiResult<Boolean> updatePopularity() {
+
+        log.info("updatePopularity");
+        memberService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        collectionService.updateAllPopularity();
+        movieService.updateAllPopularity();
+        postService.updateAllPopularity();
+
+        return getResult(true);
     }
 
     @Data

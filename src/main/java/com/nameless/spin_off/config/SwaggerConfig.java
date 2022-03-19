@@ -21,7 +21,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import java.util.List;
 
-@Profile("real")
+@Profile({"real", "local"})
 @Configuration
 @RequiredArgsConstructor
 @EnableSwagger2

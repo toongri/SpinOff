@@ -28,7 +28,7 @@ public class EmailServiceJpa implements EmailService{
         smm.setFrom(userEmail);
         smm.setTo(email);
         smm.setSubject("회원가입 이메일 인증");
-        smm.setText(domain+"/api/sign/confirm-email?email=" + email + "&authToken=" + authToken);
+        smm.setText("인증 코드는 " + authToken + " 입니다. 노출에 유의하십시오.");
 
         javaMailSender.send(smm);
     }
@@ -41,7 +41,7 @@ public class EmailServiceJpa implements EmailService{
         smm.setFrom(userEmail);
         smm.setTo(email);
         smm.setSubject("이메일 연동 인증");
-        smm.setText("http://localhost:8080/api/sign/linkage-email/check?email="
+        smm.setText(domain+"/api/sign/linkage-email/check?email="
                 + email + "&authToken=" + authToken + "&accountId=" + accountId);
 
         javaMailSender.send(smm);

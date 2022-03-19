@@ -17,17 +17,19 @@ import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
 
 @Slf4j
@@ -63,16 +65,26 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
+    public boolean sendEmailAuth(String email)
             throws AlreadyAccountIdException, AlreadyNicknameException {
-        validateDuplicateAtRegister(requestDto.getAccountId(), requestDto.getNickname(), requestDto.getEmail());
-
         EmailAuth emailAuth = emailAuthRepository.save(EmailAuth.builder()
-                .email(requestDto.getEmail())
-                .authToken(UUID.randomUUID().toString())
+                .email(email)
+//                .authToken(UUID.randomUUID().toString())
+                .authToken(RandomStringUtils.randomAlphabetic(8))
                 .expired(false)
                 .provider(EmailAuthProviderStatus.A)
                 .build());
+
+        emailService.sendForRegister(emailAuth.getEmail(), emailAuth.getAuthToken());
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
+            throws AlreadyAccountIdException, AlreadyNicknameException {
+
+        isExistAuthEmail(requestDto.getEmail(), requestDto.getAuthToken());
 
         Member member = memberRepository.save(Member.buildMember()
                 .setNickname(requestDto.getNickname())
@@ -83,7 +95,6 @@ public class MemberServiceJpa implements MemberService {
                 .setName(requestDto.getName())
                 .build());
 
-        emailService.sendForRegister(emailAuth.getEmail(), emailAuth.getAuthToken());
         return MemberRegisterResponseDto.builder()
                 .id(member.getId())
                 .accountId(member.getAccountId())
@@ -95,32 +106,48 @@ public class MemberServiceJpa implements MemberService {
     public int updateAllPopularity() {
         List<Member> members =
                 memberQueryRepository.findAllByViewAfterTime(MemberScoreEnum.MEMBER_FOLLOW.getOldestDate());
-        System.out.println("멤버리스트" + members.size());
         for (Member member : members) {
             member.updatePopularity();
         }
-
         return members.size();
     }
 
     @Transactional
     @Override
-    public void confirmEmail(EmailAuthRequestDto requestDto) {
+    public boolean confirmEmail(EmailAuthRequestDto requestDto) {
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
-                requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now(), EmailAuthProviderStatus.A)
+                        requestDto.getEmail(),
+                        requestDto.getAuthToken(),
+                        EMAIL_AUTH_MINUTE.getDateTime(),
+                        EmailAuthProviderStatus.A)
                 .orElseThrow(NotExistEmailAuthTokenException::new);
-        Member member =
-                memberRepository.findOneByEmail(requestDto.getEmail()).orElseThrow(NotExistMemberException::new);
+
         emailAuth.useToken();
-        member.updateEmailAuth(true);
+        return true;
     }
+
+    @Override
+    public boolean checkDuplicateEmail(String email) {
+        return emailAuthQueryRepository.isNotExistEmail(email);
+    }
+
+    @Override
+    public boolean checkDuplicateNickname(String nickname) {
+        return emailAuthQueryRepository.isNotExistNickname(nickname);
+    }
+
+    @Override
+    public boolean checkDuplicateAccountId(String email) {
+        return emailAuthQueryRepository.isNotExistAccountId(email);
+    }
+
 
     @Transactional
     @Override
     public void checkEmailLinkage(EmailLinkageCheckRequestDto requestDto) {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
                         requestDto.getAccountId(), requestDto.getEmail(),
-                        requestDto.getAuthToken(), LocalDateTime.now())
+                        requestDto.getAuthToken(), EMAIL_AUTH_MINUTE.getDateTime())
                 .orElseThrow(NotExistEmailAuthTokenException::new);
 
         Member member =
@@ -163,9 +190,6 @@ public class MemberServiceJpa implements MemberService {
 
         if (!passwordEncoder.matches(requestDto.getAccountPw(), member.getAccountPw())) {
             throw new LoginFailureException();
-
-        } else if (!member.getEmailAuth()) {
-            throw new EmailNotAuthenticatedException();
         } else {
             member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
             return new MemberLoginResponseDto(
@@ -301,5 +325,12 @@ public class MemberServiceJpa implements MemberService {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithSearch(memberId);
 
         return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private void isExistAuthEmail(String email, String authToken) {
+        if (!emailAuthQueryRepository.isExistAuthEmail(email, authToken,
+                REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.A)) {
+            throw new EmailNotAuthenticatedException();
+        }
     }
 }

@@ -55,7 +55,6 @@ public class Member extends BaseTimeEntity {
     private String naverEmail;
     private String kakaoEmail;
     private String refreshToken;
-    private Boolean emailAuth;
     private Double popularity;
 
     @ElementCollection(fetch = FetchType.LAZY)
@@ -189,12 +188,10 @@ public class Member extends BaseTimeEntity {
         member.updatePhoneNumber(phoneNumber);
         member.updateEmail(email);
         member.updateNickname(nickname);
-//        member.updateCountToZero();
         member.addRolesToUser();
         member.updateGoogleEmail(googleEmail);
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
-        member.updateEmailAuth(emailAuth);
         member.updatePopularityZero();
 
         return member;
@@ -276,10 +273,6 @@ public class Member extends BaseTimeEntity {
 
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
-    }
-
-    public void updateEmailAuth(Boolean emailAuth) {
-        this.emailAuth = emailAuth;
     }
 
     public Member updateGoogleEmail(String googleEmail) {

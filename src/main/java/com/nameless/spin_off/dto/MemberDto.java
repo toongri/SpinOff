@@ -223,6 +223,7 @@ public class MemberDto {
         private String nickname;
         private LocalDate birth;
         private String email;
+        private String authToken;
     }
 
     public static class MemberBuilder {
