@@ -19,8 +19,10 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
+import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -53,6 +55,8 @@ class MovieQueryServiceJpaTest {
     @Autowired MemberService memberService;
     @Autowired CollectionService collectionService;
     @Autowired MovieQueryService movieQueryService;
+    @Autowired HashtagService hashtagService;
+    @Autowired PostService postService;
     
     @Test
     public void 영화_키워드_검색() throws Exception{
@@ -320,6 +324,8 @@ class MovieQueryServiceJpaTest {
         em.clear();
         for (Movie movie : movieList) {
             movieService.insertViewedMovieByIp("22", movie.getId());
+            hashtagService.insertViewedHashtagByIp(movie.getId()+"", hashtagList.get(2).getId());
+            hashtagService.insertViewedHashtagByIp(movie.getId()+"", hashtagList.get(4).getId());
         }
         movieService.insertViewedMovieByIp("1", movieList.get(6).getId());
         movieService.insertViewedMovieByIp("2", movieList.get(6).getId());
@@ -329,6 +335,10 @@ class MovieQueryServiceJpaTest {
         em.flush();
         em.clear();
         movieService.updateAllPopularity();
+        postService.updateAllPopularity();
+        collectionService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        memberService.updateAllPopularity();
         em.flush();
         em.clear();
 

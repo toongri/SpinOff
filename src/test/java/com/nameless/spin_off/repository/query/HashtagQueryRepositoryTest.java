@@ -490,6 +490,7 @@ public class HashtagQueryRepositoryTest {
         collectionService.updateAllPopularity();
         hashtagService.updateAllPopularity();
         em.flush();
+        em.clear();
 
         //when
         System.out.println("서비스");
