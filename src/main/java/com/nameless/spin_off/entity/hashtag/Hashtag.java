@@ -27,6 +27,8 @@ public class Hashtag extends BaseTimeEntity {
 
     private String content;
 
+    private Double popularity;
+
     @OneToMany(mappedBy = "hashtag", fetch = FetchType.LAZY)
     private List<FollowedHashtag> followingMembers = new ArrayList<>();
 
@@ -36,28 +38,21 @@ public class Hashtag extends BaseTimeEntity {
     @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedHashtagByIp> viewedHashtagByIps = new ArrayList<>();
 
-    private Double postScore;
-    private Double viewScore;
-    private Double followScore;
-    private Double popularity;
 
     //==연관관계 메소드==//
     private Long addViewedHashtagByIp(String ip) {
         ViewedHashtagByIp viewedHashtagByIp = ViewedHashtagByIp.createViewedHashtagByIp(ip, this);
 
-        updateViewScore();
         this.viewedHashtagByIps.add(viewedHashtagByIp);
 
         return viewedHashtagByIp.getId();
     }
 
     public void addTaggedPosts(PostedHashtag postedHashtag) {
-        updatePostScore();
         this.taggedPosts.add(postedHashtag);
     }
 
     public void addFollowingMembers(FollowedHashtag followedHashtag) {
-        updateFollowScore();
         this.followingMembers.add(followedHashtag);
     }
 
@@ -66,24 +61,31 @@ public class Hashtag extends BaseTimeEntity {
 
         Hashtag hashtag = new Hashtag();
         hashtag.updateContent(content);
-        hashtag.updateCountToZero();
+        hashtag.updatePopularityZero();
+
+        return hashtag;
+    }
+
+    public static Hashtag createHashtag(Long id) {
+        Hashtag hashtag = new Hashtag();
+        hashtag.updateId(id);
 
         return hashtag;
     }
 
     //==수정 메소드==//
+    private void updateId(Long id) {
+        this.id = id;
+    }
     public void updateContent(String content) {
         this.content = content;
     }
 
     public void updatePopularity() {
-        this.popularity = viewScore + postScore + followScore;
+        popularity = executePostScore() + executeFollowScore() + executeViewScore();
     }
 
-    public void updateCountToZero() {
-        viewScore = 0.0;
-        postScore = 0.0;
-        followScore = 0.0;
+    public void updatePopularityZero() {
         popularity = 0.0;
     }
 
@@ -97,12 +99,12 @@ public class Hashtag extends BaseTimeEntity {
         }
     }
 
-    public void updateFollowScore() {
+    public double executeFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedHashtag followedHashtag ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = HASHTAG_FOLLOW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             followedHashtag = followingMembers.get(i);
@@ -118,17 +120,15 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        followScore = (total + HASHTAG_FOLLOW.getScores().get(j) * result) * HASHTAG_FOLLOW.getRate();
-
-        updatePopularity();
+        return (total + HASHTAG_FOLLOW.getScores().get(j) * result) * HASHTAG_FOLLOW.getRate();
     }
 
-    public void updateViewScore() {
+    public double executeViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedHashtagByIp viewedHashtagByIp ;
         int j = 0, i = viewedHashtagByIps.size() - 1;
-        double result = 0, total = HASHTAG_VIEW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             viewedHashtagByIp = viewedHashtagByIps.get(i);
@@ -144,17 +144,15 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = (total + HASHTAG_VIEW.getScores().get(j) * result) * HASHTAG_VIEW.getRate();
-
-        updatePopularity();
+        return (total + HASHTAG_VIEW.getScores().get(j) * result) * HASHTAG_VIEW.getRate();
     }
 
-    public void updatePostScore() {
+    public double executePostScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         PostedHashtag postedHashtag ;
         int j = 0, i = taggedPosts.size() - 1;
-        double result = 0, total = HASHTAG_POST.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             postedHashtag = taggedPosts.get(i);
@@ -170,9 +168,7 @@ public class Hashtag extends BaseTimeEntity {
                 j++;
             }
         }
-        postScore = (total + HASHTAG_POST.getScores().get(j) * result) * HASHTAG_POST.getRate();
-
-        updatePopularity();
+        return (total + HASHTAG_POST.getScores().get(j) * result) * HASHTAG_POST.getRate();
     }
 
     //==조회 로직==//

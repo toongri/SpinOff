@@ -2,7 +2,6 @@ package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
@@ -11,6 +10,8 @@ import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,8 +27,9 @@ import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.
 
 @Entity
 @Getter
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Collection extends BaseTimeEntity {
+public class Collection {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,11 +48,17 @@ public class Collection extends BaseTimeEntity {
     private String secondThumbnail;
     private String thirdThumbnail;
     private String fourthThumbnail;
-    private LocalDateTime lastPostUpdateTime;
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
     @NotNull
     private PublicOfCollectionStatus publicOfCollectionStatus;
+    private Double popularity;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedCollectionByIp> viewedCollectionByIps = new ArrayList<>();
@@ -70,18 +78,11 @@ public class Collection extends BaseTimeEntity {
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CommentInCollection> commentInCollections = new ArrayList<>();
 
-    private Double viewScore;
-    private Double likeScore;
-    private Double commentScore;
-    private Double followScore;
-    private Double popularity;
-
     //==연관관계 메소드==//
 
     private Long addViewedCollectionByIp(String ip) {
         ViewedCollectionByIp viewedCollectionByIp = ViewedCollectionByIp.createViewedCollectionByIp(ip, this);
 
-        updateViewScore();
         this.viewedCollectionByIps.add(viewedCollectionByIp);
         return viewedCollectionByIp.getId();
     }
@@ -96,7 +97,6 @@ public class Collection extends BaseTimeEntity {
     private Long addLikedCollectionByMember(Member member) {
         LikedCollection likedCollection = LikedCollection.createLikedCollection(member, this);
 
-        this.updateLikeScore();
         this.likedCollections.add(likedCollection);
 
         return likedCollection.getId();
@@ -105,21 +105,19 @@ public class Collection extends BaseTimeEntity {
     private Long addFollowingMemberByMember(Member member) {
         FollowedCollection followedCollection = FollowedCollection.createFollowedCollection(member, this);
 
-        this.updateFollowScore();
         this.followingMembers.add(followedCollection);
         member.addFollowedCollection(followedCollection);
+
         return followedCollection.getId();
     }
 
     public void addCollectedPost(CollectedPost collectedPost) {
         updateThumbnail(collectedPost.getPost());
-        updateLastPostUpdateTime();
         this.collectedPosts.add(collectedPost);
+        updateLastModifiedDate();
     }
 
     public void addCommentInCollection(CommentInCollection commentInCollection) {
-
-        this.updateCommentScore();
 
         this.commentInCollections.add(commentInCollection);
         commentInCollection.updateCollection(this);
@@ -127,7 +125,8 @@ public class Collection extends BaseTimeEntity {
 
     //==생성 메소드==//
     public static Collection createCollection(Member member, String title,
-                                              String content, PublicOfCollectionStatus publicOfCollectionStatus) throws OverTitleOfCollectionException, OverContentOfCollectionException {
+                                              String content, PublicOfCollectionStatus publicOfCollectionStatus)
+            throws OverTitleOfCollectionException, OverContentOfCollectionException {
 
         Collection collection = new Collection();
         collection.updateMember(member);
@@ -141,7 +140,8 @@ public class Collection extends BaseTimeEntity {
         }
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
-        collection.updateCountToZero();
+        collection.updatePopularityZero();
+        collection.updateLastModifiedDate();
         return collection;
     }
 
@@ -156,7 +156,8 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DEFAULT_COLLECTION_TITLE);
         collection.updateContent(DEFAULT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DEFAULT_COLLECTION_PUBLIC_STATUS);
-        collection.updateCountToZero();
+        collection.updatePopularityZero();
+        collection.updateLastModifiedDate();
 
         return collection;
 
@@ -172,31 +173,38 @@ public class Collection extends BaseTimeEntity {
         collection.updateTitle(DOCENT_COLLECTION_TITLE);
         collection.updateContent(DOCENT_COLLECTION_CONTENT);
         collection.updatePublicOfCollectionStatus(DOCENT_COLLECTION_PUBLIC_STATUS);
-        collection.updateCountToZero();
+        collection.updatePopularityZero();
+        collection.updateLastModifiedDate();
 
         return collection;
+    }
 
+    public static Collection createCollection(Long id) {
+        Collection collection = new Collection();
+        collection.updateId(id);
+
+        return collection;
     }
 
     //==수정 메소드==//
+    private void updateId(Long id) {
+        this.id = id;
+    }
+
     public void updateCollectedPosts(List<CollectedPost> collectedPosts) {
         this.collectedPosts = collectedPosts;
     }
 
-    public void updateCountToZero() {
-        this.viewScore = 0.0;
-        this.likeScore = 0.0;
-        this.commentScore = 0.0;
-        this.followScore = 0.0;
-        this.popularity = 0.0;
+    public void updatePopularityZero() {
+        popularity = 0.0;
+    }
+
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
     }
 
     public void updatePopularity() {
-        popularity = viewScore + likeScore + commentScore + followScore;
-    }
-
-    public void updateLastPostUpdateTime() {
-        lastPostUpdateTime = LocalDateTime.now();
+        popularity = executeViewScore() + executeLikeScore() + executeCommentScore() + executeFollowScore();
     }
     public void updatePublicOfCollectionStatus(PublicOfCollectionStatus publicOfCollectionStatus) {
         this.publicOfCollectionStatus = publicOfCollectionStatus;
@@ -237,12 +245,12 @@ public class Collection extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public void updateViewScore() {
+    public double executeViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedCollectionByIp viewedCollectionByIp;
         int j = 0, i = viewedCollectionByIps.size() - 1;
-        double result = 0, total = 1 * COLLECTION_VIEW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             viewedCollectionByIp = viewedCollectionByIps.get(i);
@@ -258,15 +266,14 @@ public class Collection extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = (total + COLLECTION_VIEW.getScores().get(j) * result) * COLLECTION_VIEW.getRate();
-        updatePopularity();
+        return (total + COLLECTION_VIEW.getScores().get(j) * result) * COLLECTION_VIEW.getRate();
     }
 
-    public void updateLikeScore() {
+    public double executeLikeScore() {
         LocalDateTime currentTime = LocalDateTime.now();
         LikedCollection likedCollection;
         int j = 0, i = likedCollections.size() - 1;
-        double result = 0, total = 1 * COLLECTION_LIKE.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             likedCollection = likedCollections.get(i);
@@ -282,16 +289,15 @@ public class Collection extends BaseTimeEntity {
                 j++;
             }
         }
-        likeScore = (total + COLLECTION_LIKE.getScores().get(j) * result) * COLLECTION_LIKE.getRate();
-        updatePopularity();
+        return (total + COLLECTION_LIKE.getScores().get(j) * result) * COLLECTION_LIKE.getRate();
     }
 
-    public void updateCommentScore() {
+    public double executeCommentScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         CommentInCollection commentInCollection;
         int j = 0, i = commentInCollections.size() - 1;
-        double result = 0, total = 1 * COLLECTION_COMMENT.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             commentInCollection = commentInCollections.get(i);
@@ -307,16 +313,14 @@ public class Collection extends BaseTimeEntity {
                 j++;
             }
         }
-        commentScore = (total + COLLECTION_COMMENT.getScores().get(j) * result) * COLLECTION_COMMENT.getRate();
-
-        updatePopularity();
+        return (total + COLLECTION_COMMENT.getScores().get(j) * result) * COLLECTION_COMMENT.getRate();
     }
 
-    public void updateFollowScore() {
+    public double executeFollowScore() {
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedCollection followedCollection;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = 1 * COLLECTION_FOLLOW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             followedCollection = followingMembers.get(i);
@@ -332,9 +336,7 @@ public class Collection extends BaseTimeEntity {
                 j++;
             }
         }
-        followScore = (total + COLLECTION_FOLLOW.getScores().get(j) * result) * COLLECTION_FOLLOW.getRate();
-
-        updatePopularity();
+        return (total + COLLECTION_FOLLOW.getScores().get(j) * result) * COLLECTION_FOLLOW.getRate();
     }
 
     public Long insertFollowedCollectionByMember(Member member) throws AlreadyFollowedCollectionException, CantFollowOwnCollectionException {

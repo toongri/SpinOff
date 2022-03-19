@@ -2,16 +2,26 @@ package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.collection.FollowedCollection;
+import com.nameless.spin_off.entity.collection.LikedCollection;
+import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
+import com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
+import com.nameless.spin_off.repository.collection.LikedCollectionRepository;
+import com.nameless.spin_off.repository.collection.ViewedCollectionByIpRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.util.List;
+
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
 @Service
 @RequiredArgsConstructor
@@ -20,76 +30,103 @@ public class CollectionServiceJpa implements CollectionService {
 
     private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
+    private final LikedCollectionRepository likedCollectionRepository;
+    private final ViewedCollectionByIpRepository viewedCollectionByIpRepository;
+    private final FollowedCollectionRepository followedCollectionRepository;
 
-
-    @Transactional()
+    @Transactional
     @Override
     public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO, Long memberId)
             throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
 
-        Member member = getMemberById(memberId);
-        Collection collection = Collection.createCollection(
-                member, collectionVO.getTitle(), collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus());
-
-        return collectionRepository.save(collection).getId();
+        return collectionRepository.save(Collection.createCollection(
+                Member.createMember(memberId), collectionVO.getTitle(),
+                collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus())).getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
 
-        Member member = getMemberById(memberId);
-        Collection collection = getCollectionByIdWithLikedCollection(collectionId);
+        isExistCollection(collectionId);
+        isExistLikedCollection(memberId, collectionId);
 
-        return collection.insertLikedCollectionByMember(member);
+        return likedCollectionRepository.save(
+                LikedCollection.createLikedCollection(
+                        Member.createMember(memberId), Collection.createCollection(collectionId))).getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertViewedCollectionByIp(String ip, Long collectionId)
             throws NotExistCollectionException {
 
-        Collection collection = getCollectionByIdWithViewedIp(collectionId);
-
-        return collection.insertViewedCollectionByIp(ip);
+        isExistCollection(collectionId);
+        if (!isExistCollectionIp(collectionId, ip)) {
+            return viewedCollectionByIpRepository.
+                    save(ViewedCollectionByIp
+                            .createViewedCollectionByIp(ip, Collection.createCollection(collectionId))).getId();
+        } else {
+            return null;
+        }
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
-        Member member = getMemberById(memberId);
-        Collection collection = getCollectionByIdWithFollowingMember(collectionId);
+        isCorrectCollectionId(memberId, collectionId);
+        isExistFollowedCollection(memberId, collectionId);
 
-        return collection.insertFollowedCollectionByMember(member);
+        return followedCollectionRepository.save(
+                FollowedCollection.createFollowedCollection(
+                        Member.createMember(memberId), Collection.createCollection(collectionId))).getId();
     }
 
-    private Member getMemberById(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
+    @Transactional
+    @Override
+    public int updateAllPopularity() {
+        List<Collection> collections = collectionQueryRepository
+                .findAllByViewAfterTime(CollectionScoreEnum.COLLECTION_VIEW.getOldestDate());
 
-        return optionalMember.orElseThrow(NotExistMemberException::new);
+        for (Collection collection : collections) {
+            collection.updatePopularity();
+        }
+        return collections.size();
     }
 
-    private Collection getCollectionByIdWithViewedIp(Long collectionId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection = collectionRepository
-                .findOneByIdWithViewedByIp(collectionId);
-
-        return optionalCollection.orElseThrow(NotExistCollectionException::new);
+    private void isExistLikedCollection(Long memberId, Long collectionId) {
+        if (collectionQueryRepository.isExistLikedCollection(memberId, collectionId)) {
+            throw new AlreadyLikedCollectionException();
+        }
     }
 
-    private Collection getCollectionByIdWithLikedCollection(Long collectionId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdWithLikedCollection(collectionId);
-
-        return optionalCollection.orElseThrow(NotExistCollectionException::new);
+    private void isExistFollowedCollection(Long memberId, Long collectionId) {
+        if (collectionQueryRepository.isExistFollowedCollection(memberId, collectionId)) {
+            throw new AlreadyFollowedCollectionException();
+        }
     }
 
-    private Collection getCollectionByIdWithFollowingMember(Long collectionId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection =
-                collectionRepository.findOneByIdWithFollowingMember(collectionId);
+    private void isCorrectCollectionId(Long memberId, Long collectionId) {
+        Long collectionOwnerId = collectionQueryRepository.getCollectionOwnerId(collectionId);
 
-        return optionalCollection.orElseThrow(NotExistCollectionException::new);
+        if (collectionOwnerId == null) {
+            throw new NotExistCollectionException();
+        } else if (collectionOwnerId.equals(memberId)) {
+            throw new CantFollowOwnCollectionException();
+        }
+    }
+
+    private boolean isExistCollectionIp(Long collectionId, String ip) {
+        return collectionQueryRepository.isExistIp(collectionId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+    }
+
+    private void isExistCollection(Long collectionId) {
+        if (!collectionQueryRepository.isExist(collectionId)) {
+            throw new NotExistCollectionException();
+        }
     }
 }

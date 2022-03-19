@@ -20,6 +20,7 @@ import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
+import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +52,7 @@ class MainPageQueryServiceJpaTest {
     @Autowired MemberService memberService;
     @Autowired MovieService movieService;
     @Autowired HashtagService hashtagService;
+    @Autowired PostService postService;
 
     @Test
     public void 발견_메인페이지() throws Exception{
@@ -85,18 +87,21 @@ class MainPageQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A) ,mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -169,7 +174,9 @@ class MainPageQueryServiceJpaTest {
             postList.get(9).insertViewedPostByIp(""+i%5);
             em.flush();
         }
-
+        collectionService.updateAllPopularity();
+        postService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -241,18 +248,21 @@ class MainPageQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -320,7 +330,7 @@ class MainPageQueryServiceJpaTest {
                 PageRequest.of(0, 5, Sort.by("id").descending()),
                 PageRequest.of(0, 3, Sort.by("id").descending()),
                 PageRequest.of(0, 3, Sort.by("id").descending()),
-                PageRequest.of(0, 1, Sort.by("id").descending()),
+                PageRequest.of(0, 1, Sort.by("lastModifiedDate").descending()),
                 member.getId());
         System.out.println("함수종료");
 
@@ -358,7 +368,7 @@ class MainPageQueryServiceJpaTest {
                 PageRequest.of(1, 5, Sort.by("id").descending()),
                 PageRequest.of(1, 3, Sort.by("id").descending()),
                 PageRequest.of(1, 3, Sort.by("id").descending()),
-                PageRequest.of(1, 1, Sort.by("id").descending()),
+                PageRequest.of(1, 1, Sort.by("lastModifiedDate").descending()),
                 member.getId());
         content1 = followData.getCollections().getContent();
 

@@ -92,7 +92,7 @@ public class Complain extends BaseTimeEntity {
         if (complain instanceof Complain) {
             if ((((Complain) complain).getMember().equals(member))) {
                 if (((Complain) complain).getContentTypeStatus().equals(contentTypeStatus)) {
-                    if (contentTypeStatus == ContentTypeStatus.F) {
+                    if (contentTypeStatus.equals(ContentTypeStatus.F)) {
                         return ((Complain) complain).getComplainedMember().equals(complainedMember);
                     } else {
                         return ((Complain) complain).getContentId().equals(contentId);

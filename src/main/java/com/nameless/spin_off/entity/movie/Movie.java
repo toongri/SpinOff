@@ -52,29 +52,23 @@ public class Movie extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private GenreOfMovieStatus fourthGenreOfMovieStatus;
 
-    private Double postScore;
-    private Double viewScore;
-    private Double followScore;
     private Double popularity;
 
     //==연관관계 메소드==//
     private Long addViewedMovieByIp(String ip) {
         ViewedMovieByIp viewedMovieByIp = ViewedMovieByIp.createViewedMovieByIp(ip, this);
 
-        updateViewScore();
         this.viewedMovieByIps.add(viewedMovieByIp);
 
         return viewedMovieByIp.getId();
     }
 
     public void addTaggedPosts(Post post) {
-        updatePostScore();
         this.taggedPosts.add(post);
         post.updateMovie(this);
     }
 
     public void addFollowingMembers(FollowedMovie followedMovie) {
-        updateFollowScore();
         this.followingMembers.add(followedMovie);
     }
 
@@ -88,25 +82,27 @@ public class Movie extends BaseTimeEntity {
         movie.updateId(id);
         movie.updateTitle(title);
         movie.updateImageUrl(imageUrl);
-        movie.updateCountToZero();
+        movie.updatePopularityZero();
         movie.updateFirstGenreOfMovieStatus(firstGenreOfMovieStatus);
         movie.updateSecondGenreOfMovieStatus(secondGenreOfMovieStatus);
         movie.updateThirdGenreOfMovieStatus(thirdGenreOfMovieStatus);
         movie.updateFourthGenreOfMovieStatus(fourthGenreOfMovieStatus);
         return movie;
     }
+    public static Movie createMovie(Long id) {
+        Movie movie = new Movie();
+        movie.updateId(id);
+
+        return movie;
+    }
 
     //==수정 메소드==//
-
-    public void updateCountToZero() {
-        this.viewScore = 0.0;
-        this.postScore = 0.0;
-        this.followScore = 0.0;
-        this.popularity = 0.0;
+    public void updatePopularityZero() {
+        popularity = 0.0;
     }
 
     public void updatePopularity() {
-        this.popularity = viewScore + postScore + followScore;
+        popularity = executeViewScore() + executeFollowScore() + executePostScore();
     }
     private void updateImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
@@ -140,12 +136,12 @@ public class Movie extends BaseTimeEntity {
         }
     }
 
-    public void updateFollowScore() {
+    public double executeFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedMovie followedMovie ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = 1 * MOVIE_FOLLOW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             followedMovie = followingMembers.get(i);
@@ -161,17 +157,15 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        followScore = (total + MOVIE_FOLLOW.getScores().get(j) * result) * MOVIE_FOLLOW.getRate();
-
-        updatePopularity();
+        return (total + MOVIE_FOLLOW.getScores().get(j) * result) * MOVIE_FOLLOW.getRate();
     }
 
-    public void updateViewScore() {
+    public double executeViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedMovieByIp viewedMovieByIp ;
         int j = 0, i = viewedMovieByIps.size() - 1;
-        double result = 0, total = 1 * MOVIE_VIEW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             viewedMovieByIp = viewedMovieByIps.get(i);
@@ -187,17 +181,15 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = (total + MOVIE_VIEW.getScores().get(j) * result) * MOVIE_VIEW.getRate();
-
-        updatePopularity();
+        return (total + MOVIE_VIEW.getScores().get(j) * result) * MOVIE_VIEW.getRate();
     }
 
-    public void updatePostScore() {
+    public double executePostScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         Post post ;
         int j = 0, i = taggedPosts.size() - 1;
-        double result = 0, total = 1 * MOVIE_POST.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             post = taggedPosts.get(i);
@@ -213,9 +205,7 @@ public class Movie extends BaseTimeEntity {
                 j++;
             }
         }
-        postScore = (total + MOVIE_POST.getScores().get(j) * result) * MOVIE_POST.getRate();
-
-        updatePopularity();
+        return (total + MOVIE_POST.getScores().get(j) * result) * MOVIE_POST.getRate();
     }
 
     //==조회 로직==//

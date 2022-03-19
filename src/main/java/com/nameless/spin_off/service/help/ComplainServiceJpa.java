@@ -5,6 +5,7 @@ import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.member.DirectMessage;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -19,9 +20,11 @@ import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
+import com.nameless.spin_off.repository.help.ComplainRepository;
 import com.nameless.spin_off.repository.member.DirectMessageRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +36,7 @@ import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.*;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class JpaComplainService implements ComplainService{
+public class ComplainServiceJpa implements ComplainService{
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -41,37 +44,51 @@ public class JpaComplainService implements ComplainService{
     private final DirectMessageRepository directMessageRepository;
     private final CommentInCollectionRepository commentInCollectionRepository;
     private final CommentInPostRepository commentInPostRepository;
+    private final MemberQueryRepository memberQueryRepository;
+    private final PostQueryRepository postQueryRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
+    private final CommentInPostQueryRepository commentInPostQueryRepository;
+    private final CommentInCollectionQueryRepository commentInCollectionQueryRepository;
+    private final DirectMessageQueryRepository directMessageQueryRepository;
+    private final ComplainQueryRepository complainQueryRepository;
+    private final ComplainRepository complainRepository;
 
-    @Transactional()
+
+    @Transactional
     @Override
-    public Long insertComplain(Long memberId, Long contentId, ContentTypeStatus contentTypeStatus,
+    public Long insertComplain(Long memberId, Long complainedId, ContentTypeStatus contentTypeStatus,
                                ComplainStatus complainStatus) throws NotExistMemberException,
             NotExistPostException, AlreadyComplainException, NotExistCollectionException, UnknownContentTypeException,
             NotExistDMException, NotExistCommentInPostException, NotExistCommentInCollectionException {
 
-        Member member = getMember(memberId);
+        isExistComplain(memberId, complainedId, contentTypeStatus);
+        Long id = getComplainedMemberByContentId(complainedId, contentTypeStatus);
 
-        Member complainedMember = getComplainedMemberByContentId(contentId, contentTypeStatus);
-
-        return complainedMember.addComplain(member, contentId, contentTypeStatus, complainStatus);
+        return complainRepository.save(Complain.createComplain(Member.createMember(memberId), Member.createMember(id),
+                complainedId, contentTypeStatus, complainStatus)).getId();
     }
 
-    private Member getComplainedMemberByContentId(Long contentId, ContentTypeStatus contentTypeStatus) throws NotExistCollectionException, NotExistPostException, UnknownContentTypeException, NotExistDMException, NotExistCommentInCollectionException, NotExistCommentInPostException {
-        Member complainedMember;
-        if (contentTypeStatus == B) {
-            complainedMember = getCollectionByIdWithComplainOfMember(contentId);
-        } else if (contentTypeStatus == A) {
-            complainedMember = getPostByIdWithComplainOfMember(contentId);
+    private Long getComplainedMemberByContentId(Long complainedId, ContentTypeStatus contentTypeStatus)
+            throws NotExistCollectionException, NotExistPostException, UnknownContentTypeException,
+            NotExistDMException, NotExistCommentInCollectionException, NotExistCommentInPostException {
+        Long memberId = null;
+        if (contentTypeStatus == A) {
+            memberId = getPostOwnerId(complainedId);
+        } else if (contentTypeStatus == B){
+            memberId = getCollectionOwnerId(complainedId);
         } else if (contentTypeStatus == C) {
-            complainedMember = getDMByIdWithComplainOfMember(contentId);
+            memberId = getDMOwnerId(complainedId);
         } else if (contentTypeStatus == D) {
-            complainedMember = getCommentInCollectionByIdWithComplainOfMember(contentId);
+            memberId = getCommentInCollectionOwnerId(complainedId);
         } else if (contentTypeStatus == E) {
-            complainedMember = getCommentInPostByIdWithComplainOfMember(contentId);
+            memberId = getCommentInPostOwnerId(complainedId);
+        } else if (contentTypeStatus == F) {
+            isExistMember(complainedId);
+            memberId = complainedId;
         } else {
             throw new UnknownContentTypeException();
         }
-        return complainedMember;
+        return memberId;
     }
 
     private Member getPostByIdWithComplainOfMember(Long contentId) throws NotExistPostException {
@@ -110,5 +127,66 @@ public class JpaComplainService implements ComplainService{
     private Member getMember(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findById(memberId);
         return optionalMember.orElseThrow(NotExistMemberException::new);
+    }
+
+    private void isExistMember(Long memberId) {
+        if (!memberQueryRepository.isExist(memberId)) {
+            throw new NotExistMemberException();
+        }
+    }
+
+    private void isExistComplain(Long memberId, Long contentId, ContentTypeStatus contentTypeStatus) {
+        if (complainQueryRepository.isExistComplain(memberId, contentId, contentTypeStatus)) {
+            throw new AlreadyComplainException();
+        }
+    }
+    private Long getCollectionOwnerId(Long collectionId) {
+        Long collectionOwnerId = collectionQueryRepository.getCollectionOwnerId(collectionId);
+
+        if (collectionOwnerId == null) {
+            throw new NotExistCollectionException();
+        } else {
+            return collectionOwnerId;
+        }
+    }
+
+    private Long getPostOwnerId(Long postId) {
+        Long collectionOwnerId = postQueryRepository.getPostOwnerId(postId);
+
+        if (collectionOwnerId == null) {
+            throw new NotExistPostException();
+        } else {
+            return collectionOwnerId;
+        }
+    }
+
+    private Long getCommentInCollectionOwnerId(Long commentId) {
+        Long collectionOwnerId = commentInCollectionQueryRepository.getCommentOwnerId(commentId);
+
+        if (collectionOwnerId == null) {
+            throw new NotExistCommentInCollectionException();
+        } else {
+            return collectionOwnerId;
+        }
+    }
+
+    private Long getCommentInPostOwnerId(Long commentId) {
+        Long collectionOwnerId = commentInPostQueryRepository.getCommentOwnerId(commentId);
+
+        if (collectionOwnerId == null) {
+            throw new NotExistCommentInPostException();
+        } else {
+            return collectionOwnerId;
+        }
+    }
+
+    private Long getDMOwnerId(Long dmId) {
+        Long collectionOwnerId = directMessageQueryRepository.getDMOwnerId(dmId);
+
+        if (collectionOwnerId == null) {
+            throw new NotExistDMException();
+        } else {
+            return collectionOwnerId;
+        }
     }
 }

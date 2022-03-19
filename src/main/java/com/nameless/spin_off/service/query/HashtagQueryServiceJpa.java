@@ -1,6 +1,5 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.dto.HashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,7 @@ public class HashtagQueryServiceJpa implements HashtagQueryService {
     }
 
     @Override
-    public List<HashtagDto.RelatedMostTaggedHashtagDto> getHashtagsByMemberIds(int length, List<Long> memberIds) {
+    public List<RelatedMostTaggedHashtagDto> getHashtagsByMemberIds(int length, List<Long> memberIds) {
         return hashtagQueryRepository.findAllByMemberIds(length, memberIds);
     }
 

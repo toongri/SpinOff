@@ -1,32 +1,42 @@
 package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PostedMedia;
+import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
+import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
+import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
+import com.nameless.spin_off.repository.query.CollectionQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.BanListOfContentsEnum.CANT_CONTAIN_AT_HASHTAG;
+import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 
 @Service
 @RequiredArgsConstructor
@@ -38,85 +48,99 @@ public class PostServiceJpa implements PostService{
     private final MovieRepository movieRepository;
     private final HashtagRepository hashtagRepository;
     private final CollectionRepository collectionRepository;
+    private final PostQueryRepository postQueryRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
+    private final LikedPostRepository likedPostRepository;
+    private final ViewedPostByIpRepository viewedPostByIpRepository;
+    private final CollectedPostRepository collectedPostRepository;
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO, Long memberId)
             throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
-        Member member = getMemberById(memberId);
-
-        List<PostedMedia> postedMedia = PostedMedia.createPostedMedias(postVO.getMediaUrls());
+        isCorrectCollectionWithOwner(postVO.getCollectionIds(), memberId);
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
         Movie movie = getMovieById(postVO.getMovieId());
-        List<Collection> collections = getCollectionsByIdIn(memberId, postVO.getCollectionIds());
 
-        Post post =  Post.buildPost()
-                .setMember(member)
+        Post post = postRepository.save(Post.buildPost()
+                .setMember(Member.createMember(memberId))
                 .setPostPublicStatus(postVO.getPublicOfPostStatus())
-                .setPostedMedias(postedMedia)
+                .setUrls(postVO.getMediaUrls())
                 .setHashTags(hashtags)
                 .setMovie(movie)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
-                .setCollections(collections)
-                .build();
+                .build());
 
-        return postRepository.save(post).getId();
+        ArrayList<CollectedPost> collectedPosts = new ArrayList<>();
+
+        for (Long collectionId : postVO.getCollectionIds()) {
+            collectedPosts.add(CollectedPost.createCollectedPost(
+                    Collection.createCollection(collectionId), post));
+        }
+        collectedPostRepository.saveAll(collectedPosts);
+
+        return post.getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        Member member = getMemberById(memberId);
-        Post post = getPostByIdWithLikedPost(postId);
-
-        return post.insertLikedPostByMember(member);
+        isExistPost(postId);
+        isExistLikedPost(memberId, postId);
+        return likedPostRepository.save(
+                LikedPost.createLikedPost(Member.createMember(memberId), Post.createPost(postId))).getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
 
-        Post post = getPostByIdWithViewedIp(postId);
-
-        return post.insertViewedPostByIp(ip);
+        isExistPost(postId);
+        if (!isExistPostIp(postId, ip)) {
+            return viewedPostByIpRepository.
+                    save(ViewedPostByIp.createViewedPostByIp(ip, Post.createPost(postId))).getId();
+        } else {
+            return null;
+        }
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
+        isExistPost(postId);
+        isCorrectCollectionWithOwner(collectionIds, memberId);
+        isExistCollectedPost(collectionIds, postId);
+        ArrayList<CollectedPost> collectedPosts = new ArrayList<>();
 
-        Post post = getPostWithCollectedPost(postId);
-        List<Collection> collections = getCollectionsByIdIn(memberId, collectionIds);
-
-        return post.insertCollectedPostByCollections(collections);
-    }
-
-    private List<Collection> getCollectionsByIdIn(Long memberId, List<Long> collectionIds)
-            throws NotMatchCollectionException {
-        List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
-
-        if (collections.size() == collectionIds.size() &&
-                collections.stream().allMatch(collection -> collection.getMember().getId().equals(memberId))) {
-            return collections;
-        } else {
-            throw new NotMatchCollectionException();
+        for (Long collectionId : collectionIds) {
+            collectedPosts.add(CollectedPost.createCollectedPost(
+                    Collection.createCollection(collectionId),
+                    Post.createPost(postId)));
         }
 
+        return collectedPostRepository.saveAll(collectedPosts)
+                .stream().map(CollectedPost::getId).collect(Collectors.toList());
     }
 
-    private Post getPostWithCollectedPost(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdWithCollectedPost(postId);
-        return optionalPost.orElseThrow(NotExistPostException::new);
-    }
+    @Transactional
+    @Override
+    public int updateAllPopularity() {
+        List<Post> posts = postQueryRepository
+                .findAllByViewAfterTime(POST_VIEW.getOldestDate());
 
+        for (Post post : posts) {
+            post.updatePopularity();
+        }
+        return posts.size();
+    }
 
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws InCorrectHashtagContentException {
 
@@ -153,12 +177,6 @@ public class PostServiceJpa implements PostService{
         return Optional.empty();
     }
 
-    private Member getMemberById(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
     private Movie getMovieById(Long movieId) throws NotExistMovieException {
         if (movieId == null) {
             return null;
@@ -168,16 +186,31 @@ public class PostServiceJpa implements PostService{
         return optionalMovie.orElseThrow(NotExistMovieException::new);
     }
 
-    private Post getPostByIdWithViewedIp(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository
-                .findOneByIdWithViewedByIp(postId);
-
-        return optionalPost.orElseThrow(NotExistPostException::new);
+    private void isExistLikedPost(Long memberId, Long postId) {
+        if (postQueryRepository.isExistLikedPost(memberId, postId)) {
+            throw new AlreadyLikedPostException();
+        }
     }
 
-    private Post getPostByIdWithLikedPost(Long postId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdWithLikedPost(postId);
+    private void isExistCollectedPost(List<Long> collectionId, Long postId) {
+        if (postQueryRepository.isExistCollectedPost(collectionId, postId)) {
+            throw new AlreadyCollectedPostException();
+        }
+    }
 
-        return optionalPost.orElseThrow(NotExistPostException::new);
+    private void isCorrectCollectionWithOwner(List<Long> collectionId, Long memberId) {
+        if (!collectionQueryRepository.isCorrectCollectionWithOwner(collectionId, memberId)) {
+            throw new NotMatchCollectionException();
+        }
+    }
+
+    private void isExistPost(Long postId) {
+        if (!postQueryRepository.isExist(postId)) {
+            throw new NotExistPostException();
+        }
+    }
+
+    private boolean isExistPostIp(Long postId, String ip) {
+        return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
     }
 }

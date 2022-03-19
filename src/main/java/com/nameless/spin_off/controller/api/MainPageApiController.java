@@ -63,7 +63,7 @@ public class MainPageApiController {
                     Pageable hashtagPageable,
             @Qualifier("movie_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
                     Pageable moviePageable,
-            @Qualifier("collection") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
+            @Qualifier("collection") @PageableDefault(sort = "lastModifiedDate", direction = Sort.Direction.DESC)
                     Pageable collectionPageable)
             throws NotExistMemberException {
 

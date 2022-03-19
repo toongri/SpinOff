@@ -7,15 +7,10 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
-import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.PostedMediaRepository;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_COMMENT;
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -35,10 +32,6 @@ class CommentInPostServiceJpaTest {
 
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired PostedMediaRepository postedMediaRepository;
-    @Autowired CollectionRepository collectionRepository;
-    @Autowired LikedPostRepository likedPostRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired CommentInPostService commentInPostService;
     @Autowired CommentInPostRepository commentInPostRepository;
@@ -51,9 +44,10 @@ class CommentInPostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
+        postService.insertViewedPostByIp("22", po.getId());
 
         em.flush();
         em.clear();
@@ -64,11 +58,17 @@ class CommentInPostServiceJpaTest {
                 new CommentDto.CreateCommentInPostVO(po.getId(), null, "야스히로 라할살"), mem.getId());
 
         System.out.println("포스트업로드");
+        em.flush();
+        em.clear();
+        postService.updateAllPopularity();
+        em.flush();
         Post post = postRepository.findById(po.getId()).get();
-
         //then
-        assertThat(post.getCommentScore()).isEqualTo(post.getCommentInPosts().size()*0.3*1.0);
-        assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1)).isEqualTo(commentInPostRepository.getById(commentId));
+        assertThat(post.getPopularity())
+                .isEqualTo(POST_VIEW.getRate() * POST_VIEW.getLatestScore() + +
+                        post.getCommentInPosts().size()*POST_COMMENT.getLatestScore()*POST_COMMENT.getRate());
+        assertThat(post.getCommentInPosts().get(post.getCommentInPosts().size() - 1))
+                .isEqualTo(commentInPostRepository.getById(commentId));
     }
 
     @Test
@@ -77,11 +77,9 @@ class CommentInPostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                .setHashTags(List.of()).build();
+                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
-        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
-        po.addCommentInPost(parent);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 
         em.flush();
         em.clear();
@@ -99,7 +97,14 @@ class CommentInPostServiceJpaTest {
                         new CommentDto.CreateCommentInPostVO(
                                 po.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
 
+        em.flush();
+        em.clear();
+
         System.out.println("부모댓글업로드");
+        postService.insertViewedPostByIp("22", po.getId());
+        em.flush();
+        em.clear();
+        postService.updateAllPopularity();
         CommentInPost parentComment = commentInPostRepository.findById(parent.getId()).get();
 
         System.out.println("포스트업로드");
@@ -108,14 +113,13 @@ class CommentInPostServiceJpaTest {
         //then
         assertThat(post.getCommentInPosts().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
-        assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);
-        assertThat(parentComment.getChildren().get(1)).isEqualTo(childComment2);
-        assertThat(childComment1.getParent()).isEqualTo(parentComment);
-        assertThat(childComment2.getParent()).isEqualTo(parentComment);
-
-        assertThat(post.getCommentScore()).isEqualTo(post.getPopularity());
-        assertThat(post.getCommentScore())
-                .isEqualTo(post.getCommentInPosts().size() * 1.0 * 0.3);
+        assertThat(parentComment.getChildren().get(0).getId()).isEqualTo(childComment1.getId());
+        assertThat(parentComment.getChildren().get(1).getId()).isEqualTo(childComment2.getId());
+        assertThat(childComment1.getParent().getId()).isEqualTo(parentComment.getId());
+        assertThat(childComment2.getParent().getId()).isEqualTo(parentComment.getId());
+        assertThat(post.getPopularity())
+                .isEqualTo(POST_VIEW.getRate() * POST_VIEW.getLatestScore() +
+                        post.getCommentInPosts().size() * POST_COMMENT.getLatestScore() * POST_COMMENT.getRate());
     }
 
     @Test
@@ -125,7 +129,7 @@ class CommentInPostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
 
@@ -139,8 +143,6 @@ class CommentInPostServiceJpaTest {
         //when
 
         //then
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO1, 0L))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2, mem.getId()))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3, mem.getId()))
@@ -155,11 +157,9 @@ class CommentInPostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                .setHashTags(List.of()).build();
+                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
-        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
-        po.addCommentInPost(parent);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 
         em.flush();
         em.clear();
@@ -188,11 +188,9 @@ class CommentInPostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                .setHashTags(List.of()).build();
+                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
-        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null);
-        po.addCommentInPost(parent);
+        CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 
         em.flush();
         em.clear();
@@ -206,9 +204,6 @@ class CommentInPostServiceJpaTest {
         CommentInPost comment = commentInPostRepository.getById(po.getCommentInPosts().get(0).getId());
 
         //then
-
-        assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(-1L, po.getCommentInPosts().get(0).getId()))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), -1L))
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId()))

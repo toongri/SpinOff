@@ -41,7 +41,7 @@ public class MemberRepositoryTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);
@@ -74,7 +74,7 @@ public class MemberRepositoryTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_COLLECT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -50,7 +51,8 @@ public class PostRepositoryTest {
         for (Post post : posts) {
             List<CollectedPost> collectedPosts = collectedPostRepository.findAllByPost(post);
 
-            assertThat(post.getCollectionScore()).isEqualTo(collectedPosts.size());
+            assertThat(post.getPopularity())
+                    .isEqualTo(collectedPosts.size() * POST_COLLECT.getLatestScore() * POST_COLLECT.getRate());
 
         }
     }

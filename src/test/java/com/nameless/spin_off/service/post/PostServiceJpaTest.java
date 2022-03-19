@@ -10,7 +10,6 @@ import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
-import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -32,6 +31,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -87,11 +87,18 @@ class PostServiceJpaTest {
         PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of("형윤이", "형윤이?"), List.of(), collectionIds);
-
+        System.out.println("서비스");
         Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
-        Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
+        em.flush();
+        em.clear();
 
-        Double postCollectionCount = post1.getCollectionScore();
+        System.out.println("포스트");
+        postService.insertViewedPostByIp("22", aLong);
+        em.flush();
+        postService.updateAllPopularity();
+        em.flush();
+
+        Post post1 = postRepository.findById(aLong).orElseThrow(Exception::new);
         Set<PostedHashtag> postedHashtags = post1.getPostedHashtags();
         int postPostedHashtagSize = postedHashtags.size();
 
@@ -116,9 +123,9 @@ class PostServiceJpaTest {
         assertThat(prepareCollectedPosts1Size).isEqualTo(postCollectedPosts1Size - 1);
         assertThat(prepareCollectedPosts2Size).isEqualTo(postCollectedPosts2Size - 1);
         assertThat(prepareCollectedPosts3Size).isEqualTo(postCollectedPosts3Size - 1);
-        assertThat(postCollectionCount).isEqualTo(3);
+        assertThat(post1.getPopularity()).isEqualTo(POST_COLLECT.getLatestScore() * POST_COLLECT.getRate() * 3 +
+                POST_VIEW.getRate() * POST_VIEW.getLatestScore());
         assertThat(postPostedHashtagSize).isEqualTo(2);
-
     }
 
     @Test
@@ -142,8 +149,6 @@ class PostServiceJpaTest {
         //when
 
         //then
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO1, 0L))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2, member.getId()))
                 .isInstanceOf(NotExistMovieException.class);//.hasMessageContaining("")
@@ -159,7 +164,7 @@ class PostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -171,14 +176,20 @@ class PostServiceJpaTest {
         postService.insertLikedPostByMemberId(mem.getId(), po.getId());
 
         System.out.println("포스트");
+        postService.insertViewedPostByIp("aa", po.getId());
+        em.flush();
+        postService.updateAllPopularity();
+        em.flush();
         Post post = postRepository.getById(po.getId());
         System.out.println("멤버");
         Member member = memberRepository.getById(mem.getId());
 
         //then
-        assertThat(post.getLikeScore()).isEqualTo(1.0*0.5);
+        assertThat(post.getPopularity())
+                .isEqualTo(POST_LIKE.getLatestScore() * POST_LIKE.getRate() +
+                        POST_VIEW.getRate() * POST_VIEW.getLatestScore());
         assertThat(post.getLikedPosts().size()).isEqualTo(1);
-        assertThat(post.getLikedPosts().get(0).getMember()).isEqualTo(member);
+        assertThat(post.getLikedPosts().get(0).getMember().getId()).isEqualTo(member.getId());
 
     }
 
@@ -189,7 +200,7 @@ class PostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -206,9 +217,6 @@ class PostServiceJpaTest {
         Member member = memberRepository.findById(mem.getId()).get();
 
         //then
-        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(0L, po.getId()))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), 0L))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
 
@@ -221,7 +229,7 @@ class PostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -246,7 +254,7 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
 
@@ -258,11 +266,15 @@ class PostServiceJpaTest {
         now = LocalDateTime.now();
         System.out.println("서비스함수");
         postService.insertViewedPostByIp("00", post.getId());
+        em.flush();
+        postService.updateAllPopularity();
+        em.flush();
         System.out.println("포스트");
         Post post1 = postRepository.getById(post.getId());
 
         //then
-        assertThat(post1.getViewScore()).isEqualTo(post1.getViewedPostByIps().size() * 1.0);
+        assertThat(post1.getPopularity())
+                .isEqualTo(post1.getViewedPostByIps().size() * POST_VIEW.getRate() * POST_VIEW.getLatestScore());
         assertThat(post1.getViewSize()).isEqualTo(1);
 
     }
@@ -274,24 +286,30 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
         now = LocalDateTime.now();
         postService.insertViewedPostByIp("00", post.getId());
 
         em.flush();
+        postService.updateAllPopularity();
+
+        em.flush();
         em.clear();
 
         //when
-        now = LocalDateTime.now();
         System.out.println("서비스함수");
         postService.insertViewedPostByIp("00", post.getId());
         System.out.println("포스트");
+        em.flush();
+        postService.updateAllPopularity();
+        em.flush();
         Post post2 = postRepository.getById(post.getId());
         
         //then
-        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size() * 1.0);
+        assertThat(post2.getPopularity())
+                .isEqualTo(post2.getViewedPostByIps().size() * POST_VIEW.getRate() * POST_VIEW.getLatestScore());
         assertThat(post2.getViewSize()).isEqualTo(1);
 
     }
@@ -304,7 +322,7 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
         now = LocalDateTime.now();
@@ -321,9 +339,8 @@ class PostServiceJpaTest {
         Post post2 = postRepository.getById(post.getId());
 
         //then
-        assertThat(post2.getViewScore()).isEqualTo(post2.getViewedPostByIps().size());
-        assertThat(post2.getViewScore()).isEqualTo(2);
-
+        assertThat(post2.getPopularity()).isEqualTo(post2.getViewedPostByIps().size());
+        assertThat(post2.getPopularity()).isEqualTo(2);
     }
 
     @Test
@@ -334,7 +351,7 @@ class PostServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         now = LocalDateTime.now();

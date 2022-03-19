@@ -50,7 +50,7 @@ public class SignApiController {
 
     @GetMapping("/linkage-email")
     public SignResult<String> linkageEmail(@ModelAttribute EmailLinkageCheckRequestDto requestDto) {
-        memberService.emailLinkageCheck(requestDto);
+        memberService.checkEmailLinkage(requestDto);
         return getResult("연동이 완료되었습니다.");
     }
 

@@ -63,22 +63,34 @@ public class CommentInCollection extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static CommentInCollection createCommentInCollection(Member member, String content, CommentInCollection parent) {
+    public static CommentInCollection createCommentInCollection(
+            Member member, String content, CommentInCollection parent, Collection collection) {
 
         CommentInCollection commentInCollection = new CommentInCollection();
         commentInCollection.updateMember(member);
         commentInCollection.updateContent(content);
         commentInCollection.updateIsDeletedToFalse();
+        collection.addCommentInCollection(commentInCollection);
 
         if ( parent != null) {
             parent.addChildren(commentInCollection);
         }
 
         return commentInCollection;
+    }
 
+    public static CommentInCollection createCommentInCollection(Long id) {
+
+        CommentInCollection commentInCollection = new CommentInCollection();
+        commentInCollection.updateId(id);
+
+        return commentInCollection;
     }
 
     //==수정 메소드==//
+    public void updateId(Long id) {
+        this.id = id;
+    }
     public void updateCollection(Collection collection) {
         this.collection = collection;
     }

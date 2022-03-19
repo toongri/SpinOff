@@ -4,7 +4,6 @@ import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedHashtagException;
-import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
@@ -14,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.HASHTAG_FOLLOW;
+import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -45,18 +46,21 @@ class HashtagServiceJpaTest {
             hashtagService.insertViewedHashtagByIp("" + i % 2, hashtag2.getId());
             hashtagService.insertViewedHashtagByIp("" + i % 3, hashtag3.getId());
         }
+        System.out.println("멤버함수");
+        hashtagService.updateAllPopularity();
+        em.flush();
 
         Hashtag tag = hashtagRepository.getById(hashtag.getId());
         Hashtag tag2 = hashtagRepository.getById(hashtag2.getId());
         Hashtag tag3 = hashtagRepository.getById(hashtag3.getId());
 
         //then
-        assertThat(tag.getViewScore()).isEqualTo(tag.getViewedHashtagByIps().size() * 1.0 * 0.3);
-        assertThat(tag.getViewScore()).isEqualTo(10 * 1.0 * 0.3);
-        assertThat(tag2.getViewScore()).isEqualTo(tag2.getViewedHashtagByIps().size() * 1.0 * 0.3);
-        assertThat(tag2.getViewScore()).isEqualTo(2 * 1.0 * 0.3);
-        assertThat(tag3.getViewScore()).isEqualTo(tag3.getViewedHashtagByIps().size() * 1.0 * 0.3);
-        assertThat(tag3.getViewScore()).isEqualTo(3 * 1.0 * 0.3);
+        assertThat(tag.getPopularity())
+                .isEqualTo(tag.getViewedHashtagByIps().size() * HASHTAG_VIEW.getRate() * HASHTAG_VIEW.getLatestScore());
+        assertThat(tag2.getPopularity())
+                .isEqualTo(tag2.getViewedHashtagByIps().size() * HASHTAG_VIEW.getRate() * HASHTAG_VIEW.getLatestScore());
+        assertThat(tag3.getPopularity())
+                .isEqualTo(tag3.getViewedHashtagByIps().size() * HASHTAG_VIEW.getRate() * HASHTAG_VIEW.getLatestScore());
     }
 
 
@@ -78,6 +82,10 @@ class HashtagServiceJpaTest {
         hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId);
 
         System.out.println("멤버함수");
+        hashtagService.insertViewedHashtagByIp("33", hashtagId);
+        em.flush();
+        hashtagService.updateAllPopularity();
+        em.flush();
         Member newMember = memberRepository.getById(memberId);
         Hashtag newHashtag = hashtagRepository.getById(hashtagId);
         //then
@@ -85,7 +93,9 @@ class HashtagServiceJpaTest {
         assertThat(newMember.getFollowedHashtags().size()).isEqualTo(1);
         assertThat(newMember.getFollowedHashtags().iterator().next().getHashtag().getId()).isEqualTo(hashtagId);
         assertThat(newHashtag.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newHashtag.getFollowScore()).isEqualTo(1.0 * 0.5);
+        assertThat(newHashtag.getPopularity())
+                .isEqualTo(HASHTAG_VIEW.getLatestScore() * HASHTAG_VIEW.getRate() +
+                        HASHTAG_FOLLOW.getLatestScore() * HASHTAG_FOLLOW.getRate());
     }
 
     @Test
@@ -110,9 +120,7 @@ class HashtagServiceJpaTest {
         //then
         assertThatThrownBy(() -> hashtagService.insertFollowedHashtagByHashtagId(memberId, hashtagId))
                 .isInstanceOf(AlreadyFollowedHashtagException.class);
-        assertThatThrownBy(() -> hashtagService.insertFollowedHashtagByHashtagId(0L, hashtagId))
-                .isInstanceOf(NotExistMemberException.class);
-        assertThatThrownBy(() -> hashtagService.insertFollowedHashtagByHashtagId(memberId, 0L))
+        assertThatThrownBy(() -> hashtagService.insertFollowedHashtagByHashtagId(memberId, -1L))
                 .isInstanceOf(NotExistHashtagException.class);
     }
 }

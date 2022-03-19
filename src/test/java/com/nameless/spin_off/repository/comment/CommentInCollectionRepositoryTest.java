@@ -5,8 +5,8 @@ import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.post.PostService;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -43,18 +42,13 @@ class CommentInCollectionRepositoryTest {
         Collection collection = Collection.createDefaultCollection(member);
         collectionRepository.save(collection);
         CommentInCollection parentComment = CommentInCollection
-                .createCommentInCollection(member, "야스히로 라할살", null);
-        collection.addCommentInCollection(parentComment);
+                .createCommentInCollection(member, "야스히로 라할살", null, collection);
 
         CommentInCollection childComment1 = CommentInCollection
-                .createCommentInCollection(member, "요지스타 라할살", parentComment);
+                .createCommentInCollection(member, "요지스타 라할살", parentComment, collection);
+        em.flush();
         CommentInCollection childComment2 = CommentInCollection
-                .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment);
-
-        em.flush();
-        collection.addCommentInCollection(childComment1);
-        em.flush();
-        collection.addCommentInCollection(childComment2);
+                .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment, collection);
         em.flush();
         em.clear();
 
@@ -92,19 +86,15 @@ class CommentInCollectionRepositoryTest {
         Collection collection = Collection.createDefaultCollection(member);
         collectionRepository.save(collection);
         CommentInCollection parentComment = CommentInCollection
-                .createCommentInCollection(member, "야스히로 라할살", null);
-        collection.addCommentInCollection(parentComment);
+                .createCommentInCollection(member, "야스히로 라할살", null, collection);
 
+        em.flush();
         CommentInCollection childComment1 = CommentInCollection
-                .createCommentInCollection(member, "요지스타 라할살", parentComment);
+                .createCommentInCollection(member, "요지스타 라할살", parentComment, collection);
+        em.flush();
         CommentInCollection childComment2 = CommentInCollection
-                .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment);
+                .createCommentInCollection(member, "슈퍼스타검흰 라할살", parentComment, collection);
 
-        em.flush();
-        collection.addCommentInCollection(childComment1);
-
-        em.flush();
-        collection.addCommentInCollection(childComment2);
 
         //when
         List<CommentInCollection> list = commentInCollectionRepository

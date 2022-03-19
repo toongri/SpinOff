@@ -8,7 +8,6 @@ import com.nameless.spin_off.entity.enums.post.AuthorityOfPostStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
@@ -22,6 +21,8 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -40,8 +41,9 @@ import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.*;
 @Entity
 @Getter
 @ToString
+@EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Post extends BaseTimeEntity {
+public class Post {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +62,13 @@ public class Post extends BaseTimeEntity {
     private String title;
     private String content;
     private String thumbnailUrl;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
+    private Double popularity;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_post_status")
@@ -92,12 +101,6 @@ public class Post extends BaseTimeEntity {
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
-    private Double viewScore;
-    private Double likeScore;
-    private Double commentScore;
-    private Double collectionScore;
-    private Double popularity;
-
     //==연관관계 메소드==//
 
     public void addPostedMedia(PostedMedia postedMedia) {
@@ -105,8 +108,7 @@ public class Post extends BaseTimeEntity {
         postedMedia.updatePost(this);
     }
 
-    private List<Long> addAllCollectedPost(List<Collection> collections) {
-        this.updateCollectScore(collections.size());
+    public List<Long> addAllCollectedPost(List<Collection> collections) {
         List<CollectedPost> collectedPosts = new ArrayList<>();
 
         for (Collection collection : collections) {
@@ -121,7 +123,6 @@ public class Post extends BaseTimeEntity {
     private Long addViewedPostByIp(String ip) {
         ViewedPostByIp viewedPostByIp = ViewedPostByIp.createViewedPostByIp(ip, this);
 
-        this.updateViewScore();
         this.viewedPostByIps.add(viewedPostByIp);
 
         return viewedPostByIp.getId();
@@ -134,7 +135,6 @@ public class Post extends BaseTimeEntity {
     }
 
     public void addCommentInPost(CommentInPost commentInPost) {
-        this.updateCommentScore();
         this.commentInPosts.add(commentInPost);
         commentInPost.updatePost(this);
     }
@@ -142,7 +142,6 @@ public class Post extends BaseTimeEntity {
     private Long addLikedPostByMember(Member member) {
         LikedPost likedPost = LikedPost.createLikedPost(member, this);
 
-        this.updateLikeScore();
         this.likedPosts.add(likedPost);
 
         return likedPost.getId();
@@ -171,7 +170,7 @@ public class Post extends BaseTimeEntity {
 
     //==생성 메소드==//
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
-                                  List<Hashtag> hashtags, List<PostedMedia> postedMedias, List<Collection> collections,
+                                  List<Hashtag> hashtags, List<String> urls,
                                   Movie movie, PublicOfPostStatus publicOfPostStatus)
             throws AlreadyPostedHashtagException, OverTitleOfPostException, OverContentOfPostException {
         Post post = new Post();
@@ -187,18 +186,20 @@ public class Post extends BaseTimeEntity {
         post.updateContent(content);
         post.updateThumbnailUrl(thumbnailUrl);
         post.addAllPostedHashtagsByHashtags(hashtags);
-        post.addAllPostedMedias(postedMedias);
+        post.updatePostedMedia(urls);
         post.updatePublicOfPostStatus(publicOfPostStatus);
-        post.updateCountToZero();
+        post.updatePopularityZero();
         post.updateAuthorityOfPostStatus(AuthorityOfPostStatus.C);
-
-
-        if (!collections.isEmpty()) {
-            post.addAllCollectedPost(collections);
-        }
+        post.updateLastModifiedDate();
 
         if (movie != null)
             movie.addTaggedPosts(post);
+
+        return post;
+    }
+    public static Post createPost(Long id) {
+        Post post = new Post();
+        post.updateId(id);
 
         return post;
     }
@@ -208,23 +209,26 @@ public class Post extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateId(Long id) {
+        this.id = id;
+    }
 
-    public void updateCountToZero() {
-        this.viewScore = 0.0;
-        this.likeScore = 0.0;
-        this.commentScore = 0.0;
-        this.collectionScore = 0.0;
-        this.popularity = 0.0;
+    public void updatePopularityZero() {
+        popularity = 0.0;
     }
 
     public void updatePopularity() {
-        popularity = viewScore + likeScore + commentScore + collectionScore;
+        popularity = executeViewScore() + executeLikeScore() + executeCommentScore() + executeCollectScore();
     }
 
     public void updatePublicOfPostStatus(PublicOfPostStatus publicStatus) {
         this.publicOfPostStatus = publicStatus;
     }
 
+    public void updatePostedMedia(List<String> urls) {
+        this.postedMedias =
+                urls.stream().map(url -> PostedMedia.createPostedMedia(url, this)).collect(Collectors.toList());
+    }
     public void updateThumbnailUrl(String thumbnailUrl) {
         this.thumbnailUrl = thumbnailUrl;
     }
@@ -242,6 +246,10 @@ public class Post extends BaseTimeEntity {
 
     public void updateMember(Member member) {
         this.member = member;
+    }
+
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
     }
 
     public void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
@@ -286,12 +294,12 @@ public class Post extends BaseTimeEntity {
 
     }
 
-    public void updateViewScore() {
+    public double executeViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         ViewedPostByIp viewedPostByIp;
         int j = 0, i = viewedPostByIps.size() - 1;
-        double result = 0, total = 1 * POST_VIEW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             viewedPostByIp = viewedPostByIps.get(i);
@@ -307,16 +315,14 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        viewScore = (total + POST_VIEW.getScores().get(j) * result ) * POST_VIEW.getRate();
-        updatePopularity();
+        return (total + POST_VIEW.getScores().get(j) * result ) * POST_VIEW.getRate();
     }
 
-    public void updateLikeScore() {
-
+    public double executeLikeScore() {
         LocalDateTime currentTime = LocalDateTime.now();
         LikedPost likedPost;
         int j = 0, i = likedPosts.size() - 1;
-        double result = 0, total = 1 * POST_LIKE.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             likedPost = likedPosts.get(i);
@@ -328,20 +334,20 @@ public class Post extends BaseTimeEntity {
                     break;
                 }
                 total += POST_LIKE.getScores().get(j) * result;
+
                 result = 0;
                 j++;
             }
         }
-        likeScore = (total + POST_LIKE.getScores().get(j) * result) * POST_LIKE.getRate();
-        updatePopularity();
+        return (total + POST_LIKE.getScores().get(j) * result) * POST_LIKE.getRate();
     }
 
-    public void updateCommentScore() {
+    public double executeCommentScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         CommentInPost commentInPost;
         int j = 0, i = commentInPosts.size() - 1;
-        double result = 0, total = 1 * POST_COMMENT.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             commentInPost = commentInPosts.get(i);
@@ -357,16 +363,15 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        commentScore = (total + POST_COMMENT.getScores().get(j) * result) * POST_COMMENT.getRate();
-        updatePopularity();
+        return (total + POST_COMMENT.getScores().get(j) * result) * POST_COMMENT.getRate();
     }
 
-    public void updateCollectScore(int listSize) {
+    public double executeCollectScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         CollectedPost collectedPost;
         int j = 0, i = collectedPosts.size() - 1;
-        double result = 0, total = listSize * POST_COLLECT.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             collectedPost = collectedPosts.get(i);
@@ -382,8 +387,7 @@ public class Post extends BaseTimeEntity {
                 j++;
             }
         }
-        collectionScore = (total + POST_COLLECT.getScores().get(j) * result) * POST_COLLECT.getRate();
-        updatePopularity();
+        return (total + POST_COLLECT.getScores().get(j) * result) * POST_COLLECT.getRate();
     }
 
     //==조회 로직==//

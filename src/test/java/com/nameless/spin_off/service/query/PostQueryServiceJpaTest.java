@@ -19,6 +19,7 @@ import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -50,6 +51,7 @@ public class PostQueryServiceJpaTest {
     @Autowired MovieRepository movieRepository;
     @Autowired MemberService memberService;
     @Autowired PostQueryService postQueryService;
+    @Autowired PostService postService;
 
     @Test
     public void 발견_포스트_테스트() throws Exception{
@@ -64,7 +66,7 @@ public class PostQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
             postList.add(save);
             em.flush();
@@ -83,7 +85,9 @@ public class PostQueryServiceJpaTest {
             postList.get(9).insertViewedPostByIp(""+i%5);
             em.flush();
         }
-
+        em.clear();
+        postService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -134,7 +138,7 @@ public class PostQueryServiceJpaTest {
         for (Hashtag hashtag : hashtagList) {
             member.addFollowedHashtag(hashtag);
             Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(hashtagList).build());
             postList.add(save);
 
@@ -206,7 +210,7 @@ public class PostQueryServiceJpaTest {
         for (Movie movie : movieList) {
             member.addFollowedMovie(movie);
             Post save = postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).setMovie(movie).build());
             postList.add(save);
 
@@ -226,7 +230,9 @@ public class PostQueryServiceJpaTest {
             postList.get(9).insertViewedPostByIp(""+i%5);
             em.flush();
         }
-
+        em.clear();
+        postService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -273,7 +279,7 @@ public class PostQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             Post save = postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
             postList.add(save);
             em.flush();
@@ -292,8 +298,11 @@ public class PostQueryServiceJpaTest {
             postList.get(9).insertViewedPostByIp(""+i%5);
             em.flush();
         }
-
         em.clear();
+        postService.updateAllPopularity();
+        em.flush();
+        em.clear();
+
 
         //when
         System.out.println("서비스");
@@ -339,7 +348,7 @@ public class PostQueryServiceJpaTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);
@@ -378,10 +387,12 @@ public class PostQueryServiceJpaTest {
             Long aLong = collectionService.insertCollectionByCollectionVO(
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
@@ -398,7 +409,9 @@ public class PostQueryServiceJpaTest {
             postList.get(9).insertViewedPostByIp(""+i%5);
             em.flush();
         }
-
+        em.clear();
+        postService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -432,86 +445,84 @@ public class PostQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
-                .setHashTags(List.of(hashtagList.get(0))).setCollections(List.of()).build());
+                .setHashTags(List.of(hashtagList.get(0))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
-                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).setCollections(List.of()).build());
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
-                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2)))
-                .setCollections(List.of()).build());
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
                         hashtagList.get(8)))
-                .setCollections(List.of()).build());
+                .build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
-                        hashtagList.get(8), hashtagList.get(9)))
-                .setCollections(List.of()).build());
+                        hashtagList.get(8), hashtagList.get(9))).build());
 
         em.flush();
 

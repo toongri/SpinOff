@@ -1,12 +1,10 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.exception.post.AlreadyAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.post.OverContentOfPostException;
@@ -139,9 +137,8 @@ public class PostDto {
         private Movie movie;
         private String thumbnailUrl;
         private PublicOfPostStatus publicOfPostStatus = PublicOfPostStatus.B;
-        private List<PostedMedia> postedMedias;
+        private List<String> urls;
         private List<Hashtag> hashtags;
-        private List<Collection> collections;
 
         public PostBuilder setMember(Member member) {
             this.member = member;
@@ -168,13 +165,8 @@ public class PostDto {
             return this;
         }
 
-        public PostBuilder setPostedMedias(List<PostedMedia> postedMedia) {
-            this.postedMedias = postedMedia;
-            return this;
-        }
-
-        public PostBuilder setCollections(List<Collection> collections) {
-            this.collections = collections;
+        public PostBuilder setUrls(List<String> urls) {
+            this.urls = urls;
             return this;
         }
 
@@ -189,7 +181,7 @@ public class PostDto {
         }
 
         public Post build() throws AlreadyPostedHashtagException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
-            return Post.createPost(member, title, content, thumbnailUrl, hashtags, postedMedias, collections, movie, publicOfPostStatus);
+            return Post.createPost(member, title, content, thumbnailUrl, hashtags, urls, movie, publicOfPostStatus);
         }
     }
 }

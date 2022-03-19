@@ -71,10 +71,12 @@ public class MovieQueryRepositoryTest {
             Long aLong = collectionService.insertCollectionByCollectionVO(
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
@@ -100,6 +102,14 @@ public class MovieQueryRepositoryTest {
         movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
         movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
 
+        em.flush();
+        for (Movie movie : movieList) {
+            movieService.insertViewedMovieByIp("22", movie.getId());
+        }
+        em.flush();
+        em.clear();
+
+        movieService.updateAllPopularity();
         em.flush();
         em.clear();
 

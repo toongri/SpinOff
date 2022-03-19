@@ -15,10 +15,9 @@ public interface MemberService {
     MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto);
     TokenResponseDto reIssue(TokenRequestDto requestDto);
     void confirmEmail(EmailAuthRequestDto requestDto);
-    void emailLinkageCheck(EmailLinkageCheckRequestDto requestDto);
-
-    void emailLinkageUpdate(String email, String accountId);
-
+    void checkEmailLinkage(EmailLinkageCheckRequestDto requestDto);
+    void updateEmailLinkage(String email, String accountId);
+    int updateAllPopularity();
     Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId) throws NotExistMemberException, AlreadyFollowedMemberException;
     Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
     Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus) throws NotExistMemberException;

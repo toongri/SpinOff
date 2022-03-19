@@ -7,7 +7,6 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
-import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
@@ -15,6 +14,7 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
+import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
+import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_COMMENT;
+import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -40,6 +42,7 @@ class CommentInCollectionServiceJpaTest {
     @Autowired MemberRepository memberRepository;
     @Autowired CommentInCollectionRepository commentInCollectionRepository;
     @Autowired CommentInCollectionService commentInCollectionService;
+    @Autowired CollectionService collectionService;
     @Autowired EntityManager em;
 
     @Test
@@ -62,10 +65,15 @@ class CommentInCollectionServiceJpaTest {
                                 new CreateCommentInCollectionVO(
                                         collection.getId(), null, "야스히로 라할살"), member.getId()));
         System.out.println("컬렉션업로드");
+        collectionService.insertViewedCollectionByIp("22", collection.getId());
+        collectionService.updateAllPopularity();
         Collection newCollection = collectionRepository.getById(collection.getId());
 
         //then
-        assertThat(newCollection.getCommentScore()).isEqualTo(newCollection.getCommentInCollections().size() * 1.0 * 0.3);
+        assertThat(newCollection.getPopularity())
+                .isEqualTo(COLLECTION_VIEW.getRate() * COLLECTION_VIEW.getLatestScore() +
+                        newCollection.getCommentInCollections().size() *
+                        COLLECTION_COMMENT.getRate() * COLLECTION_COMMENT.getLatestScore());
         assertThat(newCollection.getCommentInCollections().get(newCollection.getCommentInCollections().size() - 1)).isEqualTo(comment);
     }
 
@@ -76,8 +84,7 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
-        CommentInCollection parent = CommentInCollection.createCommentInCollection(mem, "야스히로 라할살", null);
-        col.addCommentInCollection(parent);
+        CommentInCollection parent = CommentInCollection.createCommentInCollection(mem, "야스히로 라할살", null, col);
         commentInCollectionRepository.save(parent);
 
         em.flush();
@@ -98,24 +105,28 @@ class CommentInCollectionServiceJpaTest {
                                 new CreateCommentInCollectionVO(
                                         col.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
 
+        em.flush();
+        em.clear();
+
         System.out.println("부모댓글업로드");
+        collectionService.insertViewedCollectionByIp("22", col.getId());
+        collectionService.updateAllPopularity();
         CommentInCollection parentComment = commentInCollectionRepository.findById(parent.getId()).get();
 
         System.out.println("컬렉션업로드");
         Collection collection = collectionRepository.getById(col.getId());
-
         //then
-        assertThat(collection.getCommentScore())
-                .isEqualTo(1.0 * 0.3 * collection.getCommentInCollections().size());
+        assertThat(collection.getPopularity())
+                .isEqualTo(
+                        COLLECTION_VIEW.getLatestScore() * COLLECTION_VIEW.getRate() +
+                        COLLECTION_COMMENT.getLatestScore() * COLLECTION_COMMENT.getRate() *
+                                collection.getCommentInCollections().size());
         assertThat(collection.getCommentInCollections().size()).isEqualTo(3);
         assertThat(parentComment.getChildren().size()).isEqualTo(2);
-        assertThat(parentComment.getChildren().get(0)).isEqualTo(childComment1);
-        assertThat(parentComment.getChildren().get(1)).isEqualTo(childComment2);
-        assertThat(childComment1.getParent()).isEqualTo(parentComment);
-        assertThat(childComment2.getParent()).isEqualTo(parentComment);
-        assertThat(collection.getCommentScore()).isEqualTo(collection.getPopularity());
-        assertThat(collection.getCommentScore())
-                .isEqualTo(collection.getCommentInCollections().size() * 1.0 * 0.3);
+        assertThat(parentComment.getChildren().get(0).getId()).isEqualTo(childComment1.getId());
+        assertThat(parentComment.getChildren().get(1).getId()).isEqualTo(childComment2.getId());
+        assertThat(childComment1.getParent().getId()).isEqualTo(parentComment.getId());
+        assertThat(childComment2.getParent().getId()).isEqualTo(parentComment.getId());
     }
 
     @Test
@@ -128,20 +139,17 @@ class CommentInCollectionServiceJpaTest {
         collectionRepository.save(col);
 
         CreateCommentInCollectionVO commentInCollectionVO1 =
-                new CreateCommentInCollectionVO(0L, 0L, "");
+                new CreateCommentInCollectionVO(0L, -1L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO2 =
-                new CreateCommentInCollectionVO(0L, 0L, "");
+                new CreateCommentInCollectionVO(-1L, 0L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO3 =
-                new CreateCommentInCollectionVO(col.getId(), 0L, "");
+                new CreateCommentInCollectionVO(col.getId(), -1L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInCollectionService
-                .insertCommentInCollectionByCommentVO(commentInCollectionVO1, 0L))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService
                 .insertCommentInCollectionByCommentVO(commentInCollectionVO2, mem.getId()))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
@@ -160,7 +168,8 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
-        col.addCommentInCollection(CommentInCollection.createCommentInCollection(mem, " ", null));
+        CommentInCollection commentInCollection =
+                CommentInCollection.createCommentInCollection(mem, " ", null, col);
 
         em.flush();
         em.clear();
@@ -189,7 +198,8 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
-        col.addCommentInCollection(CommentInCollection.createCommentInCollection(mem, " ", null));
+        CommentInCollection commentInCollection =
+                CommentInCollection.createCommentInCollection(mem, " ", null, col);
 
         em.flush();
         em.clear();
@@ -203,9 +213,6 @@ class CommentInCollectionServiceJpaTest {
         CommentInCollection comment = commentInCollectionRepository.getById(col.getCommentInCollections().get(0).getId());
 
         //then
-
-        assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(-1L, col.getCommentInCollections().get(0).getId()))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), -1L))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId()))

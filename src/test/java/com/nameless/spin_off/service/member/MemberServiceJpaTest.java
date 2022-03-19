@@ -108,16 +108,19 @@ class MemberServiceJpaTest {
         System.out.println("서비스함수");
         memberService.insertFollowedMemberByMemberId(memberId, followedMemberId);
 
+        em.flush();
+
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(memberId);
         Member newFollowedMember = memberRepository.getById(followedMemberId);
+        newFollowedMember.updatePopularity();
 
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getFollowedMembers().size()).isEqualTo(1);
         assertThat(newMember.getFollowedMembers().iterator().next().getMember().getId()).isEqualTo(followedMemberId);
         assertThat(newFollowedMember.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(newFollowedMember.getFollowScore()).isEqualTo(1.0);
+        assertThat(newFollowedMember.getPopularity()).isEqualTo(1.0);
     }
 
     @Test
@@ -138,8 +141,6 @@ class MemberServiceJpaTest {
         //then
         assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, followedMemberId))
                 .isInstanceOf(AlreadyFollowedMemberException.class);
-        assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(-1L, followedMemberId))
-                .isInstanceOf(NotExistMemberException.class);
         assertThatThrownBy(() -> memberService.insertFollowedMemberByMemberId(memberId, -1L))
                 .isInstanceOf(NotExistMemberException.class);
     }
@@ -160,16 +161,19 @@ class MemberServiceJpaTest {
         System.out.println("서비스함수");
         memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.A);
 
+        em.flush();
+
         System.out.println("멤버함수");
         Member newMember = memberRepository.getById(memberId);
         Member newBlockedMember = memberRepository.getById(blockedMemberId);
+        newBlockedMember.updatePopularity();
 
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
         assertThat(newMember.getBlockedMembers().size()).isEqualTo(1);
         assertThat(newMember.getBlockedMembers().iterator().next().getMember().getId()).isEqualTo(blockedMemberId);
         assertThat(newBlockedMember.getBlockingMembers().size()).isEqualTo(1);
-        assertThat(newBlockedMember.getBlockCount()).isEqualTo(1);
+        assertThat(newBlockedMember.getPopularity()).isEqualTo(1);
     }
 
     @Test
@@ -193,11 +197,7 @@ class MemberServiceJpaTest {
         //then
         assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, blockedMemberId, BlockedMemberStatus.A))
                 .isInstanceOf(AlreadyBlockedMemberException.class);
-        assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(-1L, blockedMemberId, BlockedMemberStatus.A))
-                .isInstanceOf(NotExistMemberException.class);
         assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, -1L, BlockedMemberStatus.A))
                 .isInstanceOf(NotExistMemberException.class);
     }
-
-
 }

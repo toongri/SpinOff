@@ -12,9 +12,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
+import static com.nameless.spin_off.entity.collection.QFollowedCollection.followedCollection;
+import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
+import static com.nameless.spin_off.entity.collection.QViewedCollectionByIp.viewedCollectionByIp;
 import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.DEFAULT_COLLECTION_PUBLIC;
 import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.FOLLOW_COLLECTION_PUBLIC;
 import static com.nameless.spin_off.entity.member.QMember.member;
@@ -24,6 +28,74 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public CollectionQueryRepository() {
         super(Collection.class);
+    }
+
+    public Boolean isExist(Long id) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(collection)
+                .where(collection.id.eq(id))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isCorrectCollectionWithOwner(List<Long> collectionIds, Long memberId) {
+        long length = getQueryFactory()
+                .select(collection.count())
+                .from(collection)
+                .where(
+                        collection.id.in(collectionIds),
+                        collection.member.id.eq(memberId))
+                .fetchCount();
+
+        return collectionIds.size() == length;
+    }
+
+    public Boolean isExistLikedCollection(Long memberId, Long collectionId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(likedCollection)
+                .where(
+                        likedCollection.member.id.eq(memberId),
+                        likedCollection.collection.id.eq(collectionId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistFollowedCollection(Long memberId, Long collectionId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(followedCollection)
+                .where(
+                        followedCollection.member.id.eq(memberId),
+                        followedCollection.collection.id.eq(collectionId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistIp(Long id, String ip, LocalDateTime time) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(viewedCollectionByIp)
+                .where(
+                        viewedCollectionByIp.ip.eq(ip),
+                        viewedCollectionByIp.collection.id.eq(id),
+                        viewedCollectionByIp.createdDate.after(time))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Long getCollectionOwnerId(Long collectionId) {
+        return getQueryFactory()
+                .select(collection.member.id)
+                .from(collection)
+                .where(
+                        collection.id.eq(collectionId))
+                .fetchFirst();
     }
 
     public Slice<SearchAllCollectionDto> findAllSlicedForSearchPageAtAll(
@@ -36,6 +108,15 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         memberNotIn(blockedMembers)));
 
         return MapContentToDtoForSearchPageAtAll(content, followedMembers);
+    }
+
+    public List<Collection> findAllByViewAfterTime(LocalDateTime time) {
+        return getQueryFactory()
+                .selectFrom(collection)
+                .join(collection.viewedCollectionByIps, viewedCollectionByIp).fetchJoin()
+                .where(
+                        viewedCollectionByIp.createdDate.after(time))
+                .fetch();
     }
 
     public Slice<SearchCollectionDto> findAllSlicedForSearchPageAtCollection(

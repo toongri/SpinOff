@@ -104,10 +104,10 @@ class SearchQueryServiceJpaTest {
         collectionService.insertViewedCollectionByIp("aa", collection1.getId());
 
         Post po = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle(keyword+"fgd").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle(keyword+"fgd").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         Post po2 = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle(keyword+"adfgf").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle(keyword+"adfgf").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
 
         postRepository.save(po);
@@ -120,6 +120,13 @@ class SearchQueryServiceJpaTest {
 
         hashtagService.insertViewedHashtagByIp("aa", hashtag.getId());
 
+        em.flush();
+        em.clear();
+        movieService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        memberService.updateAllPopularity();
+        postService.updateAllPopularity();
+        collectionService.updateAllPopularity();
         em.flush();
         em.clear();
 
@@ -174,6 +181,13 @@ class SearchQueryServiceJpaTest {
         }
         em.clear();
 
+        movieService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        memberService.updateAllPopularity();
+        postService.updateAllPopularity();
+        collectionService.updateAllPopularity();
+        em.flush();
+        em.clear();
         //when
         System.out.println("서비스함수");
         List<MostPopularHashtag> mostPopularHashtags = searchQueryService.getMostPopularHashtagLimit(5);
@@ -219,6 +233,14 @@ class SearchQueryServiceJpaTest {
             hashtag13.insertViewedHashtagByIp(""+ 0);
             em.flush();
         }
+        em.clear();
+
+        movieService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        memberService.updateAllPopularity();
+        postService.updateAllPopularity();
+        collectionService.updateAllPopularity();
+        em.flush();
         em.clear();
         //when
         System.out.println("서비스함수");

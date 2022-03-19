@@ -16,20 +16,80 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
+import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
 import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.entity.post.QViewedPostByIp.viewedPostByIp;
 
 @Repository
 public class PostQueryRepository extends Querydsl4RepositorySupport {
 
     public PostQueryRepository() {
         super(Post.class);
+    }
+
+    public Long getPostOwnerId(Long postId) {
+        return getQueryFactory()
+                .select(post.member.id)
+                .from(post)
+                .where(
+                        post.id.eq(postId))
+                .fetchFirst();
+    }
+
+    public Boolean isExist(Long id) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(post)
+                .where(post.id.eq(id))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistCollectedPost(List<Long> collectionIds, Long postId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(collectedPost)
+                .where(
+                        collectedPost.collection.id.in(collectionIds),
+                        collectedPost.post.id.eq(postId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistLikedPost(Long memberId, Long postId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(likedPost)
+                .where(
+                        likedPost.member.id.eq(memberId),
+                        likedPost.post.id.eq(postId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistIp(Long id, String ip, LocalDateTime time) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(viewedPostByIp)
+                .where(
+                        viewedPostByIp.ip.eq(ip),
+                        viewedPostByIp.post.id.eq(id),
+                        viewedPostByIp.createdDate.after(time))
+                .fetchFirst();
+
+        return fetchOne != null;
     }
 
     public Slice<SearchPageAtAllPostDto> findAllSlicedForSearchPageAtAll(
@@ -119,6 +179,15 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .where(postedHashtag.hashtag.in(hashtags),
                         memberNotIn(blockedMembers),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
+    }
+
+    public List<Post> findAllByViewAfterTime(LocalDateTime time) {
+        return getQueryFactory()
+                .selectFrom(post)
+                .join(post.viewedPostByIps, viewedPostByIp).fetchJoin()
+                .where(
+                        viewedPostByIp.createdDate.after(time))
+                .fetch();
     }
 
     private BooleanExpression memberNotEq(Member user) {

@@ -78,10 +78,12 @@ class MovieQueryServiceJpaTest {
             Long aLong = collectionService.insertCollectionByCollectionVO(
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
@@ -107,6 +109,14 @@ class MovieQueryServiceJpaTest {
         movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
         movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
 
+        for (Movie movie : movieList) {
+            movieService.insertViewedMovieByIp("22", movie.getId());
+        }
+
+
+        em.flush();
+        em.clear();
+        movieService.updateAllPopularity();
         em.flush();
         em.clear();
 
@@ -157,128 +167,117 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(3))
-                .setHashTags(List.of(hashtagList.get(0)))
-                .setCollections(List.of()).build();
+                .setHashTags(List.of(hashtagList.get(0))).build();
         postRepository.save(build);
         postList.add(build);
 
         em.flush();
 
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(4))
-                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1)))
-                .setCollections(List.of()).build();
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build();
         postRepository.save(build1);
         postList.add(build1);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
-                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2)))
-                .setCollections(List.of())
-                .build();
-        postRepository.save(build1);
-        postList.add(build1);
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build();
+        postRepository.save(build2);
+        postList.add(build2);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setMovie(movieList.get(7))
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3)))
-                .setCollections(List.of())
                 .build();
 
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build3);
+        postList.add(build3);
         em.flush();
 
-        build1 =Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4)))
-                .setCollections(List.of())
                 .build();
 
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build4);
+        postList.add(build4);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5)))
-                .setCollections(List.of())
                 .build();
 
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build5);
+        postList.add(build5);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6)))
-                .setCollections(List.of())
                 .build();
 
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build6);
+        postList.add(build6);
         em.flush();
 
-        build1 =Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7)))
-                .setCollections(List.of())
                 .build();
 
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build7);
+        postList.add(build7);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build8 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
                         hashtagList.get(8)))
-                .setCollections(List.of())
                 .build();
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build8);
+        postList.add(build8);
         em.flush();
 
-        build1 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+        Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
                         hashtagList.get(8), hashtagList.get(9)))
-                .setCollections(List.of())
                 .build();
-        postRepository.save(build1);
-        postList.add(build1);
+        postRepository.save(build9);
+        postList.add(build9);
         em.flush();
 
         for (int i = 1; i < 12; i++) {
@@ -317,6 +316,19 @@ class MovieQueryServiceJpaTest {
         movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
         movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
 
+        em.flush();
+        em.clear();
+        for (Movie movie : movieList) {
+            movieService.insertViewedMovieByIp("22", movie.getId());
+        }
+        movieService.insertViewedMovieByIp("1", movieList.get(6).getId());
+        movieService.insertViewedMovieByIp("2", movieList.get(6).getId());
+        movieService.insertViewedMovieByIp("3", movieList.get(5).getId());
+        movieService.insertViewedMovieByIp("1", movieList.get(5).getId());
+
+        em.flush();
+        em.clear();
+        movieService.updateAllPopularity();
         em.flush();
         em.clear();
 

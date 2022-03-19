@@ -78,7 +78,7 @@ public class MemberApiController {
         if (isNotCorrectEmail(email, NAVER)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.emailLinkageUpdate(email, member.getUsername());
+        memberService.updateEmailLinkage(email, member.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
@@ -87,7 +87,7 @@ public class MemberApiController {
         if (isNotCorrectEmail(email, KAKAO)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.emailLinkageUpdate(email, member.getUsername());
+        memberService.updateEmailLinkage(email, member.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
@@ -96,7 +96,7 @@ public class MemberApiController {
         if (isNotCorrectEmail(email, GOOGLE)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.emailLinkageUpdate(email, member.getUsername());
+        memberService.updateEmailLinkage(email, member.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 

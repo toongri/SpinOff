@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -31,10 +29,11 @@ public class PostedMedia extends BaseTimeEntity {
     //==연관관계 메소드==//
 
     //==생성 메소드==//
-    public static PostedMedia createPostedMedia(String url) {
+    public static PostedMedia createPostedMedia(String url, Post post) {
 
         PostedMedia postedMedia = new PostedMedia();
         postedMedia.updateUrl(url);
+        postedMedia.updatePost(post);
 
         return postedMedia;
 
@@ -50,9 +49,6 @@ public class PostedMedia extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
-    public static List<PostedMedia> createPostedMedias(List<String> urls) {
-        return urls.stream().map(PostedMedia::createPostedMedia).collect(Collectors.toList());
-    }
 
     //==조회 로직==//
 

@@ -13,4 +13,6 @@ public interface CollectionService {
     Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException,
             AlreadyFollowedCollectionException, CantFollowOwnCollectionException;
+
+    int updateAllPopularity();
 }

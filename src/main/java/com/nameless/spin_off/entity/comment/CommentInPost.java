@@ -62,12 +62,13 @@ public class CommentInPost extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static CommentInPost createCommentInPost(Member member, String content, CommentInPost parent) {
+    public static CommentInPost createCommentInPost(Member member, String content, CommentInPost parent, Post post) {
 
         CommentInPost commentInPost = new CommentInPost();
         commentInPost.updateMember(member);
         commentInPost.updateContent(content);
         commentInPost.updateIsDeletedToFalse();
+        post.addCommentInPost(commentInPost);
 
         if ( parent != null) {
             parent.addChildren(commentInPost);
@@ -76,7 +77,18 @@ public class CommentInPost extends BaseTimeEntity {
         return commentInPost;
     }
 
+    public static CommentInPost createCommentInPost(Long id) {
+
+        CommentInPost commentInPost = new CommentInPost();
+        commentInPost.updateId(id);
+
+        return commentInPost;
+    }
+
     //==수정 메소드==//
+    public void updateId(Long id) {
+        this.id = id;
+    }
     public void updatePost(Post post) {
         this.post = post;
     }

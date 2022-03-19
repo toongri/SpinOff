@@ -5,18 +5,16 @@ import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.entity.enums.member.MemberScoreEnum;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
-import com.nameless.spin_off.entity.member.EmailAuth;
-import com.nameless.spin_off.entity.member.EmailLinkage;
-import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.*;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.member.EmailAuthRepository;
-import com.nameless.spin_off.repository.member.EmailLinkageRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.member.*;
 import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
 import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
@@ -47,6 +45,9 @@ public class MemberServiceJpa implements MemberService {
     private final EmailAuthRepository emailAuthRepository;
     private final EmailLinkageRepository emailLinkageRepository;
     private final EmailService emailService;
+    private final MemberQueryRepository memberQueryRepository;
+    private final FollowedMemberRepository followedMemberRepository;
+    private final BlockedMemberRepository blockedMemberRepository;
 
     @Transactional
     @Override
@@ -91,6 +92,19 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
+    public int updateAllPopularity() {
+        List<Member> members =
+                memberQueryRepository.findAllByViewAfterTime(MemberScoreEnum.MEMBER_FOLLOW.getOldestDate());
+        System.out.println("멤버리스트" + members.size());
+        for (Member member : members) {
+            member.updatePopularity();
+        }
+
+        return members.size();
+    }
+
+    @Transactional
+    @Override
     public void confirmEmail(EmailAuthRequestDto requestDto) {
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                 requestDto.getEmail(), requestDto.getAuthToken(), LocalDateTime.now(), EmailAuthProviderStatus.A)
@@ -103,7 +117,7 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public void emailLinkageCheck(EmailLinkageCheckRequestDto requestDto) {
+    public void checkEmailLinkage(EmailLinkageCheckRequestDto requestDto) {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
                         requestDto.getAccountId(), requestDto.getEmail(),
                         requestDto.getAuthToken(), LocalDateTime.now())
@@ -128,7 +142,7 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public void emailLinkageUpdate(String email, String accountId) {
+    public void updateEmailLinkage(String email, String accountId) {
         validateDuplicateAtLinkage(email);
 
         EmailLinkage emailAuth = emailLinkageRepository.save(EmailLinkage.builder()
@@ -177,33 +191,66 @@ public class MemberServiceJpa implements MemberService {
         return new TokenResponseDto(accessToken, refreshToken);
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
             throws NotExistMemberException, AlreadyFollowedMemberException {
+        isExistMember(followedMemberId);
 
-        Member member = getMemberByIdWithFollowedMember(memberId);
-        Member followedMember = getMemberByIdWithFollowingMember(followedMemberId);
+        if (memberQueryRepository.isExistFollowedMember(memberId, followedMemberId)) {
+            throw new AlreadyFollowedMemberException();
+        }
 
-        return member.addFollowedMember(followedMember);
+        return followedMemberRepository
+                .save(
+                        FollowedMember.createFollowedMember(
+                                Member.createMember(memberId),
+                                Member.createMember(followedMemberId)))
+                .getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
-    public Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId, BlockedMemberStatus blockedMemberStatus) throws NotExistMemberException, AlreadyBlockedMemberException {
-        Member member = getMemberByIdWithBlockedMember(memberId);
-        Member blockedMember = getMemberByIdWithBlockingMember(blockedMemberId);
+    public Long insertBlockedMemberByMemberId(Long memberId, Long blockedMemberId,
+                                              BlockedMemberStatus blockedMemberStatus)
+            throws NotExistMemberException, AlreadyBlockedMemberException {
 
-        return member.addBlockedMember(blockedMember, blockedMemberStatus);
+        isExistMember(blockedMemberId);
+        isExistBlock(memberId, blockedMemberId);
+
+        followedMemberRepository.findByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
+                .ifPresent(followedMemberRepository::delete);
+        followedMemberRepository.findByFollowingMemberIdAndMemberId(blockedMemberId, memberId)
+                .ifPresent(followedMemberRepository::delete);
+
+        return blockedMemberRepository
+                .save(
+                        BlockedMember.createBlockedMember(
+                                Member.createMember(memberId),
+                                Member.createMember(blockedMemberId),
+                                blockedMemberStatus))
+                .getId();
     }
 
-    @Transactional()
+    @Transactional
     @Override
     public Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus) throws NotExistMemberException {
 
         Member member = getMemberWithSearch(memberId);
 
         return member.addSearch(content, searchedByMemberStatus);
+    }
+
+    private void isExistBlock(Long memberId, Long blockedMemberId) {
+        if (memberQueryRepository.isExistBlockedMember(memberId, blockedMemberId)) {
+            throw new AlreadyBlockedMemberException();
+        }
+    }
+
+    private void isExistMember(Long memberId) {
+        if (!memberQueryRepository.isExist(memberId)) {
+            throw new NotExistMemberException();
+        }
     }
 
     private void validateDuplicateAtRegister(String accountId, String nickname, String email) {
@@ -248,30 +295,6 @@ public class MemberServiceJpa implements MemberService {
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String accountId = userDetails.getUsername();
         return memberRepository.findOneByAccountId(accountId).orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithFollowingMember(Long followedMemberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowingMember(followedMemberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithBlockingMember(Long blockedMemberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockingMember(blockedMemberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithFollowedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private Member getMemberByIdWithBlockedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private Member getMemberWithSearch(Long memberId) throws NotExistMemberException {

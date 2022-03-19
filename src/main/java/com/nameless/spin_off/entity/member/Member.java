@@ -30,7 +30,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER__FOLLOW;
+import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 
 @Entity
 @Getter
@@ -51,15 +51,12 @@ public class Member extends BaseTimeEntity {
     private String email;
     private String profileImg;
     private String bio;
-    private Long complainCount;
-    private Long blockCount;
-    private Double followScore;
-    private Double popularity;
     private String googleEmail;
     private String naverEmail;
     private String kakaoEmail;
     private String refreshToken;
     private Boolean emailAuth;
+    private Double popularity;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -131,6 +128,7 @@ public class Member extends BaseTimeEntity {
         if (!this.followedMembers.add(newFollowedMember)) {
             throw new AlreadyFollowedMemberException();
         }
+
         followedMember.addFollowingMember(newFollowedMember);
 
         return newFollowedMember.getId();
@@ -149,11 +147,9 @@ public class Member extends BaseTimeEntity {
 
     public void addBlockingMember(BlockedMember blockingMember) {
         blockingMembers.add(blockingMember);
-        updateBlockCount();
     }
 
     public void addFollowingMember(FollowedMember followingMember) {
-        updateFollowScore();
         followingMembers.add(followingMember);
     }
 
@@ -168,7 +164,6 @@ public class Member extends BaseTimeEntity {
         if (!this.complains.add(complain)) {
             throw new AlreadyComplainException();
         }
-        updateComplainCount();
 
         return complain.getId();
     }
@@ -194,16 +189,16 @@ public class Member extends BaseTimeEntity {
         member.updatePhoneNumber(phoneNumber);
         member.updateEmail(email);
         member.updateNickname(nickname);
-        member.updateCountToZero();
+//        member.updateCountToZero();
         member.addRolesToUser();
         member.updateGoogleEmail(googleEmail);
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
         member.updateEmailAuth(emailAuth);
+        member.updatePopularityZero();
 
         return member;
     }
-
 
     public static Member createMemberByCreateVO(MemberRegisterRequestDto memberRegisterRequestDto) {
 
@@ -217,6 +212,13 @@ public class Member extends BaseTimeEntity {
                 .build();
     }
 
+    public static Member createMember(Long id) {
+        Member member = new Member();
+        member.updateId(id);
+
+        return member;
+    }
+
     public static MemberBuilder buildMember() {
         return new MemberBuilder();
     }
@@ -224,6 +226,9 @@ public class Member extends BaseTimeEntity {
     //==수정 메소드==//
     public void updateBio(String bio) {
         this.bio = bio;
+    }
+    private void updateId(Long id) {
+        this.id = id;
     }
     public void updateNickname(String nickname) {
         this.nickname = nickname;
@@ -257,8 +262,12 @@ public class Member extends BaseTimeEntity {
         this.name = name;
     }
 
+    public void updatePopularityZero() {
+        popularity = 0.0;
+    }
+
     public void updatePopularity() {
-        this.popularity = followScore - complainCount - blockCount;
+        popularity = blockingMembers.size() + complains.size() + executeFollowScore();
     }
 
     public void addRole(AuthorityOfMemberStatus role) {
@@ -290,30 +299,13 @@ public class Member extends BaseTimeEntity {
         this.roles.add(AuthorityOfMemberStatus.C);
     }
 
-    public void updateCountToZero() {
-        complainCount = 0L;
-        blockCount = 0L;
-        followScore = 0.0;
-        popularity = 0.0;
-    }
-
-    public void updateBlockCount() {
-        blockCount = (long)blockingMembers.size();
-        updatePopularity();
-    }
-
-    public void updateComplainCount() {
-        complainCount = (long)complains.size();
-        updatePopularity();
-    }
-
     //==비즈니스 로직==//
-    public void updateFollowScore() {
+    public Double executeFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();
         FollowedMember followedMember ;
         int j = 0, i = followingMembers.size() - 1;
-        double result = 0, total = MEMBER__FOLLOW.getLatestScore();
+        double result = 0, total = 0;
 
         while (i > -1) {
             followedMember = followingMembers.get(i);
@@ -321,24 +313,22 @@ public class Member extends BaseTimeEntity {
                 result += 1;
                 i--;
             } else {
-                if (j == MEMBER__FOLLOW.getScores().size() - 1) {
+                if (j == MEMBER_FOLLOW.getScores().size() - 1) {
                     break;
                 }
-                total += MEMBER__FOLLOW.getScores().get(j) * result;
+                total += MEMBER_FOLLOW.getScores().get(j) * result;
                 result = 0;
                 j++;
             }
         }
-        followScore = total + MEMBER__FOLLOW.getScores().get(j) * result;
-
-        updatePopularity();
+        return total + MEMBER_FOLLOW.getScores().get(j) * result;
     }
 
     //==조회 로직==//
     private boolean isInTimeFollowingMember(LocalDateTime currentTime, FollowedMember followingMember, int j) {
         return ChronoUnit.DAYS
-                .between(followingMember.getCreatedDate(), currentTime) >= MEMBER__FOLLOW.getDays().get(j) &&
+                .between(followingMember.getCreatedDate(), currentTime) >= MEMBER_FOLLOW.getDays().get(j) &&
                 ChronoUnit.DAYS
-                        .between(followingMember.getCreatedDate(), currentTime) < MEMBER__FOLLOW.getDays().get(j + 1);
+                        .between(followingMember.getCreatedDate(), currentTime) < MEMBER_FOLLOW.getDays().get(j + 1);
     }
 }

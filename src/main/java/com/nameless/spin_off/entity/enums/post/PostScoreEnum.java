@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.enums.post;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public enum PostScoreEnum {
@@ -33,7 +34,7 @@ public enum PostScoreEnum {
     public Double getLatestScore() {
         return scores.get(0);
     }
-    public Long getLatestDay() {
-        return days.get(days.size() - 1);
+    public LocalDateTime getOldestDate() {
+        return LocalDateTime.now().minusDays(days.get(days.size() - 1));
     }
 }

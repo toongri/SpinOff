@@ -75,7 +75,8 @@ public class CollectionDto {
 
             followedCollections.stream()
                     .filter(followedCollection -> followingMembers.contains(followedCollection.getMember()))
-                    .max(Comparator.comparing(followedCollection -> followedCollection.getMember().getPopularity()))
+                    .max(Comparator.comparing(
+                            followedCollection -> followedCollection.getMember().getPopularity()))
                     .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
                             followedCollection.getMember().getNickname(), followedCollections.size()));
 

@@ -6,7 +6,6 @@ import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -23,7 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.*;
 import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_COLLECT;
+import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -61,22 +63,6 @@ class CollectionServiceJpaTest {
     }
 
     @Test
-    public void 컬렉션_생성_파라미터_예외처리() throws Exception{
-
-        //given
-        Member member = Member.buildMember().build();
-        memberRepository.save(member);
-
-        CreateCollectionVO createCollectionVO1 = new CreateCollectionVO("", "", A);
-        //when
-
-        //then
-        assertThatThrownBy(() -> collectionService.insertCollectionByCollectionVO(createCollectionVO1, -1L))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
-    }
-
-
-    @Test
     public void 컬렉션_좋아요_업데이트() throws Exception{
 
         //given
@@ -91,16 +77,20 @@ class CollectionServiceJpaTest {
         //when
         System.out.println("서비스함수");
         collectionService.insertLikedCollectionByMemberId(mem.getId(), col.getId());
-        Collection collection = collectionRepository.getById(col.getId());
-
         System.out.println("멤버");
+        collectionService.insertViewedCollectionByIp("22", col.getId());
+        collectionService.updateAllPopularity();
+        em.flush();
+        Collection collection = collectionRepository.getById(col.getId());
         Member member = memberRepository.getById(mem.getId());
 
         //then
 
-        assertThat(collection.getLikeScore()).isEqualTo(1.0 * 0.5 * 1.0);
+        assertThat(collection.getPopularity())
+                .isEqualTo(COLLECTION_LIKE.getLatestScore() * COLLECTION_LIKE.getRate() +
+                        COLLECTION_VIEW.getRate() * COLLECTION_VIEW.getLatestScore());
         assertThat(collection.getLikedCollections().size()).isEqualTo(1);
-        assertThat(collection.getLikedCollections().get(0).getMember()).isEqualTo(member);
+        assertThat(collection.getLikedCollections().get(0).getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test
@@ -124,8 +114,6 @@ class CollectionServiceJpaTest {
         Collection collection = collectionRepository.getById(col.getId());
 
         //then
-        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(-1L, collection.getId()))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), -1L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
@@ -151,16 +139,20 @@ class CollectionServiceJpaTest {
         //when
         System.out.println("서비스함수");
         collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId());
-
         System.out.println("멤버");
+        collectionService.insertViewedCollectionByIp("22", col.getId());
+        collectionService.updateAllPopularity();
+        em.flush();
+
         Member member = memberRepository.getById(mem.getId());
         Collection collection = collectionRepository.getById(col.getId());
 
         //then
-
-        assertThat(collection.getFollowScore()).isEqualTo(1.0 * 1.0);
+        assertThat(collection.getPopularity())
+                .isEqualTo(COLLECTION_FOLLOW.getLatestScore() * COLLECTION_FOLLOW.getRate() +
+                        COLLECTION_VIEW.getRate() * COLLECTION_VIEW.getLatestScore());
         assertThat(collection.getFollowingMembers().size()).isEqualTo(1);
-        assertThat(collection.getFollowingMembers().get(0).getMember()).isEqualTo(member);
+        assertThat(collection.getFollowingMembers().get(0).getMember().getId()).isEqualTo(member.getId());
     }
 
     @Test
@@ -190,9 +182,6 @@ class CollectionServiceJpaTest {
         //then
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), col.getId()))
                 .isInstanceOf(CantFollowOwnCollectionException.class);//.hasMessageContaining("")
-
-        assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(0L, collection.getId()))
-                .isInstanceOf(NotExistMemberException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), 0L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
@@ -316,7 +305,7 @@ class CollectionServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
@@ -338,12 +327,18 @@ class CollectionServiceJpaTest {
         postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
 
         System.out.println("포스트함수");
+        em.flush();
+        postService.insertViewedPostByIp("33", po.getId());
+        postService.updateAllPopularity();
+        em.flush();
         List<Collection> collections = collectionRepository.findAllByPostIdWithPost(po.getId());
         Post post = postRepository.findById(po.getId()).get();
 
         //then
         assertThat(collections.size()).isEqualTo(collectionList.size());
-        assertThat(post.getCollectionScore()).isEqualTo(collections.size()*1.0);
+        assertThat(post.getPopularity())
+                .isEqualTo(collections.size()* POST_COLLECT.getRate() * POST_COLLECT.getLatestScore() +
+                        POST_VIEW.getLatestScore() * POST_VIEW.getRate());
 
     }
 
@@ -354,8 +349,7 @@ class CollectionServiceJpaTest {
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                .setHashTags(List.of()).build();
+                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);

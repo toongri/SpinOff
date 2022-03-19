@@ -39,8 +39,7 @@ public class CollectionQueryServiceJpaTest {
     @Autowired CollectionRepository collectionRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
-    @Autowired
-    CollectionService collectionService;
+    @Autowired CollectionService collectionService;
     @Autowired CollectionQueryService collectionQueryService;
     @Autowired MemberService memberService;
 
@@ -63,19 +62,22 @@ public class CollectionQueryServiceJpaTest {
             Long aLong = collectionService.insertCollectionByCollectionVO(
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
-            collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            collectionList.add(byId);//.
+            Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            post.addAllCollectedPost(List.of(byId));
+            postList.add(post);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -85,9 +87,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -108,7 +111,8 @@ public class CollectionQueryServiceJpaTest {
             collectionList.get(9).insertViewedCollectionByIp(""+i%5);
             em.flush();
         }
-
+        collectionService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -169,18 +173,21 @@ public class CollectionQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -195,9 +202,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -218,6 +226,8 @@ public class CollectionQueryServiceJpaTest {
             collectionList.get(9).insertViewedCollectionByIp(""+i%5);
             em.flush();
         }
+        collectionService.updateAllPopularity();
+        em.flush();
 
         em.clear();
 
@@ -277,18 +287,21 @@ public class CollectionQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -298,9 +311,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -322,6 +336,8 @@ public class CollectionQueryServiceJpaTest {
             em.flush();
         }
 
+        collectionService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -382,18 +398,21 @@ public class CollectionQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + mem.getId() + "0").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "1").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -408,9 +427,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle(keyword + collection.getMember().getId() + "2").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -432,6 +452,8 @@ public class CollectionQueryServiceJpaTest {
             em.flush();
         }
 
+        collectionService.updateAllPopularity();
+        em.flush();
         em.clear();
 
         //when
@@ -493,18 +515,21 @@ public class CollectionQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -512,9 +537,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -535,6 +561,8 @@ public class CollectionQueryServiceJpaTest {
             collectionList.get(9).insertViewedCollectionByIp(""+i%5);
             em.flush();
         }
+        collectionService.updateAllPopularity();
+        em.flush();
 
         em.clear();
 
@@ -591,18 +619,21 @@ public class CollectionQueryServiceJpaTest {
                     new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
-            postList.add(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
-                    .setThumbnailUrl(mem.getId()+"0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build());
+            Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                    .setTitle("").setContent("").setUrls(List.of())
+                    .setThumbnailUrl(mem.getId() + "0")
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
+            postList.add(build);
         }
         postRepository.saveAll(postList);
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -610,14 +641,17 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
         }
 
+        collectionService.updateAllPopularity();
+        em.flush();
         collectionList = collectionRepository.findAll();
 
         em.clear();
@@ -626,7 +660,7 @@ public class CollectionQueryServiceJpaTest {
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsByFollowedMemberSlicedForMainPage(
-                        PageRequest.of(0, 6, Sort.by("lastPostUpdateTime").descending()), member.getId())
+                        PageRequest.of(0, 6, Sort.by("lastModifiedDate").descending()), member.getId())
                         .getContent();
 
         System.out.println("함수종료");
@@ -669,9 +703,10 @@ public class CollectionQueryServiceJpaTest {
             collectionService.insertFollowedCollectionByMemberId(member.getId(), aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(mem.getId() + "0")
-                    .setHashTags(List.of()).setCollections(List.of(byId)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(byId));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -679,9 +714,10 @@ public class CollectionQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
-                    .setHashTags(List.of()).setCollections(List.of(collection)).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collection));
             postRepository.save(build);
             postList.add(build);
             em.flush();
@@ -692,9 +728,10 @@ public class CollectionQueryServiceJpaTest {
         for (Integer integer : integers) {
             Post build = Post.buildPost().setMember(collectionList.get(integer).getMember())
                     .setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                    .setTitle("").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collectionList.get(integer).getMember().getId() + "2")
-                    .setHashTags(List.of()).setCollections(List.of(collectionList.get(integer))).build();
+                    .setHashTags(List.of()).build();
+            build.addAllCollectedPost(List.of(collectionList.get(integer)));
 
             postRepository.save(build);
             postList.add(build);
@@ -703,16 +740,16 @@ public class CollectionQueryServiceJpaTest {
 
         Post build = Post.buildPost().setMember(collectionList.get(6).getMember())
                 .setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setCollections(List.of()).setPostedMedias(List.of())
+                .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(collectionList.get(6).getMember().getId() + "3")
-                .setHashTags(List.of()).setCollections(List.of(collectionList.get(6))).build();
-
+                .setHashTags(List.of()).build();
+        build.addAllCollectedPost(List.of(collectionList.get(6)));
         postRepository.save(build);
         postList.add(build);
         em.flush();
 
-
-
+        collectionService.updateAllPopularity();
+        em.flush();
         collectionList = collectionRepository.findAll();
         em.clear();
 
@@ -720,7 +757,7 @@ public class CollectionQueryServiceJpaTest {
         System.out.println("서비스");
         List<MainPageCollectionDto> content =
                 collectionQueryService.getCollectionsByFollowedCollectionsSlicedForMainPage(
-                        PageRequest.of(0, 6, Sort.by("lastPostUpdateTime").descending()), member.getId()).getContent();
+                        PageRequest.of(0, 6, Sort.by("lastModifiedDate").descending()), member.getId()).getContent();
         System.out.println("함수종료");
         //then
         assertThat(content.stream().map(MainPageCollectionDto::getCollectionId).collect(Collectors.toList()))
