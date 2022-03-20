@@ -1,6 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.config.auth.LoginMemberId;
+import com.nameless.spin_off.config.auth.LoginMember;
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -31,7 +32,7 @@ public class HelpApiController {
 
     @PostMapping("/complain")
     public HelpResult<Long> createOne(
-            @LoginMemberId Long memberId, @RequestParam() Long contentId,
+            @LoginMember MemberDetails currentMember, @RequestParam Long contentId,
             @RequestParam ContentTypeStatus contentTypeStatus,
             @RequestParam("status") ComplainStatus complainStatus) throws
             NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
@@ -39,12 +40,12 @@ public class HelpApiController {
             NotExistCommentInCollectionException {
 
         log.info("createOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("contentId : {}", contentId);
         log.info("contentTypeStatus : {}", contentTypeStatus);
         log.info("complainStatus : {}", complainStatus);
 
-        return getResult(complainService.insertComplain(memberId, contentId, contentTypeStatus, complainStatus));
+        return getResult(complainService.insertComplain(currentMember.getId(), contentId, contentTypeStatus, complainStatus));
     }
 
     @Data

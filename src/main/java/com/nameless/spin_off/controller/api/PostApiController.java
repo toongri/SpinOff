@@ -1,6 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.config.auth.LoginMemberId;
+import com.nameless.spin_off.config.auth.LoginMember;
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
@@ -30,14 +31,15 @@ public class PostApiController {
     private final EnumMapper enumMapper;
 
     @PostMapping("")
-    public PostApiResult<Long> createOne(@RequestBody CreatePostVO createPostVO, @LoginMemberId Long memberId) throws
+    public PostApiResult<Long> createOne(@LoginMember MemberDetails currentMember,
+                                         @RequestBody CreatePostVO createPostVO) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
             OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
         log.info("createOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", createPostVO.getTitle());
         log.info("content : {}", createPostVO.getContent());
         log.info("movieId : {}", createPostVO.getMovieId());
@@ -47,33 +49,33 @@ public class PostApiController {
         log.info("mediaUrls : {}", createPostVO.getMediaUrls());
         log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
-        return getResult(postService.insertPostByPostVO(createPostVO, memberId));
+        return getResult(postService.insertPostByPostVO(createPostVO, currentMember.getId()));
     }
 
     @PostMapping("/{postId}/like")
     public PostApiResult<Long> createLikeOne(
-            @LoginMemberId Long memberId, @PathVariable Long postId)
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         log.info("createLikeOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("postId : {}", postId);
 
-        return getResult(postService.insertLikedPostByMemberId(memberId, postId));
+        return getResult(postService.insertLikedPostByMemberId(currentMember.getId(), postId));
     }
 
     @PostMapping("/{postId}/collections")
     public PostApiResult<List<Long>> createCollectedAll(
-            @LoginMemberId Long memberId, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
         log.info("createCollectedAll");
         log.info("postId : {}", postId);
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("collectionIds : {}", collectionIds);
 
-        return getResult(postService.insertCollectedPosts(memberId, postId, collectionIds));
+        return getResult(postService.insertCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
 
     @GetMapping("/post-public-categories")

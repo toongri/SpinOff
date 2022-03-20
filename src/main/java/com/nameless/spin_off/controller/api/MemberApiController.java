@@ -1,7 +1,6 @@
 package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
-import com.nameless.spin_off.config.auth.LoginMemberId;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -34,78 +33,79 @@ public class MemberApiController {
 
     @PostMapping("/{followedMemberId}/follow")
     public MemberApiResult<Long> createFollowOne(
-            @LoginMemberId Long memberId, @PathVariable Long followedMemberId)
+            @LoginMember MemberDetails currentMember, @PathVariable Long followedMemberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
         log.info("createFollowOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("followedMemberId : {}", followedMemberId);
 
-        return getResult(memberService.insertFollowedMemberByMemberId(memberId, followedMemberId));
+        return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), followedMemberId));
     }
 
     @PostMapping("/{blockedMemberId}/block")
     public MemberApiResult<Long> createBlockOne(
-            @LoginMemberId Long memberId, @PathVariable Long blockedMemberId,
+            @LoginMember MemberDetails currentMember, @PathVariable Long blockedMemberId,
             @RequestParam BlockedMemberStatus blockedMemberStatus)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
         log.info("createBlockOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("blockedMemberId : {}", blockedMemberId);
         log.info("blockedMemberStatus : {}", blockedMemberStatus);
 
         return getResult(memberService
-                .insertBlockedMemberByMemberId(memberId, blockedMemberId, blockedMemberStatus));
+                .insertBlockedMemberByMemberId(currentMember.getId(), blockedMemberId, blockedMemberStatus));
     }
 
     @PostMapping("/search/{keyword}")
     public MemberApiResult<Long> insertSearchByKeyword(
-            @PathVariable String keyword, @LoginMemberId Long memberId,
+            @LoginMember MemberDetails currentMember, @PathVariable String keyword,
             @RequestParam("status") SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException {
 
         log.info("createBlockOne");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("keyword : {}", keyword);
         log.info("searchedByMemberStatus : {}", searchedByMemberStatus);
 
-        return getResult(memberService.insertSearch(memberId, keyword, searchedByMemberStatus));
+        return getResult(memberService.insertSearch(currentMember.getId(), keyword, searchedByMemberStatus));
     }
 
     @PostMapping("/linkage-email/naver")
-    public MemberApiResult<String> linkageEmailNaver(@RequestParam String email, @LoginMember MemberDetails member) {
+    public MemberApiResult<String> linkageEmailNaver(
+            @LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, NAVER)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.updateEmailLinkage(email, member.getUsername());
+        memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
     @PostMapping("/linkage-email/kakao")
-    public MemberApiResult<String> linkageEmailKakao(@RequestParam String email, @LoginMember MemberDetails member) {
+    public MemberApiResult<String> linkageEmailKakao(@LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, KAKAO)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.updateEmailLinkage(email, member.getUsername());
+        memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
     @PostMapping("/linkage-email/google")
-    public MemberApiResult<String> linkageEmailGoogle(@RequestParam String email, @LoginMember MemberDetails member) {
+    public MemberApiResult<String> linkageEmailGoogle(@LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, GOOGLE)) {
             throw new NotCorrectEmailRequest();
         }
-        memberService.updateEmailLinkage(email, member.getUsername());
+        memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
     @GetMapping("/member-latest")
     public MemberApiResult<List<LastSearchDto>> getLastSearchesByMemberFirst(
-            @LoginMemberId Long memberId, @RequestParam int length)
+            @LoginMember MemberDetails currentMember, @RequestParam int length)
             throws NotExistMemberException {
 
-        return getResult(memberQueryService.getLastSearchesByMemberLimit(memberId, length));
+        return getResult(memberQueryService.getLastSearchesByMemberLimit(currentMember.getId(), length));
     }
 
     private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {

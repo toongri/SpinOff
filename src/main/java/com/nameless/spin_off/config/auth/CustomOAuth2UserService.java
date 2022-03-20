@@ -1,14 +1,12 @@
 package com.nameless.spin_off.config.auth;
 
 import com.nameless.spin_off.config.auth.dto.OAuth2Attribute;
-import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.AlreadyAuthEmailException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -18,9 +16,8 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedHashSet;
 import java.util.Optional;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.ACCOUNT_ID_MAX;
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.NICKNAME_MAX;
@@ -56,19 +53,21 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         log.debug("loadUser end");
 
         return new DefaultOAuth2User(
-                getGrantedAuthorities(member),
+                member.getRoles().stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()),
                 oAuth2Attribute.getAttributes(),
                 oAuth2Attribute.getAttributeKey());
     }
 
-    private Set<GrantedAuthority> getGrantedAuthorities(Member member) {
-        Set<GrantedAuthority> authorities = new LinkedHashSet<>();
-
-        for (AuthorityOfMemberStatus role : member.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(role.getKey()));
-        }
-        return authorities;
-    }
+//    private Set<GrantedAuthority> getGrantedAuthorities(Member member) {
+//        Set<GrantedAuthority> authorities = new LinkedHashSet<>();
+//
+//        for (AuthorityOfMemberStatus role : member.getRoles()) {
+//            authorities.add(new SimpleGrantedAuthority(role.getKey()));
+//        }
+//        return authorities;
+//    }
 
     private Member getMember(String registrationId, OAuth2Attribute attributes) {
 

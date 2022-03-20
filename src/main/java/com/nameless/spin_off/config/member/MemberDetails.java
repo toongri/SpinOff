@@ -5,17 +5,17 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
+import java.util.Set;
 
 public class MemberDetails implements UserDetails {
 
     private Long id;
     private String accountId;
     private String accountPw;
-    List<GrantedAuthority> authorities;
+    Set<GrantedAuthority> authorities;
 
     @Builder
-    public MemberDetails(Long id, String accountId, String accountPw, List<GrantedAuthority> authorities) {
+    public MemberDetails(Long id, String accountId, String accountPw, Set<GrantedAuthority> authorities) {
         this.id = id;
         this.accountId = accountId;
         this.accountPw = accountPw;

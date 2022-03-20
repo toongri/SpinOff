@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
-import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -29,7 +28,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -58,9 +56,12 @@ public class PostServiceJpa implements PostService{
     @Transactional
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO, Long memberId)
-            throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException, AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
+            throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException,
+            AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
+            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
 
-        isCorrectCollectionWithOwner(postVO.getCollectionIds(), memberId);
+        List<Collection> collections = getCollections(postVO.getCollectionIds());
+        isCorrectCollectionWithOwner(collections, memberId);
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
@@ -71,18 +72,13 @@ public class PostServiceJpa implements PostService{
                 .setPostPublicStatus(postVO.getPublicOfPostStatus())
                 .setUrls(postVO.getMediaUrls())
                 .setHashTags(hashtags)
+                .setThumbnailUrl(postVO.getThumbnailUrl())
                 .setMovie(movie)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
                 .build());
 
-        ArrayList<CollectedPost> collectedPosts = new ArrayList<>();
-
-        for (Long collectionId : postVO.getCollectionIds()) {
-            collectedPosts.add(CollectedPost.createCollectedPost(
-                    Collection.createCollection(collectionId), post));
-        }
-        collectedPostRepository.saveAll(collectedPosts);
+        post.addAllCollectedPost(collections);
 
         return post.getId();
     }
@@ -116,20 +112,15 @@ public class PostServiceJpa implements PostService{
     public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
-        isExistPost(postId);
-        isCorrectCollectionWithOwner(collectionIds, memberId);
-        isExistCollectedPost(collectionIds, postId);
-        ArrayList<CollectedPost> collectedPosts = new ArrayList<>();
 
-        for (Long collectionId : collectionIds) {
-            collectedPosts.add(CollectedPost.createCollectedPost(
-                    Collection.createCollection(collectionId),
-                    Post.createPost(postId)));
-        }
+        List<Collection> collections = getCollections(collectionIds);
+        isCorrectCollectionWithOwner(collections, memberId);
 
-        return collectedPostRepository.saveAll(collectedPosts)
-                .stream().map(CollectedPost::getId).collect(Collectors.toList());
+        Post post = findOneByIdWithCollectedPost(postId);
+
+        return post.insertCollectedPostByCollections(collections);
     }
+
 
     @Transactional
     @Override
@@ -198,12 +189,6 @@ public class PostServiceJpa implements PostService{
         }
     }
 
-    private void isCorrectCollectionWithOwner(List<Long> collectionId, Long memberId) {
-        if (!collectionQueryRepository.isCorrectCollectionWithOwner(collectionId, memberId)) {
-            throw new NotMatchCollectionException();
-        }
-    }
-
     private void isExistPost(Long postId) {
         if (!postQueryRepository.isExist(postId)) {
             throw new NotExistPostException();
@@ -212,5 +197,24 @@ public class PostServiceJpa implements PostService{
 
     private boolean isExistPostIp(Long postId, String ip) {
         return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+    }
+
+    public void isCorrectCollectionWithOwner(List<Collection> collections, Long memberId) {
+        if (!collections.stream()
+                .map(collection -> collection.getMember().getId()).allMatch(memberId1 -> memberId1.equals(memberId))) {
+            throw new NotMatchCollectionException();
+        }
+    }
+
+    private Post findOneByIdWithCollectedPost(Long postId) {
+        return postRepository.findOneByIdWithCollectedPost(postId).orElseThrow(NotExistPostException::new);
+    }
+
+    private List<Collection> getCollections(List<Long> collectionIds) {
+        List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
+        if (collections.size() != collectionIds.size()) {
+            throw new NotMatchCollectionException();
+        }
+        return collections;
     }
 }

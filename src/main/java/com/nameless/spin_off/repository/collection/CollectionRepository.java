@@ -12,7 +12,7 @@ import java.util.Optional;
 public interface CollectionRepository extends JpaRepository<Collection, Long> {
     List<Collection> findAllByMember(Member member);
 
-    @Query("SELECT DISTINCT collection FROM Collection collection " +
+    @Query("SELECT collection FROM Collection collection " +
             "WHERE collection.id in :collectIds")
     List<Collection> findAllByIdIn(@Param("collectIds") List<Long> collectIds);
 
@@ -48,4 +48,8 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE collection.id = :id")
     Optional<Collection> findOneByIdWithComplainOfMember(@Param("id") Long id);
 
+    @Query("SELECT collection FROM Collection collection " +
+            "LEFT JOIN FETCH collection.collectedPosts collectedpost " +
+            "WHERE collection.id IN :ids")
+    List<Collection> findAllByIdsWithCollectedPosts(@Param("ids") List<Long> ids);
 }

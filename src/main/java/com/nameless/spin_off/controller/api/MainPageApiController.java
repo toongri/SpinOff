@@ -1,6 +1,7 @@
 package com.nameless.spin_off.controller.api;
 
-import com.nameless.spin_off.config.auth.LoginMemberId;
+import com.nameless.spin_off.config.auth.LoginMember;
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MainPageDto.MainPageDiscoveryDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -27,7 +28,7 @@ public class MainPageApiController {
 
     @GetMapping("/discovery")
     public MainPageResult<MainPageDiscoveryDto> getDiscoveryData(
-            @LoginMemberId Long memberId,
+            @LoginMember MemberDetails currentMember,
             @Qualifier("popular_post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable popularPostPageable,
             @Qualifier("latest_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
@@ -37,7 +38,7 @@ public class MainPageApiController {
             throws NotExistMemberException {
 
         log.info("getDiscoveryData");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", getMemberId(currentMember));
         log.info("popularPostPageable.getPageNumber() : {}", popularPostPageable.getPageNumber());
         log.info("popularPostPageable.getPageSize() : {}", popularPostPageable.getPageSize());
         log.info("popularPostPageable.getSort() : {}", popularPostPageable.getSort());
@@ -51,12 +52,14 @@ public class MainPageApiController {
         log.info("collectionPageable.getSort() : {}", collectionPageable.getSort());
 
         return getResult(
-                mainPageService.getDiscoveryData(popularPostPageable, latestPostPageable, collectionPageable, memberId));
+                mainPageService
+                        .getDiscoveryData(
+                                popularPostPageable, latestPostPageable, collectionPageable, getMemberId(currentMember)));
     }
 
     @GetMapping("/following")
     public MainPageResult<MainPageFollowDto> getFollowData(
-            @LoginMemberId Long memberId,
+            @LoginMember MemberDetails currentMember,
             @Qualifier("member_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
                     Pageable memberPageable,
             @Qualifier("hashtag_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
@@ -68,7 +71,7 @@ public class MainPageApiController {
             throws NotExistMemberException {
 
         log.info("getFollowData");
-        log.info("memberId : {}", memberId);
+        log.info("memberId : {}", currentMember.getId());
         log.info("memberPageable.getPageNumber() : {}", memberPageable.getPageNumber());
         log.info("memberPageable.getPageSize() : {}", memberPageable.getPageSize());
         log.info("memberPageable.getSort() : {}", memberPageable.getSort());
@@ -87,7 +90,7 @@ public class MainPageApiController {
 
         return getResult(
                 mainPageService.getFollowData(memberPageable, hashtagPageable, moviePageable,
-                        collectionPageable, memberId));
+                        collectionPageable, currentMember.getId()));
     }
 
     @Data
@@ -100,6 +103,10 @@ public class MainPageApiController {
     }
     public <T> MainPageResult<T> getResult(T data) {
         return new MainPageResult<>(data, true, "0", "성공");
+    }
+
+    public Long getMemberId(MemberDetails memberDetails) {
+        return memberDetails == null ? null : memberDetails.getId();
     }
 
 }
