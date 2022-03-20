@@ -132,7 +132,7 @@ class PostServiceJpaTest {
 
         CreatePostVO createPostVO = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of("형윤이", "형윤이?"), List.of(), collectionIds);
+                List.of("형윤이", "형윤이_"), List.of(), collectionIds);
         System.out.println("서비스");
         Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
         em.flush();
