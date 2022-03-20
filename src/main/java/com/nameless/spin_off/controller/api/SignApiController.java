@@ -44,7 +44,7 @@ public class SignApiController {
 
     @PostMapping("/auth-email")
     public SignResult<Boolean> authEmail(@RequestParam String email) {
-        return getResult(memberService.sendEmailAuth(email));
+        return getResult(memberService.sendEmailForAuth(email));
     }
 
     @PostMapping("/confirm-email")
@@ -59,13 +59,23 @@ public class SignApiController {
     }
 
     @GetMapping("/check-duplicate/nickname")
-    public SignResult<Boolean> checkDuplicateNickname(String nickname) {
+    public SignResult<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
         return getResult(memberService.checkDuplicateNickname(nickname));
     }
 
-    @GetMapping("/check-duplicate/accountId")
-    public SignResult<Boolean> checkDuplicateAccountId(String accountId) {
+    @GetMapping("/check-duplicate/account-id")
+    public SignResult<Boolean> checkDuplicateAccountId(@RequestParam String accountId) {
         return getResult(memberService.checkDuplicateAccountId(accountId));
+    }
+
+    @GetMapping("/find/account-id")
+    public SignResult<Boolean> findMemberAccountId(@RequestParam String email) {
+        return getResult(memberService.sendEmailForAccountId(email));
+    }
+
+    @PostMapping("/find/account-pw")
+    public SignResult<Boolean> findMemberAccountPw(@RequestParam String accountId) {
+        return getResult(memberService.sendEmailForAccountPw(accountId));
     }
 
     @Data

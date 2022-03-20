@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.ACCOUNT_PW_MIN;
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.EMAIL_TOKEN;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
@@ -63,7 +64,7 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public boolean sendEmailAuth(String email)
+    public boolean sendEmailForAuth(String email)
             throws AlreadyAccountIdException, AlreadyNicknameException {
 
         isCorrectEmail(email);
@@ -78,6 +79,33 @@ public class MemberServiceJpa implements MemberService {
                 .build());
 
         emailService.sendForRegister(emailAuth.getEmail(), emailAuth.getAuthToken());
+        return true;
+    }
+
+    @Override
+    public boolean sendEmailForAccountId(String email) {
+        isCorrectEmail(email);
+        String accountId = memberQueryRepository.findAccountIdByEmail(email);
+        if (accountId == null) {
+            throw new NotExistMemberException();
+        } else {
+            emailService.sendForAccountId(email, accountId);
+        }
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public boolean sendEmailForAccountPw(String accountId) {
+        isCorrectAccountId(accountId);
+        Optional<Member> optionalMember = memberRepository.findOneByAccountId(accountId);
+
+        Member member = optionalMember.orElseThrow(NotExistMemberException::new);
+
+        String randomPassword = getRandomPassword();
+        member.updateAccountPw(passwordEncoder.encode(randomPassword));
+
+        emailService.sendForAccountPw(member.getEmail(), randomPassword);
         return true;
     }
 
@@ -387,6 +415,13 @@ public class MemberServiceJpa implements MemberService {
         }
     }
 
+    private String getRandomPassword() {
+        String randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_PW_MIN.getLength());
+
+        randomAccountId += RandomStringUtils.randomNumeric(ACCOUNT_PW_MIN.getLength());
+
+        return randomAccountId;
+    }
     private boolean isIncludeAllNumber(String accountPw) {
         return !MemberCondition.NUMBER.isNotCorrect(accountPw);
     }

@@ -46,4 +46,28 @@ public class EmailServiceJpa implements EmailService{
 
         javaMailSender.send(smm);
     }
+
+    @Override
+    public void sendForAccountId(String email, String accountId) {
+        SimpleMailMessage smm = new SimpleMailMessage();
+
+        smm.setFrom(userEmail);
+        smm.setTo(email);
+        smm.setSubject("아이디 찾기");
+        smm.setText("accountId : " + accountId);
+
+        javaMailSender.send(smm);
+    }
+
+    @Override
+    public void sendForAccountPw(String email, String accountPw) {
+        SimpleMailMessage smm = new SimpleMailMessage();
+
+        smm.setFrom(userEmail);
+        smm.setTo(email);
+        smm.setSubject("비밀번호 재생성");
+        smm.setText("accountPw : " + accountPw);
+
+        javaMailSender.send(smm);
+    }
 }

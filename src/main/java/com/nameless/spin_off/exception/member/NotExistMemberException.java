@@ -2,7 +2,7 @@ package com.nameless.spin_off.exception.member;
 
 public class NotExistMemberException extends RuntimeException{
     public NotExistMemberException() {
-        super("해당 멤버는 존재하지 않습니다.");
+        super("해당 유저는 존재하지 않습니다.");
     }
 
     public NotExistMemberException(String message) {

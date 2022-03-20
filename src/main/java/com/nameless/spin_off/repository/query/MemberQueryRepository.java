@@ -25,6 +25,14 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
+    public String findAccountIdByEmail(String email) {
+        return getQueryFactory()
+                .select(member.accountId)
+                .from(member)
+                .where(member.email.eq(email))
+                .fetchFirst();
+    }
+
     public Boolean isExist(Long id) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
