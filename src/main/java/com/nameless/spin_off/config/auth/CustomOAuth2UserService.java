@@ -22,6 +22,8 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.ACCOUNT_ID_MAX;
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.NICKNAME_MAX;
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.KAKAO;
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.NAVER;
 
@@ -114,12 +116,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private String getRandomNickname() {
-        String randomNickname = RandomStringUtils.randomAlphabetic(8);
+        String randomNickname = RandomStringUtils.randomAlphabetic(NICKNAME_MAX.getLength());
 
         Optional<Member> member = memberRepository.findByNickname(randomNickname);
 
         while (member.isPresent()) {
-            randomNickname = RandomStringUtils.randomAlphabetic(8);
+            randomNickname = RandomStringUtils.randomAlphabetic(NICKNAME_MAX.getLength());
             member = memberRepository.findByNickname(randomNickname);
         }
         log.info("randomNickname : {}", randomNickname);
@@ -127,12 +129,12 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
     }
 
     private String getAccountId() {
-        String randomAccountId = RandomStringUtils.randomAlphabetic(8);
+        String randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_ID_MAX.getLength());
 
         Optional<Member> member = memberRepository.findOneByAccountId(randomAccountId);
 
         while (member.isPresent()) {
-            randomAccountId = RandomStringUtils.randomAlphabetic(8);
+            randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_ID_MAX.getLength());
             member = memberRepository.findByNickname(randomAccountId);
         }
         log.info("randomNickname : {}", randomAccountId);

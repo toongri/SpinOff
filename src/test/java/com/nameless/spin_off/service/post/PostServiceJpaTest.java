@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.post;
 
-import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
@@ -10,6 +10,7 @@ import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
+import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -51,6 +52,51 @@ class PostServiceJpaTest {
     @Autowired EntityManager em;
 
     @Test
+    public void 해시태그_검열_테스트() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        CreatePostVO createPostVO = new CreatePostVO(
+                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
+                List.of("형윤이", "형윤이?"), List.of(), List.of());
+
+
+        //when
+        System.out.println("서비스");
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+                .isInstanceOf(InCorrectHashtagContentException.class);
+
+        createPostVO.setHashtagContents(List.of("_"));
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+                .isInstanceOf(InCorrectHashtagContentException.class);
+
+        createPostVO.setHashtagContents(List.of("gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg"));
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+                .isInstanceOf(InCorrectHashtagContentException.class);
+
+        createPostVO.setHashtagContents(List.of("hashtag_what"));
+        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
+        Post byId = postRepository.getById(aLong);
+
+
+        createPostVO.setHashtagContents(List.of("hashtag_dft", "hashtag_dft"));
+        Long aLong1 = postService.insertPostByPostVO(createPostVO, member.getId());
+        Post byId1 = postRepository.getById(aLong1);
+        //then
+
+        assertThat(byId.getPostedHashtags().stream()
+                .map(PostedHashtag::getHashtag)
+                .map(Hashtag::getContent).
+                collect(Collectors.toList())).containsExactly("hashtag_what");
+
+        assertThat(byId1.getPostedHashtags().stream()
+                .map(PostedHashtag::getHashtag)
+                .map(Hashtag::getContent).
+                collect(Collectors.toList())).containsExactly("hashtag_dft");
+
+    }
+
+    @Test
     public void 포스트_생성_테스트() throws Exception{
         //given
         Member member = Member.buildMember().build();
@@ -84,7 +130,7 @@ class PostServiceJpaTest {
 
         //when
 
-        PostDto.CreatePostVO createPostVO = new PostDto.CreatePostVO(
+        CreatePostVO createPostVO = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of("형윤이", "형윤이?"), List.of(), collectionIds);
         System.out.println("서비스");
@@ -135,15 +181,15 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
 
-        PostDto.CreatePostVO createPostVO1 = new PostDto.CreatePostVO(
+        CreatePostVO createPostVO1 = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of());
 
-        PostDto.CreatePostVO createPostVO2 = new PostDto.CreatePostVO(
+        CreatePostVO createPostVO2 = new CreatePostVO(
                 "알라리숑", "얄라리얄라", 0L, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of());
 
-        PostDto.CreatePostVO createPostVO3 = new PostDto.CreatePostVO(
+        CreatePostVO createPostVO3 = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
                 List.of(), List.of(), List.of(-1L));
         //when

@@ -34,8 +34,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.BanListOfContentsEnum.CANT_CONTAIN_AT_HASHTAG;
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.entity.enums.hashtag.HashtagCondition.CONTENT;
 import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 
 @Service
@@ -144,37 +145,36 @@ public class PostServiceJpa implements PostService{
 
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws InCorrectHashtagContentException {
 
-        if (isNotContainCantChar(hashtagContents).isEmpty()) {
-            List<Hashtag> alreadySavedHashtags = hashtagRepository.findAllByContentIn(hashtagContents);
+        List<String> hashtagStrings = hashtagContents.stream()
+                .distinct()
+                .limit(HASHTAG_LIST_MAX.getLength())
+                .collect(Collectors.toList());
 
-            List<String> contentsAboutAlreadySavedHashtags =
-                    alreadySavedHashtags.stream().map(Hashtag::getContent).collect(Collectors.toList());
+        isNotContainCantChar(hashtagStrings);
 
-            List<Hashtag> anotherTags = hashtagContents.stream()
-                    .filter(tag -> !contentsAboutAlreadySavedHashtags.contains(tag))
-                    .map(Hashtag::createHashtag)
-                    .collect(Collectors.toList());
+        List<Hashtag> alreadySavedHashtags = hashtagRepository.findAllByContentIn(hashtagStrings);
 
-            hashtagRepository.saveAll(anotherTags);
+        List<String> contentsAboutAlreadySavedHashtags =
+                alreadySavedHashtags.stream().map(Hashtag::getContent).collect(Collectors.toList());
 
-            alreadySavedHashtags.addAll(anotherTags);
+        List<Hashtag> anotherTags = hashtagStrings.stream()
+                .filter(tag -> !contentsAboutAlreadySavedHashtags.contains(tag))
+                .map(Hashtag::createHashtag)
+                .collect(Collectors.toList());
 
-            return alreadySavedHashtags;
-        } else {
-            throw new InCorrectHashtagContentException();
-        }
+        hashtagRepository.saveAll(anotherTags);
+
+        alreadySavedHashtags.addAll(anotherTags);
+
+        return alreadySavedHashtags;
     }
 
-    private Optional<String> isNotContainCantChar(List<String> hashtagContents) {
-
+    private void isNotContainCantChar(List<String> hashtagContents) {
         for (String hashtagContent : hashtagContents) {
-            for (String cantContainChar : CANT_CONTAIN_AT_HASHTAG.getBanList()) {
-                if (hashtagContent.contains(cantContainChar)) {
-                    return Optional.of(hashtagContent);
-                }
+            if (CONTENT.isNotCorrect(hashtagContent)) {
+                throw new InCorrectHashtagContentException();
             }
         }
-        return Optional.empty();
     }
 
     private Movie getMovieById(Long movieId) throws NotExistMovieException {

@@ -26,7 +26,6 @@ public interface MemberService {
             throws NotExistMemberException;
     boolean sendEmailAuth(String email)
             throws AlreadyAccountIdException, AlreadyNicknameException;
-    boolean checkDuplicateEmail(String email);
     boolean checkDuplicateNickname(String email);
     boolean checkDuplicateAccountId(String email);
 }

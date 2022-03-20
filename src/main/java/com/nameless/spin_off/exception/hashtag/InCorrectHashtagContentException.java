@@ -2,7 +2,7 @@ package com.nameless.spin_off.exception.hashtag;
 
 public class InCorrectHashtagContentException extends RuntimeException{
     public InCorrectHashtagContentException() {
-        super("해시태그에 금칙어가 들어있습니다.");
+        super("해시태그가 형식에 맞지 않습니다.");
     }
 
     public InCorrectHashtagContentException(String message) {

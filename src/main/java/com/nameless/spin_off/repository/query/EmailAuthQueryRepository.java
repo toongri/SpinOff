@@ -49,7 +49,7 @@ public class EmailAuthQueryRepository {
         return fetchOne != null;
     }
 
-    public Boolean isNotExistEmail(String email) {
+    public Boolean isExistEmail(String email) {
         Integer fetchOne = jpaQueryFactory
                 .selectOne()
                 .from(member)
@@ -57,7 +57,7 @@ public class EmailAuthQueryRepository {
                         member.email.eq(email))
                 .fetchFirst();
 
-        return fetchOne == null;
+        return fetchOne != null;
     }
 
     public Boolean isNotExistNickname(String nickname) {

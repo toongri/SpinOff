@@ -3,10 +3,7 @@ package com.nameless.spin_off.service.member;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
-import com.nameless.spin_off.entity.enums.member.MemberScoreEnum;
-import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.enums.member.*;
 import com.nameless.spin_off.entity.member.*;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
@@ -28,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.EMAIL_TOKEN;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
@@ -67,10 +65,14 @@ public class MemberServiceJpa implements MemberService {
     @Override
     public boolean sendEmailAuth(String email)
             throws AlreadyAccountIdException, AlreadyNicknameException {
+
+        isCorrectEmail(email);
+        checkDuplicateEmail(email);
+
         EmailAuth emailAuth = emailAuthRepository.save(EmailAuth.builder()
                 .email(email)
 //                .authToken(UUID.randomUUID().toString())
-                .authToken(RandomStringUtils.randomAlphabetic(8))
+                .authToken(RandomStringUtils.randomAlphabetic(EMAIL_TOKEN.getLength()))
                 .expired(false)
                 .provider(EmailAuthProviderStatus.A)
                 .build());
@@ -83,7 +85,7 @@ public class MemberServiceJpa implements MemberService {
     @Override
     public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
-
+        isCorrectRegisterRequest(requestDto);
         isExistAuthEmail(requestDto.getEmail(), requestDto.getAuthToken());
 
         Member member = memberRepository.save(Member.buildMember()
@@ -115,6 +117,7 @@ public class MemberServiceJpa implements MemberService {
     @Transactional
     @Override
     public boolean confirmEmail(EmailAuthRequestDto requestDto) {
+
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                         requestDto.getEmail(),
                         requestDto.getAuthToken(),
@@ -127,18 +130,15 @@ public class MemberServiceJpa implements MemberService {
     }
 
     @Override
-    public boolean checkDuplicateEmail(String email) {
-        return emailAuthQueryRepository.isNotExistEmail(email);
-    }
-
-    @Override
     public boolean checkDuplicateNickname(String nickname) {
+        isCorrectNickname(nickname);
         return emailAuthQueryRepository.isNotExistNickname(nickname);
     }
 
     @Override
-    public boolean checkDuplicateAccountId(String email) {
-        return emailAuthQueryRepository.isNotExistAccountId(email);
+    public boolean checkDuplicateAccountId(String accountId) {
+        isCorrectAccountId(accountId);
+        return emailAuthQueryRepository.isNotExistAccountId(accountId);
     }
 
 
@@ -185,6 +185,7 @@ public class MemberServiceJpa implements MemberService {
     @Transactional
     @Override
     public MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto) {
+        isCorrectLoginRequest(requestDto);
         Member member =
                 memberRepository.findOneByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
 
@@ -332,5 +333,69 @@ public class MemberServiceJpa implements MemberService {
                 REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.A)) {
             throw new EmailNotAuthenticatedException();
         }
+    }
+
+    private void isCorrectRegisterRequest(MemberRegisterRequestDto requestDto) {
+        isCorrectAccountId(requestDto.getAccountId());
+        isCorrectAccountPw(requestDto.getAccountPw());
+        isCorrectNickname(requestDto.getNickname());
+        isCorrectEmail(requestDto.getEmail());
+    }
+
+    private void isCorrectLoginRequest(MemberLoginRequestDto requestDto) {
+        isCorrectAccountId(requestDto.getAccountId());
+        isCorrectAccountPw(requestDto.getAccountPw());
+    }
+
+    private void isCorrectEmail(String email) {
+        if (MemberCondition.EMAIL.isNotCorrect(email)) {
+            throw new InCorrectEmailException();
+        }
+    }
+
+    private void isCorrectAccountId(String accountId) {
+        if (MemberCondition.ACCOUNT_ID.isNotCorrect(accountId)) {
+            throw new InCorrectAccountIdException();
+        }
+    }
+
+    private void isCorrectAccountPw(String accountPw) {
+        isAccountPwCombination(accountPw);
+        if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
+            throw new InCorrectAccountPwException();
+        }
+    }
+
+    private void isCorrectNickname(String nickname) {
+        if (MemberCondition.NICKNAME.isNotCorrect(nickname)) {
+            throw new InCorrectNicknameException();
+        }
+    }
+
+    public void checkDuplicateEmail(String email) {
+        if (emailAuthQueryRepository.isExistEmail(email)) {
+            throw new AlreadyEmailException();
+        }
+    }
+    private void isAccountPwCombination(String accountPw) {
+        if (isIncludeAllEnglish(accountPw)) {
+            throw new InCorrectAccountPwException();
+        } else if (isIncludeAllSign(accountPw)) {
+            throw new InCorrectAccountPwException();
+        } else if (isIncludeAllNumber(accountPw)) {
+            throw new InCorrectAccountPwException();
+        }
+    }
+
+    private boolean isIncludeAllNumber(String accountPw) {
+        return !MemberCondition.NUMBER.isNotCorrect(accountPw);
+    }
+
+    private boolean isIncludeAllSign(String accountPw) {
+        return !MemberCondition.SIGN.isNotCorrect(accountPw);
+    }
+
+    private boolean isIncludeAllEnglish(String accountPw) {
+        return !MemberCondition.ENGLISH.isNotCorrect(accountPw);
     }
 }

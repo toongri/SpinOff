@@ -58,11 +58,6 @@ public class SignApiController {
         return getResult("연동이 완료되었습니다.");
     }
 
-    @GetMapping("/check-duplicate/email")
-    public SignResult<Boolean> checkDuplicateEmail(String email) {
-        return getResult(memberService.checkDuplicateEmail(email));
-    }
-
     @GetMapping("/check-duplicate/nickname")
     public SignResult<Boolean> checkDuplicateNickname(String nickname) {
         return getResult(memberService.checkDuplicateNickname(nickname));
