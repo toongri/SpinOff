@@ -122,10 +122,8 @@ public class PostDto {
         private String title;
         private String content;
         private Long movieId;
-        private String thumbnailUrl;
         private PublicOfPostStatus publicOfPostStatus;
         private List<String> hashtagContents;
-        private List<String> mediaUrls;
         private List<Long> collectionIds;
     }
 

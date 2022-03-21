@@ -14,25 +14,28 @@ import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
-import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
-import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
+import com.nameless.spin_off.service.support.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.POST_IMAGE_MAX;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 import static com.nameless.spin_off.entity.enums.hashtag.HashtagCondition.CONTENT;
 import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
@@ -42,23 +45,23 @@ import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 @Transactional(readOnly = true)
 public class PostServiceJpa implements PostService{
 
-    private final MemberRepository memberRepository;
     private final PostRepository postRepository;
     private final MovieRepository movieRepository;
     private final HashtagRepository hashtagRepository;
     private final CollectionRepository collectionRepository;
     private final PostQueryRepository postQueryRepository;
-    private final CollectionQueryRepository collectionQueryRepository;
     private final LikedPostRepository likedPostRepository;
     private final ViewedPostByIpRepository viewedPostByIpRepository;
-    private final CollectedPostRepository collectedPostRepository;
+    private final AwsS3Service awsS3Service;
 
     @Transactional
     @Override
-    public Long insertPostByPostVO(CreatePostVO postVO, Long memberId)
+    public Long insertPostByPostVO(CreatePostVO postVO, Long memberId, List<MultipartFile> multipartFiles)
             throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException,
             AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
+            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException, IOException {
+
+        List<String> urls = getUrlByMultipartFile(multipartFiles);
 
         List<Collection> collections = getCollections(postVO.getCollectionIds());
         isCorrectCollectionWithOwner(collections, memberId);
@@ -70,9 +73,9 @@ public class PostServiceJpa implements PostService{
         Post post = postRepository.save(Post.buildPost()
                 .setMember(Member.createMember(memberId))
                 .setPostPublicStatus(postVO.getPublicOfPostStatus())
-                .setUrls(postVO.getMediaUrls())
+                .setUrls(urls)
                 .setHashTags(hashtags)
-                .setThumbnailUrl(postVO.getThumbnailUrl())
+                .setThumbnailUrl(getThumbnails(urls))
                 .setMovie(movie)
                 .setTitle(postVO.getTitle())
                 .setContent(postVO.getContent())
@@ -81,6 +84,25 @@ public class PostServiceJpa implements PostService{
         post.addAllCollectedPost(collections);
 
         return post.getId();
+    }
+
+    private String getThumbnails(List<String> urls) {
+        return urls.isEmpty() ? null : urls.get(0);
+    }
+
+    private List<String> getUrlByMultipartFile(List<MultipartFile> multipartFiles) throws IOException {
+
+        if (multipartFiles.size() > POST_IMAGE_MAX.getLength()) {
+            throw new OverPostImageLengthException();
+        } else if (multipartFiles.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile multipartFile : multipartFiles) {
+                urls.add(awsS3Service.upload(multipartFile, "post"));
+            }
+            return urls;
+        }
     }
 
     @Transactional

@@ -484,6 +484,10 @@ public class HashtagQueryRepositoryTest {
             collectionList.get(9).insertViewedCollectionByIp(""+i%5);
             em.flush();
         }
+        for (int i = 0; i < 10; i++) {
+            hashtagList.get(i).insertViewedHashtagByIp("0");
+            em.flush();
+        }
 
         em.clear();
         postService.updateAllPopularity();

@@ -18,7 +18,9 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -32,24 +34,23 @@ public class PostApiController {
 
     @PostMapping("")
     public PostApiResult<Long> createOne(@LoginMember MemberDetails currentMember,
-                                         @RequestBody CreatePostVO createPostVO) throws
+                                         @RequestPart CreatePostVO createPostVO,
+                                         @RequestPart("images") List<MultipartFile> multipartFiles) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             InCorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException {
+            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException, IOException {
 
         log.info("createOne");
         log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", createPostVO.getTitle());
         log.info("content : {}", createPostVO.getContent());
         log.info("movieId : {}", createPostVO.getMovieId());
-        log.info("thumbnailUrl : {}", createPostVO.getThumbnailUrl());
         log.info("publicOfPostStatus : {}", createPostVO.getPublicOfPostStatus());
         log.info("hashtagContents : {}", createPostVO.getHashtagContents());
-        log.info("mediaUrls : {}", createPostVO.getMediaUrls());
         log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
-        return getResult(postService.insertPostByPostVO(createPostVO, currentMember.getId()));
+        return getResult(postService.insertPostByPostVO(createPostVO, currentMember.getId(), multipartFiles));
     }
 
     @PostMapping("/{postId}/like")

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -57,30 +58,30 @@ class PostServiceJpaTest {
         Member member = Member.buildMember().build();
         memberRepository.save(member);
         CreatePostVO createPostVO = new CreatePostVO(
-                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of("형윤이", "형윤이?"), List.of(), List.of());
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.A,
+                List.of("형윤이", "형윤이?"), List.of());
 
 
         //when
         System.out.println("서비스");
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
                 .isInstanceOf(InCorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("_"));
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
                 .isInstanceOf(InCorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg"));
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId()))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
                 .isInstanceOf(InCorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("hashtag_what"));
-        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
+        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList());
         Post byId = postRepository.getById(aLong);
 
 
         createPostVO.setHashtagContents(List.of("hashtag_dft", "hashtag_dft"));
-        Long aLong1 = postService.insertPostByPostVO(createPostVO, member.getId());
+        Long aLong1 = postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList());
         Post byId1 = postRepository.getById(aLong1);
         //then
 
@@ -130,11 +131,10 @@ class PostServiceJpaTest {
 
         //when
 
-        CreatePostVO createPostVO = new CreatePostVO(
-                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of("형윤이", "형윤이_"), List.of(), collectionIds);
+        CreatePostVO createPostVO = new CreatePostVO("알라리숑", "얄라리얄라", null,
+                PublicOfPostStatus.A, List.of("형윤이", "형윤이_"), collectionIds);
         System.out.println("서비스");
-        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId());
+        Long aLong = postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList());
         em.flush();
         em.clear();
 
@@ -182,24 +182,22 @@ class PostServiceJpaTest {
         memberRepository.save(member);
 
         CreatePostVO createPostVO1 = new CreatePostVO(
-                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of(), List.of(), List.of());
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.A,
+                List.of(), List.of());
 
         CreatePostVO createPostVO2 = new CreatePostVO(
-                "알라리숑", "얄라리얄라", 0L, null, PublicOfPostStatus.A,
-                List.of(), List.of(), List.of());
+                "알라리숑", "얄라리얄라", 0L, PublicOfPostStatus.A, List.of(), List.of());
 
         CreatePostVO createPostVO3 = new CreatePostVO(
-                "알라리숑", "얄라리얄라", null, null, PublicOfPostStatus.A,
-                List.of(), List.of(), List.of(-1L));
+                "알라리숑", "얄라리얄라", null, PublicOfPostStatus.A, List.of(), List.of(-1L));
         //when
 
         //then
 
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2, member.getId()))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO2, member.getId(), Collections.emptyList()))
                 .isInstanceOf(NotExistMovieException.class);//.hasMessageContaining("")
 
-        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3, member.getId()))
+        assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO3, member.getId(), Collections.emptyList()))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
     }
 

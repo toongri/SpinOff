@@ -12,6 +12,7 @@ application-real.yml
 InitDummy.java
 InitAddDummy.java
 InitLocal.java
+application-aws.yml
 
 ### STS ###
 .apt_generated

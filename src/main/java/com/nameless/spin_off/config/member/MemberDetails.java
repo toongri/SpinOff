@@ -1,12 +1,14 @@
 package com.nameless.spin_off.config.member;
 
 import lombok.Builder;
+import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Set;
 
+@ToString
 public class MemberDetails implements UserDetails {
 
     private Long id;

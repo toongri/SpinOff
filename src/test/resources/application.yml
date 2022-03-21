@@ -63,3 +63,15 @@ logging:
 org:
   gradle:
     daemon: false
+
+cloud:
+  aws:
+    credentials:
+      accessKey: test
+      secretKey: test
+    s3:
+      bucket: s3-spinoff
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false

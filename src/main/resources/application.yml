@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: oauth, local
+    include: oauth, local, aws
   jpa:
     open-in-view: false
     properties:
@@ -8,3 +8,13 @@ spring:
         dialect: org.hibernate.dialect.MariaDB103Dialect
         format_sql: true
         default_batch_fetch_size: 1000
+cloud:
+  aws:
+    s3:
+      bucket: s3-spinoff
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      instanceProfile: true

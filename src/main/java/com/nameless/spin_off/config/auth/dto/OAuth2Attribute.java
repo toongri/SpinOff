@@ -18,8 +18,7 @@ public class OAuth2Attribute {
     private String name;
     private String picture;
 
-    public static OAuth2Attribute of(String provider, String attributeKey,
-                                     Map<String, Object> attributes) {
+    public static OAuth2Attribute of(String provider, String attributeKey, Map<String, Object> attributes) {
         switch (provider) {
             case "google":
                 return ofGoogle(attributeKey, attributes);
@@ -56,8 +55,7 @@ public class OAuth2Attribute {
                 .build();
     }
 
-    private static OAuth2Attribute ofNaver(String attributeKey,
-                                           Map<String, Object> attributes) {
+    private static OAuth2Attribute ofNaver(String attributeKey, Map<String, Object> attributes) {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
         return OAuth2Attribute.builder()

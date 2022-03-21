@@ -10,7 +10,8 @@ public enum ContentsLengthEnum {
     ACCOUNT_PW_MAX(100),
     NICKNAME_MIN(2),
     NICKNAME_MAX(8),
-    EMAIL_TOKEN(8);
+    EMAIL_TOKEN(8),
+    POST_IMAGE_MAX(5);
 
     private final int length;
 
