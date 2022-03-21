@@ -24,14 +24,12 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
-    private HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
+    private HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
     private String errorMessage = null;
     private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
-
         log.error("[exceptionHandler] ex", exception);
 
         if (exception instanceof BadCredentialsException || exception instanceof InternalAuthenticationServiceException) {

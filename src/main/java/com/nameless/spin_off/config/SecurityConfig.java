@@ -26,6 +26,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final JwtTokenProvider jwtTokenProvider;
     private final OAuth2SuccessHandler successHandler;
     private final OAuth2FailureHandler failureHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
@@ -57,9 +59,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .anyRequest().hasRole("USER")
 //                        .anyRequest().permitAll()
                 .and()
-                    .exceptionHandling().authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+                    .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
-                    .exceptionHandling().accessDeniedHandler(new CustomAccessDeniedHandler())
+                    .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                     .oauth2Login()
                         .failureHandler(failureHandler)
