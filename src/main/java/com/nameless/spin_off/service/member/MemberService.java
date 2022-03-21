@@ -24,8 +24,7 @@ public interface MemberService {
             throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
     Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException;
-    boolean sendEmailForAuth(String email)
-            throws AlreadyAccountIdException, AlreadyNicknameException;
+    boolean sendEmailForAuth(String email) throws AlreadyAccountIdException, AlreadyNicknameException;
     boolean sendEmailForAccountId(String email);
     boolean sendEmailForAccountPw(String accountId);
     boolean checkDuplicateNickname(String email);

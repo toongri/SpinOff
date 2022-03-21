@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public enum ContentsTimeEnum {
     VIEWED_BY_IP_MINUTE(60L),
-    EMAIL_AUTH_MINUTE(5L),
+    EMAIL_AUTH_MINUTE(3L),
     REGISTER_EMAIL_AUTH_MINUTE(30L);
 
     private final long time;

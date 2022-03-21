@@ -30,13 +30,13 @@ public class SignApiController {
         return getResult(responseDto);
     }
 
-    @PostMapping("/login")
+    @PatchMapping("/login")
     public SignResult<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto requestDto) {
         MemberLoginResponseDto responseDto = memberService.loginMember(requestDto);
         return getResult(responseDto);
     }
 
-    @PostMapping("/reissue")
+    @PatchMapping("/reissue")
     public SignResult<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
         TokenResponseDto responseDto = memberService.reIssue(tokenRequestDto);
         return getResult(responseDto);
@@ -47,33 +47,33 @@ public class SignApiController {
         return getResult(memberService.sendEmailForAuth(email));
     }
 
-    @PostMapping("/confirm-email")
+    @PatchMapping("/auth-email")
     public SignResult<Boolean> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
         return getResult(memberService.confirmEmail(requestDto));
     }
 
-    @GetMapping("/linkage-email")
+    @PatchMapping("/linkage-email")
     public SignResult<String> linkageEmail(@ModelAttribute EmailLinkageCheckRequestDto requestDto) {
         memberService.checkEmailLinkage(requestDto);
         return getResult("연동이 완료되었습니다.");
     }
 
-    @GetMapping("/check-duplicate/nickname")
+    @GetMapping("/exist/nickname")
     public SignResult<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
         return getResult(memberService.checkDuplicateNickname(nickname));
     }
 
-    @GetMapping("/check-duplicate/account-id")
+    @GetMapping("/exist/account-id")
     public SignResult<Boolean> checkDuplicateAccountId(@RequestParam String accountId) {
         return getResult(memberService.checkDuplicateAccountId(accountId));
     }
 
-    @GetMapping("/find/account-id")
+    @GetMapping("/forget/account-id")
     public SignResult<Boolean> findMemberAccountId(@RequestParam String email) {
         return getResult(memberService.sendEmailForAccountId(email));
     }
 
-    @PostMapping("/find/account-pw")
+    @PatchMapping("/forget/account-pw")
     public SignResult<Boolean> findMemberAccountPw(@RequestParam String accountId) {
         return getResult(memberService.sendEmailForAccountPw(accountId));
     }
