@@ -1,11 +1,13 @@
 package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
+import com.nameless.spin_off.dto.CollectionDto.IdAndPublicCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.collection.LikedCollection;
 import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
 import com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.DontHaveAccessException;
@@ -48,8 +50,7 @@ public class CollectionServiceJpa implements CollectionService {
     public Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
 
-        isExistCollection(collectionId);
-        isBlockedMemberCollection(memberId, collectionId);
+        hasAuthPost(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistLikedCollection(memberId, collectionId);
 
         return likedCollectionRepository.save(
@@ -78,8 +79,7 @@ public class CollectionServiceJpa implements CollectionService {
             throws NotExistMemberException, NotExistCollectionException,
             AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
-        isCorrectCollectionId(memberId, collectionId);
-        isBlockedMemberCollection(memberId, collectionId);
+        hasAuthPost(memberId, collectionId, isCorrectIdAndGetPublic(memberId, collectionId));
         isExistFollowedCollection(memberId, collectionId);
 
         return followedCollectionRepository.save(
@@ -97,6 +97,31 @@ public class CollectionServiceJpa implements CollectionService {
             collection.updatePopularity();
         }
         return collections.size();
+    }
+
+    private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
+        PublicOfCollectionStatus publicCollection = collectionQueryRepository.findPublicByCollectionId(collectionId);
+        if (publicCollection == null) {
+            throw new NotExistCollectionException();
+        } else {
+            return publicCollection;
+        }
+    }
+
+    private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+        if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
+            if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
+            if (!collectionQueryRepository.isFollowMembersCollection(memberId, collectionId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
+            if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId))) {
+                throw new DontHaveAccessException();
+            }
+        }
     }
 
     private void isBlockedMemberCollection(Long memberId, Long collectionId) {
@@ -117,13 +142,14 @@ public class CollectionServiceJpa implements CollectionService {
         }
     }
 
-    private void isCorrectCollectionId(Long memberId, Long collectionId) {
-        Long collectionOwnerId = collectionQueryRepository.getCollectionOwnerId(collectionId);
+    private PublicOfCollectionStatus isCorrectIdAndGetPublic(Long memberId, Long collectionId) {
+        IdAndPublicCollectionDto idAndPublic = collectionQueryRepository
+                .findCollectionOwnerIdAndPublic(collectionId).orElseThrow(NotExistCollectionException::new);
 
-        if (collectionOwnerId == null) {
-            throw new NotExistCollectionException();
-        } else if (collectionOwnerId.equals(memberId)) {
+        if (idAndPublic.getId().equals(memberId)) {
             throw new CantFollowOwnCollectionException();
+        } else {
+            return idAndPublic.getPublicOfCollectionStatus();
         }
     }
 

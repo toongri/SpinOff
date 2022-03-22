@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -92,24 +93,10 @@ public class PostServiceJpa implements PostService{
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        isExistPost(postId);
-        isBlockMembersPost(memberId, postId);
+        hasAuthPost(memberId, postId, getPublicOfPost(postId));
         isExistLikedPost(memberId, postId);
         return likedPostRepository.save(
                 LikedPost.createLikedPost(Member.createMember(memberId), Post.createPost(postId))).getId();
-    }
-
-    @Transactional
-    @Override
-    public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
-
-        isExistPost(postId);
-        if (!isExistPostIp(postId, ip)) {
-            return viewedPostByIpRepository.
-                    save(ViewedPostByIp.createViewedPostByIp(ip, Post.createPost(postId))).getId();
-        } else {
-            return null;
-        }
     }
 
     @Transactional
@@ -118,7 +105,7 @@ public class PostServiceJpa implements PostService{
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
-        isBlockMembersPost(memberId, postId);
+        hasAuthPost(memberId, postId, getPublicOfPost(postId));
         List<Collection> collections = getCollections(collectionIds);
         isCorrectCollectionWithOwner(collections, memberId);
 
@@ -127,6 +114,18 @@ public class PostServiceJpa implements PostService{
         return post.insertCollectedPostByCollections(collections);
     }
 
+    @Transactional
+    @Override
+    public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
+
+        getPublicOfPost(postId);
+        if (!isExistPostIp(postId, ip)) {
+            return viewedPostByIpRepository.
+                    save(ViewedPostByIp.createViewedPostByIp(ip, Post.createPost(postId))).getId();
+        } else {
+            return null;
+        }
+    }
 
     @Transactional
     @Override
@@ -189,15 +188,12 @@ public class PostServiceJpa implements PostService{
         }
     }
 
-    private void isExistCollectedPost(List<Long> collectionId, Long postId) {
-        if (postQueryRepository.isExistCollectedPost(collectionId, postId)) {
-            throw new AlreadyCollectedPostException();
-        }
-    }
-
-    private void isExistPost(Long postId) {
-        if (!postQueryRepository.isExist(postId)) {
+    private PublicOfPostStatus getPublicOfPost(Long postId) {
+        PublicOfPostStatus publicPost = postQueryRepository.findPublicByPostId(postId);
+        if (publicPost == null) {
             throw new NotExistPostException();
+        } else {
+            return publicPost;
         }
     }
 
@@ -212,9 +208,19 @@ public class PostServiceJpa implements PostService{
         }
     }
 
-    private void isBlockMembersPost(Long memberId, Long postId) {
-        if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
-            throw new DontHaveAccessException();
+    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
+        if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
+            if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
+            if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
+            if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId))) {
+                throw new DontHaveAccessException();
+            }
         }
     }
 

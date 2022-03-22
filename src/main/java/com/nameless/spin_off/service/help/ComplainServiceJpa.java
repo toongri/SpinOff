@@ -141,7 +141,7 @@ public class ComplainServiceJpa implements ComplainService{
         }
     }
     private Long getCollectionOwnerId(Long collectionId) {
-        Long collectionOwnerId = collectionQueryRepository.getCollectionOwnerId(collectionId);
+        Long collectionOwnerId = collectionQueryRepository.findOwnerIdByCollectionId(collectionId);
 
         if (collectionOwnerId == null) {
             throw new NotExistCollectionException();

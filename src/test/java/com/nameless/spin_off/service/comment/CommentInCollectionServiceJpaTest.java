@@ -3,6 +3,7 @@ package com.nameless.spin_off.service.comment;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -139,11 +140,11 @@ class CommentInCollectionServiceJpaTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Collection col = Collection.createDefaultCollection(mem);
+        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Collection col2 = Collection.createDefaultCollection(mem2);
+        Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
 
         CreateCommentInCollectionVO commentInCollectionVO1 =
@@ -185,7 +186,7 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(member);
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Collection col = Collection.createDefaultCollection(mem);
+        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         CommentInCollection commentInCollection =
                 CommentInCollection.createCommentInCollection(mem, " ", null, col);
@@ -215,7 +216,7 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(member);
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
-        Collection col = Collection.createDefaultCollection(mem);
+        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         CommentInCollection commentInCollection =
                 CommentInCollection.createCommentInCollection(mem, " ", null, col);

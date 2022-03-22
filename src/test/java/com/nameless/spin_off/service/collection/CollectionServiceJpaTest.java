@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -143,7 +144,7 @@ class CollectionServiceJpaTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Collection col = Collection.createDefaultCollection(mem2);
+        Collection col = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
 
         em.flush();
@@ -176,9 +177,9 @@ class CollectionServiceJpaTest {
         memberRepository.save(mem);
         Member mem2 = Member.buildMember().build();
         memberRepository.save(mem2);
-        Collection col = Collection.createDefaultCollection(mem);
+        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
-        Collection col2 = Collection.createDefaultCollection(mem2);
+        Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
 
         em.flush();

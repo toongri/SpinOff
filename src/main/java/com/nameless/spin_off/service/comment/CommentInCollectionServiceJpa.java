@@ -1,9 +1,11 @@
 package com.nameless.spin_off.service.comment;
 
+import com.nameless.spin_off.dto.CollectionDto.IdAndPublicCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.LikedCommentInCollection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
@@ -32,8 +34,7 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
     public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
         Long collectionId = commentVO.getCollectionId();
-        isExistCollection(collectionId);
-        isBlockedMemberCollection(memberId, collectionId);
+        hasAuthPost(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistCommentInCollection(commentVO.getParentId(), collectionId);
         isBlockMembersComment(memberId, commentVO.getParentId());
 
@@ -50,7 +51,8 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
     public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInCollectionException, AlreadyLikedCommentInCollectionException {
 
-        isExistComment(commentId);
+        IdAndPublicCollectionDto publicAndId = getPublicAndIdCollectionByCommentId(commentId);
+        hasAuthPost(memberId, publicAndId.getId(), publicAndId.getPublicOfCollectionStatus());
         isBlockMembersComment(memberId, commentId);
         isExistLikedCommentInCollection(memberId, commentId);
 
@@ -58,18 +60,6 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
                 LikedCommentInCollection.createLikedCommentInCollection(
                         Member.createMember(memberId),
                         CommentInCollection.createCommentInCollection(commentId))).getId();
-    }
-
-    private void isExistCollection(Long collectionId) {
-        if (!collectionQueryRepository.isExist(collectionId)) {
-            throw new NotExistCollectionException();
-        }
-    }
-
-    private void isBlockedMemberCollection(Long memberId, Long collectionId) {
-        if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
-            throw new DontHaveAccessException();
-        }
     }
 
     private void isBlockMembersComment(Long memberId, Long commentId) {
@@ -80,17 +70,41 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
         }
     }
 
-    private void isExistComment(Long commentId) {
-        if (!commentInCollectionQueryRepository.isExist(commentId)) {
-            throw new NotExistCommentInCollectionException();
-        }
-    }
-
     private void isExistCommentInCollection(Long commentId, Long collectionId) {
         if (commentId == null) {
 
         } else if (!commentInCollectionQueryRepository.isExistInCollection(commentId, collectionId)) {
             throw new NotExistCommentInCollectionException();
+        }
+    }
+
+    private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
+        PublicOfCollectionStatus publicCollection = collectionQueryRepository.findPublicByCollectionId(collectionId);
+        if (publicCollection == null) {
+            throw new NotExistCollectionException();
+        } else {
+            return publicCollection;
+        }
+    }
+
+    private IdAndPublicCollectionDto getPublicAndIdCollectionByCommentId(Long commentId) {
+        return collectionQueryRepository
+                .findPublicAndIdByCommentId(commentId).orElseThrow(NotExistCommentInCollectionException::new);
+    }
+
+    private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+        if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
+            if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
+            if (!collectionQueryRepository.isFollowMembersCollection(memberId, collectionId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
+            if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId))) {
+                throw new DontHaveAccessException();
+            }
         }
     }
 

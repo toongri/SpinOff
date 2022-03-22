@@ -28,6 +28,12 @@ public class CollectionDto {
         }
     }
 
+    @Data
+    @AllArgsConstructor
+    public static class IdAndPublicCollectionDto {
+        private Long id;
+        private PublicOfCollectionStatus publicOfCollectionStatus;
+    }
 
     @Data
     @NoArgsConstructor

@@ -89,6 +89,13 @@ public class PostDto {
     }
 
     @Data
+    @AllArgsConstructor
+    public static class IdAndPublicPostDto {
+        private Long postId;
+        private PublicOfPostStatus publicOfPostStatus;
+    }
+
+    @Data
     @NoArgsConstructor
     public static class SearchPageAtAllPostDto {
 

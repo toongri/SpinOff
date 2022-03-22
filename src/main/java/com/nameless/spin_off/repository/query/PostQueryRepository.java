@@ -1,5 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.IdAndPublicPostDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
@@ -7,12 +9,14 @@ import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
 import com.nameless.spin_off.dto.QPostDto_SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.QPostDto_SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
+import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -20,12 +24,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
+import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
+import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
@@ -37,6 +44,30 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
 
     public PostQueryRepository() {
         super(Post.class);
+    }
+
+    public PublicOfPostStatus findPublicByPostId(Long postId) {
+        return getQueryFactory()
+                .select(post.publicOfPostStatus)
+                .from(post)
+                .where(post.id.eq(postId))
+                .fetchFirst();
+    }
+
+    public Optional<IdAndPublicPostDto> findPublicPostByCommentId(Long commentId) {
+        Tuple tuple = getQueryFactory()
+                .select(post.id, post.publicOfPostStatus)
+                .from(commentInPost)
+                .join(commentInPost.post, post)
+                .where(commentInPost.id.eq(commentId))
+                .fetchFirst();
+
+        if (tuple == null) {
+            return Optional.empty();
+        } else {
+            return Optional.of(new PostDto.IdAndPublicPostDto(
+                    tuple.get(post.id), tuple.get(post.publicOfPostStatus)));
+        }
     }
 
     public Boolean isBlockMembersPost(Long memberId, Long postId) {
@@ -58,6 +89,21 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
 
         return fetchOne != null;
     }
+
+    public Boolean isFollowMembersPost(Long memberId, Long postId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(post)
+                .join(post.member, member)
+                .leftJoin(member.followingMembers, followedMember)
+                .where(
+                        post.id.eq(postId).and(
+                                followedMember.followingMember.id.eq(memberId)))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
     public Long findOwnerIdByPostId(Long postId) {
         return getQueryFactory()
                 .select(post.member.id)

@@ -1,8 +1,10 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
+import com.nameless.spin_off.dto.PostDto.IdAndPublicPostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.comment.LikedCommentInPost;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
@@ -33,8 +35,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
     public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
         Long postId = commentVO.getPostId();
-        isExistPost(postId);
-        isBlockMembersPost(memberId, postId);
+        hasAuthPost(memberId, postId, getPublicOfPost(postId));
         isExistCommentInPost(commentVO.getParentId(), postId);
         isBlockMembersComment(memberId, commentVO.getParentId());
 
@@ -51,7 +52,8 @@ public class CommentInPostServiceJpa implements CommentInPostService {
     public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        isExistComment(commentId);
+        IdAndPublicPostDto idAndPublic = getPublicAndIdPostByCommentId(commentId);
+        hasAuthPost(memberId, idAndPublic.getPostId(), idAndPublic.getPublicOfPostStatus());
         isBlockMembersComment(memberId, commentId);
         isExistLikedCommentInPost(memberId, commentId);
 
@@ -61,16 +63,18 @@ public class CommentInPostServiceJpa implements CommentInPostService {
                         CommentInPost.createCommentInPost(commentId))).getId();
     }
 
-    private void isExistPost(Long postId) {
-        if (!postQueryRepository.isExist(postId)) {
+    private PublicOfPostStatus getPublicOfPost(Long postId) {
+        PublicOfPostStatus publicPost = postQueryRepository.findPublicByPostId(postId);
+        if (publicPost == null) {
             throw new NotExistPostException();
+        } else {
+            return publicPost;
         }
     }
 
-    private void isBlockMembersPost(Long memberId, Long postId) {
-        if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
-            throw new DontHaveAccessException();
-        }
+    private IdAndPublicPostDto getPublicAndIdPostByCommentId(Long commentId) {
+        return postQueryRepository
+                .findPublicPostByCommentId(commentId).orElseThrow(NotExistCommentInPostException::new);
     }
 
     private void isBlockMembersComment(Long memberId, Long commentId) {
@@ -81,9 +85,19 @@ public class CommentInPostServiceJpa implements CommentInPostService {
         }
     }
 
-    private void isExistComment(Long commentId) {
-        if (!commentInPostQueryRepository.isExist(commentId)) {
-            throw new NotExistCommentInPostException();
+    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
+        if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
+            if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
+            if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
+                throw new DontHaveAccessException();
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
+            if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId))) {
+                throw new DontHaveAccessException();
+            }
         }
     }
 

@@ -1,9 +1,11 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.PostDto.visitPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
@@ -124,6 +126,13 @@ public class PostQueryServiceJpa implements PostQueryService{
         blockedMembers = memberRepository.findAllByBlockingMemberId(memberId);
 
         return postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtags, blockedMembers);
+    }
+
+    @Override
+    public visitPostDto visitPost(MemberDetails currentMember, Long postId) {
+
+
+        return null;
     }
 
     private List<Member> getBlockedMemberByMember(Member member) {

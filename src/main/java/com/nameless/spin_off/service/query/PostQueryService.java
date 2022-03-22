@@ -1,8 +1,10 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.PostDto.visitPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.data.domain.Pageable;
@@ -20,4 +22,5 @@ public interface PostQueryService {
             Pageable pageable, List<String> hashtagContent, Long memberId, int length);
     Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(Pageable pageable, List<String> hashtagContent, Long memberId);
 
+    visitPostDto visitPost(MemberDetails currentMember, Long postId);
 }
