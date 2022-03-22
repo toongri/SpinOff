@@ -31,8 +31,7 @@ public class EnumMapper {
         if (keys == null || keys.size() == 0) {
             return new LinkedHashMap<>();
         }
-        return keys.stream()
-                .collect(Collectors.toMap(Function.identity(), key -> factory.get(key)));
+        return keys.stream().collect(Collectors.toMap(Function.identity(), key -> factory.get(key)));
     }
 
     public Map<String, List<EnumMapperValue>> getAll() {

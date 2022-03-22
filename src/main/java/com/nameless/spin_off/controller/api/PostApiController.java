@@ -79,7 +79,7 @@ public class PostApiController {
         return getResult(postService.insertCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
 
-    @GetMapping("/post-public-categories")
+    @GetMapping("/public-categories")
     public List<EnumMapperValue> getPostPublicCategories() {
 
         log.info("getPostPublicCategories");

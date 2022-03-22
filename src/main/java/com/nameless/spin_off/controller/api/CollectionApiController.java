@@ -2,15 +2,21 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.CollectionNameDto;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
+import com.nameless.spin_off.entity.enums.EnumMapper;
+import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.query.CollectionQueryService;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -19,6 +25,8 @@ import org.springframework.web.bind.annotation.*;
 public class CollectionApiController {
 
     private final CollectionService collectionService;
+    private final CollectionQueryService collectionQueryService;
+    private final EnumMapper enumMapper;
 
     @PostMapping("")
     public CollectionApiResult<Long> createOne(
@@ -56,6 +64,23 @@ public class CollectionApiController {
         log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionService.insertFollowedCollectionByMemberId(currentMember.getId(), collectionId));
+    }
+
+    @GetMapping("/list/name")
+    public CollectionApiResult<List<CollectionNameDto>> getCollectionNamesById(@LoginMember MemberDetails currentMember) {
+
+        log.info("getCollectionNamesById");
+        log.info("memberId : {}", currentMember.getId());
+
+        return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
+    }
+
+    @GetMapping("/public-categories")
+    public List<EnumMapperValue> getCollectionPublicCategories() {
+
+        log.info("getCollectionPublicCategories");
+
+        return enumMapper.get("PublicOfCollectionStatus");
     }
 
     @Data

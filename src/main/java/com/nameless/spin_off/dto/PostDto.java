@@ -1,5 +1,10 @@
 package com.nameless.spin_off.dto;
 
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
+import com.nameless.spin_off.dto.MovieDto.MovieInVisitPostDto;
+import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -14,10 +19,51 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
 public class PostDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class visitPostDto {
+        private Long postId;
+        private ContentMemberDto member;
+        private String postTitle;
+        private LocalDateTime createTime;
+        private String timeComment;
+        private String postContent;
+        private MovieInVisitPostDto movie;
+        private boolean hasAuth;
+        private int likeSize;
+        private List<ContentMemberDto> likeMembers;
+        private List<ContentHashtagDto> hashtags;
+        private int commentSize;
+        private List<ContentCommentDto> comments;
+        private boolean isLike;
+
+        public visitPostDto(Post post, List<CommentInPost> comments, Long memberId) {
+            this.postId = post.getId();
+            this.member = new ContentMemberDto(post.getMember());
+            this.postTitle = post.getTitle();
+            this.createTime = post.getCreatedDate();
+            this.timeComment = getTimeToComment(post.getLastModifiedDate());
+            this.postContent = post.getContent();
+            this.movie = new MovieInVisitPostDto(post.getMovie());
+            this.hasAuth = hasAuth;
+            this.likeSize = likeSize;
+            this.likeMembers = likeMembers;
+            this.hashtags = hashtags;
+            this.commentSize = commentSize;
+//            this.comments = comments.stream().map();
+            this.isLike = isLike;
+        }
+
+        private String getTimeToComment(LocalDateTime lastModifiedDate) {
+            return null;
+        }
+    }
 
     @Data
     @NoArgsConstructor

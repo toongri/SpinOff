@@ -28,8 +28,11 @@ public class Movie extends BaseTimeEntity {
 
     private String title;
 
-    @Column(name = "image_url")
-    private String imageUrl;
+    private String thumbnail;
+
+    private String directorName;
+
+    private Double popularity;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<FollowedMovie> followingMembers = new ArrayList<>();
@@ -51,8 +54,6 @@ public class Movie extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private GenreOfMovieStatus fourthGenreOfMovieStatus;
-
-    private Double popularity;
 
     //==연관관계 메소드==//
     private Long addViewedMovieByIp(String ip) {
@@ -105,7 +106,7 @@ public class Movie extends BaseTimeEntity {
         popularity = executeViewScore() + executeFollowScore() + executePostScore();
     }
     private void updateImageUrl(String imageUrl) {
-        this.imageUrl = imageUrl;
+        this.thumbnail = imageUrl;
     }
     private void updateTitle(String title) {
         this.title = title;

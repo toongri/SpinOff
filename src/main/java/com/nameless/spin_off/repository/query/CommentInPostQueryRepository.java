@@ -1,11 +1,16 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.comment.QLikedCommentInPost.likedCommentInPost;
+import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
+import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
@@ -14,7 +19,26 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
         super(CommentInPost.class);
     }
 
-    public Long getCommentOwnerId(Long commentId) {
+    public Boolean isBlockMembersComment(Long memberId, Long commentId) {
+        QBlockedMember blockingMember = new QBlockedMember("blockingMember");
+
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(commentInPost)
+                .join(commentInPost.member, member)
+                .leftJoin(member.blockedMembers, blockedMember)
+                .leftJoin(member.blockingMembers, blockingMember)
+                .where(
+                        commentInPost.id.eq(commentId).and(
+                                ((blockedMember.member.id.eq(memberId).and(
+                                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A))).or(
+                                        blockingMember.blockingMember.id.eq(memberId).and(
+                                                blockingMember.blockedMemberStatus.eq(BlockedMemberStatus.A))))))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+    public Long findCommentOwnerId(Long commentId) {
         return getQueryFactory()
                 .select(commentInPost.member.id)
                 .from(commentInPost)
@@ -28,6 +52,19 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
                 .selectOne()
                 .from(commentInPost)
                 .where(commentInPost.id.eq(id))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistInPost(Long id, Long postId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(commentInPost)
+                .join(commentInPost.post, post)
+                .where(
+                        commentInPost.id.eq(id),
+                        post.id.eq(postId))
                 .fetchFirst();
 
         return fetchOne != null;

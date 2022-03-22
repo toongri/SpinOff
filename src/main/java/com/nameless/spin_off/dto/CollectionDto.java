@@ -17,6 +17,20 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
+    public static class CollectionNameDto {
+        private Long id;
+        private String title;
+
+        @QueryProjection
+        public CollectionNameDto(Long id, String title) {
+            this.id = id;
+            this.title = title;
+        }
+    }
+
+
+    @Data
+    @NoArgsConstructor
     public static class SearchCollectionDto {
 
         private Long collectionId;

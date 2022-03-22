@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
@@ -11,6 +12,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -21,6 +23,7 @@ import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
 import com.nameless.spin_off.service.comment.CommentInPostService;
+import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -51,6 +54,7 @@ class PostServiceJpaTest {
     @Autowired LikedPostRepository likedPostRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
+    @Autowired MemberService memberService;
 
     @Test
     public void 해시태그_검열_테스트() throws Exception{
@@ -60,7 +64,6 @@ class PostServiceJpaTest {
         CreatePostVO createPostVO = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, PublicOfPostStatus.A,
                 List.of("형윤이", "형윤이?"), List.of());
-
 
         //when
         System.out.println("서비스");
@@ -248,6 +251,13 @@ class PostServiceJpaTest {
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+        Post po2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setHashTags(List.of()).build();
+        postRepository.save(po2);
+
         em.flush();
         em.clear();
 
@@ -264,6 +274,10 @@ class PostServiceJpaTest {
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), 0L))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
 
+        memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po2.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 
     @Test

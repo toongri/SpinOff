@@ -151,7 +151,7 @@ public class ComplainServiceJpa implements ComplainService{
     }
 
     private Long getPostOwnerId(Long postId) {
-        Long collectionOwnerId = postQueryRepository.getPostOwnerId(postId);
+        Long collectionOwnerId = postQueryRepository.findOwnerIdByPostId(postId);
 
         if (collectionOwnerId == null) {
             throw new NotExistPostException();
@@ -171,7 +171,7 @@ public class ComplainServiceJpa implements ComplainService{
     }
 
     private Long getCommentInPostOwnerId(Long commentId) {
-        Long collectionOwnerId = commentInPostQueryRepository.getCommentOwnerId(commentId);
+        Long collectionOwnerId = commentInPostQueryRepository.findCommentOwnerId(commentId);
 
         if (collectionOwnerId == null) {
             throw new NotExistCommentInPostException();

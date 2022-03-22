@@ -3,7 +3,9 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.QMemberDto_SearchAllMemberDto;
+import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -12,11 +14,14 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.nameless.spin_off.entity.help.QComplain.complain;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class MemberQueryRepository extends Querydsl4RepositorySupport {
@@ -25,6 +30,14 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
+    public List<Member> findAllByLikedPostId(Long postId) {
+        return getQueryFactory()
+                .select(member)
+                .from(likedPost)
+                .join(likedPost.post, post)
+                .join(likedPost.member, member)
+                .fetch();
+    }
     public String findAccountIdByEmail(String email) {
         return getQueryFactory()
                 .select(member.accountId)
@@ -98,6 +111,18 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    public Optional<BlockedMember> findOneByBlockingIdAndBlockedId(Long blockingMemberId, Long blockedMemberId) {
+        BlockedMember blockedMember = getQueryFactory()
+                .select(QBlockedMember.blockedMember)
+                .from(QBlockedMember.blockedMember)
+                .where(
+                        QBlockedMember.blockedMember.blockingMember.id.eq(blockingMemberId),
+                        QBlockedMember.blockedMember.member.id.eq(blockedMemberId))
+                .fetchFirst();
+
+        return Optional.ofNullable(blockedMember);
     }
 
     private Slice<SearchMemberDto> MapContentToDtoForSearchPage(

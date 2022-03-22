@@ -19,6 +19,37 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
+    public static class CommentMemberDto {
+        private Long memberId;
+        private String profile;
+        private String nickname;
+
+        public CommentMemberDto(Member member) {
+            this.memberId = member.getId();
+            this.profile = member.getProfileImg();
+            this.nickname = member.getNickname();
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class ContentMemberDto {
+        private Long memberId;
+        private String profile;
+        private String nickname;
+        private String accountId;
+
+        public ContentMemberDto(Member member) {
+            this.memberId = member.getId();
+            this.profile = member.getProfileImg();
+            this.nickname = member.getNickname();
+            this.accountId = member.getAccountId();
+        }
+
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class EmailAuthRequestDto {
         private String email;
         private String authToken;

@@ -40,10 +40,20 @@ public class FollowedCollection extends BaseTimeEntity {
         followedCollection.updateMember(member);
 
         return followedCollection;
+    }
 
+    public static FollowedCollection createFollowedCollection(Long id) {
+
+        FollowedCollection followedCollection = new FollowedCollection();
+        followedCollection.updateId(id);
+
+        return followedCollection;
     }
 
     //==수정 메소드==//
+    public void updateId(Long id) {
+        this.id = id;
+    }
     public void updateCollection(Collection collection) {
         this.collection = collection;
     }

@@ -18,6 +18,21 @@ public class MovieDto {
 
     @Data
     @AllArgsConstructor
+    public static class MovieInVisitPostDto {
+        private String thumbnail;
+        private String title;
+        private String directorName;
+
+        public MovieInVisitPostDto(Movie movie) {
+            this.thumbnail = movie.getThumbnail();
+            this.title = movie.getTitle();
+            this.directorName = movie.getDirectorName();
+        }
+    }
+
+
+    @Data
+    @AllArgsConstructor
     public static class SearchMovieFirstDto {
 
         SearchMovieAboutFirstMovieDto firstMovie;
@@ -36,7 +51,7 @@ public class MovieDto {
         public SearchMovieAboutFirstMovieDto(Movie movie) {
             movieId = movie.getId();
             title = movie.getTitle();
-            imageUrl = movie.getImageUrl();
+            imageUrl = movie.getThumbnail();
             List<Post> taggedPosts = movie.getTaggedPosts();
 
             for (Post taggedPost : taggedPosts) {

@@ -1,6 +1,7 @@
 package com.nameless.spin_off.config;
 
 import com.nameless.spin_off.entity.enums.EnumMapper;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +26,7 @@ public class SpringConfig {
         EnumMapper enumMapper = new EnumMapper();
 
         enumMapper.put("PublicOfPostStatus", PublicOfPostStatus.class);
+        enumMapper.put("PublicOfCollectionStatus", PublicOfCollectionStatus.class);
 
         return enumMapper;
     }

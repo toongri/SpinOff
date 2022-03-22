@@ -7,6 +7,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
@@ -31,15 +32,18 @@ public class CommentInPostServiceJpa implements CommentInPostService {
     @Override
     public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
+        Long postId = commentVO.getPostId();
+        isExistPost(postId);
+        isBlockMembersPost(memberId, postId);
+        isExistCommentInPost(commentVO.getParentId(), postId);
+        isBlockMembersComment(memberId, commentVO.getParentId());
 
-        isExistPost(commentVO.getPostId());
-        isExistComment(commentVO.getParentId());
         return commentInPostRepository.save(CommentInPost
                 .createCommentInPost(
                         Member.createMember(memberId),
                         commentVO.getContent(),
                         getParentCommentById(commentVO.getParentId()),
-                        Post.createPost(commentVO.getPostId()))).getId();
+                        Post.createPost(postId))).getId();
     }
 
     @Transactional
@@ -48,6 +52,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
         isExistComment(commentId);
+        isBlockMembersComment(memberId, commentId);
         isExistLikedCommentInPost(memberId, commentId);
 
         return likedCommentInPostRepository.save(
@@ -62,10 +67,30 @@ public class CommentInPostServiceJpa implements CommentInPostService {
         }
     }
 
-    private void isExistComment(Long commentId) {
+    private void isBlockMembersPost(Long memberId, Long postId) {
+        if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+            throw new DontHaveAccessException();
+        }
+    }
+
+    private void isBlockMembersComment(Long memberId, Long commentId) {
         if (commentId == null) {
 
-        } else if (!commentInPostQueryRepository.isExist(commentId)) {
+        } else if (commentInPostQueryRepository.isBlockMembersComment(memberId, commentId)) {
+            throw new DontHaveAccessException();
+        }
+    }
+
+    private void isExistComment(Long commentId) {
+        if (!commentInPostQueryRepository.isExist(commentId)) {
+            throw new NotExistCommentInPostException();
+        }
+    }
+
+    private void isExistCommentInPost(Long commentId, Long postId) {
+        if (commentId == null) {
+
+        } else if (!commentInPostQueryRepository.isExistInPost(commentId, postId)) {
             throw new NotExistCommentInPostException();
         }
     }

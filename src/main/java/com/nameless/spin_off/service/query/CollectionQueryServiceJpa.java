@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.dto.CollectionDto.CollectionNameDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
@@ -76,6 +77,10 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
                 .map(SearchCollectionDto::getCollectionId).collect(Collectors.toList())));
     }
 
+    @Override
+    public List<CollectionNameDto> getCollectionNamesByMemberId(Long memberId) {
+        return collectionQueryRepository.findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(memberId);
+    }
 
     @Override
     public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(Pageable pageable,

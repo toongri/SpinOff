@@ -79,7 +79,7 @@ public class SearchQueryRepositoryQuerydsl implements SearchQueryRepository {
     public List<RelatedSearchMovieDto> findRelatedMoviesAboutKeyword(String keyword, int length) {
         return jpaQueryFactory
                 .select(new QMovieDto_RelatedSearchMovieDto(
-                        movie.id, movie.title, movie.imageUrl))
+                        movie.id, movie.title, movie.thumbnail))
                 .from(movie)
                 .where(movie.title.contains(keyword))
                 .orderBy(movie.popularity.desc())

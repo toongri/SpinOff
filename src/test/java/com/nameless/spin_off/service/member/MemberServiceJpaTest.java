@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 
+import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -259,6 +261,15 @@ class MemberServiceJpaTest {
         Long memberId = memberRepository.save(member).getId();
         Member blockedMember = Member.buildMember().build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
+        Long aLong = collectionService
+                .insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO("", "", A), member.getId());
+
+        Long aLong1 = collectionService
+                .insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO("", "", A), blockedMember.getId());
+
+        memberService.insertFollowedMemberByMemberId(memberId, blockedMemberId);
+        collectionService.insertFollowedCollectionByMemberId(memberId, aLong1);
+        collectionService.insertFollowedCollectionByMemberId(blockedMemberId, aLong);
 
         em.flush();
         em.clear();
@@ -276,6 +287,9 @@ class MemberServiceJpaTest {
 
         //then
         assertThat(newMember.getId()).isEqualTo(memberId);
+        assertThat(newMember.getFollowedMembers().size()).isEqualTo(0);
+        assertThat(newMember.getFollowedCollections().size()).isEqualTo(0);
+        assertThat(newBlockedMember.getFollowedCollections().size()).isEqualTo(0);
         assertThat(newMember.getBlockedMembers().size()).isEqualTo(1);
         assertThat(newMember.getBlockedMembers().iterator().next().getMember().getId()).isEqualTo(blockedMemberId);
         assertThat(newBlockedMember.getBlockingMembers().size()).isEqualTo(1);

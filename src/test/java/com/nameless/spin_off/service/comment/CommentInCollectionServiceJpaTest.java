@@ -3,10 +3,12 @@ package com.nameless.spin_off.service.comment;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
@@ -15,6 +17,7 @@ import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.PostedMediaRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +47,7 @@ class CommentInCollectionServiceJpaTest {
     @Autowired CommentInCollectionService commentInCollectionService;
     @Autowired CollectionService collectionService;
     @Autowired EntityManager em;
+    @Autowired MemberService memberService;
 
     @Test
     public void saveCommentInCollectionByCommentVO() throws Exception{
@@ -137,6 +141,10 @@ class CommentInCollectionServiceJpaTest {
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+        Collection col2 = Collection.createDefaultCollection(mem2);
+        collectionRepository.save(col2);
 
         CreateCommentInCollectionVO commentInCollectionVO1 =
                 new CreateCommentInCollectionVO(0L, -1L, "");
@@ -157,6 +165,17 @@ class CommentInCollectionServiceJpaTest {
                 .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId()))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
+        Long aLong = commentInCollectionService.insertCommentInCollectionByCommentVO(
+                new CreateCommentInCollectionVO(col.getId(), null, ""), mem2.getId());
+        memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
+                new CreateCommentInCollectionVO(col2.getId(), null, ""), mem.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+
+        assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
+                new CreateCommentInCollectionVO(col.getId(), aLong, ""), mem.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -218,6 +237,10 @@ class CommentInCollectionServiceJpaTest {
         assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId()))
                 .isInstanceOf(AlreadyLikedCommentInCollectionException.class);//.hasMessageContaining("")
 
+        memberService.insertBlockedMemberByMemberId(member.getId(), mem.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 
 }

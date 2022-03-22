@@ -2,14 +2,17 @@ package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +43,7 @@ class CollectionServiceJpaTest {
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
+    @Autowired MemberService memberService;
 
     @Test
     public void 컬렉션_생성_테스트() throws Exception{
@@ -99,8 +103,12 @@ class CollectionServiceJpaTest {
         //given
         Member mem = Member.buildMember().build();
         memberRepository.save(mem);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
+        Collection col2 = Collection.createDefaultCollection(mem2);
+        collectionRepository.save(col2);
 
         em.flush();
         em.clear();
@@ -120,6 +128,11 @@ class CollectionServiceJpaTest {
 
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyLikedCollectionException.class);//.hasMessageContaining("")
+
+        memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), col2.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -189,6 +202,11 @@ class CollectionServiceJpaTest {
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
                 .isInstanceOf(AlreadyFollowedCollectionException.class);//.hasMessageContaining("")
 
+        memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+
     }
     
     @Test
@@ -215,7 +233,6 @@ class CollectionServiceJpaTest {
         //then
         assertThat(collection.getViewSize()).isEqualTo(collection.getViewedCollectionByIps().size());
         assertThat(collection.getViewSize()).isEqualTo(1);
-
     }
     
     @Test
@@ -377,5 +394,9 @@ class CollectionServiceJpaTest {
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
 
+        memberService.insertBlockedMemberByMemberId(mem2.getId(), mem.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 }

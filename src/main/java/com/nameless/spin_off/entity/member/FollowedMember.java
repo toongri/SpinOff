@@ -1,7 +1,6 @@
 package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
-import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -44,7 +43,18 @@ public class FollowedMember extends BaseTimeEntity {
         return newFollowedMember;
     }
 
+    public static FollowedMember createFollowedMember(Long id) {
+
+        FollowedMember newFollowedMember = new FollowedMember();
+        newFollowedMember.updateId(id);
+
+        return newFollowedMember;
+    }
+
     //==수정 메소드==//
+    public void updateId(Long id) {
+        this.id = id;
+    }
     public void updateMember(Member member) {
         this.member = member;
     }

@@ -8,12 +8,12 @@ import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
 import com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.collection.LikedCollectionRepository;
 import com.nameless.spin_off.repository.collection.ViewedCollectionByIpRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,8 +27,6 @@ import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_M
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CollectionServiceJpa implements CollectionService {
-
-    private final MemberRepository memberRepository;
     private final CollectionRepository collectionRepository;
     private final CollectionQueryRepository collectionQueryRepository;
     private final LikedCollectionRepository likedCollectionRepository;
@@ -51,6 +49,7 @@ public class CollectionServiceJpa implements CollectionService {
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
 
         isExistCollection(collectionId);
+        isBlockedMemberCollection(memberId, collectionId);
         isExistLikedCollection(memberId, collectionId);
 
         return likedCollectionRepository.save(
@@ -76,9 +75,11 @@ public class CollectionServiceJpa implements CollectionService {
     @Transactional
     @Override
     public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException, AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
+            throws NotExistMemberException, NotExistCollectionException,
+            AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
         isCorrectCollectionId(memberId, collectionId);
+        isBlockedMemberCollection(memberId, collectionId);
         isExistFollowedCollection(memberId, collectionId);
 
         return followedCollectionRepository.save(
@@ -96,6 +97,12 @@ public class CollectionServiceJpa implements CollectionService {
             collection.updatePopularity();
         }
         return collections.size();
+    }
+
+    private void isBlockedMemberCollection(Long memberId, Long collectionId) {
+        if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
+            throw new DontHaveAccessException();
+        }
     }
 
     private void isExistLikedCollection(Long memberId, Long collectionId) {

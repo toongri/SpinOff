@@ -46,7 +46,7 @@ class CommentInPostRepositoryTest {
         CommentInPost childComment2 = CommentInPost.createCommentInPost(member, "슈스검흰 라할살", parentComment, post);
         em.flush();
         //when
-        List<CommentInPost> comments = commentInPostRepository.findParentsByPostWithChildren(post);
+        List<CommentInPost> comments = commentInPostRepository.findParentsByPostWithChildrenOrderByIdDESC(post);
 
         //then
         for (CommentInPost comment : comments) {

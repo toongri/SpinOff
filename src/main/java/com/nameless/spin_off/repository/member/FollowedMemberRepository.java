@@ -5,12 +5,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Optional;
+import java.util.List;
 
 public interface FollowedMemberRepository extends JpaRepository<FollowedMember, Long> {
 
-    @Query("SELECT followedMember FROM FollowedMember followedMember " +
-            "WHERE followedMember.followingMember.id = :memberId AND followedMember.member.id = :followedMemberId")
-    Optional<FollowedMember> findByFollowingMemberIdAndMemberId
+    @Query("SELECT followedMember.id FROM FollowedMember followedMember " +
+            "WHERE (followedMember.followingMember.id = :memberId AND followedMember.member.id = :followedMemberId) OR " +
+            "(followedMember.member.id = :memberId AND followedMember.followingMember.id = :followedMemberId)")
+    List<Long> findAllByFollowingMemberIdAndMemberId
             (@Param("memberId") Long memberId, @Param("followedMemberId") Long followedMemberId);
 }

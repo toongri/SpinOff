@@ -11,6 +11,7 @@ import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
@@ -86,31 +87,13 @@ public class PostServiceJpa implements PostService{
         return post.getId();
     }
 
-    private String getThumbnails(List<String> urls) {
-        return urls.isEmpty() ? null : urls.get(0);
-    }
-
-    private List<String> getUrlByMultipartFile(List<MultipartFile> multipartFiles) throws IOException {
-
-        if (multipartFiles.size() > POST_IMAGE_MAX.getLength()) {
-            throw new OverPostImageLengthException();
-        } else if (multipartFiles.isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            List<String> urls = new ArrayList<>();
-            for (MultipartFile multipartFile : multipartFiles) {
-                urls.add(awsS3Service.upload(multipartFile, "post"));
-            }
-            return urls;
-        }
-    }
-
     @Transactional
     @Override
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
         isExistPost(postId);
+        isBlockMembersPost(memberId, postId);
         isExistLikedPost(memberId, postId);
         return likedPostRepository.save(
                 LikedPost.createLikedPost(Member.createMember(memberId), Post.createPost(postId))).getId();
@@ -135,6 +118,7 @@ public class PostServiceJpa implements PostService{
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
+        isBlockMembersPost(memberId, postId);
         List<Collection> collections = getCollections(collectionIds);
         isCorrectCollectionWithOwner(collections, memberId);
 
@@ -228,6 +212,12 @@ public class PostServiceJpa implements PostService{
         }
     }
 
+    private void isBlockMembersPost(Long memberId, Long postId) {
+        if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+            throw new DontHaveAccessException();
+        }
+    }
+
     private Post findOneByIdWithCollectedPost(Long postId) {
         return postRepository.findOneByIdWithCollectedPost(postId).orElseThrow(NotExistPostException::new);
     }
@@ -238,5 +228,24 @@ public class PostServiceJpa implements PostService{
             throw new NotMatchCollectionException();
         }
         return collections;
+    }
+
+    private String getThumbnails(List<String> urls) {
+        return urls.isEmpty() ? null : urls.get(0);
+    }
+
+    private List<String> getUrlByMultipartFile(List<MultipartFile> multipartFiles) throws IOException {
+
+        if (multipartFiles.size() > POST_IMAGE_MAX.getLength()) {
+            throw new OverPostImageLengthException();
+        } else if (multipartFiles.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            List<String> urls = new ArrayList<>();
+            for (MultipartFile multipartFile : multipartFiles) {
+                urls.add(awsS3Service.upload(multipartFile, "post"));
+            }
+            return urls;
+        }
     }
 }

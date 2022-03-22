@@ -6,8 +6,10 @@ import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
 import com.nameless.spin_off.dto.QPostDto_SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.QPostDto_SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
@@ -23,6 +25,7 @@ import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPo
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
+import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
@@ -36,7 +39,26 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
-    public Long getPostOwnerId(Long postId) {
+    public Boolean isBlockMembersPost(Long memberId, Long postId) {
+        QBlockedMember blockingMember = new QBlockedMember("blockingMember");
+
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(post)
+                .join(post.member, member)
+                .leftJoin(member.blockedMembers, blockedMember)
+                .leftJoin(member.blockingMembers, blockingMember)
+                .where(
+                        post.id.eq(postId).and(
+                                ((blockedMember.member.id.eq(memberId).and(
+                                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A))).or(
+                                        blockingMember.blockingMember.id.eq(memberId).and(
+                                                blockingMember.blockedMemberStatus.eq(BlockedMemberStatus.A))))))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+    public Long findOwnerIdByPostId(Long postId) {
         return getQueryFactory()
                 .select(post.member.id)
                 .from(post)

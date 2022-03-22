@@ -13,8 +13,11 @@ public interface CommentInPostRepository extends JpaRepository<CommentInPost, Lo
 
     @Query("SELECT DISTINCT parent FROM CommentInPost parent " +
             "LEFT JOIN FETCH parent.children children " +
-            "WHERE parent.parent IS NULL AND parent.post = :post")
-    List<CommentInPost> findParentsByPostWithChildren(@Param("post") Post post);
+            "LEFT JOIN FETCH parent.member m " +
+            "LEFT JOIN FETCH children.member mchildren " +
+            "WHERE parent.parent IS NULL AND parent.post = :post " +
+            "ORDER BY parent.id DESC, children.id DESC")
+    List<CommentInPost> findParentsByPostWithChildrenOrderByIdDESC(@Param("post") Post post);
 
     @Query("SELECT DISTINCT parent FROM CommentInPost parent " +
             "WHERE parent.parent IS NULL AND parent.post = :post")

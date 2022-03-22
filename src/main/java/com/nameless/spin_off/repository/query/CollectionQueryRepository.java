@@ -1,11 +1,15 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.CollectionDto.CollectionNameDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
+import com.nameless.spin_off.dto.QCollectionDto_CollectionNameDto;
 import com.nameless.spin_off.dto.QCollectionDto_MainPageCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -15,12 +19,14 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.collection.QFollowedCollection.followedCollection;
 import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
 import static com.nameless.spin_off.entity.collection.QViewedCollectionByIp.viewedCollectionByIp;
 import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.DEFAULT_COLLECTION_PUBLIC;
 import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.FOLLOW_COLLECTION_PUBLIC;
+import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
 
 @Repository
@@ -28,6 +34,16 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public CollectionQueryRepository() {
         super(Collection.class);
+    }
+
+    public List<CollectionNameDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
+        return getQueryFactory()
+                .selectDistinct(new QCollectionDto_CollectionNameDto(collection.id, collection.title))
+                .from(collection)
+                .join(collection.collectedPosts, collectedPost)
+                .where(collection.member.id.eq(memberId))
+                .orderBy(collectedPost.id.desc())
+                .fetch();
     }
 
     public Boolean isExist(Long id) {
@@ -59,6 +75,26 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         likedCollection.member.id.eq(memberId),
                         likedCollection.collection.id.eq(collectionId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isBlockMembersCollection(Long memberId, Long collectionId) {
+        QBlockedMember blockingMember = new QBlockedMember("blockingMember");
+
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(collection)
+                .join(collection.member, member)
+                .leftJoin(member.blockedMembers, blockedMember)
+                .leftJoin(member.blockingMembers, blockingMember)
+                .where(
+                        collection.id.eq(collectionId).and(
+                                ((blockedMember.member.id.eq(memberId).and(
+                                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A))).or(
+                                        blockingMember.blockingMember.id.eq(memberId).and(
+                                                blockingMember.blockedMemberStatus.eq(BlockedMemberStatus.A))))))
                 .fetchFirst();
 
         return fetchOne != null;

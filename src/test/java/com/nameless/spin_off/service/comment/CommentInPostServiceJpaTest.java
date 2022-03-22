@@ -2,15 +2,18 @@ package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
+import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +39,7 @@ class CommentInPostServiceJpaTest {
     @Autowired CommentInPostService commentInPostService;
     @Autowired CommentInPostRepository commentInPostRepository;
     @Autowired EntityManager em;
+    @Autowired MemberService memberService;
 
 
     @Test
@@ -132,6 +136,12 @@ class CommentInPostServiceJpaTest {
                 .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+        Post post2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setHashTags(List.of()).build();
+        postRepository.save(post2);
 
         CommentDto.CreateCommentInPostVO commentInPostVO1 =
                 new CommentDto.CreateCommentInPostVO(0L, 0L, "");
@@ -147,6 +157,18 @@ class CommentInPostServiceJpaTest {
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3, mem.getId()))
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
+
+        Long aLong = commentInPostService.insertCommentInPostByCommentVO(
+                new CommentDto.CreateCommentInPostVO(post.getId(), null, ""), mem2.getId());
+        memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
+                new CommentDto.CreateCommentInPostVO(post2.getId(), null, ""), mem.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
+                new CommentDto.CreateCommentInPostVO(post.getId(), aLong, ""), mem.getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -208,5 +230,10 @@ class CommentInPostServiceJpaTest {
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId()))
                 .isInstanceOf(AlreadyLikedCommentInPostException.class);//.hasMessageContaining("")
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), mem.getId(), BlockedMemberStatus.A);
+        em.flush();
+        assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId()))
+                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }
 }

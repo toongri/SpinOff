@@ -3,11 +3,13 @@ package com.nameless.spin_off.service.member;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.member.*;
 import com.nameless.spin_off.entity.member.*;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.member.*;
 import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
 import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.ACCOUNT_PW_MIN;
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.EMAIL_TOKEN;
@@ -49,6 +52,7 @@ public class MemberServiceJpa implements MemberService {
     private final MemberQueryRepository memberQueryRepository;
     private final FollowedMemberRepository followedMemberRepository;
     private final BlockedMemberRepository blockedMemberRepository;
+    private final FollowedCollectionRepository followedCollectionRepository;
 
     @Transactional
     @Override
@@ -269,12 +273,25 @@ public class MemberServiceJpa implements MemberService {
             throws NotExistMemberException, AlreadyBlockedMemberException {
 
         isExistMember(blockedMemberId);
-        isExistBlock(memberId, blockedMemberId);
+        if (blockedMemberStatus.equals(BlockedMemberStatus.B)) {
+            isExistBlock(memberId, blockedMemberId);
+        } else if (blockedMemberStatus.equals(BlockedMemberStatus.A)) {
+            isExistBlockAndDeletePastBlocked(memberId, blockedMemberId);
 
-        followedMemberRepository.findByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
-                .ifPresent(followedMemberRepository::delete);
-        followedMemberRepository.findByFollowingMemberIdAndMemberId(blockedMemberId, memberId)
-                .ifPresent(followedMemberRepository::delete);
+            followedMemberRepository
+                    .deleteAll(followedMemberRepository
+                            .findAllByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
+                            .stream()
+                            .map(FollowedMember::createFollowedMember)
+                            .collect(Collectors.toList()));
+
+            followedCollectionRepository
+                    .deleteAll(followedCollectionRepository
+                            .findAllByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
+                            .stream()
+                            .map(FollowedCollection::createFollowedCollection)
+                            .collect(Collectors.toList()));
+        }
 
         return blockedMemberRepository
                 .save(
@@ -297,6 +314,19 @@ public class MemberServiceJpa implements MemberService {
     private void isExistBlock(Long memberId, Long blockedMemberId) {
         if (memberQueryRepository.isExistBlockedMember(memberId, blockedMemberId)) {
             throw new AlreadyBlockedMemberException();
+        }
+    }
+
+    private void isExistBlockAndDeletePastBlocked(Long memberId, Long blockedMemberId) {
+        Optional<BlockedMember> optional = 
+                memberQueryRepository.findOneByBlockingIdAndBlockedId(memberId, blockedMemberId);
+        if (optional.isPresent()) {
+            BlockedMember blockedMember = optional.get();
+            if (blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A)) {
+                throw new AlreadyBlockedMemberException();
+            } else {
+                blockedMemberRepository.delete(blockedMember);
+            }
         }
     }
 

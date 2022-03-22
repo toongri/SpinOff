@@ -62,7 +62,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
     public Slice<SearchAllMovieDto> findAllSlicedForSearchPageAtAll(String keyword, Pageable pageable) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QMovieDto_SearchAllMovieDto(
-                        movie.id, movie.title, movie.imageUrl,
+                        movie.id, movie.title, movie.thumbnail,
                         movie.firstGenreOfMovieStatus, movie.secondGenreOfMovieStatus))
                 .from(movie)
                 .where(movie.title.contains(keyword)));
@@ -71,7 +71,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
     public Slice<SearchMovieDto> findAllSlicedForSearchPageAtMovie(String keyword, Pageable pageable) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QMovieDto_SearchMovieDto(
-                        movie.id, movie.title, movie.imageUrl))
+                        movie.id, movie.title, movie.thumbnail))
                 .from(movie)
                 .where(movie.title.contains(keyword)));
     }
