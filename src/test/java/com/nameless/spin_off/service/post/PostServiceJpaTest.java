@@ -276,6 +276,7 @@ class PostServiceJpaTest {
 
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
+        System.out.println("멤버차단");
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po2.getId()))
                 .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
     }

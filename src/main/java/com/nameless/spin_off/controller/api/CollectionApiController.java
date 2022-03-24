@@ -2,8 +2,8 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CollectionDto.CollectionNameDto;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
+import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.*;
@@ -67,7 +67,8 @@ public class CollectionApiController {
     }
 
     @GetMapping("/list/name")
-    public CollectionApiResult<List<CollectionNameDto>> getCollectionNamesById(@LoginMember MemberDetails currentMember) {
+    public CollectionApiResult<List<PostInCollectionDto>> getCollectionNamesById(
+            @LoginMember MemberDetails currentMember) {
 
         log.info("getCollectionNamesById");
         log.info("memberId : {}", currentMember.getId());

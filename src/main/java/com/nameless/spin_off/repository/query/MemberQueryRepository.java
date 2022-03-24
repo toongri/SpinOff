@@ -20,8 +20,6 @@ import static com.nameless.spin_off.entity.help.QComplain.complain;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
-import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
-import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class MemberQueryRepository extends Querydsl4RepositorySupport {
@@ -30,14 +28,6 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
-    public List<Member> findAllByLikedPostId(Long postId) {
-        return getQueryFactory()
-                .select(member)
-                .from(likedPost)
-                .join(likedPost.post, post)
-                .join(likedPost.member, member)
-                .fetch();
-    }
     public String findAccountIdByEmail(String email) {
         return getQueryFactory()
                 .select(member.accountId)
@@ -68,7 +58,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchAllMemberDto> findAllSlicedForSearchPageAtAll(
-            String keyword, Pageable pageable, List<Member> blockedMembers) {
+            String keyword, Pageable pageable, List<Long> blockedMembers) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QMemberDto_SearchAllMemberDto(
@@ -79,14 +69,14 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchMemberDto> findAllSlicedForSearchPageAtMember(
-            String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+            String keyword, Pageable pageable, List<Long> followedMemberIds, List<Long> blockedMembers) {
 
         Slice<Member> content = applySlicing(pageable, contentQuery -> contentQuery
                 .selectFrom(member)
                 .where(member.nickname.contains(keyword),
                         memberNotIn(blockedMembers)));
 
-        return MapContentToDtoForSearchPage(content, followedMembers);
+        return MapContentToDtoForSearchPage(content, followedMemberIds);
     }
 
     public Boolean isExistFollowedMember(Long followingMemberId, Long followedMemberId) {
@@ -126,15 +116,11 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     private Slice<SearchMemberDto> MapContentToDtoForSearchPage(
-            Slice<Member> contents, List<Member> followedMembers) {
-        if (followedMembers.isEmpty()) {
-            return contents.map(SearchMemberDto::new);
-        } else {
-            return contents.map(content -> new SearchMemberDto(content, followedMembers));
-        }
+            Slice<Member> contents, List<Long> followedMemberIds) {
+        return contents.map(content -> new SearchMemberDto(content, followedMemberIds));
     }
 
-    private BooleanExpression memberNotIn(List<Member> members) {
-        return members.isEmpty() ? null : member.notIn(members);
+    private BooleanExpression memberNotIn(List<Long> members) {
+        return members.isEmpty() ? null : member.id.notIn(members);
     }
 }

@@ -1,12 +1,11 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CollectionDto.*;
-import com.nameless.spin_off.dto.QCollectionDto_CollectionNameDto;
 import com.nameless.spin_off.dto.QCollectionDto_MainPageCollectionDto;
+import com.nameless.spin_off.dto.QCollectionDto_PostInCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.Tuple;
@@ -64,9 +63,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public Optional<IdAndPublicCollectionDto> findCollectionOwnerIdAndPublic(Long collectionId) {
         Tuple tuple = getQueryFactory()
-                .select(member.id, collection.publicOfCollectionStatus)
+                .select(collection.member.id, collection.publicOfCollectionStatus)
                 .from(collection)
-                .join(collection.member, member)
                 .where(
                         collection.id.eq(collectionId))
                 .fetchFirst();
@@ -74,17 +72,16 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
             return Optional.empty();
         } else {
             return Optional.of(new IdAndPublicCollectionDto(
-                    tuple.get(member.id), tuple.get(collection.publicOfCollectionStatus)));
+                    tuple.get(collection.member.id), tuple.get(collection.publicOfCollectionStatus)));
         }
     }
 
-    public List<CollectionNameDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
+    public List<PostInCollectionDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
         return getQueryFactory()
-                .selectDistinct(new QCollectionDto_CollectionNameDto(collection.id, collection.title))
+                .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title))
                 .from(collection)
-                .join(collection.collectedPosts, collectedPost)
                 .where(collection.member.id.eq(memberId))
-                .orderBy(collectedPost.id.desc())
+                .orderBy(collectedPost.lastModifiedDate.desc())
                 .fetch();
     }
 
@@ -191,7 +188,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchAllCollectionDto> findAllSlicedForSearchPageAtAll(
-            String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+            String keyword, Pageable pageable, List<Long> followedMembers, List<Long> blockedMembers) {
         Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
                 .selectFrom(collection)
                 .join(collection.member, member).fetchJoin()
@@ -212,7 +209,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchCollectionDto> findAllSlicedForSearchPageAtCollection(
-            String keyword, Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+            String keyword, Pageable pageable, List<Long> followedMembers, List<Long> blockedMembers) {
         Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
                 .selectFrom(collection)
                 .join(collection.member, member).fetchJoin()
@@ -224,7 +221,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<MainPageCollectionDto> findAllSlicedForMainPage(
-            Pageable pageable, Member user, List<Member> blockedMembers) {
+            Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -233,12 +230,12 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .join(collection.member, member)
                 .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
-                        memberNotIn(blockedMembers),
-                        memberNotEq(user)));
+                        memberNotIn(blockedMemberIds),
+                        memberNotEq(memberId)));
     }
 
     public Slice<MainPageCollectionDto> findAllByFollowedMemberSlicedForMainPage(
-            Pageable pageable, List<Member> followedMembers, List<Member> blockedMembers) {
+            Pageable pageable, Long memberId, List<Long> blockedMembers) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -246,51 +243,48 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
                 .join(collection.member, member)
-                .where(memberIn(followedMembers),
+                .join(member.followingMembers, followedMember)
+                .where(
+                        followedMember.followingMember.id.eq(memberId),
                         memberNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPageCollectionDto> findAllByFollowedCollectionsSlicedForMainPage(
-            Pageable pageable, List<Collection> followedCollections, List<Member> blockedMembers) {
+            Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
                         collection.id, collection.title, member.id, member.nickname,
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
+                .join(collection.followingMembers, followedCollection)
                 .join(collection.member, member)
-                .where(memberNotIn(blockedMembers),
-                        collectionIn(followedCollections)));
+                .where(
+                        followedCollection.member.id.eq(memberId),
+                        memberNotIn(blockedMemberIds)));
     }
 
     private Slice<SearchCollectionDto> MapContentToDtoForSearchPageAtCollection(
-            Slice<Collection> contents, List<Member> followedMembers) {
-        if (followedMembers.isEmpty()) {
-            return contents.map(SearchCollectionDto::new);
-        } else {
-            return contents.map(content -> new SearchCollectionDto(content, followedMembers));
-        }
+            Slice<Collection> contents, List<Long> followedMembers) {
+
+        return contents.map(content -> new SearchCollectionDto(content, followedMembers));
     }
 
     private Slice<SearchAllCollectionDto> MapContentToDtoForSearchPageAtAll(
-            Slice<Collection> contents, List<Member> followedMembers) {
-        if (followedMembers.isEmpty()) {
-            return contents.map(SearchAllCollectionDto::new);
-        } else {
-            return contents.map(content -> new SearchAllCollectionDto(content, followedMembers));
-        }
+            Slice<Collection> contents, List<Long> followedMembers) {
+        return contents.map(content -> new SearchAllCollectionDto(content, followedMembers));
     }
-    private BooleanExpression memberNotEq(Member user) {
-        return user != null ? member.ne(user) : null;
+    private BooleanExpression memberNotEq(Long memberId) {
+        return memberId != null ? member.id.ne(memberId) : null;
     }
-    private BooleanExpression memberIn(List<Member> members) {
-        return members.isEmpty() ? null : member.in(members);
+    private BooleanExpression memberIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.in(memberIds);
     }
     private BooleanExpression collectionIn(List<Collection> collections) {
         return collections.isEmpty() ? null : collection.in(collections);
     }
-    private BooleanExpression memberNotIn(List<Member> members) {
-        return members.isEmpty() ? null : member.notIn(members);
+    private BooleanExpression memberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
 }

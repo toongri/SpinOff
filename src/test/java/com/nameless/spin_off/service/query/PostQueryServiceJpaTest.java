@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -566,6 +567,28 @@ public class PostQueryServiceJpaTest {
 
         assertThat(hashtags.stream().map(RelatedMostTaggedHashtagDto::getContent).collect(Collectors.toList()))
                 .containsOnly("9", "6", "5");
+    }
+
+    @Test
+    public void 포스트_조회() throws Exception{
+        //given
+        Member build = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("fuckyou")
+                .setName("fdfd")
+                .setBirth(LocalDate.now())
+                .setAccountPw("dfdfd")
+                .setNickname("fdfd").build();
+
+        memberRepository.save(build);
+
+
+
+
+        //when
+
+        //then
+
     }
 
 }

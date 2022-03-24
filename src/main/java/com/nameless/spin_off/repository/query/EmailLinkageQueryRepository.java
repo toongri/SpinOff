@@ -17,8 +17,7 @@ public class EmailLinkageQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Optional<EmailLinkage> findValidLinkageByEmail(
-            String accountId, String email,
+    public Optional<EmailLinkage> findValidLinkageByEmail(String accountId, String email,
             String authToken, LocalDateTime currentTime) {
         EmailLinkage firstEmailLinkage = jpaQueryFactory
                 .selectFrom(emailLinkage)

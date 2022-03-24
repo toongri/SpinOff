@@ -8,10 +8,6 @@ import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.BlockedMember;
-import com.nameless.spin_off.entity.member.FollowedMember;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
 import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
@@ -25,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.search.SearchEnum.RELATED_SEARCH_KEYWORD_MAX_STR;
@@ -78,10 +73,8 @@ public class SearchQueryServiceJpa implements SearchQueryService {
             String keyword, Long memberId, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-        Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
-
-        List<Member> followedMembers = getFollowedMemberByMember(member);
-        List<Member> blockedMembers = getBlockedMemberByMember(member);
+        List<Long> followedMembers = getFollowedMemberByMemberId(memberId);
+        List<Long> blockedMembers = getBlockedMemberByMemberId(memberId);
 
         return new SearchAllDto(
                 postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, postPageable, blockedMembers),
@@ -96,12 +89,12 @@ public class SearchQueryServiceJpa implements SearchQueryService {
             String keyword, Long memberId, int length, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-        Member member = getMemberByIdWithFollowedMemberAndBlockedMember(memberId);
+        List<Long> followedMembers = getFollowedMemberByMemberId(memberId);
+        List<Long> blockedMembers = getBlockedMemberByMemberId(memberId);
 
-        List<Member> followedMembers = getFollowedMemberByMember(member);
-        List<Member> blockedMembers = getBlockedMemberByMember(member);
         Slice<SearchPageAtAllPostDto> posts = postQueryRepository.findAllSlicedForSearchPageAtAll(
                 keyword, postPageable, blockedMembers);
+
         return new SearchFirstDto<>(
                 new SearchAllDto(
                 posts,
@@ -123,38 +116,25 @@ public class SearchQueryServiceJpa implements SearchQueryService {
                 searchQueryRepository.findRelatedCollectionsAboutKeyword(keyword, length));
     }
 
-    private Member getMemberByIdWithFollowedMemberAndBlockedMember(Long memberId) throws NotExistMemberException {
-        if (memberId == null) {
-            return null;
-        }
-
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMemberAndBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private List<Member> getFollowedMemberByMember(Member member) {
-        if (member != null) {
-            return member.getFollowedMembers().stream()
-                    .map(FollowedMember::getMember).collect(Collectors.toList());
-        } else{
-            return new ArrayList<>();
-        }
-    }
-
-    private List<Member> getBlockedMemberByMember(Member member) {
-        if (member != null) {
-            return member.getBlockedMembers().stream()
-                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
-                    .map(BlockedMember::getMember).collect(Collectors.toList());
-        } else{
-            return new ArrayList<>();
-        }
-    }
-
     private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIdsAtAll(int length, List<SearchPageAtAllPostDto> data) {
         return hashtagQueryRepository.findAllByPostIds(
                 length,
                 data.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()));
+    }
+
+    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByBlockingMemberId(memberId);
+        } else{
+            return new ArrayList<>();
+        }
+    }
+
+    private List<Long> getFollowedMemberByMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByFollowingMemberId(memberId);
+        } else{
+            return new ArrayList<>();
+        }
     }
 }

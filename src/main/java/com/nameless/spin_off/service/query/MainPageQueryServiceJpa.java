@@ -3,18 +3,9 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageDiscoveryDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
-import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.FollowedCollection;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.member.BlockedMember;
-import com.nameless.spin_off.entity.member.FollowedMember;
-import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.movie.FollowedMovie;
-import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -37,24 +26,20 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
     private final PostQueryRepository postQueryRepository;
     private final CollectionQueryRepository collectionQueryRepository;
     private final MemberRepository memberRepository;
-    private List<Collection> followedCollections;
-    private List<Member> followedMembers;
-    private List<Member> blockedMembers;
+    private final MovieRepository movieRepository;
+    private List<Long> blockedMemberIds;
 
     @Override
     public MainPageDiscoveryDto getDiscoveryData(Pageable popularPostPageable, Pageable latestPostPageable,
                                                  Pageable collectionPageable, Long memberId)
             throws NotExistMemberException {
 
-        Optional<Member> optionalMember = getMemberByIdWithBlockedMember(memberId);
-        Member member = optionalMember.orElse(null);
-
-        blockedMembers = getBlockedMemberByMember(member);
+        blockedMemberIds = getBlockedMemberByMemberId(memberId);
 
         return new MainPageDiscoveryDto(
-                postQueryRepository.findAllSlicedForMainPage(popularPostPageable, member, blockedMembers),
-                postQueryRepository.findAllSlicedForMainPage(latestPostPageable, member, blockedMembers),
-                collectionQueryRepository.findAllSlicedForMainPage(collectionPageable, member, blockedMembers));
+                postQueryRepository.findAllSlicedForMainPage(popularPostPageable, memberId, blockedMemberIds),
+                postQueryRepository.findAllSlicedForMainPage(latestPostPageable, memberId, blockedMemberIds),
+                collectionQueryRepository.findAllSlicedForMainPage(collectionPageable, memberId, blockedMemberIds));
     }
 
     @Override
@@ -63,67 +48,53 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
             Pageable moviePageable, Pageable collectionPageable, Long memberId)
             throws NotExistMemberException {
 
-        Member member = getMemberByIdWithFollowedContentsAndBlockedMember(memberId);
+        List<Long> followedMemberIds = getFollowedMemberByMemberId(memberId);
 
-        followedCollections = member.getFollowedCollections().stream()
-                .map(FollowedCollection::getCollection).collect(Collectors.toList());
-        followedMembers =
-                member.getFollowedMembers().stream().map(FollowedMember::getMember).collect(Collectors.toList());
-        List<Movie> movies =
-                member.getFollowedMovies().stream().map(FollowedMovie::getMovie).collect(Collectors.toList());
-        List<Hashtag> hashtags =
-                member.getFollowedHashtags().stream().map(FollowedHashtag::getHashtag).collect(Collectors.toList());
-
-        blockedMembers = member.getBlockedMembers().stream()
-                .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
-                .map(BlockedMember::getMember).collect(Collectors.toList());
-
-        Slice<MainPageCollectionDto> collections = getMainPageCollectionList(collectionPageable);
+        blockedMemberIds = getBlockedMemberByMemberId(memberId);
 
         return new MainPageFollowDto(
                 postQueryRepository.findAllByFollowingMemberSlicedForMainPage(memberPageable,
-                        followedMembers, blockedMembers),
+                        memberId, blockedMemberIds),
                 postQueryRepository.findAllByFollowedHashtagsSlicedForMainPage(hashtagPageable,
-                        movies, followedMembers, hashtags, blockedMembers),
+                        getFollowedMovieByMemberId(memberId), followedMemberIds, blockedMemberIds, memberId),
                 postQueryRepository.findAllByFollowedMoviesSlicedForMainPage(moviePageable,
-                         movies, followedMembers, blockedMembers),
-                collections);
+                        followedMemberIds, blockedMemberIds, memberId),
+                getMainPageCollectionList(collectionPageable, memberId));
     }
 
-    private Slice<MainPageCollectionDto> getMainPageCollectionList(Pageable pageable) {
+    private Slice<MainPageCollectionDto> getMainPageCollectionList(Pageable pageable, Long memberId) {
         if (pageable.getPageNumber() % 2 == 0) {
             return collectionQueryRepository.findAllByFollowedMemberSlicedForMainPage(
                     PageRequest.of(pageable.getPageNumber() / 2, pageable.getPageSize(),
-                            pageable.getSort()), followedMembers, blockedMembers);
+                            pageable.getSort()), memberId, blockedMemberIds);
         } else {
              return collectionQueryRepository.findAllByFollowedCollectionsSlicedForMainPage(
                     PageRequest.of(pageable.getPageNumber() / 2, pageable.getPageSize(),
-                            pageable.getSort()), followedCollections, blockedMembers);
+                            pageable.getSort()), memberId, blockedMemberIds);
         }
     }
 
-    private List<Member> getBlockedMemberByMember(Member member) {
-        if (member != null) {
-            return member.getBlockedMembers().stream()
-                    .filter(blockedMember -> blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A))
-                    .map(BlockedMember::getMember).collect(Collectors.toList());
+    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByBlockingMemberId(memberId);
         } else{
             return new ArrayList<>();
         }
     }
 
-    private Optional<Member> getMemberByIdWithBlockedMember(Long memberId) throws NotExistMemberException {
-        if (memberId == null) {
-            return Optional.empty();
+    private List<Long> getFollowedMemberByMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByFollowingMemberId(memberId);
+        } else{
+            return new ArrayList<>();
         }
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithBlockedMember(memberId);
-
-        return Optional.of(optionalMember.orElseThrow(NotExistMemberException::new));
     }
 
-    private Member getMemberByIdWithFollowedContentsAndBlockedMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedContentsAndBlockedMember(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
+    private List<Long> getFollowedMovieByMemberId(Long memberId) {
+        if (memberId != null) {
+            return movieRepository.findAllIdByFollowingMemberId(memberId);
+        } else{
+            return new ArrayList<>();
+        }
     }
 }

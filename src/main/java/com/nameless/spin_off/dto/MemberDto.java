@@ -1,7 +1,6 @@
 package com.nameless.spin_off.dto;
 
 
-import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
@@ -38,12 +37,14 @@ public class MemberDto {
         private String profile;
         private String nickname;
         private String accountId;
+        private boolean isFollowed;
 
-        public ContentMemberDto(Member member) {
+        public ContentMemberDto(Member member, boolean isFollowed) {
             this.memberId = member.getId();
             this.profile = member.getProfileImg();
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();
+            this.isFollowed = isFollowed;
         }
 
     }
@@ -188,20 +189,24 @@ public class MemberDto {
             setThumbnails(member);
         }
 
-        public SearchMemberDto(Member member, List<Member> followingMembers) {
+        public SearchMemberDto(Member member, List<Long> followingMembers) {
             this.memberId = member.getId();
             this.profileImg = member.getProfileImg();
             this.nickname = member.getNickname();
             this.accountId = member.getAccountId();
             this.bio = member.getBio();
             setThumbnails(member);
+            if (!followingMembers.isEmpty()) {
+                findRelatedMember(member, followingMembers);
+            }
+        }
 
-            List<FollowedMember> followingMembers2 = member.getFollowingMembers();
-            followingMembers2.stream()
-                    .filter(followingMember -> followingMembers.contains(followingMember.getFollowingMember()))
+        private void findRelatedMember(Member member, List<Long> followingMembers) {
+            member.getFollowingMembers().stream()
+                    .filter(followingMember -> followingMembers.contains(followingMember.getFollowingMember().getId()))
                     .max(Comparator.comparing(followingMember -> followingMember.getFollowingMember().getPopularity()))
                     .ifPresent(followingMember -> setFollowingMemberNicknameAndNumber(
-                            followingMember.getFollowingMember().getNickname(), followingMembers2.size()));
+                            followingMember.getFollowingMember().getNickname(), member.getFollowingMembers().size()));
         }
 
         public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
@@ -269,7 +274,6 @@ public class MemberDto {
         private String googleEmail;
         private String kakaoEmail;
         private String naverEmail;
-        private Boolean emailAuth = false;
 
         public MemberBuilder setAccountId(String accountId) {
             this.accountId = accountId;
@@ -321,14 +325,9 @@ public class MemberDto {
             return this;
         }
 
-        public MemberBuilder setEmailAuth(Boolean emailAuth) {
-            this.emailAuth = emailAuth;
-            return this;
-        }
-
         public Member build() {
             return Member.createMember(accountId, accountPw, nickname,name, birth, phoneNumber, email,
-                    googleEmail, naverEmail, kakaoEmail, emailAuth);
+                    googleEmail, naverEmail, kakaoEmail);
         }
     }
 }

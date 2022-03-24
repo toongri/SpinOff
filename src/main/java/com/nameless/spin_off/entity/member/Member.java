@@ -178,7 +178,7 @@ public class Member extends BaseTimeEntity {
     //==생성 메소드==//
     public static Member createMember(String accountId, String accountPw, String nickname,
                                       String name, LocalDate birth, String phoneNumber, String email,
-                                      String googleEmail, String naverEmail, String kakaoEmail, Boolean emailAuth) {
+                                      String googleEmail, String naverEmail, String kakaoEmail) {
 
         Member member = new Member();
         member.updateAccountId(accountId);

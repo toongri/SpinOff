@@ -3,7 +3,6 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,14 +16,16 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
-    public static class CollectionNameDto {
+    public static class PostInCollectionDto {
         private Long id;
         private String title;
+        private boolean isCollected;
 
         @QueryProjection
-        public CollectionNameDto(Long id, String title) {
+        public PostInCollectionDto(Long id, String title) {
             this.id = id;
             this.title = title;
+            this.isCollected = false;
         }
     }
 
@@ -47,8 +48,7 @@ public class CollectionDto {
         private String followingMemberNickname;
         private int followingNumber;
 
-        public SearchCollectionDto(Collection collection) {
-
+        public SearchCollectionDto(Collection collection, List<Long> followingMembers) {
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
             this.memberId = collection.getMember().getId();
@@ -67,39 +67,19 @@ public class CollectionDto {
                         }
                     }
                 }
+            }
+            if (!followingMembers.isEmpty()) {
+                findRelatedMember(followingMembers, collection.getFollowingMembers());
             }
         }
 
-        public SearchCollectionDto(Collection collection, List<Member> followingMembers) {
-            this.collectionId = collection.getId();
-            this.collectionTitle = collection.getTitle();
-            this.memberId = collection.getMember().getId();
-            this.memberAccountId = collection.getMember().getAccountId();
-            if (collection.getFirstThumbnail() != null) {
-                thumbnailUrls.add(collection.getFirstThumbnail());
-
-                if (collection.getSecondThumbnail() != null) {
-                    thumbnailUrls.add(collection.getSecondThumbnail());
-
-                    if (collection.getThirdThumbnail() != null) {
-                        thumbnailUrls.add(collection.getThirdThumbnail());
-
-                        if (collection.getFourthThumbnail() != null) {
-                            thumbnailUrls.add(collection.getFourthThumbnail());
-                        }
-                    }
-                }
-            }
-
-            List<FollowedCollection> followedCollections = collection.getFollowingMembers();
-
+        private void findRelatedMember(List<Long> followingMembers, List<FollowedCollection> followedCollections) {
             followedCollections.stream()
-                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember()))
+                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember().getId()))
                     .max(Comparator.comparing(
                             followedCollection -> followedCollection.getMember().getPopularity()))
                     .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
                             followedCollection.getMember().getNickname(), followedCollections.size()));
-
         }
 
         public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
@@ -120,30 +100,24 @@ public class CollectionDto {
         private String followingMemberNickname;
         private int followingNumber;
 
-        public SearchAllCollectionDto(Collection collection) {
-
+        public SearchAllCollectionDto(Collection collection, List<Long> followingMembers) {
             this.collectionId = collection.getId();
             this.collectionTitle = collection.getTitle();
             this.memberId = collection.getMember().getId();
             this.memberAccountId = collection.getMember().getAccountId();
             this.thumbnailUrl = collection.getFirstThumbnail();
+
+            if (!followingMembers.isEmpty()) {
+                findRelatedMember(followingMembers, collection.getFollowingMembers());
+            }
         }
 
-        public SearchAllCollectionDto(Collection collection, List<Member> followingMembers) {
-            this.collectionId = collection.getId();
-            this.collectionTitle = collection.getTitle();
-            this.memberId = collection.getMember().getId();
-            this.memberAccountId = collection.getMember().getAccountId();
-            this.thumbnailUrl = collection.getFirstThumbnail();
-
-            List<FollowedCollection> followedCollections = collection.getFollowingMembers();
-
+        private void findRelatedMember(List<Long> followingMembers, List<FollowedCollection> followedCollections) {
             followedCollections.stream()
-                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember()))
+                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember().getId()))
                     .max(Comparator.comparing(followedCollection -> followedCollection.getMember().getPopularity()))
                     .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
                             followedCollection.getMember().getNickname(), followedCollections.size()));
-
         }
 
         public void setFollowingMemberNicknameAndNumber(String nickname, int size) {

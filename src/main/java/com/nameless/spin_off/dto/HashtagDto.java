@@ -1,6 +1,7 @@
 package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,6 +19,11 @@ public class HashtagDto {
         public ContentHashtagDto(Long id, String content) {
             this.id = id;
             this.content = content;
+        }
+
+        public ContentHashtagDto(PostedHashtag postedHashtag) {
+            this.id = postedHashtag.getHashtag().getId();
+            this.content = postedHashtag.getHashtag().getContent();;
         }
     }
 

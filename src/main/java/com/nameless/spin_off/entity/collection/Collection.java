@@ -48,11 +48,13 @@ public class Collection {
     private String secondThumbnail;
     private String thirdThumbnail;
     private String fourthThumbnail;
+    private Double popularity;
+    private Boolean isDefault;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "public_of_collection_status")
     @NotNull
     private PublicOfCollectionStatus publicOfCollectionStatus;
-    private Double popularity;
 
     @CreatedDate
     @Column(updatable = false)
@@ -142,6 +144,8 @@ public class Collection {
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
         collection.updatePopularityZero();
         collection.updateLastModifiedDate();
+        collection.updateIsDefault(false);
+
         return collection;
     }
 
@@ -158,6 +162,7 @@ public class Collection {
         collection.updatePublicOfCollectionStatus(DEFAULT_COLLECTION_PUBLIC_STATUS);
         collection.updatePopularityZero();
         collection.updateLastModifiedDate();
+        collection.updateIsDefault(true);
 
         return collection;
 
@@ -175,6 +180,7 @@ public class Collection {
         collection.updatePublicOfCollectionStatus(DOCENT_COLLECTION_PUBLIC_STATUS);
         collection.updatePopularityZero();
         collection.updateLastModifiedDate();
+        collection.updateIsDefault(true);
 
         return collection;
     }
@@ -187,6 +193,9 @@ public class Collection {
     }
 
     //==수정 메소드==//
+    private void updateIsDefault(boolean isDefault) {
+        this.isDefault = isDefault;
+    }
     private void updateId(Long id) {
         this.id = id;
     }

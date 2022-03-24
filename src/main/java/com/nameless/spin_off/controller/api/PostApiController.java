@@ -65,6 +65,17 @@ public class PostApiController {
         return getResult(postService.insertLikedPostByMemberId(currentMember.getId(), postId));
     }
 
+//    @GetMapping("/{postId}/collections")
+//    public PostApiResult<List<PostInCollectionDto>> getCollectionCheckPost(
+//            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+//
+//        log.info("getCollectionCheckPost");
+//        log.info("memberId : {}", currentMember.getId());
+//        log.info("postId : {}", postId);
+//
+//        return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
+//    }
+
     @PostMapping("/{postId}/collections")
     public PostApiResult<List<Long>> createCollectedAll(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)

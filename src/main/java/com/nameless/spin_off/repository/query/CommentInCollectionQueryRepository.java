@@ -6,7 +6,6 @@ import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
-import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.comment.QCommentInCollection.commentInCollection;
 import static com.nameless.spin_off.entity.comment.QLikedCommentInCollection.likedCommentInCollection;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
@@ -61,10 +60,9 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
         Integer fetchOne = getQueryFactory()
                 .selectOne()
                 .from(commentInCollection)
-                .join(commentInCollection.collection, collection)
                 .where(
                         commentInCollection.id.eq(id),
-                        collection.id.eq(collectionId))
+                        commentInCollection.collection.id.eq(collectionId))
                 .fetchFirst();
 
         return fetchOne != null;

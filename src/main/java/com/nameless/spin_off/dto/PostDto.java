@@ -1,14 +1,13 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
 import com.nameless.spin_off.dto.MovieDto.MovieInVisitPostDto;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.post.AlreadyAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
@@ -20,8 +19,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class PostDto {
 
@@ -37,31 +38,35 @@ public class PostDto {
         private MovieInVisitPostDto movie;
         private boolean hasAuth;
         private int likeSize;
-        private List<ContentMemberDto> likeMembers;
         private List<ContentHashtagDto> hashtags;
         private int commentSize;
-        private List<ContentCommentDto> comments;
-        private boolean isLike;
+        private boolean isLiked;
 
-        public visitPostDto(Post post, List<CommentInPost> comments, Long memberId) {
+        public visitPostDto(Post post, Long memberId, boolean isAdmin) {
+
             this.postId = post.getId();
-            this.member = new ContentMemberDto(post.getMember());
+            this.member = new ContentMemberDto(post.getMember(), true);
             this.postTitle = post.getTitle();
             this.createTime = post.getCreatedDate();
             this.timeComment = getTimeToComment(post.getLastModifiedDate());
             this.postContent = post.getContent();
             this.movie = new MovieInVisitPostDto(post.getMovie());
-            this.hasAuth = hasAuth;
-            this.likeSize = likeSize;
-            this.likeMembers = likeMembers;
-            this.hashtags = hashtags;
-            this.commentSize = commentSize;
-//            this.comments = comments.stream().map();
-            this.isLike = isLike;
+            this.hasAuth = post.getMember().getId().equals(memberId) || isAdmin;
+            this.hashtags = post.getPostedHashtags().stream().map(ContentHashtagDto::new).collect(Collectors.toList());
         }
 
         private String getTimeToComment(LocalDateTime lastModifiedDate) {
             return null;
+        }
+
+        private List<ContentMemberDto> getLikedMembers(List<LikedPost> likedPosts,
+                                                       List<Member> blockedMembers, List<Member> followedMembers) {
+            return likedPosts.stream()
+                    .filter(likedPost -> !blockedMembers.contains(likedPost.getMember()))
+                    .map(likedPost -> new ContentMemberDto(
+                            likedPost.getMember(), followedMembers.contains(likedPost.getMember())))
+                    .sorted(Comparator.comparing(ContentMemberDto::isFollowed, Comparator.reverseOrder()))
+                    .collect(Collectors.toList());
         }
     }
 

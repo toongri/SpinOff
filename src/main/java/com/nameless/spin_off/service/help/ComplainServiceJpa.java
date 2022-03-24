@@ -1,14 +1,9 @@
 package com.nameless.spin_off.service.help;
 
-import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.help.Complain;
-import com.nameless.spin_off.entity.member.DirectMessage;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
@@ -28,8 +23,6 @@ import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.*;
 
@@ -89,44 +82,6 @@ public class ComplainServiceJpa implements ComplainService{
             throw new UnknownContentTypeException();
         }
         return memberId;
-    }
-
-    private Member getPostByIdWithComplainOfMember(Long contentId) throws NotExistPostException {
-        Optional<Post> optionalPost = postRepository.findOneByIdWithComplainOfMember(contentId);
-
-        return optionalPost.orElseThrow(NotExistPostException::new).getMember();
-    }
-
-    private Member getCollectionByIdWithComplainOfMember(Long contentId) throws NotExistCollectionException {
-        Optional<Collection> optionalCollection = collectionRepository.findOneByIdWithComplainOfMember(contentId);
-
-        return optionalCollection.orElseThrow(NotExistCollectionException::new).getMember();
-    }
-
-    private Member getCommentInCollectionByIdWithComplainOfMember(Long contentId)
-            throws NotExistCommentInCollectionException {
-
-        Optional<CommentInCollection> optionalComment =
-                commentInCollectionRepository.findOneByIdWithComplainOfMember(contentId);
-
-        return optionalComment.orElseThrow(NotExistCommentInCollectionException::new).getMember();
-    }
-
-    private Member getCommentInPostByIdWithComplainOfMember(Long contentId) throws NotExistCommentInPostException {
-        Optional<CommentInPost> optionalComment = commentInPostRepository.findOneByIdWithComplainOfMember(contentId);
-
-        return optionalComment.orElseThrow(NotExistCommentInPostException::new).getMember();
-    }
-
-    private Member getDMByIdWithComplainOfMember(Long contentId) throws NotExistDMException {
-        Optional<DirectMessage> optionalDM = directMessageRepository.findOneByIdWithComplainOfMember(contentId);
-
-        return optionalDM.orElseThrow(NotExistDMException::new).getMember();
-    }
-
-    private Member getMember(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findById(memberId);
-        return optionalMember.orElseThrow(NotExistMemberException::new);
     }
 
     private void isExistMember(Long memberId) {
