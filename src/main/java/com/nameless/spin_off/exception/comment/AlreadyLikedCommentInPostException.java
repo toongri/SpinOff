@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.comment;
 
-public class AlreadyLikedCommentInPostException extends RuntimeException{
-    public AlreadyLikedCommentInPostException() {
-        super("이미 해당 댓글을 좋아요 했습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyLikedCommentInPostException extends CustomRuntimeException {
+    public AlreadyLikedCommentInPostException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyLikedCommentInPostException(String message) {
-        super(message);
-    }
-
-    public AlreadyLikedCommentInPostException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyLikedCommentInPostException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyLikedCommentInPostException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyLikedCommentInPostException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

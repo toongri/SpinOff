@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.member;
 
-public class AlreadyFollowedHashtagException extends RuntimeException {
-    public AlreadyFollowedHashtagException() {
-        super("이미 해당 해시태그를 팔로우 했습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyFollowedHashtagException extends CustomRuntimeException {
+    public AlreadyFollowedHashtagException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyFollowedHashtagException(String message) {
-        super(message);
-    }
-
-    public AlreadyFollowedHashtagException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyFollowedHashtagException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyFollowedHashtagException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyFollowedHashtagException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

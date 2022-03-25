@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.post;
 
-public class AlreadyLikedPostException extends RuntimeException{
-    public AlreadyLikedPostException() {
-        super("이미 해당 유저를 팔로우 했습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyLikedPostException extends CustomRuntimeException {
+    public AlreadyLikedPostException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyLikedPostException(String message) {
-        super(message);
-    }
-
-    public AlreadyLikedPostException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyLikedPostException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyLikedPostException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyLikedPostException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

@@ -3,12 +3,12 @@ package com.nameless.spin_off.exception.post;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.exception.support.CustomRuntimeException;
 
-public class NotExistPostException extends CustomRuntimeException {
-    public NotExistPostException(String message, ErrorEnum errorEnum) {
+public class IncorrectPostImageLengthException extends CustomRuntimeException {
+    public IncorrectPostImageLengthException(String message, ErrorEnum errorEnum) {
         super(message, errorEnum);
     }
 
-    public NotExistPostException(ErrorEnum errorEnum) {
+    public IncorrectPostImageLengthException(ErrorEnum errorEnum) {
         super(errorEnum);
     }
 }

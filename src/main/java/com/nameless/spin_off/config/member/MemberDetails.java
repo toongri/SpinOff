@@ -1,5 +1,6 @@
 package com.nameless.spin_off.config.member;
 
+import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
 import lombok.Builder;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;
@@ -62,4 +63,11 @@ public class MemberDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public boolean isAdmin() {
+        return authorities.stream()
+                .anyMatch(grantedAuthority ->
+                        AuthorityOfMemberStatus.A.getKey().equals(grantedAuthority.getAuthority()));
+    }
+
 }

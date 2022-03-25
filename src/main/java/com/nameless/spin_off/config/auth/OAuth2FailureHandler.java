@@ -3,7 +3,8 @@ package com.nameless.spin_off.config.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameless.spin_off.controller.exhandler.ErrorResult;
-import com.nameless.spin_off.exception.member.AlreadyAuthEmailException;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.security.AlreadyAuthEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -26,22 +27,31 @@ import java.io.IOException;
 public class OAuth2FailureHandler implements AuthenticationFailureHandler {
     private HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
     private String errorMessage = null;
+    private String errorCode = null;
     private final ObjectMapper objectMapper;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-        log.error("[exceptionHandler] ex", exception);
+        log.info("[exceptionHandler] ex", exception);
 
-        if (exception instanceof BadCredentialsException || exception instanceof InternalAuthenticationServiceException) {
-            errorMessage = "아이디나 비밀번호가 맞지 않습니다. 다시 확인해 주십시오.";
+        if (exception instanceof BadCredentialsException) {
+            errorMessage = ErrorEnum.BAD_CREDENTIALS.getMessage();
+            errorCode = ErrorEnum.BAD_CREDENTIALS.getCode();
+        } else if (exception instanceof InternalAuthenticationServiceException) {
+            errorMessage = ErrorEnum.INTERNAL_AUTHENTICATION_SERVICE.getMessage();
+            errorCode = ErrorEnum.INTERNAL_AUTHENTICATION_SERVICE.getCode();
         } else if (exception instanceof DisabledException) {
-            errorMessage = "계정이 비활성화 되었습니다. 관리자에게 문의하세요.";
+            errorMessage = ErrorEnum.DISABLED.getMessage();
+            errorCode = ErrorEnum.DISABLED.getCode();
         } else if (exception instanceof CredentialsExpiredException) {
-            errorMessage = "비밀번호가 유효기간이 만료되었습니다. 관리자에게 문의하세요";
+            errorMessage = ErrorEnum.CREDENTIALS_EXPIRED.getMessage();
+            errorCode = ErrorEnum.CREDENTIALS_EXPIRED.getCode();
         } else if (exception instanceof AlreadyAuthEmailException) {
-            errorMessage = exception.getMessage();
+            errorMessage = ErrorEnum.ALREADY_AUTH_EMAIL.getMessage();
+            errorCode = ErrorEnum.ALREADY_AUTH_EMAIL.getCode();
         } else {
-            errorMessage = "알 수 없는 이유로 로그인에 실패하였습니다. 관리자에게 문의하세요";
+            errorMessage = ErrorEnum.UNKNOWN.getMessage();
+            errorCode = ErrorEnum.UNKNOWN.getCode();
         }
         writeTokenResponse(response);
     }
@@ -50,12 +60,12 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
         response.addHeader("isSuccess", String.valueOf(false));
-        response.addHeader("code", "EX");
+        response.addHeader("code", errorCode);
         response.addHeader("message", errorMessage);
         response.setContentType("application/json;charset=UTF-8");
 
         var writer = response.getWriter();
-        writer.println(objectMapper.writeValueAsString(new ErrorResult(false, "EX", errorMessage)));
+        writer.println(objectMapper.writeValueAsString(new ErrorResult(false, errorCode, errorMessage)));
         writer.flush();
     }
 }

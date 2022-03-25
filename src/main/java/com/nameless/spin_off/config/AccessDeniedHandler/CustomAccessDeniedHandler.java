@@ -2,6 +2,7 @@ package com.nameless.spin_off.config.AccessDeniedHandler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameless.spin_off.controller.exhandler.ErrorResult;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,21 +19,25 @@ import java.io.IOException;
 @RequiredArgsConstructor
 @Component
 public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-    HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-    private String errorMessage = "권한이 부족합니다.";
+    HttpStatus httpStatus = HttpStatus.FORBIDDEN;
+    private String errorMessage = null;
+    private String errorCode = null;
     private final ObjectMapper objectMapper;
 
     //권한초과
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
+        log.info("[exceptionHandler] ex", accessDeniedException);
         writeTokenResponse(response);
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
+        errorMessage = ErrorEnum.ACCESS_DENIED.getMessage();
+
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
         response.addHeader("isSuccess", String.valueOf(false));
-        response.addHeader("code", "EX");
+        response.addHeader("code", ErrorEnum.ACCESS_DENIED.getCode());
         response.addHeader("message", errorMessage);
         response.setContentType("application/json;charset=UTF-8");
 

@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.member;
 
-public class AlreadyAccountIdException extends RuntimeException{
-    public AlreadyAccountIdException() {
-        super("해당 아이디는 이미 존재합니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyAccountIdException extends CustomRuntimeException {
+    public AlreadyAccountIdException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyAccountIdException(String message) {
-        super(message);
-    }
-
-    public AlreadyAccountIdException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyAccountIdException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyAccountIdException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyAccountIdException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

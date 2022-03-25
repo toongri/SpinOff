@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.comment;
 
-public class NotExistCommentInPostException extends RuntimeException{
-    public NotExistCommentInPostException() {
-        super("댓글이 존재하지 않습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class NotExistCommentInPostException extends CustomRuntimeException {
+    public NotExistCommentInPostException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public NotExistCommentInPostException(String message) {
-        super(message);
-    }
-
-    public NotExistCommentInPostException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NotExistCommentInPostException(Throwable cause) {
-        super(cause);
-    }
-
-    protected NotExistCommentInPostException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public NotExistCommentInPostException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.member;
 
-public class NotExistMemberException extends RuntimeException{
-    public NotExistMemberException() {
-        super("해당 유저는 존재하지 않습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class NotExistMemberException extends CustomRuntimeException {
+    public NotExistMemberException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public NotExistMemberException(String message) {
-        super(message);
-    }
-
-    public NotExistMemberException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NotExistMemberException(Throwable cause) {
-        super(cause);
-    }
-
-    protected NotExistMemberException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public NotExistMemberException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

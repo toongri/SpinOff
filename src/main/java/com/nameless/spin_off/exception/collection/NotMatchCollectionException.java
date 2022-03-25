@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.collection;
 
-public class NotMatchCollectionException extends RuntimeException {
-    public NotMatchCollectionException() {
-        super("컬렉션 id가 옳바르지 않습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class NotMatchCollectionException extends CustomRuntimeException {
+    public NotMatchCollectionException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public NotMatchCollectionException(String message) {
-        super(message);
-    }
-
-    public NotMatchCollectionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NotMatchCollectionException(Throwable cause) {
-        super(cause);
-    }
-
-    protected NotMatchCollectionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public NotMatchCollectionException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

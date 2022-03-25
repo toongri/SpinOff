@@ -3,12 +3,12 @@ package com.nameless.spin_off.exception.collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.exception.support.CustomRuntimeException;
 
-public class AlreadyLikedCollectionException extends CustomRuntimeException {
-    public AlreadyLikedCollectionException(String message, ErrorEnum errorEnum) {
+public class IncorrectTitleOfCollectionException extends CustomRuntimeException {
+    public IncorrectTitleOfCollectionException(String message, ErrorEnum errorEnum) {
         super(message, errorEnum);
     }
 
-    public AlreadyLikedCollectionException(ErrorEnum errorEnum) {
+    public IncorrectTitleOfCollectionException(ErrorEnum errorEnum) {
         super(errorEnum);
     }
 }

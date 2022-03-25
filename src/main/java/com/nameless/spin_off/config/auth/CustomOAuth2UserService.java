@@ -1,8 +1,9 @@
 package com.nameless.spin_off.config.auth;
 
 import com.nameless.spin_off.config.auth.dto.OAuth2Attribute;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.exception.member.AlreadyAuthEmailException;
+import com.nameless.spin_off.exception.security.AlreadyAuthEmailException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -97,18 +98,15 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
         if (optionalMember.isPresent()) {
             if (NAVER.getValue().equals(registrationId)) {
                 if (optionalMember.get().getNaverEmail() == null) {
-                    throw new AlreadyAuthEmailException(
-                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                    throw new AlreadyAuthEmailException(ErrorEnum.ALREADY_AUTH_EMAIL);
                 }
             } else if (KAKAO.getValue().equals(registrationId)) {
                 if (optionalMember.get().getKakaoEmail() == null) {
-                    throw new AlreadyAuthEmailException(
-                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                    throw new AlreadyAuthEmailException(ErrorEnum.ALREADY_AUTH_EMAIL);
                 }
             } else {
                 if (optionalMember.get().getGoogleEmail() == null) {
-                    throw new AlreadyAuthEmailException(
-                            "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요");
+                    throw new AlreadyAuthEmailException(ErrorEnum.ALREADY_AUTH_EMAIL);
                 }
             }
         }

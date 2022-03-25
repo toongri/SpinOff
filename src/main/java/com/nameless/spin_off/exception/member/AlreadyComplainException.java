@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.member;
 
-public class AlreadyComplainException extends RuntimeException{
-    public AlreadyComplainException() {
-        super("이미 신고가 접수 되었습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyComplainException extends CustomRuntimeException {
+    public AlreadyComplainException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyComplainException(String message) {
-        super(message);
-    }
-
-    public AlreadyComplainException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyComplainException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyComplainException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyComplainException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

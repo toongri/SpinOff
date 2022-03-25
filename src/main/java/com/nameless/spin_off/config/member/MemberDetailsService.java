@@ -1,6 +1,7 @@
 package com.nameless.spin_off.config.member;
 
 import com.nameless.spin_off.config.auth.MemberAdapter;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -23,7 +24,8 @@ public class MemberDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String accountId) throws UsernameNotFoundException {
         log.info("accountId : {}", accountId);
-        Member member = memberRepository.findByAccountIdWithRoles(accountId).orElseThrow(NotExistMemberException::new);
+        Member member = memberRepository.findByAccountIdWithRoles(accountId)
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
         log.info("member.getRoles() : {}", member.getRoles().toString());
 
         return new MemberAdapter(member);

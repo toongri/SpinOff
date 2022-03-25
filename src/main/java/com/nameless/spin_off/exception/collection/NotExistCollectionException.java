@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.collection;
 
-public class NotExistCollectionException extends RuntimeException{
-    public NotExistCollectionException() {
-        super("컬렉션이 존재하지 않습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class NotExistCollectionException extends CustomRuntimeException {
+    public NotExistCollectionException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public NotExistCollectionException(String message) {
-        super(message);
-    }
-
-    public NotExistCollectionException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NotExistCollectionException(Throwable cause) {
-        super(cause);
-    }
-
-    protected NotExistCollectionException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public NotExistCollectionException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }

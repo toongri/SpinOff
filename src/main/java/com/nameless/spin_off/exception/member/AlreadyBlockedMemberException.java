@@ -1,23 +1,14 @@
 package com.nameless.spin_off.exception.member;
 
-public class AlreadyBlockedMemberException extends RuntimeException{
-    public AlreadyBlockedMemberException() {
-        super("이미 해당 유저를 차단 했습니다.");
+import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.exception.support.CustomRuntimeException;
+
+public class AlreadyBlockedMemberException extends CustomRuntimeException {
+    public AlreadyBlockedMemberException(String message, ErrorEnum errorEnum) {
+        super(message, errorEnum);
     }
 
-    public AlreadyBlockedMemberException(String message) {
-        super(message);
-    }
-
-    public AlreadyBlockedMemberException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public AlreadyBlockedMemberException(Throwable cause) {
-        super(cause);
-    }
-
-    protected AlreadyBlockedMemberException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
+    public AlreadyBlockedMemberException(ErrorEnum errorEnum) {
+        super(errorEnum);
     }
 }
