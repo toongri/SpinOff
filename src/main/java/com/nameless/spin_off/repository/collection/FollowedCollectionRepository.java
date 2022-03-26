@@ -13,6 +13,6 @@ public interface FollowedCollectionRepository extends JpaRepository<FollowedColl
             "JOIN followedCollection.collection collection " +
             "WHERE (followedCollection.member.id = :memberId AND collection.member.id = :followedMemberId) OR " +
             "(followedCollection.member.id = :followedMemberId AND collection.member.id = :memberId)")
-    List<Long> findAllByFollowingMemberIdAndMemberId
+    List<Long> findAllIdByFollowingMemberIdAndMemberId
             (@Param("memberId") Long memberId, @Param("followedMemberId") Long followedMemberId);
 }

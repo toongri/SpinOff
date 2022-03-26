@@ -12,6 +12,6 @@ public interface FollowedMemberRepository extends JpaRepository<FollowedMember, 
     @Query("SELECT followedMember.id FROM FollowedMember followedMember " +
             "WHERE (followedMember.followingMember.id = :memberId AND followedMember.member.id = :followedMemberId) OR " +
             "(followedMember.member.id = :memberId AND followedMember.followingMember.id = :followedMemberId)")
-    List<Long> findAllByFollowingMemberIdAndMemberId
+    List<Long> findAllIdByFollowingMemberIdAndMemberId
             (@Param("memberId") Long memberId, @Param("followedMemberId") Long followedMemberId);
 }

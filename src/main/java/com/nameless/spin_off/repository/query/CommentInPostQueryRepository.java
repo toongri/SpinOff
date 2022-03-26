@@ -6,6 +6,8 @@ import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.comment.QLikedCommentInPost.likedCommentInPost;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
@@ -80,5 +82,15 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    public Long countCommentInPost(Long postId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(commentInPost.id)
+                .from(commentInPost)
+                .where(
+                        commentInPost.post.id.eq(postId),
+                        commentInPost.member.id.notIn(blockedMemberIds))
+                .fetchCount();
     }
 }

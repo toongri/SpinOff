@@ -3,12 +3,13 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
-import com.nameless.spin_off.exception.member.NotCorrectEmailRequest;
+import com.nameless.spin_off.exception.sign.NotCorrectEmailRequest;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.query.MemberQueryService;
@@ -76,7 +77,7 @@ public class MemberApiController {
     public MemberApiResult<String> linkageEmailNaver(
             @LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, NAVER)) {
-            throw new NotCorrectEmailRequest();
+            throw new NotCorrectEmailRequest(ErrorEnum.NOT_CORRECT_EMAIL);
         }
         memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
@@ -85,7 +86,7 @@ public class MemberApiController {
     @PostMapping("/linkage-email/kakao")
     public MemberApiResult<String> linkageEmailKakao(@LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, KAKAO)) {
-            throw new NotCorrectEmailRequest();
+            throw new NotCorrectEmailRequest(ErrorEnum.NOT_CORRECT_EMAIL);
         }
         memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");
@@ -94,7 +95,7 @@ public class MemberApiController {
     @PostMapping("/linkage-email/google")
     public MemberApiResult<String> linkageEmailGoogle(@LoginMember MemberDetails currentMember, @RequestParam String email) {
         if (isNotCorrectEmail(email, GOOGLE)) {
-            throw new NotCorrectEmailRequest();
+            throw new NotCorrectEmailRequest(ErrorEnum.NOT_CORRECT_EMAIL);
         }
         memberService.updateEmailLinkage(email, currentMember.getUsername());
         return getResult("메일을 확인하여 주시기 바랍니다.");

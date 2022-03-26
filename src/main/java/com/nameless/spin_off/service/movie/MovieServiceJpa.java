@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.movie;
 
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
@@ -72,18 +73,18 @@ public class MovieServiceJpa implements MovieService{
     private Movie getMovieById(Long movieId) throws NotExistMovieException {
         Optional<Movie> optionalMovie = movieRepository.findById(movieId);
 
-        return optionalMovie.orElseThrow(NotExistMovieException::new);
+        return optionalMovie.orElseThrow(() -> new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE));
     }
 
     private void isExistFollowedMovie(Long memberId, Long followedMovieId) {
         if (movieQueryRepository.isExistFollowedMovie(memberId, followedMovieId)) {
-            throw new AlreadyFollowedMovieException();
+            throw new AlreadyFollowedMovieException(ErrorEnum.ALREADY_FOLLOWED_MOVIE);
         }
     }
 
     private void isExistMovie(Long movieId) {
         if (!movieQueryRepository.isExist(movieId)) {
-            throw new NotExistMovieException();
+            throw new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE);
         }
     }
 

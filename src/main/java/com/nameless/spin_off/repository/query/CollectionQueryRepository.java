@@ -1,8 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CollectionDto.*;
-import com.nameless.spin_off.dto.QCollectionDto_MainPageCollectionDto;
-import com.nameless.spin_off.dto.QCollectionDto_PostInCollectionDto;
+import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -16,7 +15,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
@@ -68,6 +69,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         collection.id.eq(collectionId))
                 .fetchFirst();
+
         if (tuple == null) {
             return Optional.empty();
         } else {
@@ -78,7 +80,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public List<PostInCollectionDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
         return getQueryFactory()
-                .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title))
+                .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title, collection.firstThumbnail))
                 .from(collection)
                 .where(collection.member.id.eq(memberId))
                 .orderBy(collectedPost.lastModifiedDate.desc())
@@ -93,18 +95,6 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst();
 
         return fetchOne != null;
-    }
-
-    public Boolean isCorrectCollectionWithOwner(List<Long> collectionIds, Long memberId) {
-        long length = getQueryFactory()
-                .select(collection.count())
-                .from(collection)
-                .where(
-                        collection.id.in(collectionIds),
-                        collection.member.id.eq(memberId))
-                .fetchCount();
-
-        return collectionIds.size() == length;
     }
 
     public Boolean isExistLikedCollection(Long memberId, Long collectionId) {
@@ -188,15 +178,54 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchAllCollectionDto> findAllSlicedForSearchPageAtAll(
-            String keyword, Pageable pageable, List<Long> followedMembers, List<Long> blockedMembers) {
-        Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
-                .selectFrom(collection)
-                .join(collection.member, member).fetchJoin()
+            String keyword, Pageable pageable, List<Long> blockedMembers, Long memberId) {
+
+        Slice<SearchAllCollectionDto> content = applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QCollectionDto_SearchAllCollectionDto(
+                        collection.id, collection.title, member.id, member.accountId, collection.firstThumbnail,
+                        followedCollection.count()))
+                .from(collection)
+                .join(collection.member, member)
+                .leftJoin(collection.followingMembers, followedCollection)
+                .groupBy(collection)
                 .where(
+                        followedCollection.member.id.notIn(blockedMembers),
+                        collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
 
-        return MapContentToDtoForSearchPageAtAll(content, followedMembers);
+        Map<Long, List<FollowCollectionMemberDto>> followingMembers =
+                getFollowingMembersAtCollection(memberId, getCollectionIdsAll(content.getContent()));
+
+        content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+
+        return content;
+    }
+
+    public Slice<SearchCollectionDto> findAllSlicedForSearchPageAtCollection(
+            String keyword, Pageable pageable, List<Long> blockedMembers, Long memberId) {
+
+        Slice<SearchCollectionDto> content = applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QCollectionDto_SearchCollectionDto(
+                        collection.id, collection.title, member.id, member.accountId,
+                        collection.firstThumbnail, collection.secondThumbnail, collection.thirdThumbnail,
+                        collection.fourthThumbnail, followedCollection.count()))
+                .from(collection)
+                .join(collection.member, member)
+                .leftJoin(collection.followingMembers, followedCollection)
+                .groupBy(collection)
+                .where(
+                        followedCollection.member.id.notIn(blockedMembers),
+                        collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
+                        collection.title.contains(keyword),
+                        memberNotIn(blockedMembers)));
+
+        Map<Long, List<FollowCollectionMemberDto>> followingMembers =
+                getFollowingMembersAtCollection(memberId, getCollectionIds(content.getContent()));
+
+        content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+
+        return content;
     }
 
     public List<Collection> findAllByViewAfterTime(LocalDateTime time) {
@@ -208,18 +237,6 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
-    public Slice<SearchCollectionDto> findAllSlicedForSearchPageAtCollection(
-            String keyword, Pageable pageable, List<Long> followedMembers, List<Long> blockedMembers) {
-        Slice<Collection> content = applySlicing(pageable, contentQuery -> contentQuery
-                .selectFrom(collection)
-                .join(collection.member, member).fetchJoin()
-                .where(
-                        collection.title.contains(keyword),
-                        memberNotIn(blockedMembers)));
-
-        return MapContentToDtoForSearchPageAtCollection(content, followedMembers);
-    }
-
     public Slice<MainPageCollectionDto> findAllSlicedForMainPage(
             Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
 
@@ -229,7 +246,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.firstThumbnail, collection.secondThumbnail))
                 .from(collection)
                 .join(collection.member, member)
-                .where(collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
+                .where(
+                        collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         memberNotIn(blockedMemberIds),
                         memberNotEq(memberId)));
     }
@@ -265,16 +283,33 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         memberNotIn(blockedMemberIds)));
     }
 
-    private Slice<SearchCollectionDto> MapContentToDtoForSearchPageAtCollection(
-            Slice<Collection> contents, List<Long> followedMembers) {
-
-        return contents.map(content -> new SearchCollectionDto(content, followedMembers));
+    private List<Long> getCollectionIds(List<SearchCollectionDto> content) {
+        return content.stream().map(SearchCollectionDto::getCollectionId).collect(Collectors.toList());
     }
+
+    private List<Long> getCollectionIdsAll(List<SearchAllCollectionDto> content) {
+        return content.stream().map(SearchAllCollectionDto::getCollectionId).collect(Collectors.toList());
+    }
+
+    private Map<Long, List<FollowCollectionMemberDto>> getFollowingMembersAtCollection(Long memberId, List<Long> collectionIds) {
+        return getQueryFactory()
+                .select(new QCollectionDto_FollowCollectionMemberDto(
+                        followedCollection.collection.id, member.id, member.popularity, member.nickname))
+                .from(followedCollection)
+                .join(followedCollection.member, member)
+                .join(member.followingMembers, followedMember)
+                .where(
+                        followedCollection.collection.id.in(collectionIds),
+                        followedMember.followingMember.id.eq(memberId))
+                .fetch().stream().collect(Collectors.groupingBy(FollowCollectionMemberDto::getCollectionId));
+    }
+
 
     private Slice<SearchAllCollectionDto> MapContentToDtoForSearchPageAtAll(
             Slice<Collection> contents, List<Long> followedMembers) {
         return contents.map(content -> new SearchAllCollectionDto(content, followedMembers));
     }
+
     private BooleanExpression memberNotEq(Long memberId) {
         return memberId != null ? member.id.ne(memberId) : null;
     }

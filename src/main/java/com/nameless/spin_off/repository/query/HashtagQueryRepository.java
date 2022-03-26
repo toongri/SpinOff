@@ -1,6 +1,8 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.QHashtagDto_ContentHashtagDto;
 import com.nameless.spin_off.dto.QHashtagDto_RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
@@ -103,6 +105,16 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
                 .groupBy(postedHashtag.hashtag)
                 .orderBy(postedHashtag.hashtag.count().desc(), hashtag.popularity.desc())
                 .limit(length)
+                .fetch();
+    }
+
+    public List<ContentHashtagDto> findAllByPostId(Long postId) {
+        return getQueryFactory()
+                .select(new QHashtagDto_ContentHashtagDto(
+                        hashtag.id, hashtag.content))
+                .from(postedHashtag)
+                .join(postedHashtag.hashtag, hashtag)
+                .where(postedHashtag.post.id.eq(postId))
                 .fetch();
     }
 

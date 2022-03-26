@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.hashtag;
 
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -67,13 +68,13 @@ public class HashtagServiceJpa implements HashtagService{
 
     private void isExistFollowedHashtag(Long memberId, Long followedHashtagId) {
         if (hashtagQueryRepository.isExistFollowedHashtag(memberId, followedHashtagId)) {
-            throw new AlreadyFollowedHashtagException();
+            throw new AlreadyFollowedHashtagException(ErrorEnum.ALREADY_FOLLOWED_HASHTAG);
         }
     }
 
     private void isExistHashtag(Long hashtagId) {
         if (!hashtagQueryRepository.isExist(hashtagId)) {
-            throw new NotExistHashtagException();
+            throw new NotExistHashtagException(ErrorEnum.NOT_EXIST_HASHTAG);
         }
     }
 

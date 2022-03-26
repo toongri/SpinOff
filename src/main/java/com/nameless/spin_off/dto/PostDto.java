@@ -7,66 +7,63 @@ import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
-import com.nameless.spin_off.exception.post.AlreadyAuthorityOfPostStatusException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
-import com.nameless.spin_off.exception.post.OverContentOfPostException;
-import com.nameless.spin_off.exception.post.OverTitleOfPostException;
+import com.nameless.spin_off.exception.post.IncorrectContentOfPostException;
+import com.nameless.spin_off.exception.post.IncorrectTitleOfPostException;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.domain.Slice;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class PostDto {
 
     @Data
     @NoArgsConstructor
-    public static class visitPostDto {
+    public static class VisitPostDto {
         private Long postId;
         private ContentMemberDto member;
         private String postTitle;
         private LocalDateTime createTime;
-        private String timeComment;
+        private LocalDateTime getLastModifiedDate;
         private String postContent;
         private MovieInVisitPostDto movie;
+        private PublicOfPostStatus publicOfPostStatus;
         private boolean hasAuth;
-        private int likeSize;
         private List<ContentHashtagDto> hashtags;
-        private int commentSize;
+        private Long likedSize;
+        private Long commentSize;
         private boolean isLiked;
 
-        public visitPostDto(Post post, Long memberId, boolean isAdmin) {
-
-            this.postId = post.getId();
-            this.member = new ContentMemberDto(post.getMember(), true);
-            this.postTitle = post.getTitle();
-            this.createTime = post.getCreatedDate();
-            this.timeComment = getTimeToComment(post.getLastModifiedDate());
-            this.postContent = post.getContent();
-            this.movie = new MovieInVisitPostDto(post.getMovie());
-            this.hasAuth = post.getMember().getId().equals(memberId) || isAdmin;
-            this.hashtags = post.getPostedHashtags().stream().map(ContentHashtagDto::new).collect(Collectors.toList());
+        public void setIsLiked(boolean isLiked) {
+            this.isLiked = isLiked;
         }
 
-        private String getTimeToComment(LocalDateTime lastModifiedDate) {
-            return null;
+        public void setHasAuth(Long memberId, boolean isAdmin) {
+            this.hasAuth = this.member.getMemberId().equals(memberId) || isAdmin;
         }
 
-        private List<ContentMemberDto> getLikedMembers(List<LikedPost> likedPosts,
-                                                       List<Member> blockedMembers, List<Member> followedMembers) {
-            return likedPosts.stream()
-                    .filter(likedPost -> !blockedMembers.contains(likedPost.getMember()))
-                    .map(likedPost -> new ContentMemberDto(
-                            likedPost.getMember(), followedMembers.contains(likedPost.getMember())))
-                    .sorted(Comparator.comparing(ContentMemberDto::isFollowed, Comparator.reverseOrder()))
-                    .collect(Collectors.toList());
+        @QueryProjection
+        public VisitPostDto(Long postId, Long memberId, String profile, String nickname, String accountId,
+                            String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
+                            String postContent, String movieThumbnail, String movieTitle, String directorName,
+                            Long likedSize, Long commentSize, PublicOfPostStatus publicOfPostStatus) {
+
+            this.postId = postId;
+            this.member = new ContentMemberDto(memberId, profile, nickname, accountId);
+            this.postTitle = postTitle;
+            this.createTime = createTime;
+            this.publicOfPostStatus = publicOfPostStatus;
+            this.getLastModifiedDate = getLastModifiedDate;
+            this.postContent = postContent;
+            this.movie = new MovieInVisitPostDto(movieThumbnail, movieTitle, directorName);
+            this.likedSize = likedSize;
+            this.commentSize = commentSize;
         }
     }
 
@@ -175,6 +172,49 @@ public class PostDto {
 
     @Data
     @AllArgsConstructor
+    public static class RelatedPostFirstDto<T> {
+        private T data;
+        private Slice<RelatedPostDto> posts;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class RelatedPostDto {
+
+        private Long postId;
+        private String postTitle;
+        private Long memberId;
+        private String memberNickname;
+        private String memberProfileImgUrl;
+        private String thumbnailUrl;
+
+        @QueryProjection
+        public RelatedPostDto(Long postId, String title, Long memberId, String memberNickname,
+                               String memberProfileImgUrl, String thumbnailUrl) {
+            this.postId = postId;
+            this.postTitle = title;
+            this.memberId = memberId;
+            this.memberNickname = memberNickname;
+            this.memberProfileImgUrl = memberProfileImgUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(postId);
+        }
+
+        @Override
+        public boolean equals(Object mainPagePostDto) {
+            if (mainPagePostDto instanceof MainPagePostDto) {
+                return ((MainPagePostDto) mainPagePostDto).postId.equals(postId);
+            }
+            return false;
+        }
+    }
+
+    @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class CreatePostVO {
         private String title;
@@ -236,7 +276,7 @@ public class PostDto {
             return this;
         }
 
-        public Post build() throws AlreadyPostedHashtagException, AlreadyAuthorityOfPostStatusException, OverTitleOfPostException, OverContentOfPostException {
+        public Post build() throws AlreadyPostedHashtagException, IncorrectTitleOfPostException, IncorrectContentOfPostException {
             return Post.createPost(member, title, content, thumbnailUrl, hashtags, urls, movie, publicOfPostStatus);
         }
     }

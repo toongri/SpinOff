@@ -39,6 +39,17 @@ public class MemberDto {
         private String accountId;
         private boolean isFollowed;
 
+        public ContentMemberDto(Long memberId, String profile, String nickname, String accountId) {
+            this.memberId = memberId;
+            this.profile = profile;
+            this.nickname = nickname;
+            this.accountId = accountId;
+        }
+
+        public void setFollowed(boolean followed) {
+            isFollowed = followed;
+        }
+
         public ContentMemberDto(Member member, boolean isFollowed) {
             this.memberId = member.getId();
             this.profile = member.getProfileImg();

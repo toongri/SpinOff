@@ -4,14 +4,15 @@ import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.dto.PostDto.IdAndPublicPostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.comment.LikedCommentInPost;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.comment.LikedCommentInPostRepository;
 import com.nameless.spin_off.repository.query.CommentInPostQueryRepository;
@@ -66,7 +67,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
     private PublicOfPostStatus getPublicOfPost(Long postId) {
         PublicOfPostStatus publicPost = postQueryRepository.findPublicByPostId(postId);
         if (publicPost == null) {
-            throw new NotExistPostException();
+            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         } else {
             return publicPost;
         }
@@ -74,29 +75,30 @@ public class CommentInPostServiceJpa implements CommentInPostService {
 
     private IdAndPublicPostDto getPublicAndIdPostByCommentId(Long commentId) {
         return postQueryRepository
-                .findPublicPostByCommentId(commentId).orElseThrow(NotExistCommentInPostException::new);
+                .findPublicPostByCommentId(commentId)
+                .orElseThrow(() -> new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST));
     }
 
     private void isBlockMembersComment(Long memberId, Long commentId) {
         if (commentId == null) {
 
         } else if (commentInPostQueryRepository.isBlockMembersComment(memberId, commentId)) {
-            throw new DontHaveAccessException();
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }
 
     private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
             if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
             if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId))) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
     }
@@ -105,7 +107,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
         if (commentId == null) {
 
         } else if (!commentInPostQueryRepository.isExistInPost(commentId, postId)) {
-            throw new NotExistCommentInPostException();
+            throw new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST);
         }
     }
 
@@ -115,7 +117,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
 
     private void isExistLikedCommentInPost(Long memberId, Long commentId) {
         if (commentInPostQueryRepository.isExistLikedCommentInPost(memberId, commentId)) {
-            throw new AlreadyLikedCommentInPostException();
+            throw new AlreadyLikedCommentInPostException(ErrorEnum.ALREADY_LIKED_COMMENT_IN_POST);
         }
     }
 }

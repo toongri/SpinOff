@@ -143,7 +143,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
                         0,
                         0,
@@ -258,7 +258,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchAllCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
                         2,
                         0,
@@ -340,6 +340,8 @@ public class CollectionQueryServiceJpaTest {
         em.flush();
         em.clear();
 
+        System.out.println("dfddfd"+ member.getId());
+
         //when
         System.out.println("서비스");
         List<SearchCollectionDto> content = collectionQueryService
@@ -368,7 +370,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
                         0,
                         0,
@@ -483,7 +485,7 @@ public class CollectionQueryServiceJpaTest {
                         null,
                         null,
                         null);
-        assertThat(content.stream().map(SearchCollectionDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
                         2,
                         0,
@@ -492,8 +494,6 @@ public class CollectionQueryServiceJpaTest {
                         0,
                         0);
     }
-
-
 
     @Test
     public void 발견_컬렉션_테스트() throws Exception{

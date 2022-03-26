@@ -31,7 +31,7 @@ public class CollectionApiController {
     @PostMapping("")
     public CollectionApiResult<Long> createOne(
             @LoginMember MemberDetails currentMember, @RequestBody CreateCollectionVO collectionVO)
-            throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
+            throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         log.info("createOne");
         log.info("memberId : {}", currentMember.getId());

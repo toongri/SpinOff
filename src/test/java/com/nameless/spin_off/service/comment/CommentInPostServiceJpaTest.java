@@ -8,8 +8,8 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -164,11 +164,11 @@ class CommentInPostServiceJpaTest {
         em.flush();
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
                 new CommentDto.CreateCommentInPostVO(post2.getId(), null, ""), mem.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
                 new CommentDto.CreateCommentInPostVO(post.getId(), aLong, ""), mem.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -234,6 +234,6 @@ class CommentInPostServiceJpaTest {
         memberService.insertBlockedMemberByMemberId(member.getId(), mem.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> commentInPostService.insertLikedCommentByMemberId(member.getId(), po.getCommentInPosts().get(0).getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 }

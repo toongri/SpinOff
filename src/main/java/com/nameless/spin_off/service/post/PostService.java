@@ -4,7 +4,7 @@ import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
-import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
+import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
@@ -17,9 +17,9 @@ public interface PostService {
 
     Long insertPostByPostVO(PostDto.CreatePostVO postVO, Long memberId, List<MultipartFile> multipartFiles)
             throws NotExistMemberException, NotExistMovieException, NotExistCollectionException,
-            InCorrectHashtagContentException, AlreadyPostedHashtagException,
-            AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException, IOException;
+            IncorrectHashtagContentException, AlreadyPostedHashtagException,
+            AlreadyCollectedPostException,
+            IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException;
     Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException;
     Long insertViewedPostByIp(String ip, Long postId)

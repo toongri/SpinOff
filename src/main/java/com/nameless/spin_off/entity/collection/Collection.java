@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -128,17 +129,17 @@ public class Collection {
     //==생성 메소드==//
     public static Collection createCollection(Member member, String title,
                                               String content, PublicOfCollectionStatus publicOfCollectionStatus)
-            throws OverTitleOfCollectionException, OverContentOfCollectionException {
+            throws IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         Collection collection = new Collection();
         collection.updateMember(member);
 
         if (title.length() > TITLE_LENGTH_MAX.getValue()) {
-            throw new OverTitleOfCollectionException();
+            throw new IncorrectTitleOfCollectionException(ErrorEnum.INCORRECT_TITLE_OF_COLLECTION);
         }
         collection.updateTitle(title);
         if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
-            throw new OverContentOfCollectionException();
+            throw new IncorrectContentOfCollectionException(ErrorEnum.INCORRECT_CONTENT_OF_COLLECTION);
         }
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
@@ -350,12 +351,12 @@ public class Collection {
 
     public Long insertFollowedCollectionByMember(Member member) throws AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
         if (this.member.equals(member)) {
-            throw new CantFollowOwnCollectionException();
+            throw new CantFollowOwnCollectionException(ErrorEnum.CANT_FOLLOW_OWN_COLLECTION);
         }
         else if (isNotAlreadyMemberFollowCollection(member)) {
             return addFollowingMemberByMember(member);
         } else {
-            throw new AlreadyFollowedCollectionException();
+            throw new AlreadyFollowedCollectionException(ErrorEnum.ALREADY_FOLLOWED_COLLECTION);
         }
     }
 
@@ -373,7 +374,7 @@ public class Collection {
         if (isNotAlreadyMemberLikeCollection(member)) {
             return addLikedCollectionByMember(member);
         } else {
-            throw new AlreadyLikedCollectionException();
+            throw new AlreadyLikedCollectionException(ErrorEnum.ALREADY_LIKED_COLLECTION);
         }
     }
 
@@ -385,7 +386,7 @@ public class Collection {
 
         return commentInCollections.stream()
                 .filter(comment -> comment.getId().equals(commentInCollectionId))
-                .findAny().orElseThrow(NotExistCommentInCollectionException::new);
+                .findAny().orElseThrow(() -> new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION));
     }
     //==조회 로직==//
     private boolean isInTimeViewedCollect(LocalDateTime currentTime, ViewedCollectionByIp viewedCollectionByIp, int j) {

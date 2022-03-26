@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -11,17 +12,18 @@ import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
-import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
+import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.support.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -55,13 +57,14 @@ public class PostServiceJpa implements PostService{
     private final LikedPostRepository likedPostRepository;
     private final ViewedPostByIpRepository viewedPostByIpRepository;
     private final AwsS3Service awsS3Service;
+    private final MemberQueryRepository memberQueryRepository;
 
     @Transactional
     @Override
     public Long insertPostByPostVO(CreatePostVO postVO, Long memberId, List<MultipartFile> multipartFiles)
-            throws NotExistMemberException, NotExistMovieException, InCorrectHashtagContentException,
-            AlreadyPostedHashtagException, AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException, IOException {
+            throws NotExistMemberException, NotExistMovieException, IncorrectHashtagContentException,
+            AlreadyPostedHashtagException, AlreadyCollectedPostException,
+            IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException {
 
         List<String> urls = getUrlByMultipartFile(multipartFiles);
 
@@ -139,7 +142,7 @@ public class PostServiceJpa implements PostService{
         return posts.size();
     }
 
-    private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws InCorrectHashtagContentException {
+    private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws IncorrectHashtagContentException {
 
         List<String> hashtagStrings = hashtagContents.stream()
                 .distinct()
@@ -168,7 +171,7 @@ public class PostServiceJpa implements PostService{
     private void isNotContainCantChar(List<String> hashtagContents) {
         for (String hashtagContent : hashtagContents) {
             if (CONTENT.isNotCorrect(hashtagContent)) {
-                throw new InCorrectHashtagContentException();
+                throw new IncorrectHashtagContentException(ErrorEnum.INCORRECT_HASHTAG_CONTENT);
             }
         }
     }
@@ -179,19 +182,19 @@ public class PostServiceJpa implements PostService{
         }
         Optional<Movie> optionalMovie = movieRepository.findById(movieId);
 
-        return optionalMovie.orElseThrow(NotExistMovieException::new);
+        return optionalMovie.orElseThrow(() -> new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE));
     }
 
     private void isExistLikedPost(Long memberId, Long postId) {
         if (postQueryRepository.isExistLikedPost(memberId, postId)) {
-            throw new AlreadyLikedPostException();
+            throw new AlreadyLikedPostException(ErrorEnum.ALREADY_LIKED_POST);
         }
     }
 
     private PublicOfPostStatus getPublicOfPost(Long postId) {
         PublicOfPostStatus publicPost = postQueryRepository.findPublicByPostId(postId);
         if (publicPost == null) {
-            throw new NotExistPostException();
+            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         } else {
             return publicPost;
         }
@@ -204,34 +207,35 @@ public class PostServiceJpa implements PostService{
     public void isCorrectCollectionWithOwner(List<Collection> collections, Long memberId) {
         if (!collections.stream()
                 .map(collection -> collection.getMember().getId()).allMatch(memberId1 -> memberId1.equals(memberId))) {
-            throw new NotMatchCollectionException();
+            throw new NotMatchCollectionException(ErrorEnum.NOT_MATCH_COLLECTION);
         }
     }
 
     private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
             if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
             if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId))) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
     }
 
     private Post findOneByIdWithCollectedPost(Long postId) {
-        return postRepository.findOneByIdWithCollectedPost(postId).orElseThrow(NotExistPostException::new);
+        return postRepository.findOneByIdWithCollectedPost(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private List<Collection> getCollections(List<Long> collectionIds) {
         List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
         if (collections.size() != collectionIds.size()) {
-            throw new NotMatchCollectionException();
+            throw new NotMatchCollectionException(ErrorEnum.NOT_MATCH_COLLECTION);
         }
         return collections;
     }
@@ -243,7 +247,7 @@ public class PostServiceJpa implements PostService{
     private List<String> getUrlByMultipartFile(List<MultipartFile> multipartFiles) throws IOException {
 
         if (multipartFiles.size() > POST_IMAGE_MAX.getLength()) {
-            throw new OverPostImageLengthException();
+            throw new IncorrectPostImageLengthException(ErrorEnum.INCORRECT_POST_IMAGE_LENGTH);
         } else if (multipartFiles.isEmpty()) {
             return Collections.emptyList();
         } else {

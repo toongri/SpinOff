@@ -8,7 +8,7 @@ import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
-import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
+import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
@@ -37,9 +37,9 @@ public class PostApiController {
                                          @RequestPart CreatePostVO createPostVO,
                                          @RequestPart("images") List<MultipartFile> multipartFiles) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
-            InCorrectHashtagContentException, AlreadyPostedHashtagException,
-            AlreadyCollectedPostException, AlreadyAuthorityOfPostStatusException,
-            OverTitleOfPostException, OverContentOfPostException, NotMatchCollectionException, IOException {
+            IncorrectHashtagContentException, AlreadyPostedHashtagException,
+            AlreadyCollectedPostException,
+            IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException {
 
         log.info("createOne");
         log.info("memberId : {}", currentMember.getId());

@@ -51,57 +51,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowedMember(@Param("id") Long id);
 
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithBlockedMember(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedHashtags followedHashtag " +
-            "LEFT JOIN FETCH m.followedMembers followedMember " +
-            "LEFT JOIN FETCH m.followedMovies followedMovie " +
-            "LEFT JOIN FETCH m.followedCollections followedCollection " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedContentsAndBlockedMember(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedMovies followedMovie " +
-            "LEFT JOIN FETCH m.followedMembers followedMember " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedMovieAndBlockedAndFollowedMember(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedMembers followedMember " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedMemberAndBlockedMember(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedMembers followedMember " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "LEFT JOIN FETCH m.roles " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedMemberAndBlockedMemberAndRoles(@Param("id") Long id);
-
-    @Query("SELECT DISTINCT m FROM Member m " +
-            "LEFT JOIN FETCH m.followedCollections followedCollection " +
-            "LEFT JOIN FETCH m.blockedMembers blockedMember " +
-            "WHERE m.id = :id")
-    Optional<Member> findOneByIdWithFollowedCollectionAndBlockedMember(@Param("id") Long id);
-
     List<Member> findAllByAccountIdOrNicknameOrEmail(String accountId, String nickname, String email);
 
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.searches " +
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithSearch(@Param("id") Long id);
-
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.blockingMembers blockingMembers " +
-            "WHERE blockingMembers.blockingMember.id = :id")
-    List<Member> findAllByBlockingMemberId(@Param("id") Long id);
 
     @Query("SELECT followingMember.member.id FROM FollowedMember followingMember " +
             "WHERE followingMember.followingMember.id = :id")

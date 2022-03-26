@@ -3,9 +3,9 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.QMemberDto_SearchAllMemberDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -41,6 +41,21 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .selectOne()
                 .from(member)
                 .where(member.id.eq(id))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isBlockedOrBlockingAboutAll(Long memberId, Long targetMemberId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(blockedMember)
+                .where(
+                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A),
+                        (blockedMember.member.id.eq(memberId).and(
+                                blockedMember.blockingMember.id.eq(targetMemberId))).or(
+                                blockedMember.blockingMember.id.eq(memberId).and(
+                                        blockedMember.member.id.eq(targetMemberId))))
                 .fetchFirst();
 
         return fetchOne != null;
@@ -104,15 +119,14 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Optional<BlockedMember> findOneByBlockingIdAndBlockedId(Long blockingMemberId, Long blockedMemberId) {
-        BlockedMember blockedMember = getQueryFactory()
-                .select(QBlockedMember.blockedMember)
-                .from(QBlockedMember.blockedMember)
-                .where(
-                        QBlockedMember.blockedMember.blockingMember.id.eq(blockingMemberId),
-                        QBlockedMember.blockedMember.member.id.eq(blockedMemberId))
-                .fetchFirst();
 
-        return Optional.ofNullable(blockedMember);
+        return Optional.ofNullable(getQueryFactory()
+                .select(blockedMember)
+                .from(blockedMember)
+                .where(
+                        blockedMember.blockingMember.id.eq(blockingMemberId),
+                        blockedMember.member.id.eq(blockedMemberId))
+                .fetchFirst());
     }
 
     private Slice<SearchMemberDto> MapContentToDtoForSearchPage(

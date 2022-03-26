@@ -8,8 +8,8 @@ import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -133,7 +133,7 @@ class CollectionServiceJpaTest {
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> collectionService.insertLikedCollectionByMemberId(mem.getId(), col2.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -206,7 +206,7 @@ class CollectionServiceJpaTest {
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> collectionService.insertFollowedCollectionByMemberId(mem.getId(), collection.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
     }
     
@@ -398,6 +398,6 @@ class CollectionServiceJpaTest {
         memberService.insertBlockedMemberByMemberId(mem2.getId(), mem.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 }

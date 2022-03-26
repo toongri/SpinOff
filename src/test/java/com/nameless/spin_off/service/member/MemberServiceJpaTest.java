@@ -7,6 +7,7 @@ import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.sign.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.EmailAuthRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;

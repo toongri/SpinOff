@@ -11,11 +11,11 @@ import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
-import com.nameless.spin_off.exception.hashtag.InCorrectHashtagContentException;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
+import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -68,15 +68,15 @@ class PostServiceJpaTest {
         //when
         System.out.println("서비스");
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
-                .isInstanceOf(InCorrectHashtagContentException.class);
+                .isInstanceOf(IncorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("_"));
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
-                .isInstanceOf(InCorrectHashtagContentException.class);
+                .isInstanceOf(IncorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg"));
         assertThatThrownBy(() -> postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList()))
-                .isInstanceOf(InCorrectHashtagContentException.class);
+                .isInstanceOf(IncorrectHashtagContentException.class);
 
         createPostVO.setHashtagContents(List.of("hashtag_what"));
         Long aLong = postService.insertPostByPostVO(createPostVO, member.getId(), Collections.emptyList());
@@ -278,7 +278,7 @@ class PostServiceJpaTest {
         em.flush();
         System.out.println("멤버차단");
         assertThatThrownBy(() -> postService.insertLikedPostByMemberId(mem.getId(), po2.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
     @Test

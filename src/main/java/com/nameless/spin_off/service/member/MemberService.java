@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.sign.AlreadyNicknameException;
 
 public interface MemberService {
 

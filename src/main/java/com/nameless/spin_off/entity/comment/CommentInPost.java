@@ -1,5 +1,6 @@
 package com.nameless.spin_off.entity.comment;
 
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -118,7 +119,7 @@ public class CommentInPost extends BaseTimeEntity {
         if (isNotAlreadyMemberLikeComment(member)) {
             return addCommentLike(member);
         } else {
-            throw new AlreadyLikedCommentInPostException();
+            throw new AlreadyLikedCommentInPostException(ErrorEnum.ALREADY_LIKED_COMMENT_IN_POST);
         }
     }
     //==조회 로직==//

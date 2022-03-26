@@ -16,25 +16,63 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
+    public static class QuickPostInCollectionDto {
+        private Long id;
+        private String title;
+
+        @QueryProjection
+        public QuickPostInCollectionDto(Long id, String title) {
+            this.id = id;
+            this.title = title;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class PostInCollectionDto {
         private Long id;
         private String title;
+        private String thumbnail;
         private boolean isCollected;
 
         @QueryProjection
-        public PostInCollectionDto(Long id, String title) {
+        public PostInCollectionDto(Long id, String title, String thumbnail) {
             this.id = id;
             this.title = title;
+            this.thumbnail = thumbnail;
             this.isCollected = false;
         }
     }
 
     @Data
-    @AllArgsConstructor
     public static class IdAndPublicCollectionDto {
         private Long id;
         private PublicOfCollectionStatus publicOfCollectionStatus;
+
+        @QueryProjection
+        public IdAndPublicCollectionDto(Long id, PublicOfCollectionStatus publicOfCollectionStatus) {
+            this.id = id;
+            this.publicOfCollectionStatus = publicOfCollectionStatus;
+        }
     }
+
+    @Data
+    @NoArgsConstructor
+    public static class FollowCollectionMemberDto {
+        private Long collectionId;
+        private Long memberId;
+        private Double memberPopularity;
+        private String memberNickname;
+
+        @QueryProjection
+        public FollowCollectionMemberDto(Long collectionId, Long memberId, Double memberPopularity, String memberNickname) {
+            this.collectionId = collectionId;
+            this.memberId = memberId;
+            this.memberPopularity = memberPopularity;
+            this.memberNickname = memberNickname;
+        }
+    }
+
 
     @Data
     @NoArgsConstructor
@@ -46,45 +84,47 @@ public class CollectionDto {
         private String memberAccountId;
         private List<String> thumbnailUrls = new ArrayList<>();
         private String followingMemberNickname;
-        private int followingNumber;
+        private int followingCount;
 
-        public SearchCollectionDto(Collection collection, List<Long> followingMembers) {
-            this.collectionId = collection.getId();
-            this.collectionTitle = collection.getTitle();
-            this.memberId = collection.getMember().getId();
-            this.memberAccountId = collection.getMember().getAccountId();
-            if (collection.getFirstThumbnail() != null) {
-                thumbnailUrls.add(collection.getFirstThumbnail());
+        @QueryProjection
+        public SearchCollectionDto(Long collectionId, String collectionTitle, Long memberId, String memberAccountId,
+                                   String thumbnail1, String thumbnail2, String thumbnail3, String thumbnail4,
+                                   Long followedMemberCount) {
 
-                if (collection.getSecondThumbnail() != null) {
-                    thumbnailUrls.add(collection.getSecondThumbnail());
+            this.collectionId = collectionId;
+            this.collectionTitle = collectionTitle;
+            this.memberId = memberId;
+            this.memberAccountId = memberAccountId;
+            this.followingCount = followedMemberCount.intValue();
+            if (thumbnail1 != null) {
+                thumbnailUrls.add(thumbnail1);
 
-                    if (collection.getThirdThumbnail() != null) {
-                        thumbnailUrls.add(collection.getThirdThumbnail());
+                if (thumbnail2 != null) {
+                    thumbnailUrls.add(thumbnail2);
 
-                        if (collection.getFourthThumbnail() != null) {
-                            thumbnailUrls.add(collection.getFourthThumbnail());
+                    if (thumbnail3 != null) {
+                        thumbnailUrls.add(thumbnail3);
+
+                        if (thumbnail4 != null) {
+                            thumbnailUrls.add(thumbnail4);
                         }
                     }
                 }
             }
-            if (!followingMembers.isEmpty()) {
-                findRelatedMember(followingMembers, collection.getFollowingMembers());
+        }
+
+        public void setFollowingMember(List<FollowCollectionMemberDto> followedCollections) {
+            if (followedCollections != null) {
+                followedCollections.stream()
+                        .max(Comparator.comparing(
+                                c -> c.memberPopularity))
+                        .ifPresent(c -> setFollowingMemberNickname(c.getMemberNickname()));
             }
         }
 
-        private void findRelatedMember(List<Long> followingMembers, List<FollowedCollection> followedCollections) {
-            followedCollections.stream()
-                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember().getId()))
-                    .max(Comparator.comparing(
-                            followedCollection -> followedCollection.getMember().getPopularity()))
-                    .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
-                            followedCollection.getMember().getNickname(), followedCollections.size()));
-        }
-
-        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
+        public void setFollowingMemberNickname(String nickname) {
             this.followingMemberNickname = nickname;
-            this.followingNumber = size - 1;
+            this.followingCount -= 1;
         }
     }
 
@@ -98,7 +138,32 @@ public class CollectionDto {
         private String memberAccountId;
         private String thumbnailUrl;
         private String followingMemberNickname;
-        private int followingNumber;
+        private int followingCount;
+
+        @QueryProjection
+        public SearchAllCollectionDto(Long collectionId, String collectionTitle, Long memberId, String memberAccountId,
+                                      String thumbnailUrl, Long followedMemberCount) {
+            this.collectionId = collectionId;
+            this.collectionTitle = collectionTitle;
+            this.memberId = memberId;
+            this.memberAccountId = memberAccountId;
+            this.thumbnailUrl = thumbnailUrl;
+            this.followingCount = followedMemberCount.intValue();
+        }
+
+        public void setFollowingMember(List<FollowCollectionMemberDto> followedCollections) {
+            if (followedCollections != null) {
+                followedCollections.stream()
+                        .max(Comparator.comparing(
+                                c -> c.memberPopularity))
+                        .ifPresent(c -> setFollowingMemberNickname(c.getMemberNickname()));
+            }
+        }
+
+        public void setFollowingMemberNickname(String nickname) {
+            this.followingMemberNickname = nickname;
+            this.followingCount -= 1;
+        }
 
         public SearchAllCollectionDto(Collection collection, List<Long> followingMembers) {
             this.collectionId = collection.getId();
@@ -122,7 +187,7 @@ public class CollectionDto {
 
         public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
             this.followingMemberNickname = nickname;
-            this.followingNumber = size - 1;
+            this.followingCount = size - 1;
         }
     }
 
@@ -161,20 +226,6 @@ public class CollectionDto {
                 this.thumbnailUrls.add(thumbnailUrl1);
                 if (thumbnailUrl2 != null) {
                     this.thumbnailUrls.add(thumbnailUrl2);
-                }
-            }
-        }
-
-        public MainPageCollectionDto(Collection collection) {
-
-            this.collectionId = collection.getId();
-            this.collectionTitle = collection.getTitle();
-            this.memberId = collection.getMember().getId();
-            this.memberNickname = collection.getMember().getNickname();
-            if (collection.getFirstThumbnail() != null) {
-                this.thumbnailUrls.add(collection.getFirstThumbnail());
-                if (collection.getSecondThumbnail() != null) {
-                    this.thumbnailUrls.add(collection.getSecondThumbnail());
                 }
             }
         }

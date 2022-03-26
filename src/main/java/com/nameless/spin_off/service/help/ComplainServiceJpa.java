@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.help;
 
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.help.Complain;
@@ -79,27 +80,27 @@ public class ComplainServiceJpa implements ComplainService{
             isExistMember(complainedId);
             memberId = complainedId;
         } else {
-            throw new UnknownContentTypeException();
+            throw new UnknownContentTypeException(ErrorEnum.UNKNOWN_CONTENT_TYPE);
         }
         return memberId;
     }
 
     private void isExistMember(Long memberId) {
         if (!memberQueryRepository.isExist(memberId)) {
-            throw new NotExistMemberException();
+            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
         }
     }
 
     private void isExistComplain(Long memberId, Long contentId, ContentTypeStatus contentTypeStatus) {
         if (complainQueryRepository.isExistComplain(memberId, contentId, contentTypeStatus)) {
-            throw new AlreadyComplainException();
+            throw new AlreadyComplainException(ErrorEnum.ALREADY_COMPLAIN);
         }
     }
     private Long getCollectionOwnerId(Long collectionId) {
         Long collectionOwnerId = collectionQueryRepository.findOwnerIdByCollectionId(collectionId);
 
         if (collectionOwnerId == null) {
-            throw new NotExistCollectionException();
+            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
         } else {
             return collectionOwnerId;
         }
@@ -109,7 +110,7 @@ public class ComplainServiceJpa implements ComplainService{
         Long collectionOwnerId = postQueryRepository.findOwnerIdByPostId(postId);
 
         if (collectionOwnerId == null) {
-            throw new NotExistPostException();
+            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         } else {
             return collectionOwnerId;
         }
@@ -119,7 +120,7 @@ public class ComplainServiceJpa implements ComplainService{
         Long collectionOwnerId = commentInCollectionQueryRepository.getCommentOwnerId(commentId);
 
         if (collectionOwnerId == null) {
-            throw new NotExistCommentInCollectionException();
+            throw new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION);
         } else {
             return collectionOwnerId;
         }
@@ -129,7 +130,7 @@ public class ComplainServiceJpa implements ComplainService{
         Long collectionOwnerId = commentInPostQueryRepository.findCommentOwnerId(commentId);
 
         if (collectionOwnerId == null) {
-            throw new NotExistCommentInPostException();
+            throw new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST);
         } else {
             return collectionOwnerId;
         }
@@ -139,7 +140,7 @@ public class ComplainServiceJpa implements ComplainService{
         Long collectionOwnerId = directMessageQueryRepository.getDMOwnerId(dmId);
 
         if (collectionOwnerId == null) {
-            throw new NotExistDMException();
+            throw new NotExistDMException(ErrorEnum.NOT_EXIST_DM);
         } else {
             return collectionOwnerId;
         }

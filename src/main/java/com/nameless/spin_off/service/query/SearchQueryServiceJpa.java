@@ -8,9 +8,9 @@ import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
-import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
+import com.nameless.spin_off.exception.search.IncorrectLengthRelatedKeywordException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
@@ -40,12 +40,12 @@ public class SearchQueryServiceJpa implements SearchQueryService {
 
     @Override
     public RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword, int length)
-            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
 
         if (keyword.length() < RELATED_SEARCH_KEYWORD_MIN_STR.getValue()) {
-            throw new UnderLengthRelatedKeywordException();
+            throw new IncorrectLengthRelatedKeywordException(ErrorEnum.INCORRECT_LENGTH_RELATED_KEYWORD);
         } else if (keyword.length() > RELATED_SEARCH_KEYWORD_MAX_STR.getValue()) {
-            throw new OverLengthRelatedKeywordException();
+            throw new IncorrectLengthRelatedKeywordException(ErrorEnum.INCORRECT_LENGTH_RELATED_KEYWORD);
         } else {
             return getRelatedSearchDtoByKeyword(keyword, length);
         }
@@ -53,13 +53,13 @@ public class SearchQueryServiceJpa implements SearchQueryService {
 
     @Override
     public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword, int length)
-            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
         return searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, length);
     }
 
     @Override
     public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword, int length)
-            throws OverLengthRelatedKeywordException, UnderLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
         return searchQueryRepository.findRelatedMembersAboutKeyword(keyword, length);
     }
 
@@ -79,7 +79,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
         return new SearchAllDto(
                 postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, postPageable, blockedMembers),
                 collectionQueryRepository.findAllSlicedForSearchPageAtAll(
-                        keyword, collectionPageable, followedMembers, blockedMembers),
+                        keyword, collectionPageable, blockedMembers, memberId),
                 movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, moviePageable),
                 memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, memberPageable, blockedMembers));
     }
@@ -89,7 +89,6 @@ public class SearchQueryServiceJpa implements SearchQueryService {
             String keyword, Long memberId, int length, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-        List<Long> followedMembers = getFollowedMemberByMemberId(memberId);
         List<Long> blockedMembers = getBlockedMemberByMemberId(memberId);
 
         Slice<SearchPageAtAllPostDto> posts = postQueryRepository.findAllSlicedForSearchPageAtAll(
@@ -99,7 +98,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
                 new SearchAllDto(
                 posts,
                 collectionQueryRepository.findAllSlicedForSearchPageAtAll(
-                        keyword, collectionPageable, followedMembers, blockedMembers),
+                        keyword, collectionPageable, blockedMembers, memberId),
                 movieQueryRepository.findAllSlicedForSearchPageAtAll(
                         keyword, moviePageable),
                 memberQueryRepository.findAllSlicedForSearchPageAtAll(

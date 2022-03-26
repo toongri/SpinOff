@@ -14,8 +14,7 @@ import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
-import com.nameless.spin_off.exception.search.OverLengthRelatedKeywordException;
-import com.nameless.spin_off.exception.search.UnderLengthRelatedKeywordException;
+import com.nameless.spin_off.exception.search.IncorrectLengthRelatedKeywordException;
 import com.nameless.spin_off.service.query.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -44,7 +43,7 @@ public class SearchApiController {
     @GetMapping("/related/all/{keyword}")
     public SearchApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(
             @PathVariable String keyword, @RequestParam int length)
-            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
 
         return getResult(
                 searchQueryService.getRelatedSearchAllByKeyword(keyword, length));
@@ -53,7 +52,7 @@ public class SearchApiController {
     @GetMapping("/related/hashtag/{keyword}")
     public SearchApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(
             @PathVariable String keyword, @RequestParam int length)
-            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
 
         return getResult(
                 searchQueryService.getRelatedSearchHashtagByKeyword(keyword, length));
@@ -62,7 +61,7 @@ public class SearchApiController {
     @GetMapping("/related/member/{keyword}")
     public SearchApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword
             (@PathVariable String keyword, @RequestParam int length)
-            throws UnderLengthRelatedKeywordException, OverLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
 
         return getResult(
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));

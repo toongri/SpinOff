@@ -1,21 +1,23 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
-import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
-import com.nameless.spin_off.dto.PostDto.visitPostDto;
+import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
-import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
+import com.nameless.spin_off.repository.query.CommentInPostQueryRepository;
+import com.nameless.spin_off.repository.query.HashtagQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,10 +38,9 @@ public class PostQueryServiceJpa implements PostQueryService{
     private final MemberRepository memberRepository;
     private final HashtagRepository hashtagRepository;
     private final MovieRepository movieRepository;
-    private List<Long> blockedMemberIds;
-    private List<Long> followedMemberIds;
-    private List<Hashtag> hashtagIds;
-    private List<Long> movieIds;
+    private final MemberQueryRepository memberQueryRepository;
+    private final HashtagQueryRepository hashtagQueryRepository;
+    private final CommentInPostQueryRepository commentInPostQueryRepository;
 
     @Override
     public Slice<SearchPageAtAllPostDto> getPostsSlicedForSearchPagePostAtAll(
@@ -90,32 +90,48 @@ public class PostQueryServiceJpa implements PostQueryService{
     public SearchFirstDto<Slice<SearchPageAtHashtagPostDto>> getPostsByHashtagsSlicedForSearchPageFirst(
             Pageable pageable, List<String> hashtagContent, Long memberId, int length) {
 
-        hashtagIds = hashtagRepository.findAllByContentIn(hashtagContent);
-        blockedMemberIds = memberRepository.findAllByBlockingMemberId(memberId).stream().map(Member::getId).collect(Collectors.toList());
+        List<Hashtag> hashtags = hashtagRepository.findAllByContentIn(hashtagContent);
+
         return new SearchFirstDto<>(
-                postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtagIds, blockedMemberIds),
-                hashtagIds.stream().map(RelatedMostTaggedHashtagDto::new).limit(length).collect(Collectors.toList()));
+                postQueryRepository.findAllByHashtagsSlicedForSearchPage(
+                        pageable,
+                        hashtags.stream().map(Hashtag::getId).collect(Collectors.toList()),
+                        getBlockedMemberByMemberId(memberId)),
+                hashtags.stream().map(RelatedMostTaggedHashtagDto::new).limit(length).collect(Collectors.toList()));
     }
 
     @Override
     public Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(
             Pageable pageable, List<String> hashtagContent, Long memberId) {
 
-        hashtagIds = hashtagRepository.findAllByContentIn(hashtagContent);
-        blockedMemberIds = memberRepository.findAllByBlockingMemberId(memberId).stream().map(Member::getId).collect(Collectors.toList());
-
-        return postQueryRepository.findAllByHashtagsSlicedForSearchPage(pageable, hashtagIds, blockedMemberIds);
+        return postQueryRepository.findAllByHashtagsSlicedForSearchPage(
+                pageable,
+                hashtagRepository.findAllIdByContentIn(hashtagContent),
+                getBlockedMemberByMemberId(memberId));
     }
 
     @Override
-    public visitPostDto visitPost(Long memberId, Long postId) {
+    public RelatedPostFirstDto<VisitPostDto> visitPost(MemberDetails currentMember, Long postId, Pageable pageable) {
 
-        Member member = findOneByIdWithFollowedMemberAndBlockedMemberAndRoles(memberId);
-        setMemberInfoByMember(member);
+        Long memberId = currentMember.getId();
+        List<Long> blockedMemberIds = getBlockedMemberByMemberId(memberId);
+        VisitPostDto post = getOneByPostId(postId, memberId, blockedMemberIds);
+        isExistBlockedMember(memberId, post.getMember().getMemberId());
+        post.setHasAuth(memberId, currentMember.isAdmin());
+        post.setIsLiked(isExistLikedPost(memberId, postId));
+        post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
+        List<ContentHashtagDto> hashtags = hashtagQueryRepository.findAllByPostId(postId);
+        post.setHashtags(hashtags);
 
-        Post post = getPostByIdWithHashtagAndMovieAndMember(postId);
 
-        return new visitPostDto(post, memberId, isAdmin(member));
+
+        return new RelatedPostFirstDto<>(
+                post, postQueryRepository.findAllRelatedPostByPostId(pageable, memberId, blockedMemberIds, postId));
+    }
+
+    private VisitPostDto getOneByPostId(Long postId, Long memberId, List<Long> blockedMemberIds) {
+        return postQueryRepository.findOneByPostId(postId, blockedMemberIds)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     @Override
@@ -123,25 +139,9 @@ public class PostQueryServiceJpa implements PostQueryService{
         return null;
     }
 
-    private boolean isAdmin(Member member) {
-        return member.getRoles().stream().anyMatch(AuthorityOfMemberStatus.A::equals);
-    }
-
-    private Member findOneByIdWithFollowedMemberAndBlockedMemberAndRoles(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithFollowedMemberAndBlockedMemberAndRoles(memberId);
-
-        return optionalMember.orElseThrow(NotExistMemberException::new);
-    }
-
-    private void setMemberInfoByMember(Member member) {
-        followedMemberIds =
-                member.getFollowedMembers().stream().map(followedMember -> followedMember.getMember().getId()).collect(Collectors.toList());
-        blockedMemberIds =
-                member.getBlockedMembers().stream().map(blockedMember -> blockedMember.getMember().getId()).collect(Collectors.toList());
-    }
-
     private Post getPostByIdWithHashtagAndMovieAndMember(Long postId) {
-        return postQueryRepository.findOneByIdWithHashtagAndMovieAndMember(postId).orElseThrow(NotExistPostException::new);
+        return postQueryRepository.findOneByIdWithHashtagAndMovieAndMember(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private List<Long> getBlockedMemberByMemberId(Long memberId) {
@@ -160,11 +160,25 @@ public class PostQueryServiceJpa implements PostQueryService{
         }
     }
 
+    private void isExistBlockedMember(Long memberId, Long targetMemberId) {
+        if (memberQueryRepository.isExistBlockedMember(memberId, targetMemberId)) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+    }
+
     private List<Long> getFollowedMovieByMemberId(Long memberId) {
         if (memberId != null) {
             return movieRepository.findAllIdByFollowingMemberId(memberId);
         } else{
             return new ArrayList<>();
         }
+    }
+
+    private boolean isExistFollowedMember(Long memberId, Long followedMemberId) {
+        return memberQueryRepository.isExistFollowedMember(memberId, followedMemberId);
+    }
+
+    private boolean isExistLikedPost(Long memberId, Long postId) {
+        return postQueryRepository.isExistLikedPost(memberId, postId);
     }
 }

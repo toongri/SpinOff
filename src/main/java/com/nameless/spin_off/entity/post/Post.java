@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.PostDto.PostBuilder;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.post.AuthorityOfPostStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -14,8 +15,8 @@ import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
-import com.nameless.spin_off.exception.post.OverContentOfPostException;
-import com.nameless.spin_off.exception.post.OverTitleOfPostException;
+import com.nameless.spin_off.exception.post.IncorrectContentOfPostException;
+import com.nameless.spin_off.exception.post.IncorrectTitleOfPostException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -151,7 +152,7 @@ public class Post {
         PostedHashtag postedHashtag = PostedHashtag.createPostedHashtag(hashtag, this);
 
         if (!this.postedHashtags.add(postedHashtag)) {
-            throw new AlreadyPostedHashtagException();
+            throw new AlreadyPostedHashtagException(ErrorEnum.ALREADY_POSTED_HASHTAG);
         }
         hashtag.addTaggedPosts(postedHashtag);
     }
@@ -172,16 +173,16 @@ public class Post {
     public static Post createPost(Member member, String title, String content, String thumbnailUrl,
                                   List<Hashtag> hashtags, List<String> urls,
                                   Movie movie, PublicOfPostStatus publicOfPostStatus)
-            throws AlreadyPostedHashtagException, OverTitleOfPostException, OverContentOfPostException {
+            throws AlreadyPostedHashtagException, IncorrectTitleOfPostException, IncorrectContentOfPostException {
         Post post = new Post();
         member.addPost(post);
 
         if (title.length() > TITLE_LENGTH_MAX.getValue()) {
-            throw new OverTitleOfPostException();
+            throw new IncorrectTitleOfPostException(ErrorEnum.INCORRECT_TITLE_OF_POST);
         }
         post.updateTitle(title);
         if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
-            throw new OverContentOfPostException();
+            throw new IncorrectContentOfPostException(ErrorEnum.INCORRECT_CONTENT_OF_POST);
         }
         post.updateContent(content);
         post.updateThumbnailUrl(thumbnailUrl);
@@ -262,7 +263,7 @@ public class Post {
         if (isNotAlreadyCollectedPosts(collections)) {
             return addAllCollectedPost(collections);
         } else {
-            throw new AlreadyCollectedPostException();
+            throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
         }
     }
 
@@ -280,7 +281,7 @@ public class Post {
         if (isNotAlreadyMemberLikePost(member)) {
             return addLikedPostByMember(member);
         } else {
-            throw new AlreadyLikedPostException();
+            throw new AlreadyLikedPostException(ErrorEnum.ALREADY_LIKED_POST);
         }
     }
 
@@ -290,7 +291,7 @@ public class Post {
             return null;
 
         return commentInPosts.stream().filter(comment -> comment.getId().equals(commentInPostId))
-                .findAny().orElseThrow(NotExistCommentInPostException::new);
+                .findAny().orElseThrow(() -> new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST));
 
     }
 

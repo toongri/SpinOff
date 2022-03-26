@@ -3,6 +3,7 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.help.ComplainStatus;
 import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
@@ -103,7 +104,7 @@ public class Member extends BaseTimeEntity {
         FollowedHashtag followedHashtag = FollowedHashtag.createFollowedHashtag(this, hashtag);
 
         if (!this.followedHashtags.add(followedHashtag)) {
-            throw new AlreadyFollowedHashtagException();
+            throw new AlreadyFollowedHashtagException(ErrorEnum.ALREADY_FOLLOWED_HASHTAG);
         }
         hashtag.addFollowingMembers(followedHashtag);
 
@@ -114,7 +115,7 @@ public class Member extends BaseTimeEntity {
         FollowedMovie followedMovie = FollowedMovie.createFollowedMovie(this, movie);
 
         if (!this.followedMovies.add(followedMovie)) {
-            throw new AlreadyFollowedMovieException();
+            throw new AlreadyFollowedMovieException(ErrorEnum.ALREADY_FOLLOWED_MOVIE);
         }
         movie.addFollowingMembers(followedMovie);
 
@@ -125,7 +126,7 @@ public class Member extends BaseTimeEntity {
         FollowedMember newFollowedMember = FollowedMember.createFollowedMember(this, followedMember);
 
         if (!this.followedMembers.add(newFollowedMember)) {
-            throw new AlreadyFollowedMemberException();
+            throw new AlreadyFollowedMemberException(ErrorEnum.ALREADY_FOLLOWED_MEMBER);
         }
 
         followedMember.addFollowingMember(newFollowedMember);
@@ -137,7 +138,7 @@ public class Member extends BaseTimeEntity {
         BlockedMember newBlockedMember = BlockedMember.createBlockedMember(this, blockedMember, blockedMemberStatus);
 
         if (!this.blockedMembers.add(newBlockedMember)) {
-            throw new AlreadyBlockedMemberException();
+            throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
         }
         blockedMember.addBlockingMember(newBlockedMember);
 
@@ -161,7 +162,7 @@ public class Member extends BaseTimeEntity {
         Complain complain = Complain.createComplain(member, this, contentId, contentTypeStatus, complainStatus);
 
         if (!this.complains.add(complain)) {
-            throw new AlreadyComplainException();
+            throw new AlreadyComplainException(ErrorEnum.ALREADY_COMPLAIN);
         }
 
         return complain.getId();

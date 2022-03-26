@@ -9,7 +9,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
@@ -172,11 +172,11 @@ class CommentInCollectionServiceJpaTest {
         em.flush();
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
                 new CreateCommentInCollectionVO(col2.getId(), null, ""), mem.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
                 new CreateCommentInCollectionVO(col.getId(), aLong, ""), mem.getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
     @Test
@@ -241,7 +241,7 @@ class CommentInCollectionServiceJpaTest {
         memberService.insertBlockedMemberByMemberId(member.getId(), mem.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> commentInCollectionService.insertLikedCommentByMemberId(member.getId(), col.getCommentInCollections().get(0).getId()))
-                .isInstanceOf(DontHaveAccessException.class);//.hasMessageContaining("")
+                .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
 }

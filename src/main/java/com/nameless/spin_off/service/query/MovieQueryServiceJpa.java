@@ -6,6 +6,7 @@ import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -64,7 +65,7 @@ public class MovieQueryServiceJpa implements MovieQueryService{
             Optional<Movie> optionalMovie =
                     movieRepository.findOneByIdWithTaggedPost(movies.getContent().get(0).getMovieId());
 
-            Movie movie = optionalMovie.orElseThrow(NotExistMovieException::new);
+            Movie movie = optionalMovie.orElseThrow(() -> new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE));
 
             return new SearchMovieAboutFirstMovieDto(movie);
 

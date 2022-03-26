@@ -1,16 +1,11 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.dto.PostDto.IdAndPublicPostDto;
-import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
-import com.nameless.spin_off.dto.QPostDto_MainPagePostDto;
-import com.nameless.spin_off.dto.QPostDto_SearchPageAtAllPostDto;
-import com.nameless.spin_off.dto.QPostDto_SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.*;
+import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.entity.hashtag.QPostedHashtag;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
@@ -102,16 +97,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Long countComment(Long memberId, Long postId, List<Long> blockedMemberIds) {
-        return getQueryFactory()
-                .select(commentInPost.id)
-                .from(commentInPost)
-                .where(
-                        commentInPost.post.id.eq(postId),
-                        commentInPost.member.id.notIn(blockedMemberIds))
-                .fetchCount();
-    }
-
     public Boolean isFollowMembersPost(Long memberId, Long postId) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
@@ -190,11 +175,14 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .from(post)
                 .join(post.member, member)
                 .where(
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
                         post.title.contains(keyword),
                         memberNotIn(blockedMemberIds)));
     }
 
     public Slice<MainPagePostDto> findAllSlicedForMainPage(Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
+        blockedMemberIds.add(memberId);
+
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
                         post.id,
@@ -205,9 +193,36 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member)
-                .where(post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
-                        memberNotIn(blockedMemberIds),
-                        memberNotEq(memberId)));
+                .where(
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
+                        member.id.notIn(blockedMemberIds)));
+    }
+
+    public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable, Long memberId,
+                                                             List<Long> blockedMemberIds, Long postId) {
+        blockedMemberIds.add(memberId);
+        QPostedHashtag relatedPostHashtag = new QPostedHashtag("relatedPostHashtag");
+
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QPostDto_RelatedPostDto(
+                        post.id,
+                        post.title,
+                        member.id,
+                        member.nickname,
+                        member.profileImg,
+                        post.thumbnailUrl))
+                .from(post)
+                .join(post.member, member)
+                .join(post.postedHashtags, postedHashtag)
+                .join(postedHashtag.hashtag, hashtag)
+                .join(hashtag.taggedPosts, relatedPostHashtag)
+                .groupBy(post)
+                .where(
+                        postedHashtag.count().goe(5),
+                        relatedPostHashtag.post.id.eq(postId),
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
+                        member.id.notIn(blockedMemberIds))
+                .orderBy(postedHashtag.count().desc()));
     }
 
     public Slice<MainPagePostDto> findAllByFollowingMemberSlicedForMainPage(
@@ -229,6 +244,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
             Pageable pageable, List<Long> followedMovies, List<Long> followedMemberIds,
             List<Long> blockedMemberIds, Long memberId) {
 
+        blockedMemberIds.addAll(followedMemberIds);
+
         return applySlicing(pageable, contentQuery -> contentQuery
                 .selectDistinct(new QPostDto_MainPagePostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
@@ -241,13 +258,14 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         followedHashtag.member.id.eq(memberId),
                         postedMovieNotIn(followedMovies),
-                        memberNotIn(followedMemberIds),
                         memberNotIn(blockedMemberIds),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPagePostDto> findAllByFollowedMoviesSlicedForMainPage(
             Pageable pageable, List<Long> followedMemberIds, List<Long> blockedMemberIds, Long memberId) {
+        blockedMemberIds.addAll(followedMemberIds);
+
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
@@ -257,20 +275,38 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(movie.followingMembers, followedMovie)
                 .where(
                         followedMovie.member.id.eq(memberId),
-                        memberNotIn(followedMemberIds),
                         memberNotIn(blockedMemberIds),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
+    public Optional<VisitPostDto> findOneByPostId(Long postId, List<Long> blockedMemberIds) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QPostDto_VisitPostDto(
+                        post.id, member.id, member.profileImg, member.nickname, member.accountId, post.title,
+                        post.createdDate, post.lastModifiedDate, post.content, movie.thumbnail, movie.title,
+                        movie.directorName, likedPost.count(), commentInPost.count(), post.publicOfPostStatus))
+                .from(post)
+                .join(post.member, member)
+                .leftJoin(post.movie, movie)
+                .leftJoin(post.likedPosts, likedPost)
+                .leftJoin(post.commentInPosts, commentInPost)
+                .groupBy(post)
+                .where(
+                        likedPost.member.id.in(blockedMemberIds),
+                        commentInPost.member.id.in(blockedMemberIds),
+                        post.id.eq(postId))
+                .fetchFirst());
+    }
+
     public Slice<SearchPageAtHashtagPostDto> findAllByHashtagsSlicedForSearchPage(
-            Pageable pageable, List<Hashtag> hashtags, List<Long> blockedMemberIds) {
+            Pageable pageable, List<Long> hashtagIds, List<Long> blockedMemberIds) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .selectDistinct(new QPostDto_SearchPageAtHashtagPostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
                 .from(post)
                 .join(post.member, member)
                 .join(post.postedHashtags, postedHashtag)
-                .where(postedHashtag.hashtag.in(hashtags),
+                .where(postedHashtag.hashtag.id.in(hashtagIds),
                         memberNotIn(blockedMemberIds),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }

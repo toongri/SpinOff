@@ -6,12 +6,13 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.collection.LikedCollection;
 import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
-import com.nameless.spin_off.exception.member.DontHaveAccessException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.collection.LikedCollectionRepository;
@@ -38,7 +39,7 @@ public class CollectionServiceJpa implements CollectionService {
     @Transactional
     @Override
     public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO, Long memberId)
-            throws NotExistMemberException, OverTitleOfCollectionException, OverContentOfCollectionException {
+            throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         return collectionRepository.save(Collection.createCollection(
                 Member.createMember(memberId), collectionVO.getTitle(),
@@ -102,7 +103,7 @@ public class CollectionServiceJpa implements CollectionService {
     private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
         PublicOfCollectionStatus publicCollection = collectionQueryRepository.findPublicByCollectionId(collectionId);
         if (publicCollection == null) {
-            throw new NotExistCollectionException();
+            throw new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY);
         } else {
             return publicCollection;
         }
@@ -111,43 +112,44 @@ public class CollectionServiceJpa implements CollectionService {
     private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
             if (!collectionQueryRepository.isFollowMembersCollection(memberId, collectionId)) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
             if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId))) {
-                throw new DontHaveAccessException();
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
     }
 
     private void isBlockedMemberCollection(Long memberId, Long collectionId) {
         if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
-            throw new DontHaveAccessException();
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }
 
     private void isExistLikedCollection(Long memberId, Long collectionId) {
         if (collectionQueryRepository.isExistLikedCollection(memberId, collectionId)) {
-            throw new AlreadyLikedCollectionException();
+            throw new AlreadyLikedCollectionException(ErrorEnum.ALREADY_LIKED_COLLECTION);
         }
     }
 
     private void isExistFollowedCollection(Long memberId, Long collectionId) {
         if (collectionQueryRepository.isExistFollowedCollection(memberId, collectionId)) {
-            throw new AlreadyFollowedCollectionException();
+            throw new AlreadyFollowedCollectionException(ErrorEnum.ALREADY_FOLLOWED_COLLECTION);
         }
     }
 
     private PublicOfCollectionStatus isCorrectIdAndGetPublic(Long memberId, Long collectionId) {
         IdAndPublicCollectionDto idAndPublic = collectionQueryRepository
-                .findCollectionOwnerIdAndPublic(collectionId).orElseThrow(NotExistCollectionException::new);
+                .findCollectionOwnerIdAndPublic(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
 
         if (idAndPublic.getId().equals(memberId)) {
-            throw new CantFollowOwnCollectionException();
+            throw new CantFollowOwnCollectionException(ErrorEnum.CANT_FOLLOW_OWN_COLLECTION);
         } else {
             return idAndPublic.getPublicOfCollectionStatus();
         }
@@ -159,7 +161,7 @@ public class CollectionServiceJpa implements CollectionService {
 
     private void isExistCollection(Long collectionId) {
         if (!collectionQueryRepository.isExist(collectionId)) {
-            throw new NotExistCollectionException();
+            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
         }
     }
 }

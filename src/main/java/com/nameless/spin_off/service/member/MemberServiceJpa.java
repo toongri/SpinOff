@@ -4,10 +4,16 @@ import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.*;
 import com.nameless.spin_off.entity.member.*;
-import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.member.AlreadyAccountIdException;
+import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
+import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
+import com.nameless.spin_off.exception.sign.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.member.*;
@@ -76,7 +82,6 @@ public class MemberServiceJpa implements MemberService {
 
         EmailAuth emailAuth = emailAuthRepository.save(EmailAuth.builder()
                 .email(email)
-//                .authToken(UUID.randomUUID().toString())
                 .authToken(RandomStringUtils.randomAlphabetic(EMAIL_TOKEN.getLength()))
                 .expired(false)
                 .provider(EmailAuthProviderStatus.A)
@@ -91,7 +96,7 @@ public class MemberServiceJpa implements MemberService {
         isCorrectEmail(email);
         String accountId = memberQueryRepository.findAccountIdByEmail(email);
         if (accountId == null) {
-            throw new NotExistMemberException();
+            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
         } else {
             emailService.sendForAccountId(email, accountId);
         }
@@ -104,7 +109,8 @@ public class MemberServiceJpa implements MemberService {
         isCorrectAccountId(accountId);
         Optional<Member> optionalMember = memberRepository.findOneByAccountId(accountId);
 
-        Member member = optionalMember.orElseThrow(NotExistMemberException::new);
+        Member member = optionalMember
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
 
         String randomPassword = getRandomPassword();
         member.updateAccountPw(passwordEncoder.encode(randomPassword));
@@ -155,7 +161,7 @@ public class MemberServiceJpa implements MemberService {
                         requestDto.getAuthToken(),
                         EMAIL_AUTH_MINUTE.getDateTime(),
                         EmailAuthProviderStatus.A)
-                .orElseThrow(NotExistEmailAuthTokenException::new);
+                .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
         emailAuth.useToken();
         return true;
@@ -180,11 +186,12 @@ public class MemberServiceJpa implements MemberService {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
                         requestDto.getAccountId(), requestDto.getEmail(),
                         requestDto.getAuthToken(), EMAIL_AUTH_MINUTE.getDateTime())
-                .orElseThrow(NotExistEmailAuthTokenException::new);
+                .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
         Member member =
                 memberRepository
-                        .findOneByAccountId(requestDto.getAccountId()).orElseThrow(NotExistMemberException::new);
+                        .findOneByAccountId(requestDto.getAccountId())
+                        .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
 
         String provider = getProviderByEmail(requestDto.getEmail());
 
@@ -219,10 +226,11 @@ public class MemberServiceJpa implements MemberService {
     public MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto) {
         isCorrectLoginRequest(requestDto);
         Member member =
-                memberRepository.findOneByAccountId(requestDto.getAccountId()).orElseThrow(LoginFailureException::new);
+                memberRepository.findOneByAccountId(requestDto.getAccountId())
+                        .orElseThrow(() -> new NotExistAccountIdException(ErrorEnum.NOT_EXIST_ACCOUNT_ID));
 
         if (!passwordEncoder.matches(requestDto.getAccountPw(), member.getAccountPw())) {
-            throw new LoginFailureException();
+            throw new NotMatchAccountPwException(ErrorEnum.NOT_MATCH_ACCOUNT_PW);
         } else {
             member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
             return new MemberLoginResponseDto(
@@ -234,12 +242,12 @@ public class MemberServiceJpa implements MemberService {
     @Override
     public TokenResponseDto reIssue(TokenRequestDto requestDto) {
         if (!jwtTokenProvider.validateTokenExpiration(requestDto.getRefreshToken())) {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException(ErrorEnum.INVALID_REFRESH_TOKEN);
         }
         Member member = findMemberByToken(requestDto);
 
         if (!member.getRefreshToken().equals(requestDto.getRefreshToken())) {
-            throw new InvalidRefreshTokenException();
+            throw new InvalidRefreshTokenException(ErrorEnum.INVALID_REFRESH_TOKEN);
         }
         String accessToken = jwtTokenProvider.createToken(member.getAccountId());
         String refreshToken = jwtTokenProvider.createRefreshToken();
@@ -253,10 +261,9 @@ public class MemberServiceJpa implements MemberService {
     public Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
             throws NotExistMemberException, AlreadyFollowedMemberException {
         isExistMember(followedMemberId);
+        isBlockedOrBlockingAboutAll(memberId, followedMemberId);
 
-        if (memberQueryRepository.isExistFollowedMember(memberId, followedMemberId)) {
-            throw new AlreadyFollowedMemberException();
-        }
+        isExistFollowedMember(memberId, followedMemberId);
 
         return followedMemberRepository
                 .save(
@@ -273,24 +280,16 @@ public class MemberServiceJpa implements MemberService {
             throws NotExistMemberException, AlreadyBlockedMemberException {
 
         isExistMember(blockedMemberId);
-        if (blockedMemberStatus.equals(BlockedMemberStatus.B)) {
+        if (BlockedMemberStatus.B.equals(blockedMemberStatus)) {
             isExistBlock(memberId, blockedMemberId);
-        } else if (blockedMemberStatus.equals(BlockedMemberStatus.A)) {
+        } else if (BlockedMemberStatus.A.equals(blockedMemberStatus)) {
             isExistBlockAndDeletePastBlocked(memberId, blockedMemberId);
 
             followedMemberRepository
-                    .deleteAll(followedMemberRepository
-                            .findAllByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
-                            .stream()
-                            .map(FollowedMember::createFollowedMember)
-                            .collect(Collectors.toList()));
+                    .deleteAll(getFollowedMembersByFollowingMemberIdAndMemberId(memberId, blockedMemberId));
 
             followedCollectionRepository
-                    .deleteAll(followedCollectionRepository
-                            .findAllByFollowingMemberIdAndMemberId(memberId, blockedMemberId)
-                            .stream()
-                            .map(FollowedCollection::createFollowedCollection)
-                            .collect(Collectors.toList()));
+                    .deleteAll(getFollowedCollectionsByFollowingMemberIdAndMemberId(memberId, blockedMemberId));
         }
 
         return blockedMemberRepository
@@ -313,7 +312,7 @@ public class MemberServiceJpa implements MemberService {
 
     private void isExistBlock(Long memberId, Long blockedMemberId) {
         if (memberQueryRepository.isExistBlockedMember(memberId, blockedMemberId)) {
-            throw new AlreadyBlockedMemberException();
+            throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
         }
     }
 
@@ -322,8 +321,8 @@ public class MemberServiceJpa implements MemberService {
                 memberQueryRepository.findOneByBlockingIdAndBlockedId(memberId, blockedMemberId);
         if (optional.isPresent()) {
             BlockedMember blockedMember = optional.get();
-            if (blockedMember.getBlockedMemberStatus().equals(BlockedMemberStatus.A)) {
-                throw new AlreadyBlockedMemberException();
+            if (BlockedMemberStatus.A.equals(blockedMember.getBlockedMemberStatus())) {
+                throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
             } else {
                 blockedMemberRepository.delete(blockedMember);
             }
@@ -332,7 +331,7 @@ public class MemberServiceJpa implements MemberService {
 
     private void isExistMember(Long memberId) {
         if (!memberQueryRepository.isExist(memberId)) {
-            throw new NotExistMemberException();
+            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
         }
     }
 
@@ -343,11 +342,11 @@ public class MemberServiceJpa implements MemberService {
         if (memberList.isEmpty()) {
 
         } else if (memberList.stream().anyMatch(member -> member.getAccountId().equals(accountId))) {
-            throw new AlreadyAccountIdException();
+            throw new AlreadyAccountIdException(ErrorEnum.ALREADY_ACCOUNT_ID);
         } else if (memberList.stream().anyMatch(member -> member.getNickname().equals(nickname))) {
-            throw new AlreadyNicknameException();
+            throw new AlreadyNicknameException(ErrorEnum.ALREADY_NICKNAME);
         } else {
-            throw new AlreadyEmailException();
+            throw new AlreadyEmailException(ErrorEnum.ALREADY_EMAIL);
         }
     }
 
@@ -365,7 +364,7 @@ public class MemberServiceJpa implements MemberService {
         }
 
         if (optionalMember.isPresent()) {
-            throw new AlreadyLinkageEmailException();
+            throw new AlreadyLinkageEmailException(ErrorEnum.ALREADY_LINKAGE_EMAIL);
         }
     }
 
@@ -377,19 +376,20 @@ public class MemberServiceJpa implements MemberService {
         Authentication auth = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         String accountId = userDetails.getUsername();
-        return memberRepository.findOneByAccountId(accountId).orElseThrow(NotExistMemberException::new);
+        return memberRepository.findOneByAccountId(accountId)
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private Member getMemberWithSearch(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithSearch(memberId);
 
-        return optionalMember.orElseThrow(NotExistMemberException::new);
+        return optionalMember.orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private void isExistAuthEmail(String email, String authToken) {
         if (!emailAuthQueryRepository.isExistAuthEmail(email, authToken,
                 REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.A)) {
-            throw new EmailNotAuthenticatedException();
+            throw new EmailNotAuthenticatedException(ErrorEnum.EMAIL_NOT_AUTHENTICATED);
         }
     }
 
@@ -407,41 +407,41 @@ public class MemberServiceJpa implements MemberService {
 
     private void isCorrectEmail(String email) {
         if (MemberCondition.EMAIL.isNotCorrect(email)) {
-            throw new InCorrectEmailException();
+            throw new InCorrectEmailException(ErrorEnum.INCORRECT_EMAIL);
         }
     }
 
     private void isCorrectAccountId(String accountId) {
         if (MemberCondition.ACCOUNT_ID.isNotCorrect(accountId)) {
-            throw new InCorrectAccountIdException();
+            throw new InCorrectAccountIdException(ErrorEnum.INCORRECT_ACCOUNT_ID);
         }
     }
 
     private void isCorrectAccountPw(String accountPw) {
         isAccountPwCombination(accountPw);
         if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
-            throw new InCorrectAccountPwException();
+            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }
     }
 
     private void isCorrectNickname(String nickname) {
         if (MemberCondition.NICKNAME.isNotCorrect(nickname)) {
-            throw new InCorrectNicknameException();
+            throw new InCorrectNicknameException(ErrorEnum.INCORRECT_NICKNAME);
         }
     }
 
     public void checkDuplicateEmail(String email) {
         if (emailAuthQueryRepository.isExistEmail(email)) {
-            throw new AlreadyEmailException();
+            throw new AlreadyEmailException(ErrorEnum.ALREADY_EMAIL);
         }
     }
     private void isAccountPwCombination(String accountPw) {
         if (isIncludeAllEnglish(accountPw)) {
-            throw new InCorrectAccountPwException();
+            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         } else if (isIncludeAllSign(accountPw)) {
-            throw new InCorrectAccountPwException();
+            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         } else if (isIncludeAllNumber(accountPw)) {
-            throw new InCorrectAccountPwException();
+            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }
     }
 
@@ -462,5 +462,34 @@ public class MemberServiceJpa implements MemberService {
 
     private boolean isIncludeAllEnglish(String accountPw) {
         return !MemberCondition.ENGLISH.isNotCorrect(accountPw);
+    }
+
+    private void isExistFollowedMember(Long memberId, Long followedMemberId) {
+        if (memberQueryRepository.isExistFollowedMember(memberId, followedMemberId)) {
+            throw new AlreadyFollowedMemberException(ErrorEnum.ALREADY_FOLLOWED_MEMBER);
+        }
+    }
+
+    private void isBlockedOrBlockingAboutAll(Long memberId, Long targetMemberId) {
+        if (memberQueryRepository.isBlockedOrBlockingAboutAll(memberId, targetMemberId)) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+    }
+
+    private List<FollowedCollection> getFollowedCollectionsByFollowingMemberIdAndMemberId(
+            Long memberId, Long followedMemberId) {
+        return followedCollectionRepository
+                .findAllIdByFollowingMemberIdAndMemberId(memberId, followedMemberId)
+                .stream()
+                .map(FollowedCollection::createFollowedCollection)
+                .collect(Collectors.toList());
+    }
+
+    private List<FollowedMember> getFollowedMembersByFollowingMemberIdAndMemberId(Long memberId, Long followedMemberId) {
+        return followedMemberRepository
+                .findAllIdByFollowingMemberIdAndMemberId(memberId, followedMemberId)
+                .stream()
+                .map(FollowedMember::createFollowedMember)
+                .collect(Collectors.toList());
     }
 }
