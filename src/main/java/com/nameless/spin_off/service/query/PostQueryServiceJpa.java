@@ -115,21 +115,20 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         Long memberId = currentMember.getId();
         List<Long> blockedMemberIds = getBlockedMemberByMemberId(memberId);
-        VisitPostDto post = getOneByPostId(postId, memberId, blockedMemberIds);
-        isExistBlockedMember(memberId, post.getMember().getMemberId());
-        post.setHasAuth(memberId, currentMember.isAdmin());
-        post.setIsLiked(isExistLikedPost(memberId, postId));
-        post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
-        List<ContentHashtagDto> hashtags = hashtagQueryRepository.findAllByPostId(postId);
-        post.setHashtags(hashtags);
-
-
+        VisitPostDto post = getVisitPostDto(currentMember, postId, memberId, blockedMemberIds);
 
         return new RelatedPostFirstDto<>(
                 post, postQueryRepository.findAllRelatedPostByPostId(pageable, memberId, blockedMemberIds, postId));
     }
 
-    private VisitPostDto getOneByPostId(Long postId, Long memberId, List<Long> blockedMemberIds) {
+    @Override
+    public Slice<RelatedPostDto> RelatedPostsSliced(Long memberId, Long postId, Pageable pageable) {
+
+        return postQueryRepository.findAllRelatedPostByPostId(pageable, memberId,
+                getBlockedMemberByMemberId(memberId), postId);
+    }
+
+    private VisitPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
         return postQueryRepository.findOneByPostId(postId, blockedMemberIds)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
@@ -142,6 +141,17 @@ public class PostQueryServiceJpa implements PostQueryService{
     private Post getPostByIdWithHashtagAndMovieAndMember(Long postId) {
         return postQueryRepository.findOneByIdWithHashtagAndMovieAndMember(postId)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+    }
+
+    private VisitPostDto getVisitPostDto(MemberDetails currentMember, Long postId, Long memberId, List<Long> blockedMemberIds) {
+        VisitPostDto post = getOneByPostId(postId, blockedMemberIds);
+        isExistBlockedMember(memberId, post.getMember().getMemberId());
+        post.setHasAuth(memberId, currentMember.isAdmin());
+        post.setIsLiked(isExistLikedPost(memberId, postId));
+        post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
+        List<ContentHashtagDto> hashtags = hashtagQueryRepository.findAllByPostId(postId);
+        post.setHashtags(hashtags);
+        return post;
     }
 
     private List<Long> getBlockedMemberByMemberId(Long memberId) {
