@@ -53,8 +53,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         blockedMemberIds = getBlockedMemberByMemberId(memberId);
 
         return new MainPageFollowDto(
-                postQueryRepository.findAllByFollowingMemberSlicedForMainPage(memberPageable,
-                        memberId, blockedMemberIds),
+                postQueryRepository.findAllByFollowingMemberSlicedForMainPage(memberPageable, memberId),
                 postQueryRepository.findAllByFollowedHashtagsSlicedForMainPage(hashtagPageable,
                         getFollowedMovieByMemberId(memberId), followedMemberIds, blockedMemberIds, memberId),
                 postQueryRepository.findAllByFollowedMoviesSlicedForMainPage(moviePageable,
@@ -66,11 +65,11 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         if (pageable.getPageNumber() % 2 == 0) {
             return collectionQueryRepository.findAllByFollowedMemberSlicedForMainPage(
                     PageRequest.of(pageable.getPageNumber() / 2, pageable.getPageSize(),
-                            pageable.getSort()), memberId, blockedMemberIds);
+                            pageable.getSort()), memberId);
         } else {
              return collectionQueryRepository.findAllByFollowedCollectionsSlicedForMainPage(
                     PageRequest.of(pageable.getPageNumber() / 2, pageable.getPageSize(),
-                            pageable.getSort()), memberId, blockedMemberIds);
+                            pageable.getSort()), memberId);
         }
     }
 

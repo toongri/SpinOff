@@ -2,13 +2,11 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
-import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
@@ -82,8 +80,7 @@ public class PostQueryServiceJpa implements PostQueryService{
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return postQueryRepository
-                .findAllByFollowingMemberSlicedForMainPage(pageable,
-                        memberId, getBlockedMemberByMemberId(memberId));
+                .findAllByFollowingMemberSlicedForMainPage(pageable, memberId);
     }
 
     @Override
@@ -111,18 +108,18 @@ public class PostQueryServiceJpa implements PostQueryService{
     }
 
     @Override
-    public RelatedPostFirstDto<VisitPostDto> visitPost(MemberDetails currentMember, Long postId, Pageable pageable) {
+    public RelatedPostFirstDto<VisitPostDto> getPostForVisit(MemberDetails currentMember, Long postId, Pageable pageable) {
 
-        Long memberId = currentMember.getId();
+        Long memberId = getCurrentMemberId(currentMember);
         List<Long> blockedMemberIds = getBlockedMemberByMemberId(memberId);
-        VisitPostDto post = getVisitPostDto(currentMember, postId, memberId, blockedMemberIds);
+        VisitPostDto post = getVisitPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
 
         return new RelatedPostFirstDto<>(
                 post, postQueryRepository.findAllRelatedPostByPostId(pageable, memberId, blockedMemberIds, postId));
     }
 
     @Override
-    public Slice<RelatedPostDto> RelatedPostsSliced(Long memberId, Long postId, Pageable pageable) {
+    public Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable) {
 
         return postQueryRepository.findAllRelatedPostByPostId(pageable, memberId,
                 getBlockedMemberByMemberId(memberId), postId);
@@ -138,20 +135,33 @@ public class PostQueryServiceJpa implements PostQueryService{
         return null;
     }
 
-    private Post getPostByIdWithHashtagAndMovieAndMember(Long postId) {
-        return postQueryRepository.findOneByIdWithHashtagAndMovieAndMember(postId)
-                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+    private VisitPostDto getVisitPostDto(Long postId, Long memberId,
+                                         List<Long> blockedMemberIds, boolean isAdmin) {
+
+        VisitPostDto post = getOneByPostId(postId, blockedMemberIds);
+        Long postMemberId = post.getMember().getMemberId();
+        isExistBlockedMember(memberId, postMemberId);
+        post.setHasAuth(memberId, isAdmin);
+        post.setIsLiked(isExistLikedPost(memberId, postId));
+        post.getMember().setIsFollowed(isExistFollowedMember(memberId, postMemberId));
+        post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
+        return post;
     }
 
-    private VisitPostDto getVisitPostDto(MemberDetails currentMember, Long postId, Long memberId, List<Long> blockedMemberIds) {
-        VisitPostDto post = getOneByPostId(postId, blockedMemberIds);
-        isExistBlockedMember(memberId, post.getMember().getMemberId());
-        post.setHasAuth(memberId, currentMember.isAdmin());
-        post.setIsLiked(isExistLikedPost(memberId, postId));
-        post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
-        List<ContentHashtagDto> hashtags = hashtagQueryRepository.findAllByPostId(postId);
-        post.setHashtags(hashtags);
-        return post;
+    private boolean isCurrentMemberAdmin(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.isAdmin();
+        } else {
+            return false;
+        }
+    }
+
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
     }
 
     private List<Long> getBlockedMemberByMemberId(Long memberId) {

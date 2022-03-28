@@ -37,7 +37,7 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
-        log.debug("onAuthenticationSuccess start");
+
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
         SocialMemberDto socialMemberDto = userRequestMapper.toDto(oAuth2User);
 
@@ -48,7 +48,6 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 new TokenResponseDto(jwtTokenProvider.createToken(member.getAccountId()), member.getRefreshToken());
         log.info("{}", token);
 
-        log.debug("onAuthenticationSuccess end");
         writeTokenResponse(response, token);
     }
 

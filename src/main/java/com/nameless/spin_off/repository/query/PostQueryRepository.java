@@ -1,7 +1,8 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.PostDto.*;
+import com.nameless.spin_off.dto.*;
+import com.nameless.spin_off.entity.enums.ContentsLengthEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -10,17 +11,16 @@ import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
@@ -43,16 +43,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
-    public Optional<Post> findOneByIdWithHashtagAndMovieAndMember(Long postId) {
-         return Optional.ofNullable(getQueryFactory()
-                 .selectFrom(post)
-                 .join(post.postedHashtags, postedHashtag).fetchJoin()
-                 .join(post.member, member).fetchJoin()
-                 .join(post.movie, movie).fetchJoin()
-                 .where(post.id.eq(postId))
-                 .fetchFirst());
-    }
-
     public PublicOfPostStatus findPublicByPostId(Long postId) {
         return getQueryFactory()
                 .select(post.publicOfPostStatus)
@@ -62,19 +52,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Optional<IdAndPublicPostDto> findPublicPostByCommentId(Long commentId) {
-        Tuple tuple = getQueryFactory()
-                .select(post.id, post.publicOfPostStatus)
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QPostDto_IdAndPublicPostDto(
+                        post.id, post.publicOfPostStatus))
                 .from(commentInPost)
                 .join(commentInPost.post, post)
                 .where(commentInPost.id.eq(commentId))
-                .fetchFirst();
-
-        if (tuple == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new PostDto.IdAndPublicPostDto(
-                    tuple.get(post.id), tuple.get(post.publicOfPostStatus)));
-        }
+                .fetchFirst());
     }
 
     public Boolean isBlockMembersPost(Long memberId, Long postId) {
@@ -130,18 +114,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isExistCollectedPost(List<Long> collectionIds, Long postId) {
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(collectedPost)
-                .where(
-                        collectedPost.collection.id.in(collectionIds),
-                        collectedPost.post.id.eq(postId))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
     public Boolean isExistLikedPost(Long memberId, Long postId) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
@@ -181,7 +153,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<MainPagePostDto> findAllSlicedForMainPage(Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
-        blockedMemberIds.add(memberId);
+        List<Long> banList = new ArrayList<>(blockedMemberIds);
+        addBanList(memberId, banList);
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
@@ -195,12 +168,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(post.member, member)
                 .where(
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
-                        member.id.notIn(blockedMemberIds)));
+                        member.id.notIn(banList)));
     }
 
     public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable, Long memberId,
                                                              List<Long> blockedMemberIds, Long postId) {
-        blockedMemberIds.add(memberId);
+        List<Long> banList = new ArrayList<>(blockedMemberIds);
+        addBanList(memberId, banList);
         QPostedHashtag relatedPostHashtag = new QPostedHashtag("relatedPostHashtag");
 
         return applySlicing(pageable, contentQuery -> contentQuery
@@ -217,16 +191,16 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(postedHashtag.hashtag, hashtag)
                 .join(hashtag.taggedPosts, relatedPostHashtag)
                 .groupBy(post)
+                .having(postedHashtag.count().goe(ContentsLengthEnum.RELATED_POST_MIN_TAG.getLength()))
                 .where(
-                        postedHashtag.count().goe(5),
                         relatedPostHashtag.post.id.eq(postId),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
-                        member.id.notIn(blockedMemberIds))
+                        member.id.notIn(banList))
                 .orderBy(postedHashtag.count().desc()));
     }
 
     public Slice<MainPagePostDto> findAllByFollowingMemberSlicedForMainPage(
-            Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
+            Pageable pageable, Long memberId) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
@@ -236,7 +210,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(member.followingMembers, followedMember)
                 .where(
                         followedMember.followingMember.id.eq(memberId),
-                        memberNotIn(blockedMemberIds),
                         post.publicOfPostStatus.in(FOLLOW_POST_PUBLIC.getPrivacyBound())));
     }
 
@@ -244,7 +217,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
             Pageable pageable, List<Long> followedMovies, List<Long> followedMemberIds,
             List<Long> blockedMemberIds, Long memberId) {
 
-        blockedMemberIds.addAll(followedMemberIds);
+        List<Long> banList = new ArrayList<>(blockedMemberIds);
+        banList.addAll(followedMemberIds);
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .selectDistinct(new QPostDto_MainPagePostDto(
@@ -258,13 +232,14 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         followedHashtag.member.id.eq(memberId),
                         postedMovieNotIn(followedMovies),
-                        memberNotIn(blockedMemberIds),
+                        memberNotIn(banList),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPagePostDto> findAllByFollowedMoviesSlicedForMainPage(
             Pageable pageable, List<Long> followedMemberIds, List<Long> blockedMemberIds, Long memberId) {
-        blockedMemberIds.addAll(followedMemberIds);
+        List<Long> banList = new ArrayList<>(blockedMemberIds);
+        banList.addAll(followedMemberIds);
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_MainPagePostDto(
@@ -275,7 +250,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(movie.followingMembers, followedMovie)
                 .where(
                         followedMovie.member.id.eq(memberId),
-                        memberNotIn(blockedMemberIds),
+                        memberNotIn(banList),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
@@ -284,7 +259,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .select(new QPostDto_VisitPostDto(
                         post.id, member.id, member.profileImg, member.nickname, member.accountId, post.title,
                         post.createdDate, post.lastModifiedDate, post.content, movie.thumbnail, movie.title,
-                        movie.directorName, likedPost.count(), commentInPost.count(), post.publicOfPostStatus))
+                        movie.directorName, likedPost.countDistinct(), commentInPost.countDistinct(), post.publicOfPostStatus))
                 .from(post)
                 .join(post.member, member)
                 .leftJoin(post.movie, movie)
@@ -292,8 +267,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .leftJoin(post.commentInPosts, commentInPost)
                 .groupBy(post)
                 .where(
-                        likedPost.member.id.in(blockedMemberIds),
-                        commentInPost.member.id.in(blockedMemberIds),
+                        likedPostMemberNotIn(blockedMemberIds),
+                        commentMemberNotIn(blockedMemberIds),
                         post.id.eq(postId))
                 .fetchFirst());
     }
@@ -320,6 +295,12 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
+    private void addBanList(Long memberId, List<Long> blockedMemberIds) {
+        if (memberId != null) {
+            blockedMemberIds.add(memberId);
+        }
+    }
+
     private BooleanExpression memberNotEq(Long memberId) {
         return memberId != null ? member.id.ne(memberId) : null;
     }
@@ -327,6 +308,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         return memberIds.isEmpty() ? null : member.id.in(memberIds);
     }
 
+    private BooleanExpression commentMemberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : commentInPost.member.id.notIn(memberIds);
+    }
+
+    private BooleanExpression likedPostMemberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : likedPost.member.id.notIn(memberIds);
+    }
     private BooleanExpression memberNotIn(List<Long> members) {
         return members.isEmpty() ? null : member.id.notIn(members);
     }

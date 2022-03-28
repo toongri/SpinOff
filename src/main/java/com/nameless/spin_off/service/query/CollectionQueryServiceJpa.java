@@ -75,7 +75,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return collectionQueryRepository
-                .findAllByFollowedMemberSlicedForMainPage(pageable, memberId, getBlockedMemberByMemberId(memberId));
+                .findAllByFollowedMemberSlicedForMainPage(pageable, memberId);
     }
 
     @Override
@@ -83,7 +83,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
             Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return collectionQueryRepository
-                .findAllByFollowedCollectionsSlicedForMainPage(pageable, memberId, getBlockedMemberByMemberId(memberId));
+                .findAllByFollowedCollectionsSlicedForMainPage(pageable, memberId);
     }
 
     private List<Long> getFollowedMemberByMemberId(Long memberId) {

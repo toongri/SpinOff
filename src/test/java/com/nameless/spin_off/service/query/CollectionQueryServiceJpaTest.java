@@ -145,12 +145,12 @@ public class CollectionQueryServiceJpaTest {
                         null);
         assertThat(content.stream().map(SearchAllCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0);
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L);
     }
 
     @Test
@@ -260,12 +260,12 @@ public class CollectionQueryServiceJpaTest {
                         null);
         assertThat(content.stream().map(SearchAllCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
-                        2,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0);
+                        2L,
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L);
     }
     @Test
     public void 컬렉션_검색_컬렉션_테스트_멤버_단일_팔로우() throws Exception{
@@ -372,12 +372,12 @@ public class CollectionQueryServiceJpaTest {
                         null);
         assertThat(content.stream().map(SearchCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
-                        0,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0);
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L);
     }
 
     @Test
@@ -487,12 +487,12 @@ public class CollectionQueryServiceJpaTest {
                         null);
         assertThat(content.stream().map(SearchCollectionDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
-                        2,
-                        0,
-                        0,
-                        0,
-                        0,
-                        0);
+                        2L,
+                        0L,
+                        0L,
+                        0L,
+                        0L,
+                        0L);
     }
 
     @Test

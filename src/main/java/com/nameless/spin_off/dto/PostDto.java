@@ -91,10 +91,15 @@ public class PostDto {
     }
 
     @Data
-    @AllArgsConstructor
     public static class IdAndPublicPostDto {
         private Long postId;
         private PublicOfPostStatus publicOfPostStatus;
+
+        @QueryProjection
+        public IdAndPublicPostDto(Long postId, PublicOfPostStatus publicOfPostStatus) {
+            this.postId = postId;
+            this.publicOfPostStatus = publicOfPostStatus;
+        }
     }
 
     @Data

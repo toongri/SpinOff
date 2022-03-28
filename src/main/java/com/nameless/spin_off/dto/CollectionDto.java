@@ -1,7 +1,5 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.AllArgsConstructor;
@@ -84,7 +82,7 @@ public class CollectionDto {
         private String memberAccountId;
         private List<String> thumbnailUrls = new ArrayList<>();
         private String followingMemberNickname;
-        private int followingCount;
+        private Long followingCount;
 
         @QueryProjection
         public SearchCollectionDto(Long collectionId, String collectionTitle, Long memberId, String memberAccountId,
@@ -95,7 +93,7 @@ public class CollectionDto {
             this.collectionTitle = collectionTitle;
             this.memberId = memberId;
             this.memberAccountId = memberAccountId;
-            this.followingCount = followedMemberCount.intValue();
+            this.followingCount = followedMemberCount;
             if (thumbnail1 != null) {
                 thumbnailUrls.add(thumbnail1);
 
@@ -138,7 +136,7 @@ public class CollectionDto {
         private String memberAccountId;
         private String thumbnailUrl;
         private String followingMemberNickname;
-        private int followingCount;
+        private Long followingCount;
 
         @QueryProjection
         public SearchAllCollectionDto(Long collectionId, String collectionTitle, Long memberId, String memberAccountId,
@@ -148,7 +146,7 @@ public class CollectionDto {
             this.memberId = memberId;
             this.memberAccountId = memberAccountId;
             this.thumbnailUrl = thumbnailUrl;
-            this.followingCount = followedMemberCount.intValue();
+            this.followingCount = followedMemberCount;
         }
 
         public void setFollowingMember(List<FollowCollectionMemberDto> followedCollections) {
@@ -163,31 +161,6 @@ public class CollectionDto {
         public void setFollowingMemberNickname(String nickname) {
             this.followingMemberNickname = nickname;
             this.followingCount -= 1;
-        }
-
-        public SearchAllCollectionDto(Collection collection, List<Long> followingMembers) {
-            this.collectionId = collection.getId();
-            this.collectionTitle = collection.getTitle();
-            this.memberId = collection.getMember().getId();
-            this.memberAccountId = collection.getMember().getAccountId();
-            this.thumbnailUrl = collection.getFirstThumbnail();
-
-            if (!followingMembers.isEmpty()) {
-                findRelatedMember(followingMembers, collection.getFollowingMembers());
-            }
-        }
-
-        private void findRelatedMember(List<Long> followingMembers, List<FollowedCollection> followedCollections) {
-            followedCollections.stream()
-                    .filter(followedCollection -> followingMembers.contains(followedCollection.getMember().getId()))
-                    .max(Comparator.comparing(followedCollection -> followedCollection.getMember().getPopularity()))
-                    .ifPresent(followedCollection -> setFollowingMemberNicknameAndNumber(
-                            followedCollection.getMember().getNickname(), followedCollections.size()));
-        }
-
-        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
-            this.followingMemberNickname = nickname;
-            this.followingCount = size - 1;
         }
     }
 

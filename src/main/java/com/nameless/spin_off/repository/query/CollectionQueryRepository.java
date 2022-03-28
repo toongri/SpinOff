@@ -7,13 +7,13 @@ import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
-import com.querydsl.core.Tuple;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,35 +47,23 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Optional<IdAndPublicCollectionDto> findPublicAndIdByCommentId(Long commentId) {
-        Tuple tuple = getQueryFactory()
-                .select(collection.id, collection.publicOfCollectionStatus)
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_IdAndPublicCollectionDto(
+                        collection.id, collection.publicOfCollectionStatus))
                 .from(commentInCollection)
                 .join(commentInCollection.collection, collection)
                 .where(commentInCollection.id.eq(commentId))
-                .fetchFirst();
-
-        if (tuple == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new IdAndPublicCollectionDto(
-                    tuple.get(collection.id), tuple.get(collection.publicOfCollectionStatus)));
-        }
+                .fetchFirst());
     }
 
     public Optional<IdAndPublicCollectionDto> findCollectionOwnerIdAndPublic(Long collectionId) {
-        Tuple tuple = getQueryFactory()
-                .select(collection.member.id, collection.publicOfCollectionStatus)
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_IdAndPublicCollectionDto(
+                        collection.member.id, collection.publicOfCollectionStatus))
                 .from(collection)
                 .where(
                         collection.id.eq(collectionId))
-                .fetchFirst();
-
-        if (tuple == null) {
-            return Optional.empty();
-        } else {
-            return Optional.of(new IdAndPublicCollectionDto(
-                    tuple.get(collection.member.id), tuple.get(collection.publicOfCollectionStatus)));
-        }
+                .fetchFirst());
     }
 
     public List<PostInCollectionDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
@@ -239,6 +227,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public Slice<MainPageCollectionDto> findAllSlicedForMainPage(
             Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
+        List<Long> banList = new ArrayList<>(blockedMemberIds);
+        addBanList(memberId, banList);
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -248,12 +238,11 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .join(collection.member, member)
                 .where(
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
-                        memberNotIn(blockedMemberIds),
-                        memberNotEq(memberId)));
+                        memberNotIn(banList)));
     }
 
     public Slice<MainPageCollectionDto> findAllByFollowedMemberSlicedForMainPage(
-            Pageable pageable, Long memberId, List<Long> blockedMembers) {
+            Pageable pageable, Long memberId) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -264,12 +253,11 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .join(member.followingMembers, followedMember)
                 .where(
                         followedMember.followingMember.id.eq(memberId),
-                        memberNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(FOLLOW_COLLECTION_PUBLIC.getPrivacyBound())));
     }
 
     public Slice<MainPageCollectionDto> findAllByFollowedCollectionsSlicedForMainPage(
-            Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
+            Pageable pageable, Long memberId) {
 
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MainPageCollectionDto(
@@ -279,8 +267,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .join(collection.followingMembers, followedCollection)
                 .join(collection.member, member)
                 .where(
-                        followedCollection.member.id.eq(memberId),
-                        memberNotIn(blockedMemberIds)));
+                        followedCollection.member.id.eq(memberId)));
     }
 
     private List<Long> getCollectionIds(List<SearchCollectionDto> content) {
@@ -304,10 +291,10 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetch().stream().collect(Collectors.groupingBy(FollowCollectionMemberDto::getCollectionId));
     }
 
-
-    private Slice<SearchAllCollectionDto> MapContentToDtoForSearchPageAtAll(
-            Slice<Collection> contents, List<Long> followedMembers) {
-        return contents.map(content -> new SearchAllCollectionDto(content, followedMembers));
+    private void addBanList(Long memberId, List<Long> blockedMemberIds) {
+        if (memberId != null) {
+            blockedMemberIds.add(memberId);
+        }
     }
 
     private BooleanExpression memberNotEq(Long memberId) {

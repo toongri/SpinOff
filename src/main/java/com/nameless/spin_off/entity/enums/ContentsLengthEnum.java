@@ -11,7 +11,8 @@ public enum ContentsLengthEnum {
     NICKNAME_MIN(2),
     NICKNAME_MAX(8),
     EMAIL_TOKEN(8),
-    POST_IMAGE_MAX(5);
+    POST_IMAGE_MAX(5),
+    RELATED_POST_MIN_TAG(5);
 
     private final int length;
 

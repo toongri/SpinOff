@@ -61,15 +61,6 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 oAuth2Attribute.getAttributeKey());
     }
 
-//    private Set<GrantedAuthority> getGrantedAuthorities(Member member) {
-//        Set<GrantedAuthority> authorities = new LinkedHashSet<>();
-//
-//        for (AuthorityOfMemberStatus role : member.getRoles()) {
-//            authorities.add(new SimpleGrantedAuthority(role.getKey()));
-//        }
-//        return authorities;
-//    }
-
     private Member getMember(String registrationId, OAuth2Attribute attributes) {
 
         isAlreadyAuth(attributes.getEmail(), registrationId);

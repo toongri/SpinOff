@@ -1,12 +1,19 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.HashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
+import com.nameless.spin_off.dto.PostDto.RelatedPostFirstDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.PostDto.VisitPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -18,6 +25,7 @@ import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
@@ -26,6 +34,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -53,6 +62,7 @@ public class PostQueryServiceJpaTest {
     @Autowired MemberService memberService;
     @Autowired PostQueryService postQueryService;
     @Autowired PostService postService;
+    @Autowired CommentInPostService commentInPostService;
 
     @Test
     public void 발견_포스트_테스트() throws Exception{
@@ -379,9 +389,9 @@ public class PostQueryServiceJpaTest {
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
         }
+        memberRepository.saveAll(memberList);
 
         List<Post> postList = new ArrayList<>();
-        memberRepository.saveAll(memberList);
 
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
@@ -572,23 +582,199 @@ public class PostQueryServiceJpaTest {
     @Test
     public void 포스트_조회() throws Exception{
         //given
-        Member build = Member.buildMember()
+        Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("fuckyou")
-                .setName("fdfd")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
                 .setBirth(LocalDate.now())
-                .setAccountPw("dfdfd")
-                .setNickname("fdfd").build();
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
 
-        memberRepository.save(build);
+        memberRepository.save(member);
 
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
 
+        memberRepository.save(member2);
 
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail",
+                GenreOfMovieStatus.A, null, null, null);
+
+        movieRepository.save(movie);
+
+        List<String> urls = List.of("a", "b", "c", "d", "e");
+
+        List<Hashtag> hashtagList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            hashtagList.add(Hashtag.createHashtag(i+""));
+        }
+        hashtagRepository.saveAll(hashtagList);
+
+        Post post = Post.buildPost()
+                .setMember(member)
+                .setMovie(movie)
+                .setTitle("postTitle")
+                .setContent("postContent")
+                .setPostPublicStatus(PublicOfPostStatus.A)
+                .setUrls(urls)
+                .setThumbnailUrl(urls.get(0))
+                .setHashTags(hashtagList)
+                .build();
+        postRepository.save(post);
+
+        Long dfdd = commentInPostService.insertCommentInPostByCommentVO(new CommentDto
+                .CreateCommentInPostVO(post.getId(), null, "dfdd"), memberList.get(3).getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
+                .CreateCommentInPostVO(post.getId(), dfdd, "dfdd"), memberList.get(3).getId());
+        Long dfdd1 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto
+                .CreateCommentInPostVO(post.getId(), null, "dfdd"), memberList.get(5).getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
+                .CreateCommentInPostVO(post.getId(), dfdd1, "dfdd"), memberList.get(0).getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
+                .CreateCommentInPostVO(post.getId(), null, "dfdd"), memberList.get(8).getId());
+
+        postService.insertLikedPostByMemberId(memberList.get(4).getId(), post.getId());
+        postService.insertLikedPostByMemberId(memberList.get(8).getId(), post.getId());
+        postService.insertLikedPostByMemberId(memberList.get(7).getId(), post.getId());
+        postService.insertLikedPostByMemberId(memberList.get(5).getId(), post.getId());
+        postService.insertLikedPostByMemberId(memberList.get(9).getId(), post.getId());
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8))).build());
+
+        em.flush();
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8), hashtagList.get(9))).build());
+        postRepository.saveAll(postList);
+        em.flush();
+        em.clear();
 
         //when
+        System.out.println("서비스함수");
+        RelatedPostFirstDto<VisitPostDto> visitPost = postQueryService.getPostForVisit(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                post.getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+
+        System.out.println("서비스함수끝");
+
+        VisitPostDto data = visitPost.getData();
+        Slice<RelatedPostDto> posts = visitPost.getPosts();
 
         //then
+        assertThat(data.getMember().getMemberId()).isEqualTo(member.getId());
+        assertThat(data.getMember().getAccountId()).isEqualTo(member.getAccountId());
+        assertThat(data.getMember().getNickname()).isEqualTo(member.getNickname());
+        assertThat(data.getMember().getProfile()).isEqualTo(member.getProfileImg());
 
+        assertThat(data.getCommentSize()).isEqualTo(4);
+        assertThat(data.getLikedSize()).isEqualTo(4);
+        assertThat(data.getPostId()).isEqualTo(post.getId());
+        assertThat(data.getHashtags().stream().map(HashtagDto.ContentHashtagDto::getId).collect(Collectors.toList()))
+                .contains(hashtagList.get(0).getId(), hashtagList.get(1).getId(), hashtagList.get(2).getId(),
+                        hashtagList.get(3).getId(), hashtagList.get(4).getId(), hashtagList.get(5).getId(),
+                        hashtagList.get(6).getId(), hashtagList.get(7).getId(), hashtagList.get(8).getId(),
+                        hashtagList.get(9).getId());
+        assertThat(data.getMovie().getTitle()).isEqualTo(movie.getTitle());
+        assertThat(data.getMovie().getThumbnail()).isEqualTo(movie.getThumbnail());
+        assertThat(data.getMovie().getDirectorName()).isEqualTo(movie.getDirectorName());
+        assertThat(data.getPublicOfPostStatus()).isEqualTo(post.getPublicOfPostStatus());
+
+        assertThat(posts.getContent().get(0).getPostId()).isEqualTo(postList.get(9).getId());
+        assertThat(posts.getContent().get(1).getPostId()).isEqualTo(postList.get(8).getId());
+        assertThat(posts.getContent().get(2).getPostId()).isEqualTo(postList.get(7).getId());
+        assertThat(posts.hasNext()).isTrue();
+        assertThat(posts.getSize()).isEqualTo(3);
     }
 
 }

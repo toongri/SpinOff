@@ -20,7 +20,7 @@ public interface PostQueryService {
             Pageable pageable, List<String> hashtagContent, Long memberId, int length);
     Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(Pageable pageable, List<String> hashtagContent, Long memberId);
 
-    RelatedPostFirstDto<VisitPostDto> visitPost(MemberDetails currentMember, Long postId, Pageable pageable);
-    Slice<RelatedPostDto> RelatedPostsSliced(Long memberId, Long postId, Pageable pageable);
+    RelatedPostFirstDto<VisitPostDto> getPostForVisit(MemberDetails currentMember, Long postId, Pageable pageable);
+    Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable);
     List<PostInCollectionDto> getCollectionNamesByMemberIdAndPostId(Long memberId, Long postId);
 }

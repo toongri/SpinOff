@@ -46,8 +46,8 @@ public class MemberDto {
             this.accountId = accountId;
         }
 
-        public void setFollowed(boolean followed) {
-            isFollowed = followed;
+        public void setIsFollowed(boolean isFollowed) {
+            this.isFollowed = isFollowed;
         }
 
         public ContentMemberDto(Member member, boolean isFollowed) {
