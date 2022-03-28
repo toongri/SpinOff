@@ -33,16 +33,17 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
         errorMessage = ErrorEnum.ACCESS_DENIED.getMessage();
+        errorCode = ErrorEnum.ACCESS_DENIED.getCode();
 
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
         response.addHeader("isSuccess", String.valueOf(false));
-        response.addHeader("code", ErrorEnum.ACCESS_DENIED.getCode());
+        response.addHeader("code", errorCode);
         response.addHeader("message", errorMessage);
         response.setContentType("application/json;charset=UTF-8");
 
         var writer = response.getWriter();
-        writer.println(objectMapper.writeValueAsString(new ErrorResult(false, "EX", errorMessage)));
+        writer.println(objectMapper.writeValueAsString(new ErrorResult(false, errorCode, errorMessage)));
         writer.flush();
     }
 }

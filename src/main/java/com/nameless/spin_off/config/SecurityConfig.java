@@ -64,9 +64,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
                 .and()
                     .oauth2Login()
-                        .failureHandler(failureHandler)
-                        .successHandler(successHandler)
-                        .userInfoEndpoint().userService(oAuth2UserService);
+                    .userInfoEndpoint().userService(oAuth2UserService)
+                .and()
+                    .failureHandler(failureHandler)
+                    .successHandler(successHandler);
 
         http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }

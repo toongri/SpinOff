@@ -10,11 +10,13 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -27,28 +29,48 @@ import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRequestMapper userRequestMapper;
     private final ObjectMapper objectMapper;
     private final MemberRepository memberRepository;
 
+    @Value("${spring.oauth.default}")
+    String defaultUrl;
+    @Value("${spring.oauth.register}")
+    String registerUrl;
+    String targetUrl;
+
     @Transactional
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
             throws IOException, ServletException {
-
         OAuth2User oAuth2User = (OAuth2User)authentication.getPrincipal();
         SocialMemberDto socialMemberDto = userRequestMapper.toDto(oAuth2User);
 
         Member member = getMemberByEmail(socialMemberDto.getEmail());
+        if (member.getRefreshToken() == null) {
+            targetUrl = registerUrl;
+        } else {
+            targetUrl = defaultUrl;
+        }
         member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
 
         TokenResponseDto token =
                 new TokenResponseDto(jwtTokenProvider.createToken(member.getAccountId()), member.getRefreshToken());
         log.info("{}", token);
 
-        writeTokenResponse(response, token);
+        targetUrl = determineTargetUrl(request, response, authentication, token);
+
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    private String determineTargetUrl(HttpServletRequest request, HttpServletResponse response,
+                                      Authentication authentication, TokenResponseDto token) {
+        return UriComponentsBuilder.fromUriString(targetUrl)
+                .queryParam("accessToken", token.getAccessToken())
+                .queryParam("refreshToken", token.getRefreshToken())
+                .build().toUriString();
     }
 
     private Member getMemberByEmail(String email) {

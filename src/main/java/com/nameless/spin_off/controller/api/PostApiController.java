@@ -128,7 +128,7 @@ public class PostApiController {
 
         return getResult(postQueryService.getRelatedPostsSliced(currentMemberId, postId, pageable));
     }
-    
+
     private Long getCurrentMemberId(MemberDetails currentMember) {
         if (currentMember != null) {
             return currentMember.getId();

@@ -7,14 +7,16 @@ import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.exception.security.AlreadyAuthEmailException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.CredentialsExpiredException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -24,11 +26,15 @@ import java.io.IOException;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class OAuth2FailureHandler implements AuthenticationFailureHandler {
+public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler {
     private HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
     private String errorMessage = null;
     private String errorCode = null;
     private final ObjectMapper objectMapper;
+    String targetUrl;
+
+    @Value("${spring.oauth.err}")
+    String errUrl;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
@@ -53,7 +59,14 @@ public class OAuth2FailureHandler implements AuthenticationFailureHandler {
             errorMessage = ErrorEnum.UNKNOWN.getMessage();
             errorCode = ErrorEnum.UNKNOWN.getCode();
         }
-        writeTokenResponse(response);
+        targetUrl = UriComponentsBuilder.fromUriString(errUrl)
+                .queryParam("code", errorCode)
+                .queryParam("message", errorMessage)
+                .build().toUriString();
+
+        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+//        writeTokenResponse(response);
+
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
