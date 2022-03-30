@@ -1,5 +1,8 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.config.auth.ProviderService;
+import com.nameless.spin_off.config.auth.dto.AccessToken;
+import com.nameless.spin_off.config.auth.dto.profile.ProfileDto;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
@@ -34,8 +37,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.ACCOUNT_PW_MIN;
-import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.EMAIL_TOKEN;
+import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.*;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
@@ -59,6 +61,7 @@ public class MemberServiceJpa implements MemberService {
     private final FollowedMemberRepository followedMemberRepository;
     private final BlockedMemberRepository blockedMemberRepository;
     private final FollowedCollectionRepository followedCollectionRepository;
+    private final ProviderService providerService;
 
     @Transactional
     @Override
@@ -197,9 +200,9 @@ public class MemberServiceJpa implements MemberService {
 
         emailLinkage.useToken();
 
-        if (GOOGLE.getValue().equals(provider)) {
+        if (google.getValue().equals(provider)) {
             member.updateGoogleEmail(requestDto.getEmail());
-        } else if (NAVER.getValue().equals(provider)) {
+        } else if (naver.getValue().equals(provider)) {
             member.updateNaverEmail(requestDto.getEmail());
         } else {
             member.updateKakaoEmail(requestDto.getEmail());
@@ -208,8 +211,8 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public void updateEmailLinkage(String email, String accountId) {
-        validateDuplicateAtLinkage(email);
+    public void updateEmailLinkage(String email, String accountId, String provider) {
+        validateDuplicateAtLinkage(email, provider);
 
         EmailLinkage emailAuth = emailLinkageRepository.save(EmailLinkage.builder()
                 .email(email)
@@ -236,6 +239,21 @@ public class MemberServiceJpa implements MemberService {
             return new MemberLoginResponseDto(
                     member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()), member.getRefreshToken());
         }
+    }
+
+    @Transactional
+    @Override
+    public MemberLoginResponseDto loginBySocial(String authCode, String provider) {
+        AccessToken accessToken = providerService.getAccessToken(authCode, provider);
+        ProfileDto profile = providerService.getProfile(accessToken.getAccess_token(), provider);
+        Member member = getMemberByProvider(profile.getEmail(), provider)
+                .orElseGet(() -> saveMember(profile, provider));
+
+        member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
+        return new MemberLoginResponseDto(
+                member.getId(),
+                jwtTokenProvider.createToken(member.getAccountId()),
+                member.getRefreshToken());
     }
 
     @Transactional
@@ -350,22 +368,42 @@ public class MemberServiceJpa implements MemberService {
         }
     }
 
-    private void validateDuplicateAtLinkage(String email) {
-
-        String provider = getProviderByEmail(email);
-        Optional<Member> optionalMember;
-
-        if (NAVER.getValue().equals(provider)) {
-            optionalMember = memberRepository.findOneByNaverEmail(email);
-        } else if (KAKAO.getValue().equals(provider)) {
-            optionalMember = memberRepository.findOneByKakaoEmail(email);
-        } else {
-            optionalMember = memberRepository.findOneByGoogleEmail(email);
-        }
+    private void validateDuplicateAtLinkage(String email, String provider) {
+        Optional<Member> optionalMember = getMemberByProvider(email, provider);
 
         if (optionalMember.isPresent()) {
             throw new AlreadyLinkageEmailException(ErrorEnum.ALREADY_LINKAGE_EMAIL);
         }
+    }
+
+    private Optional<Member> getMemberByProvider(String email, String provider) {
+        if (naver.getName().equals(provider)) {
+            return memberRepository.findOneByNaverEmail(email);
+        } else if (kakao.getName().equals(provider)) {
+            return memberRepository.findOneByKakaoEmail(email);
+        } else {
+            return memberRepository.findOneByGoogleEmail(email);
+        }
+    }
+
+    private Member saveMember(ProfileDto profile, String provider) {
+        MemberBuilder memberBuilder = Member.buildMember()
+                .setEmail(profile.getEmail())
+                .setAccountId(getRandomAccountId())
+                .setNickname(getRandomNickname())
+                .setName(profile.getName())
+                .setAccountPw(null);
+        Member member;
+
+        if (naver.getName().equals(provider)) {
+            member = memberBuilder.setNaverEmail(profile.getEmail()).build();
+        } else if (kakao.getName().equals(provider)) {
+            member = memberBuilder.setKakaoEmail(profile.getEmail()).build();
+        } else {
+            member = memberBuilder.setGoogleEmail(profile.getEmail()).build();
+        }
+        memberRepository.save(member);
+        return member;
     }
 
     private String getProviderByEmail(String email) {
@@ -407,26 +445,26 @@ public class MemberServiceJpa implements MemberService {
 
     private void isCorrectEmail(String email) {
         if (MemberCondition.EMAIL.isNotCorrect(email)) {
-            throw new InCorrectEmailException(ErrorEnum.INCORRECT_EMAIL);
+            throw new IncorrectEmailException(ErrorEnum.INCORRECT_EMAIL);
         }
     }
 
     private void isCorrectAccountId(String accountId) {
         if (MemberCondition.ACCOUNT_ID.isNotCorrect(accountId)) {
-            throw new InCorrectAccountIdException(ErrorEnum.INCORRECT_ACCOUNT_ID);
+            throw new IncorrectAccountIdException(ErrorEnum.INCORRECT_ACCOUNT_ID);
         }
     }
 
     private void isCorrectAccountPw(String accountPw) {
         isAccountPwCombination(accountPw);
         if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
-            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }
     }
 
     private void isCorrectNickname(String nickname) {
         if (MemberCondition.NICKNAME.isNotCorrect(nickname)) {
-            throw new InCorrectNicknameException(ErrorEnum.INCORRECT_NICKNAME);
+            throw new IncorrectNicknameException(ErrorEnum.INCORRECT_NICKNAME);
         }
     }
 
@@ -437,11 +475,11 @@ public class MemberServiceJpa implements MemberService {
     }
     private void isAccountPwCombination(String accountPw) {
         if (isIncludeAllEnglish(accountPw)) {
-            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         } else if (isIncludeAllSign(accountPw)) {
-            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         } else if (isIncludeAllNumber(accountPw)) {
-            throw new InCorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }
     }
 
@@ -491,5 +529,31 @@ public class MemberServiceJpa implements MemberService {
                 .stream()
                 .map(FollowedMember::createFollowedMember)
                 .collect(Collectors.toList());
+    }
+
+    private String getRandomNickname() {
+        String randomNickname = RandomStringUtils.randomAlphabetic(NICKNAME_MAX.getLength());
+
+        Optional<Member> member = memberRepository.findByNickname(randomNickname);
+
+        while (member.isPresent()) {
+            randomNickname = RandomStringUtils.randomAlphabetic(NICKNAME_MAX.getLength());
+            member = memberRepository.findByNickname(randomNickname);
+        }
+        log.info("randomNickname : {}", randomNickname);
+        return randomNickname;
+    }
+
+    private String getRandomAccountId() {
+        String randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_ID_MAX.getLength());
+
+        Optional<Member> member = memberRepository.findOneByAccountId(randomAccountId);
+
+        while (member.isPresent()) {
+            randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_ID_MAX.getLength());
+            member = memberRepository.findByNickname(randomAccountId);
+        }
+        log.info("randomNickname : {}", randomAccountId);
+        return randomAccountId;
     }
 }

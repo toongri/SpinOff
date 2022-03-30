@@ -9,5 +9,10 @@
       "name": "spring.social.kakao.kakao.client_id",
       "type": "java.lang.String",
       "description": "Description for spring.social.kakao.kakao.client_id."
+    },
+    {
+      "name": "spring.social.kakao.client_id",
+      "type": "java.lang.String",
+      "description": "Description for spring.social.kakao.client_id."
     }
   ] }

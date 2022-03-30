@@ -1,9 +1,9 @@
 package com.nameless.spin_off.entity.enums.member;
 
 public enum EmailLinkageServiceEnum {
-    NAVER("naver"),
-    GOOGLE("gmail"),
-    KAKAO("kakao");
+    naver("naver"),
+    google("gmail"),
+    kakao("kakao");
 
     private final String value;
 
@@ -13,5 +13,9 @@ public enum EmailLinkageServiceEnum {
 
     public String getValue() {
         return value;
+    }
+
+    public String getName() {
+        return name();
     }
 }

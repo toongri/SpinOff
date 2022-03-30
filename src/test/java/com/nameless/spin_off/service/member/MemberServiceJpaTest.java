@@ -6,7 +6,10 @@ import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.member.AlreadyAccountIdException;
+import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
+import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.sign.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.EmailAuthRepository;
@@ -122,53 +125,53 @@ class MemberServiceJpaTest {
         //when
         //then
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountIdException.class);
+                .isInstanceOf(IncorrectAccountIdException.class);
 
         memberRegisterRequestDto.setAccountId("aaaaaaaaaaaaa");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountIdException.class);
+                .isInstanceOf(IncorrectAccountIdException.class);
 
         memberRegisterRequestDto.setAccountId("aaaaa%aaa");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountIdException.class);
+                .isInstanceOf(IncorrectAccountIdException.class);
 
         memberRegisterRequestDto.setAccountId("가나다라마바사아");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountIdException.class);
+                .isInstanceOf(IncorrectAccountIdException.class);
 
         memberRegisterRequestDto.setAccountId("abcdefgt");
         memberRegisterRequestDto.setAccountPw("가나다라마바사아");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountPwException.class);
+                .isInstanceOf(IncorrectAccountPwException.class);
 
         memberRegisterRequestDto.setAccountPw("125123223");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountPwException.class);
+                .isInstanceOf(IncorrectAccountPwException.class);
 
         memberRegisterRequestDto.setAccountPw("asbdsddd");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountPwException.class);
+                .isInstanceOf(IncorrectAccountPwException.class);
 
         memberRegisterRequestDto.setAccountPw("!@%!@#%@@#@");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountPwException.class);
+                .isInstanceOf(IncorrectAccountPwException.class);
 
         memberRegisterRequestDto.setAccountPw("ds23!");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectAccountPwException.class);
+                .isInstanceOf(IncorrectAccountPwException.class);
 
         memberRegisterRequestDto.setAccountPw("abdfsdf231!");
         memberRegisterRequestDto.setNickname("가");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectNicknameException.class);
+                .isInstanceOf(IncorrectNicknameException.class);
 
         memberRegisterRequestDto.setNickname("rkskekfkfkfk");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectNicknameException.class);
+                .isInstanceOf(IncorrectNicknameException.class);
 
         memberRegisterRequestDto.setNickname("rksk!");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectNicknameException.class);
+                .isInstanceOf(IncorrectNicknameException.class);
 
         emailAuthRepository.save(EmailAuth.builder()
                 .authToken("abc")
@@ -179,7 +182,7 @@ class MemberServiceJpaTest {
         memberRegisterRequestDto.setNickname("퉁그리_");
         memberRegisterRequestDto.setEmail("@naver.com");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectEmailException.class);
+                .isInstanceOf(IncorrectEmailException.class);
 
         emailAuthRepository.save(EmailAuth.builder()
                 .authToken("abc")
@@ -189,7 +192,7 @@ class MemberServiceJpaTest {
                 .build());
         memberRegisterRequestDto.setEmail("abc@naver");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectEmailException.class);
+                .isInstanceOf(IncorrectEmailException.class);
         emailAuthRepository.save(EmailAuth.builder()
                 .authToken("abc")
                 .email("abc@")
@@ -198,7 +201,7 @@ class MemberServiceJpaTest {
                 .build());
         memberRegisterRequestDto.setEmail("abc@");
         assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(InCorrectEmailException.class);
+                .isInstanceOf(IncorrectEmailException.class);
     }
 
     @Test
