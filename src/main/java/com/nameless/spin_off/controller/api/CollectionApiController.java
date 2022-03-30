@@ -4,21 +4,27 @@ import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
+import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.query.CollectionQueryService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
+
 @Slf4j
+@Api(tags = {"컬렉션 api"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/collection")
@@ -28,8 +34,17 @@ public class CollectionApiController {
     private final CollectionQueryService collectionQueryService;
     private final EnumMapper enumMapper;
 
+    @ApiOperation(value = "컬렉션 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionVO",
+                    value = "컬렉션 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "CreateCollectionVO")
+    })
     @PostMapping("")
-    public CollectionApiResult<Long> createOne(
+    public SingleApiResult<Long> createOne(
             @LoginMember MemberDetails currentMember, @RequestBody CreateCollectionVO collectionVO)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
@@ -42,8 +57,18 @@ public class CollectionApiController {
         return getResult(collectionService.insertCollectionByCollectionVO(collectionVO, currentMember.getId()));
     }
 
+    @ApiOperation(value = "컬렉션 좋아요 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
     @PostMapping("/{collectionId}/like")
-    public CollectionApiResult<Long> createLikeOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
+    public SingleApiResult<Long> createLikeOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
@@ -54,8 +79,18 @@ public class CollectionApiController {
         return getResult(collectionService.insertLikedCollectionByMemberId(currentMember.getId(), collectionId));
     }
 
+    @ApiOperation(value = "컬렉션 팔로우 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
     @PostMapping("/{collectionId}/follow")
-    public CollectionApiResult<Long> createFollowOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
+    public SingleApiResult<Long> createFollowOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,
             NotExistCollectionException, CantFollowOwnCollectionException {
 
@@ -66,8 +101,11 @@ public class CollectionApiController {
         return getResult(collectionService.insertFollowedCollectionByMemberId(currentMember.getId(), collectionId));
     }
 
+    @ApiOperation(value = "컬렉션 리스트 조회", notes = "로그인 된 멤버의 컬렉션 리스트 조회")
+    @ApiImplicitParams({
+    })
     @GetMapping("/list/name")
-    public CollectionApiResult<List<PostInCollectionDto>> getCollectionNamesById(
+    public SingleApiResult<List<PostInCollectionDto>> getCollectionNamesById(
             @LoginMember MemberDetails currentMember) {
 
         log.info("getCollectionNamesById");
@@ -76,6 +114,9 @@ public class CollectionApiController {
         return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
     }
 
+    @ApiOperation(value = "컬렉션 공개 설정 리스트 조회", notes = "")
+    @ApiImplicitParams({
+    })
     @GetMapping("/public-categories")
     public List<EnumMapperValue> getCollectionPublicCategories() {
 
@@ -83,17 +124,4 @@ public class CollectionApiController {
 
         return enumMapper.get("PublicOfCollectionStatus");
     }
-
-    @Data
-    @AllArgsConstructor
-    public static class CollectionApiResult<T> {
-        private T data;
-        Boolean isSuccess;
-        String code;
-        String message;
-    }
-    public <T> CollectionApiResult<T> getResult(T data) {
-        return new CollectionApiResult<>(data, true, "0", "성공");
-    }
-
 }

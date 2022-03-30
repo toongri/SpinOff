@@ -9,6 +9,10 @@ import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
 import com.nameless.spin_off.service.post.PostService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
+@Api(tags = {"조회 api"}, hidden = true)
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/view")
@@ -30,6 +35,15 @@ public class ViewApiController {
     private final MovieService movieService;
     private final MemberService memberService;
 
+    @ApiOperation(value = "유저 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "requestDto",
+                    value = "회원가입 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "MemberRegisterRequestDto")
+    })
     @PostMapping("/post/{postId}/view/{ip}")
     public ViewApiResult<Long> createPostOne(
             @PathVariable String ip, @PathVariable Long postId)

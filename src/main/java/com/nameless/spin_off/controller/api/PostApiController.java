@@ -6,6 +6,7 @@ import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostFirstDto;
 import com.nameless.spin_off.dto.PostDto.VisitPostDto;
+import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
@@ -17,8 +18,10 @@ import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
 import com.nameless.spin_off.service.query.PostQueryService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +34,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
+
 @Slf4j
+@Api(tags = {"글 api"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/post")
@@ -41,10 +47,26 @@ public class PostApiController {
     private final PostQueryService postQueryService;
     private final EnumMapper enumMapper;
 
+    @ApiOperation(value = "글 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "createPostVO",
+                    value = "{" +
+                            "\"title\":\"string\"," +
+                            " \"content\":\"string\"," +
+                            " \"movieId\":null," +
+                            " \"publicOfPostStatus\": \"A\"," +
+                            " \"hashtagContents\" : []," +
+                            " \"collectionIds\":[]" +
+                            "}",
+                    required = true,
+                    paramType = "formData",
+                    dataType = "CreatePostVO")
+    })
     @PostMapping("")
-    public PostApiResult<Long> createOne(@LoginMember MemberDetails currentMember,
-                                         @RequestPart CreatePostVO createPostVO,
-                                         @RequestPart("images") List<MultipartFile> multipartFiles) throws
+    public SingleApiResult<Long> createOne(@LoginMember MemberDetails currentMember,
+                                                     @RequestPart CreatePostVO createPostVO,
+                                                     @RequestPart("images") List<MultipartFile> multipartFiles) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             IncorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException,
@@ -62,8 +84,18 @@ public class PostApiController {
         return getResult(postService.insertPostByPostVO(createPostVO, currentMember.getId(), multipartFiles));
     }
 
+    @ApiOperation(value = "글 좋아요 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
     @PostMapping("/{postId}/like")
-    public PostApiResult<Long> createLikeOne(
+    public SingleApiResult<Long> createLikeOne(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
@@ -85,8 +117,26 @@ public class PostApiController {
 //        return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
 //    }
 
+    @ApiOperation(value = "글 컬렉션삽입 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "collectionIds",
+                    value = "컬렉션 id 리스트",
+                    required = true,
+                    paramType = "query",
+                    dataType = "long",
+                    example = "123",
+                    allowMultiple = true)
+    })
     @PostMapping("/{postId}/collections")
-    public PostApiResult<List<Long>> createCollectedAll(
+    public SingleApiResult<List<Long>> createCollectedAll(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
@@ -99,22 +149,97 @@ public class PostApiController {
         return getResult(postService.insertCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
 
+    @ApiOperation(value = "글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "page",
+                    value = "페이지 번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "페이지 크기",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123",
+                    allowableValues = "range[0, 100]"),
+            @ApiImplicitParam(
+                    name = "sort",
+                    value = "페이지 정렬",
+                    required = false,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "popularity,desc"),
+            @ApiImplicitParam(
+                    name = "ip",
+                    value = "ip주소",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "192.168.0.1")
+    })
     @GetMapping("/{postId}")
-    public PostApiResult<RelatedPostFirstDto<VisitPostDto>> getPostForVisit(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId,
+    public SingleApiResult<RelatedPostFirstDto<VisitPostDto>> getPostForVisit(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam String ip,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
         log.info("getPostForVisit");
         log.info("postId : {}", postId);
+        log.info("ip : {}", ip);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        return getResult(postQueryService.getPostForVisit(currentMember, postId, pageable));
+        RelatedPostFirstDto<VisitPostDto> postForVisit = postQueryService.getPostForVisit(currentMember, postId, pageable);
+        postService.insertViewedPostByIp(ip, postId);
+        return getResult(postForVisit);
     }
+
+    @ApiOperation(value = "연관 글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "page",
+                    value = "페이지 번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "페이지 크기",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123",
+                    allowableValues = "range[0, 100]"),
+            @ApiImplicitParam(
+                    name = "sort",
+                    value = "페이지 정렬",
+                    required = false,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "popularity,desc")
+    })
     @GetMapping("/{postId}/related")
-    public PostApiResult<Slice<RelatedPostDto>> getRelatedPostsSliced(
+    public SingleApiResult<Slice<RelatedPostDto>> getRelatedPostsSliced(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
@@ -129,14 +254,9 @@ public class PostApiController {
         return getResult(postQueryService.getRelatedPostsSliced(currentMemberId, postId, pageable));
     }
 
-    private Long getCurrentMemberId(MemberDetails currentMember) {
-        if (currentMember != null) {
-            return currentMember.getId();
-        } else {
-            return null;
-        }
-    }
-
+    @ApiOperation(value = "글 공개 설정 리스트 조회", notes = "")
+    @ApiImplicitParams({
+    })
     @GetMapping("/public-categories")
     public List<EnumMapperValue> getPostPublicCategories() {
 
@@ -145,15 +265,11 @@ public class PostApiController {
         return enumMapper.get("PublicOfPostStatus");
     }
 
-    @Data
-    @AllArgsConstructor
-    public static class PostApiResult<T> {
-        private T data;
-        Boolean isSuccess;
-        String code;
-        String message;
-    }
-    public <T> PostApiResult<T> getResult(T data) {
-        return new PostApiResult<>(data, true, "0", "성공");
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
     }
 }

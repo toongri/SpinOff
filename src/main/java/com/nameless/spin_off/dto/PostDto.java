@@ -12,6 +12,7 @@ import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.post.IncorrectContentOfPostException;
 import com.nameless.spin_off.exception.post.IncorrectTitleOfPostException;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -222,11 +223,46 @@ public class PostDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreatePostVO {
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String title;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String content;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private Long movieId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private PublicOfPostStatus publicOfPostStatus;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private List<String> hashtagContents;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "List<Long>")
         private List<Long> collectionIds;
     }
 

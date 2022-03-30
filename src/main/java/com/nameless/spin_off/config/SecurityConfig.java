@@ -2,9 +2,6 @@ package com.nameless.spin_off.config;
 
 import com.nameless.spin_off.config.AccessDeniedHandler.CustomAccessDeniedHandler;
 import com.nameless.spin_off.config.AuthenticationEntryPoint.CustomAuthenticationEntryPoint;
-import com.nameless.spin_off.config.auth.CustomOAuth2UserService;
-import com.nameless.spin_off.config.auth.OAuth2FailureHandler;
-import com.nameless.spin_off.config.auth.OAuth2SuccessHandler;
 import com.nameless.spin_off.config.jwt.JwtAuthenticationFilter;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private final CustomOAuth2UserService oAuth2UserService;
     private final JwtTokenProvider jwtTokenProvider;
-    private final OAuth2SuccessHandler successHandler;
-    private final OAuth2FailureHandler failureHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
 
@@ -51,24 +45,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/api/main-page/discovery").permitAll()
                         .antMatchers("/api/hashtag/most-popular").permitAll()
                         .antMatchers("/api/post/post-public-categories").permitAll()
-                        .antMatchers("/swagger-ui/**").permitAll()
-                        .antMatchers("/swagger-resources/**").permitAll()
-                        .antMatchers("/swagger-ui.html").permitAll()
-                        .antMatchers("/v2/api-docs").permitAll()
-                        .antMatchers("/webjars/**").permitAll()
-                        .anyRequest().hasRole("USER")
-//                        .anyRequest().permitAll()
+//                        .anyRequest().hasRole("USER")
+                        .anyRequest().permitAll()
                 .and()
                     .exceptionHandling().authenticationEntryPoint(customAuthenticationEntryPoint)
                 .and()
-                    .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler)
-                .and()
-                    .oauth2Login()
-                    .userInfoEndpoint().userService(oAuth2UserService)
-                .and()
-                    .failureHandler(failureHandler)
-                    .successHandler(successHandler);
-
+                    .exceptionHandling().accessDeniedHandler(customAccessDeniedHandler);
         http.addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
     }
 }

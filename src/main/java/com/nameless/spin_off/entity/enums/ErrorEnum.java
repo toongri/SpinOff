@@ -10,9 +10,9 @@ public enum ErrorEnum {
 
     //SECURITY
     INVALID_REFRESH_TOKEN("ERR001", "리프레쉬 토큰이 유효하지 않습니다."),
-    AUTHENTICATION_ENTRY("ERR002", "토큰의 유효기간이 다 됬습니다. 재발급이 필요합니다."),
+    AUTHENTICATION_ENTRY("ERR002", "접근 권한이 필요합니다. 토큰을 발급해주세요."),
     ACCESS_DENIED("ERR003", "접근 권한이 없습니다."),
-    BAD_CREDENTIALS("ERR004", "아이디나 비밀번호가 맞지 않습니다. 다시 확인해 주십시오."),
+    SOCIAL("ERR004", "소셜 로그인에 실패하였습니다. 고객센터에 문의바랍니다."),
     INTERNAL_AUTHENTICATION_SERVICE("ERR005", "아이디나 비밀번호가 맞지 않습니다. 다시 확인해 주십시오."),
     DISABLED("ERR006", "계정이 비활성화 되었습니다. 관리자에게 문의하세요."),
     CREDENTIALS_EXPIRED("ERR007", "비밀번호가 유효기간이 만료되었습니다. 관리자에게 문의하세요."),
@@ -33,6 +33,7 @@ public enum ErrorEnum {
     NOT_EXIST_EMAIL_AUTH_TOKEN("ERR020", "해당 이메일 인증이 존재하지 않습니다."),
     NOT_EXIST_EMAIL_LINKAGE_TOKEN("ERR021", "현재 이메일 연동 토큰을 찾을 수 없습니다."),
     NOT_MATCH_ACCOUNT_PW("ERR022", "비밀번호가 일치하지 않습니다."),
+    INCORRECT_PROVIDER("ERR056", "요청한 provider가 존재하지 않습니다."),
 
     //COLLECTION
     ALREADY_COLLECTED_POST("ERR023", "이미 컬렉션에 포스트가 포함되있습니다."),

@@ -4,6 +4,7 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -63,7 +64,19 @@ public class MemberDto {
     @Data
     @NoArgsConstructor
     public static class EmailAuthRequestDto {
+
+        @ApiModelProperty(
+                value = "이메일 정보",
+                required = true,
+                example = "spinoff@naver.com",
+                dataType = "string")
         private String email;
+
+        @ApiModelProperty(
+                value = "이메일 인증 토큰",
+                required = true,
+                example = "dsklsdk32930",
+                dataType = "string")
         private String authToken;
 
         public EmailAuthRequestDto(String email, String authToken) {
@@ -87,8 +100,26 @@ public class MemberDto {
     @Data
     @NoArgsConstructor
     public static class EmailLinkageCheckRequestDto {
+
+        @ApiModelProperty(
+                value = "이메일 정보",
+                required = true,
+                example = "spinoff@naver.com",
+                dataType = "string")
         private String email;
+
+        @ApiModelProperty(
+                value = "계정 아이디",
+                required = true,
+                example = "spinof2321",
+                dataType = "string")
         private String accountId;
+
+        @ApiModelProperty(
+                value = "이메일 인증 토큰 정보",
+                required = true,
+                example = "dfldkfbnk1232",
+                dataType = "string")
         private String authToken;
 
         public EmailLinkageCheckRequestDto(String email, String accountId, String authToken) {
@@ -133,7 +164,19 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class TokenRequestDto {
+
+        @ApiModelProperty(
+                value = "엑세스토큰",
+                required = true,
+                example = "spinoff2323",
+                dataType = "string")
         String accessToken;
+
+        @ApiModelProperty(
+                value = "리프레쉬토큰",
+                required = true,
+                example = "spinoff2323",
+                dataType = "string")
         String refreshToken;
     }
 
@@ -141,7 +184,19 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberLoginRequestDto {
+
+        @ApiModelProperty(
+                value = "계정아이디",
+                required = true,
+                example = "spinoff2323",
+                dataType = "string")
         private String accountId;
+
+        @ApiModelProperty(
+                value = "계정비밀번호",
+                required = true,
+                example = "spino34223",
+                dataType = "string")
         private String accountPw;
     }
 
@@ -264,12 +319,54 @@ public class MemberDto {
     @NoArgsConstructor
     @AllArgsConstructor
     public static class MemberRegisterRequestDto {
+
+        @ApiModelProperty(
+                value = "계정 id",
+                required = true,
+                example = "spinoff",
+                dataType = "string")
         private String accountId;
+
+        @ApiModelProperty(
+                value = "계정 id",
+                required = true,
+                example = "dfd9232",
+                dataType = "string")
         private String accountPw;
+
+        @ApiModelProperty(
+                value = "이름",
+                required = true,
+                example = "김준형",
+                dataType = "string")
         private String name;
+
+        @ApiModelProperty(
+                value = "닉네임",
+                required = true,
+                example = "퉁그리",
+                dataType = "string")
         private String nickname;
+
+        @ApiModelProperty(
+                value = "생일",
+                required = true,
+                example = "2019-05-05",
+                dataType = "string")
         private LocalDate birth;
+
+        @ApiModelProperty(
+                value = "이메일",
+                required = true,
+                example = "spinoff@naver.com",
+                dataType = "string")
         private String email;
+
+        @ApiModelProperty(
+                value = "이메일 인증코드",
+                required = true,
+                example = "dfdfd0922",
+                dataType = "string")
         private String authToken;
     }
 

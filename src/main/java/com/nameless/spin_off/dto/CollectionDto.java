@@ -2,6 +2,7 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -210,8 +211,25 @@ public class CollectionDto {
     @NoArgsConstructor
     public static class CreateCollectionVO {
 
+        @ApiModelProperty(
+                value = "컬렉션 제목",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String title;
+
+        @ApiModelProperty(
+                value = "컬렉션 본문",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String content;
+
+        @ApiModelProperty(
+                value = "컬렉션 공개범위",
+                required = true,
+                example = "A",
+                dataType = "PublicOfCollectionStatus")
         private PublicOfCollectionStatus publicOfCollectionStatus;
     }
 }

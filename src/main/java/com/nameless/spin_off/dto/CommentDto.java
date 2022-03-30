@@ -5,6 +5,7 @@ import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.comment.LikedCommentInPost;
 import com.nameless.spin_off.entity.member.Member;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -77,8 +78,25 @@ public class CommentDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateCommentInPostVO {
+
+        @ApiModelProperty(
+                value = "글 id",
+                required = true,
+                example = "123",
+                dataType = "Long")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "댓글 id",
+                example = "123",
+                dataType = "Long")
         private Long parentId;
+
+        @ApiModelProperty(
+                value = "댓글 내용",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String content;
     }
 
@@ -86,8 +104,25 @@ public class CommentDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class CreateCommentInCollectionVO {
+
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                required = true,
+                example = "123",
+                dataType = "Long")
         private Long collectionId;
+
+        @ApiModelProperty(
+                value = "댓글 id",
+                example = "123",
+                dataType = "Long")
         private Long parentId;
+
+        @ApiModelProperty(
+                value = "댓글 내용",
+                required = true,
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
+                dataType = "String")
         private String content;
     }
 }
