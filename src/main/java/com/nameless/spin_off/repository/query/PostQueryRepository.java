@@ -43,12 +43,12 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
-    public PublicOfPostStatus findPublicByPostId(Long postId) {
-        return getQueryFactory()
+    public Optional<PublicOfPostStatus> findPublicByPostId(Long postId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(post.publicOfPostStatus)
                 .from(post)
                 .where(post.id.eq(postId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Optional<IdAndPublicPostDto> findPublicPostByCommentId(Long commentId) {

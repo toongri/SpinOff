@@ -191,12 +191,8 @@ public class PostServiceJpa implements PostService{
     }
 
     private PublicOfPostStatus getPublicOfPost(Long postId) {
-        PublicOfPostStatus publicPost = postQueryRepository.findPublicByPostId(postId);
-        if (publicPost == null) {
-            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
-        } else {
-            return publicPost;
-        }
+        return postQueryRepository.findPublicByPostId(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private boolean isExistPostIp(Long postId, String ip) {

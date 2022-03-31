@@ -43,7 +43,6 @@ public class HashtagServiceJpa implements HashtagService{
     @Override
     public Long insertFollowedHashtagByHashtagId(Long memberId, Long hashtagId) throws
             NotExistMemberException, NotExistHashtagException, AlreadyFollowedHashtagException {
-
         isExistHashtag(hashtagId);
         isExistFollowedHashtag(memberId, hashtagId);
 

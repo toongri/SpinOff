@@ -38,12 +38,12 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
-    public PublicOfCollectionStatus findPublicByCollectionId(Long collectionId) {
-        return getQueryFactory()
+    public Optional<PublicOfCollectionStatus> findPublicByCollectionId(Long collectionId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(collection.publicOfCollectionStatus)
                 .from(collection)
                 .where(collection.id.eq(collectionId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Optional<IdAndPublicCollectionDto> findPublicAndIdByCommentId(Long commentId) {

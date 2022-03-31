@@ -64,28 +64,24 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
     }
 
     private void isBlockMembersComment(Long memberId, Long commentId) {
-        if (commentId == null) {
-
-        } else if (commentInCollectionQueryRepository.isBlockMembersComment(memberId, commentId)) {
-            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        if (commentId != null) {
+            if (commentInCollectionQueryRepository.isBlockMembersComment(memberId, commentId)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
         }
     }
 
     private void isExistCommentInCollection(Long commentId, Long collectionId) {
-        if (commentId == null) {
-
-        } else if (!commentInCollectionQueryRepository.isExistInCollection(commentId, collectionId)) {
-            throw new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION);
+        if (commentId != null) {
+            if (!commentInCollectionQueryRepository.isExistInCollection(commentId, collectionId)) {
+                throw new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION);
+            }
         }
     }
 
     private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
-        PublicOfCollectionStatus publicCollection = collectionQueryRepository.findPublicByCollectionId(collectionId);
-        if (publicCollection == null) {
-            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
-        } else {
-            return publicCollection;
-        }
+        return collectionQueryRepository.findPublicByCollectionId(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     private IdAndPublicCollectionDto getPublicAndIdCollectionByCommentId(Long commentId) {

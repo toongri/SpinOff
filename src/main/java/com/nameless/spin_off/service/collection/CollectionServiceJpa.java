@@ -100,12 +100,8 @@ public class CollectionServiceJpa implements CollectionService {
     }
 
     private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
-        PublicOfCollectionStatus publicCollection = collectionQueryRepository.findPublicByCollectionId(collectionId);
-        if (publicCollection == null) {
-            throw new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY);
-        } else {
-            return publicCollection;
-        }
+        return collectionQueryRepository.findPublicByCollectionId(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY));
     }
 
     private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {

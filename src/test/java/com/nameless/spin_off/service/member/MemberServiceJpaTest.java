@@ -1,20 +1,12 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
-import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.exception.member.AlreadyAccountIdException;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.exception.sign.*;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.member.EmailAuthRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
-import java.time.LocalDate;
 
 import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -37,172 +28,6 @@ class MemberServiceJpaTest {
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
-    @Autowired CollectionRepository collectionRepository;
-    @Autowired PostRepository postRepository;
-    @Autowired EmailAuthRepository emailAuthRepository;
-
-    @Test
-    public void 멤버_회원가입() throws Exception{
-        //given
-        String accountId = "aa";
-        String accountPw = "aa";
-        String name = "dd";
-        String nickname = "ddd";
-        LocalDate birth = LocalDate.now();
-        String email = "cc";
-        String profileImg = null;
-
-        MemberRegisterRequestDto memberRegisterRequestDto =
-                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email, null);
-        //when
-        Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
-
-        em.flush();
-        //then
-        Member member = memberRepository.getById(aLong);
-
-        assertThat(member.getAccountId()).isEqualTo(accountId);
-        assertThat(member.getAccountPw()).isEqualTo(accountPw);
-        assertThat(member.getName()).isEqualTo(name);
-        assertThat(member.getNickname()).isEqualTo(nickname);
-        assertThat(member.getBirth()).isEqualTo(birth);
-        assertThat(member.getEmail()).isEqualTo(email);
-        assertThat(member.getProfileImg()).isEqualTo(profileImg);
-    }
-
-    @Test
-    public void 멤버_회원가입_예외처리() throws Exception{
-        //given
-        String accountId = "bdfdfd";
-        String accountPw = "dfdfdf";
-        String name = "fdfdf";
-        String nickname = "fdfdf";
-        LocalDate birth = LocalDate.now();
-        String email = "cc";
-        String profileImg = null;
-
-        MemberRegisterRequestDto memberRegisterRequestDto =
-                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email, "abc");
-
-        //when
-        Long aLong = memberService.insertMemberByMemberVO(memberRegisterRequestDto);
-        em.flush();
-
-        //then
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
-                .isInstanceOf(AlreadyAccountIdException.class);
-
-        memberRegisterRequestDto.setNickname("");
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
-                .isInstanceOf(AlreadyAccountIdException.class);
-
-        memberRegisterRequestDto.setNickname(nickname);
-        memberRegisterRequestDto.setAccountId("");
-        assertThatThrownBy(() -> memberService.insertMemberByMemberVO(memberRegisterRequestDto))
-                .isInstanceOf(AlreadyNicknameException.class);
-    }
-    @Test
-    public void 멤버_회원가입_형식_예외처리() throws Exception{
-        //given
-        String accountId = "aaaaa";
-        String accountPw = "dfdfdf231";
-        String name = "fdfdf";
-        String nickname = "fdfdff";
-        LocalDate birth = LocalDate.now();
-        String email = "cc@naver.com";
-        String profileImg = null;
-
-        emailAuthRepository.save(EmailAuth.builder()
-                .authToken("abc")
-                .email(email)
-                .expired(true)
-                .provider(EmailAuthProviderStatus.A)
-                .build());
-
-        MemberRegisterRequestDto memberRegisterRequestDto =
-                new MemberRegisterRequestDto(accountId, accountPw, name, nickname, birth, email, "abc");
-
-        //when
-        //then
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountIdException.class);
-
-        memberRegisterRequestDto.setAccountId("aaaaaaaaaaaaa");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountIdException.class);
-
-        memberRegisterRequestDto.setAccountId("aaaaa%aaa");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountIdException.class);
-
-        memberRegisterRequestDto.setAccountId("가나다라마바사아");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountIdException.class);
-
-        memberRegisterRequestDto.setAccountId("abcdefgt");
-        memberRegisterRequestDto.setAccountPw("가나다라마바사아");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("125123223");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("asbdsddd");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("!@%!@#%@@#@");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("ds23!");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("abdfsdf231!");
-        memberRegisterRequestDto.setNickname("가");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectNicknameException.class);
-
-        memberRegisterRequestDto.setNickname("rkskekfkfkfk");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectNicknameException.class);
-
-        memberRegisterRequestDto.setNickname("rksk!");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectNicknameException.class);
-
-        emailAuthRepository.save(EmailAuth.builder()
-                .authToken("abc")
-                .email("@naver.com")
-                .expired(true)
-                .provider(EmailAuthProviderStatus.A)
-                .build());
-        memberRegisterRequestDto.setNickname("퉁그리_");
-        memberRegisterRequestDto.setEmail("@naver.com");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectEmailException.class);
-
-        emailAuthRepository.save(EmailAuth.builder()
-                .authToken("abc")
-                .email("abc@naver")
-                .expired(true)
-                .provider(EmailAuthProviderStatus.A)
-                .build());
-        memberRegisterRequestDto.setEmail("abc@naver");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectEmailException.class);
-        emailAuthRepository.save(EmailAuth.builder()
-                .authToken("abc")
-                .email("abc@")
-                .expired(true)
-                .provider(EmailAuthProviderStatus.A)
-                .build());
-        memberRegisterRequestDto.setEmail("abc@");
-        assertThatThrownBy(() -> memberService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectEmailException.class);
-    }
 
     @Test
     public void 멤버_팔로우_멤버() throws Exception{

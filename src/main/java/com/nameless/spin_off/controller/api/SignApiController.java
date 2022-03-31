@@ -9,7 +9,7 @@ import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
 import com.nameless.spin_off.entity.enums.member.MemberCondition;
 import com.nameless.spin_off.exception.sign.IncorrectProviderException;
 import com.nameless.spin_off.exception.sign.NotCorrectEmailRequest;
-import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.member.SignService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -26,8 +26,7 @@ import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/sign")
 public class SignApiController {
-
-    private final MemberService memberService;
+    private final SignService signService;
 
     @ApiOperation(value = "유저 생성", notes = "")
     @ApiImplicitParams({
@@ -48,7 +47,7 @@ public class SignApiController {
         log.info("nickname : {}", requestDto.getNickname());
         log.info("birth : {}", requestDto.getBirth());
         log.info("email : {}", requestDto.getEmail());
-        return getResult(memberService.registerMember(requestDto));
+        return getResult(signService.registerMember(requestDto));
     }
 
     @ApiOperation(value = "소셜 유저 생성 및 조회", notes = "")
@@ -72,7 +71,7 @@ public class SignApiController {
     public SingleApiResult<MemberLoginResponseDto> registerBySocial(
             @RequestParam String authCode, @PathVariable String provider) {
 
-        return getResult(memberService.loginBySocial(authCode, provider));
+        return getResult(signService.loginBySocial(authCode, provider));
     }
 
     @ApiOperation(value = "유저 조회 및 수정", notes = "")
@@ -86,7 +85,7 @@ public class SignApiController {
     })
     @PatchMapping("/login")
     public SingleApiResult<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto requestDto) {
-        MemberLoginResponseDto responseDto = memberService.loginMember(requestDto);
+        MemberLoginResponseDto responseDto = signService.loginMember(requestDto);
         return getResult(responseDto);
     }
 
@@ -101,7 +100,7 @@ public class SignApiController {
     })
     @PatchMapping("/reissue")
     public SingleApiResult<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
-        TokenResponseDto responseDto = memberService.reIssue(tokenRequestDto);
+        TokenResponseDto responseDto = signService.reIssue(tokenRequestDto);
         return getResult(responseDto);
     }
 
@@ -117,7 +116,7 @@ public class SignApiController {
     })
     @PostMapping("/auth-email")
     public SingleApiResult<Boolean> authEmail(@RequestParam String email) {
-        return getResult(memberService.sendEmailForAuth(email));
+        return getResult(signService.sendEmailForAuth(email));
     }
 
     @ApiOperation(value = "이메일 인증 수정", notes = "")
@@ -131,7 +130,7 @@ public class SignApiController {
     })
     @PatchMapping("/auth-email")
     public SingleApiResult<Boolean> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
-        return getResult(memberService.confirmEmail(requestDto));
+        return getResult(signService.confirmEmail(requestDto));
     }
 
     @ApiOperation(value = "소셜 연동 생성", notes = "연동을 시도하는 api")
@@ -162,7 +161,7 @@ public class SignApiController {
             throw new IncorrectProviderException(ErrorEnum.INCORRECT_PROVIDER);
         }
 
-        memberService.updateEmailLinkage(email, currentMember.getUsername(), provider);
+        signService.updateEmailLinkage(email, currentMember.getUsername(), provider);
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
@@ -177,7 +176,7 @@ public class SignApiController {
     })
     @PatchMapping("/linkage-email")
     public SingleApiResult<String> linkageEmail(@RequestBody EmailLinkageCheckRequestDto requestDto) {
-        memberService.checkEmailLinkage(requestDto);
+        signService.checkEmailLinkage(requestDto);
         return getResult("연동이 완료되었습니다.");
     }
 
@@ -193,7 +192,7 @@ public class SignApiController {
     })
     @GetMapping("/exist/nickname")
     public SingleApiResult<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
-        return getResult(memberService.checkDuplicateNickname(nickname));
+        return getResult(signService.checkDuplicateNickname(nickname));
     }
 
     @ApiOperation(value = "아이디 존재 여부 조회", notes = "")
@@ -208,7 +207,7 @@ public class SignApiController {
     })
     @GetMapping("/exist/account-id")
     public SingleApiResult<Boolean> checkDuplicateAccountId(@RequestParam String accountId) {
-        return getResult(memberService.checkDuplicateAccountId(accountId));
+        return getResult(signService.checkDuplicateAccountId(accountId));
     }
 
     @ApiOperation(value = "아이디 정보 조회 및 메일 발송", notes = "")
@@ -223,7 +222,7 @@ public class SignApiController {
     })
     @GetMapping("/forget/account-id")
     public SingleApiResult<Boolean> findMemberAccountId(@RequestParam String email) {
-        return getResult(memberService.sendEmailForAccountId(email));
+        return getResult(signService.sendEmailForAccountId(email));
     }
 
     @ApiOperation(value = "비밀번호 정보 조회 및 수정, 메일 발송", notes = "")
@@ -238,7 +237,7 @@ public class SignApiController {
     })
     @PatchMapping("/forget/account-pw")
     public SingleApiResult<Boolean> findMemberAccountPw(@RequestParam String accountId) {
-        return getResult(memberService.sendEmailForAccountPw(accountId));
+        return getResult(signService.sendEmailForAccountPw(accountId));
     }
 
     private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {
