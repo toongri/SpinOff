@@ -292,29 +292,6 @@ class CollectionServiceJpaTest {
         assertThat(collection2.getViewSize()).isEqualTo(2);
 
     }
-
-    @Test
-    public void 글_조회수_파리미터_AND_복수데이터_예외처리() throws Exception{
-
-        //given
-        LocalDateTime now;
-        Member mem = Member.buildMember().build();
-        memberRepository.save(mem);
-        Collection col = Collection.createDefaultCollection(mem);
-        collectionRepository.save(col);
-        now = LocalDateTime.now();
-        col.insertViewedCollectionByIp("00");
-
-        em.flush();
-        em.clear();
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> collectionService.insertViewedCollectionByIp("00", 0L))
-                .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
-
-    }
     
     @Test
     public void 글_컬렉션_등록() throws Exception{

@@ -401,31 +401,4 @@ class PostServiceJpaTest {
         assertThat(post2.getPopularity()).isEqualTo(post2.getViewedPostByIps().size());
         assertThat(post2.getPopularity()).isEqualTo(2);
     }
-
-    @Test
-    public void 글_조회수_파리미터_AND_복수데이터_예외처리() throws Exception{
-
-        //given
-        LocalDateTime now;
-        Member mem = Member.buildMember().build();
-        memberRepository.save(mem);
-        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
-                .setHashTags(List.of()).build();
-        postRepository.save(po);
-        now = LocalDateTime.now();
-        po.insertViewedPostByIp("00");
-        em.flush();
-        po.insertViewedPostByIp("00");
-
-        em.flush();
-        em.clear();
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> postService.insertViewedPostByIp("00", 0L))
-                .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-    }
-
 }

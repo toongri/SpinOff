@@ -47,8 +47,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Long> findAllIdByBlockingMemberId(@Param("id")Long id);
 
     @Query("SELECT DISTINCT m.id FROM Member m " +
-            "JOIN m.blockingMembers blockingM " +
-            "JOIN m.blockedMembers blockedM " +
+            "LEFT JOIN m.blockingMembers blockingM " +
+            "LEFT JOIN m.blockedMembers blockedM " +
             "WHERE (blockingM.blockingMember.id = :id AND blockingM.blockedMemberStatus = :status) " +
             "OR (blockedM.member.id = :id AND blockedM.blockedMemberStatus = :status)")
     List<Long> findBlockingAllAndBlockedAllByIdAndBlockStatus(@Param("id") Long id,
