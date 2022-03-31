@@ -19,7 +19,8 @@ public class EmailLinkageQueryRepository {
 
     public Optional<EmailLinkage> findValidLinkageByEmail(String accountId, String email,
             String authToken, LocalDateTime currentTime) {
-        EmailLinkage firstEmailLinkage = jpaQueryFactory
+
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(emailLinkage)
                 .where(
                         emailLinkage.accountId.eq(accountId),
@@ -28,8 +29,6 @@ public class EmailLinkageQueryRepository {
                         emailLinkage.createdDate.after(currentTime),
                         emailLinkage.expired.eq(false))
                 .orderBy(emailLinkage.id.desc())
-                .fetchFirst();
-
-        return Optional.ofNullable(firstEmailLinkage);
+                .fetchFirst());
     }
 }

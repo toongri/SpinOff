@@ -162,7 +162,7 @@ public class MemberQueryServiceJpaTest {
                         memberList.get(3).getNickname(),
                         memberList.get(2).getNickname());
 
-        assertThat(content.stream().map(SearchMemberDto::getFollowingNumber).collect(Collectors.toList()))
+        assertThat(content.stream().map(SearchMemberDto::getFollowingCount).collect(Collectors.toList()))
                 .containsExactly(
                         6,
                         5,

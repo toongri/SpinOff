@@ -306,8 +306,6 @@ public class HashtagQueryRepositoryTest {
                         hashtagList.get(3).getId(),
                         hashtagList.get(4).getId(),
                         hashtagList.get(5).getId());
-
-
     }
 
     @Test

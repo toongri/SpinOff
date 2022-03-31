@@ -95,13 +95,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Long findOwnerIdByPostId(Long postId) {
-        return getQueryFactory()
+    public Optional<Long> findOwnerIdByPostId(Long postId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(post.member.id)
                 .from(post)
                 .where(
                         post.id.eq(postId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Boolean isExist(Long id) {

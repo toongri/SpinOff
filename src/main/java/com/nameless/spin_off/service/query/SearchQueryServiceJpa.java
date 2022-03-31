@@ -9,6 +9,7 @@ import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.IncorrectLengthRelatedKeywordException;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -40,7 +41,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
 
     @Override
     public RelatedSearchAllDto getRelatedSearchAllByKeyword(String keyword, int length)
-            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
 
         if (keyword.length() < RELATED_SEARCH_KEYWORD_MIN_STR.getValue()) {
             throw new IncorrectLengthRelatedKeywordException(ErrorEnum.INCORRECT_LENGTH_RELATED_KEYWORD);
@@ -53,13 +54,13 @@ public class SearchQueryServiceJpa implements SearchQueryService {
 
     @Override
     public List<RelatedSearchHashtagDto> getRelatedSearchHashtagByKeyword(String keyword, int length)
-            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
         return searchQueryRepository.findRelatedHashtagsAboutKeyword(keyword, length);
     }
 
     @Override
     public List<RelatedSearchMemberDto> getRelatedSearchMemberByKeyword(String keyword, int length)
-            throws IncorrectLengthRelatedKeywordException, IncorrectLengthRelatedKeywordException {
+            throws IncorrectLengthRelatedKeywordException {
         return searchQueryRepository.findRelatedMembersAboutKeyword(keyword, length);
     }
 
@@ -73,8 +74,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
             String keyword, Long memberId, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-        List<Long> followedMembers = getFollowedMemberByMemberId(memberId);
-        List<Long> blockedMembers = getBlockedMemberByMemberId(memberId);
+        List<Long> blockedMembers = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
         return new SearchAllDto(
                 postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, postPageable, blockedMembers),
@@ -89,7 +89,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
             String keyword, Long memberId, int length, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
-        List<Long> blockedMembers = getBlockedMemberByMemberId(memberId);
+        List<Long> blockedMembers = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
         Slice<SearchPageAtAllPostDto> posts = postQueryRepository.findAllSlicedForSearchPageAtAll(
                 keyword, postPageable, blockedMembers);
@@ -121,9 +121,9 @@ public class SearchQueryServiceJpa implements SearchQueryService {
                 data.stream().map(SearchPageAtAllPostDto::getPostId).collect(Collectors.toList()));
     }
 
-    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+    private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {
         if (memberId != null) {
-            return memberRepository.findAllIdByBlockingMemberId(memberId);
+            return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
             return new ArrayList<>();
         }

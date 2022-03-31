@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.collection.QFollowedCollection.followedCollection;
 import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
@@ -71,7 +70,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title, collection.firstThumbnail))
                 .from(collection)
                 .where(collection.member.id.eq(memberId))
-                .orderBy(collectedPost.lastModifiedDate.desc())
+                .orderBy(collection.lastModifiedDate.desc())
                 .fetch();
     }
 
@@ -81,7 +80,6 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .where(collection.id.eq(id))
                 .fetchFirst();
-
         return fetchOne != null;
     }
 
@@ -131,13 +129,13 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Long findOwnerIdByCollectionId(Long collectionId) {
-        return getQueryFactory()
+    public Optional<Long> findOwnerIdByCollectionId(Long collectionId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(collection.member.id)
                 .from(collection)
                 .where(
                         collection.id.eq(collectionId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Boolean isExistFollowedCollection(Long memberId, Long collectionId) {

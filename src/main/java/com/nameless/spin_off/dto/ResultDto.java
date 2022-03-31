@@ -10,9 +10,6 @@ public class ResultDto {
     @AllArgsConstructor
     public static class SingleApiResult<T> {
 
-        @ApiModelProperty(
-                value = "결과값",
-                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private T data;
 
         @ApiModelProperty(

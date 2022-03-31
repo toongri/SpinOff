@@ -3,6 +3,7 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageDiscoveryDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
@@ -34,7 +35,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
                                                  Pageable collectionPageable, Long memberId)
             throws NotExistMemberException {
 
-        blockedMemberIds = getBlockedMemberByMemberId(memberId);
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
         return new MainPageDiscoveryDto(
                 postQueryRepository.findAllSlicedForMainPage(popularPostPageable, memberId, blockedMemberIds),
@@ -50,7 +51,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
 
         List<Long> followedMemberIds = getFollowedMemberByMemberId(memberId);
 
-        blockedMemberIds = getBlockedMemberByMemberId(memberId);
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
         return new MainPageFollowDto(
                 postQueryRepository.findAllByFollowingMemberSlicedForMainPage(memberPageable, memberId),
@@ -73,9 +74,9 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         }
     }
 
-    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+    private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {
         if (memberId != null) {
-            return memberRepository.findAllIdByBlockingMemberId(memberId);
+            return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
             return new ArrayList<>();
         }

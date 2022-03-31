@@ -1,8 +1,6 @@
 package com.nameless.spin_off.config;
 
-import com.fasterxml.classmate.TypeResolver;
 import com.nameless.spin_off.config.member.MemberDetails;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -23,11 +21,8 @@ import java.util.List;
 
 @Profile({"real", "local"})
 @Configuration
-@RequiredArgsConstructor
 @EnableSwagger2
 public class SwaggerConfig {
-
-    private final TypeResolver typeResolver;
 
     private String version;
     private String title;

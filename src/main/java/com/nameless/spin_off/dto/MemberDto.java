@@ -1,8 +1,8 @@
 package com.nameless.spin_off.dto;
 
 
+import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -34,10 +34,30 @@ public class MemberDto {
     @Data
     @NoArgsConstructor
     public static class ContentMemberDto {
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
         private String profile;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String nickname;
+
+        @ApiModelProperty(
+                value = "멤버 아이디",
+                example = "spinoff2322")
         private String accountId;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
         private boolean isFollowed;
 
         public ContentMemberDto(Long memberId, String profile, String nickname, String accountId) {
@@ -242,58 +262,70 @@ public class MemberDto {
         private String accountId;
         private String bio;
         private String followingMemberNickname;
-        private int followingNumber;
+        private int followingCount;
         private List<String> thumbnailUrls = new ArrayList<>();
 
-        public SearchMemberDto(Member member) {
-            this.memberId = member.getId();
-            this.profileImg = member.getProfileImg();
-            this.nickname = member.getNickname();
-            this.accountId = member.getAccountId();
-            this.bio = member.getBio();
+        @QueryProjection
+        public SearchMemberDto(Long memberId, String profileImg, String nickname, String accountId, String bio,
+                               Long followingCount) {
 
-            setThumbnails(member);
+            this.memberId = memberId;
+            this.profileImg = profileImg;
+            this.nickname = nickname;
+            this.accountId = accountId;
+            this.bio = bio;
+            this.followingCount = followingCount.intValue();
         }
 
-        public SearchMemberDto(Member member, List<Long> followingMembers) {
-            this.memberId = member.getId();
-            this.profileImg = member.getProfileImg();
-            this.nickname = member.getNickname();
-            this.accountId = member.getAccountId();
-            this.bio = member.getBio();
-            setThumbnails(member);
-            if (!followingMembers.isEmpty()) {
-                findRelatedMember(member, followingMembers);
+        public void setFollowingMemberAndThumbnails(List<FollowingMemberMemberDto> followingMembers,
+                                                    List<ThumbnailMemberDto> thumbnails) {
+            if (followingMembers != null) {
+                followingMembers.stream()
+                        .max(Comparator.comparing(
+                                m -> m.followingMemberPopularity))
+                        .ifPresent(m -> setFollowingMemberNickname(m.getFollowingMemberNickname()));
+            }
+
+            if (thumbnails != null) {
+                setThumbnails(thumbnails);
             }
         }
 
-        private void findRelatedMember(Member member, List<Long> followingMembers) {
-            member.getFollowingMembers().stream()
-                    .filter(followingMember -> followingMembers.contains(followingMember.getFollowingMember().getId()))
-                    .max(Comparator.comparing(followingMember -> followingMember.getFollowingMember().getPopularity()))
-                    .ifPresent(followingMember -> setFollowingMemberNicknameAndNumber(
-                            followingMember.getFollowingMember().getNickname(), member.getFollowingMembers().size()));
-        }
-
-        public void setFollowingMemberNicknameAndNumber(String nickname, int size) {
+        public void setFollowingMemberNickname(String nickname) {
             this.followingMemberNickname = nickname;
-            this.followingNumber = size - 1;
+            this.followingCount -= 1;
         }
 
-
-        private void setThumbnails(Member member) {
-            List<Post> posts = member.getPosts();
-            int memberPostIndex = posts.size() - 1;
+        private void setThumbnails(List<ThumbnailMemberDto> thumbnails) {
+            int memberPostIndex = thumbnails.size() - 1;
             while (memberPostIndex >= 0) {
-                thumbnailUrls.add(posts.get(memberPostIndex).getThumbnailUrl());
+                thumbnailUrls.add(thumbnails.get(memberPostIndex).getThumbnail());
                 if (thumbnailUrls.size() == 4) {
                     break;
                 }
                 memberPostIndex--;
             }
-            if (memberPostIndex == -1 && thumbnailUrls.size() % 2 == 1) {
-                thumbnailUrls.remove(thumbnailUrls.size() - 1);
+            if (thumbnailUrls.size() == 3) {
+                thumbnailUrls.remove(2);
             }
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class FollowingMemberMemberDto {
+        private Long memberId;
+        private Long followingMemberId;
+        private Double followingMemberPopularity;
+        private String followingMemberNickname;
+
+        @QueryProjection
+        public FollowingMemberMemberDto(Long memberId, Long followingMemberId,
+                                        Double followingMemberPopularity, String followingMemberNickname) {
+            this.memberId = memberId;
+            this.followingMemberId = followingMemberId;
+            this.followingMemberPopularity = followingMemberPopularity;
+            this.followingMemberNickname = followingMemberNickname;
         }
     }
 

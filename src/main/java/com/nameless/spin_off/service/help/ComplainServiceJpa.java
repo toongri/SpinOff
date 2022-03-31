@@ -97,52 +97,27 @@ public class ComplainServiceJpa implements ComplainService{
         }
     }
     private Long getCollectionOwnerId(Long collectionId) {
-        Long collectionOwnerId = collectionQueryRepository.findOwnerIdByCollectionId(collectionId);
-
-        if (collectionOwnerId == null) {
-            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
-        } else {
-            return collectionOwnerId;
-        }
+        return collectionQueryRepository.findOwnerIdByCollectionId(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     private Long getPostOwnerId(Long postId) {
-        Long collectionOwnerId = postQueryRepository.findOwnerIdByPostId(postId);
-
-        if (collectionOwnerId == null) {
-            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
-        } else {
-            return collectionOwnerId;
-        }
+        return postQueryRepository.findOwnerIdByPostId(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private Long getCommentInCollectionOwnerId(Long commentId) {
-        Long collectionOwnerId = commentInCollectionQueryRepository.getCommentOwnerId(commentId);
-
-        if (collectionOwnerId == null) {
-            throw new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION);
-        } else {
-            return collectionOwnerId;
-        }
+        return commentInCollectionQueryRepository.getCommentOwnerId(commentId)
+                .orElseThrow(() -> new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION));
     }
 
     private Long getCommentInPostOwnerId(Long commentId) {
-        Long collectionOwnerId = commentInPostQueryRepository.findCommentOwnerId(commentId);
-
-        if (collectionOwnerId == null) {
-            throw new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST);
-        } else {
-            return collectionOwnerId;
-        }
+        return commentInPostQueryRepository.findCommentOwnerId(commentId)
+                .orElseThrow(() -> new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST));
     }
 
     private Long getDMOwnerId(Long dmId) {
-        Long collectionOwnerId = directMessageQueryRepository.getDMOwnerId(dmId);
-
-        if (collectionOwnerId == null) {
-            throw new NotExistDMException(ErrorEnum.NOT_EXIST_DM);
-        } else {
-            return collectionOwnerId;
-        }
+        return directMessageQueryRepository.getDMOwnerId(dmId)
+                .orElseThrow(() -> new NotExistDMException(ErrorEnum.NOT_EXIST_DM));
     }
 }

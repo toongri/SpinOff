@@ -5,6 +5,7 @@ import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
@@ -35,7 +36,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
 
         return memberQueryRepository
                 .findAllSlicedForSearchPageAtMember(keyword, pageable,
-                        getFollowedMemberByMemberId(memberId), getBlockedMemberByMemberId(memberId));
+                        memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
@@ -44,7 +45,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
 
         Slice<SearchMemberDto> members = memberQueryRepository
                 .findAllSlicedForSearchPageAtMember(keyword, pageable,
-                        getFollowedMemberByMemberId(memberId), getBlockedMemberByMemberId(memberId));
+                        memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
 
         return new SearchFirstDto<>(members, getHashtagsByPostIds(length, members.getContent()));
     }
@@ -54,7 +55,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable,
-                getBlockedMemberByMemberId(memberId));
+                getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
@@ -68,9 +69,9 @@ public class MemberQueryServiceJpa implements MemberQueryService {
                 data.stream().map(SearchMemberDto::getMemberId).collect(Collectors.toList()));
     }
 
-    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+    private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {
         if (memberId != null) {
-            return memberRepository.findAllIdByBlockingMemberId(memberId);
+            return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
             return new ArrayList<>();
         }

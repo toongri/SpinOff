@@ -45,7 +45,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
         response.setContentType("application/json;charset=UTF-8");
 
         var writer = response.getWriter();
-        writer.println(objectMapper.writeValueAsString(new ErrorResult(false, errorCode, errorMessage)));
+        writer.println(objectMapper.writeValueAsString(new ErrorResult(errorCode, errorMessage)));
         writer.flush();
     }
 }

@@ -29,9 +29,25 @@ public class CollectionDto {
     @Data
     @NoArgsConstructor
     public static class PostInCollectionDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long id;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String title;
+
+        @ApiModelProperty(
+                value = "글 썸네일 주소",
+                example = "www.naver.com")
         private String thumbnail;
+
+        @ApiModelProperty(
+                value = "콜렉팅 유무",
+                example = "false")
         private boolean isCollected;
 
         @QueryProjection
@@ -183,10 +199,25 @@ public class CollectionDto {
     @NoArgsConstructor
     public static class MainPageCollectionDto {
 
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                example = "123")
         private Long collectionId;
+        @ApiModelProperty(
+                value = "컬렉션 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String collectionTitle;
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String memberNickname;
+        @ApiModelProperty(
+                value = "컬렉션 썸네일",
+                example = "[\"www.naver.com\",\"www.kakao.com\",\"www.google.com\",\"www.nate.com\"]")
         private List<String> thumbnailUrls = new ArrayList<>();
 
         @QueryProjection

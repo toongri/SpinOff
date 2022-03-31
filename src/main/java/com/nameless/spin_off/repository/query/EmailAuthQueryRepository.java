@@ -21,7 +21,7 @@ public class EmailAuthQueryRepository {
 
     public Optional<EmailAuth> findValidAuthByEmail(String email, String authToken,
                                                     LocalDateTime currentTime, EmailAuthProviderStatus provider) {
-        EmailAuth firstEmailAuth = jpaQueryFactory
+        return Optional.ofNullable(jpaQueryFactory
                 .selectFrom(emailAuth)
                 .where(
                         emailAuth.email.eq(email),
@@ -29,9 +29,7 @@ public class EmailAuthQueryRepository {
                         emailAuth.createdDate.after(currentTime),
                         emailAuth.expired.eq(false),
                         emailAuth.provider.eq(provider))
-                .fetchFirst();
-
-        return Optional.ofNullable(firstEmailAuth);
+                .fetchFirst());
     }
 
     public Boolean isExistAuthEmail(String email, String authToken, LocalDateTime currentTime, EmailAuthProviderStatus provider) {

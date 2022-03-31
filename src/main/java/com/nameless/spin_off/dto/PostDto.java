@@ -27,18 +27,58 @@ public class PostDto {
     @Data
     @NoArgsConstructor
     public static class VisitPostDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
         private ContentMemberDto member;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postTitle;
+
+        @ApiModelProperty(
+                value = "글 생성 시간",
+                example = "2022-03-31T09:31:47.021Z")
         private LocalDateTime createTime;
+
+        @ApiModelProperty(
+                value = "글 수정 시간",
+                example = "2022-03-31T09:31:47.021Z")
         private LocalDateTime getLastModifiedDate;
+
+        @ApiModelProperty(
+                value = "글 내용",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postContent;
         private MovieInVisitPostDto movie;
+
+        @ApiModelProperty(
+                value = "글 공개범위",
+                example = "A")
         private PublicOfPostStatus publicOfPostStatus;
+
+        @ApiModelProperty(
+                value = "권한 여부",
+                example = "false")
         private boolean hasAuth;
         private List<ContentHashtagDto> hashtags;
+
+        @ApiModelProperty(
+                value = "좋아요 갯수",
+                example = "123")
         private Long likedSize;
+
+        @ApiModelProperty(
+                value = "댓글 갯수",
+                example = "123")
         private Long commentSize;
+
+        @ApiModelProperty(
+                value = "좋아요 여부",
+                example = "false")
         private boolean isLiked;
 
         public void setIsLiked(boolean isLiked) {
@@ -72,11 +112,34 @@ public class PostDto {
     @NoArgsConstructor
     public static class SearchPageAtHashtagPostDto {
 
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postTitle;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String memberNickname;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
         private String memberProfileImgUrl;
+
+        @ApiModelProperty(
+                value = "글 썸네일 이미지 주소",
+                example = "www.naver.com")
         private String thumbnailUrl;
 
         @QueryProjection
@@ -93,7 +156,15 @@ public class PostDto {
 
     @Data
     public static class IdAndPublicPostDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "글 공개범위",
+                example = "A")
         private PublicOfPostStatus publicOfPostStatus;
 
         @QueryProjection
@@ -107,11 +178,34 @@ public class PostDto {
     @NoArgsConstructor
     public static class SearchPageAtAllPostDto {
 
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postTitle;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String memberNickname;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
         private String memberProfileImgUrl;
+
+        @ApiModelProperty(
+                value = "글 썸네일 이미지 주소",
+                example = "www.naver.com")
         private String thumbnailUrl;
 
         @QueryProjection
@@ -130,7 +224,14 @@ public class PostDto {
     @NoArgsConstructor
     public static class RelatedSearchPostDto {
 
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long id;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String title;
 
         @QueryProjection
@@ -144,11 +245,34 @@ public class PostDto {
     @NoArgsConstructor
     public static class MainPagePostDto {
 
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postTitle;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String memberNickname;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
         private String memberProfileImgUrl;
+
+        @ApiModelProperty(
+                value = "글 썸네일 이미지 주소",
+                example = "www.naver.com")
         private String thumbnailUrl;
 
         @QueryProjection
@@ -177,6 +301,18 @@ public class PostDto {
     }
 
     @Data
+    public static class ThumbnailMemberDto {
+        private Long memberId;
+        private String thumbnail;
+
+        @QueryProjection
+        public ThumbnailMemberDto(Long memberId, String thumbnail) {
+            this.memberId = memberId;
+            this.thumbnail = thumbnail;
+        }
+    }
+
+    @Data
     @AllArgsConstructor
     public static class RelatedPostFirstDto<T> {
         private T data;
@@ -187,11 +323,34 @@ public class PostDto {
     @NoArgsConstructor
     public static class RelatedPostDto {
 
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
         private Long postId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postTitle;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
         private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
         private String memberNickname;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
         private String memberProfileImgUrl;
+
+        @ApiModelProperty(
+                value = "글 썸네일 이미지 주소",
+                example = "www.naver.com")
         private String thumbnailUrl;
 
         @QueryProjection

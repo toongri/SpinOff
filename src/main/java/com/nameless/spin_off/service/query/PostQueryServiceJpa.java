@@ -6,6 +6,7 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -13,7 +14,6 @@ import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.query.CommentInPostQueryRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
@@ -38,21 +38,20 @@ public class PostQueryServiceJpa implements PostQueryService{
     private final MovieRepository movieRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
-    private final CommentInPostQueryRepository commentInPostQueryRepository;
 
     @Override
     public Slice<SearchPageAtAllPostDto> getPostsSlicedForSearchPagePostAtAll(
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable,
-                getBlockedMemberByMemberId(memberId));
+                getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
     public Slice<MainPagePostDto> getPostsSlicedForMainPage(Pageable pageable, Long memberId)
             throws NotExistMemberException {
 
-        return postQueryRepository.findAllSlicedForMainPage(pageable, memberId, getBlockedMemberByMemberId(memberId));
+        return postQueryRepository.findAllSlicedForMainPage(pageable, memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
@@ -62,7 +61,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         return postQueryRepository
                 .findAllByFollowedHashtagsSlicedForMainPage(pageable,
                         getFollowedMovieByMemberId(memberId), getFollowedMemberByMemberId(memberId),
-                        getBlockedMemberByMemberId(memberId), memberId);
+                        getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
 
@@ -72,7 +71,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         return postQueryRepository
                 .findAllByFollowedMoviesSlicedForMainPage(pageable,
-                        getFollowedMemberByMemberId(memberId), getBlockedMemberByMemberId(memberId), memberId);
+                        getFollowedMemberByMemberId(memberId), getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
     @Override
@@ -93,7 +92,7 @@ public class PostQueryServiceJpa implements PostQueryService{
                 postQueryRepository.findAllByHashtagsSlicedForSearchPage(
                         pageable,
                         hashtags.stream().map(Hashtag::getId).collect(Collectors.toList()),
-                        getBlockedMemberByMemberId(memberId)),
+                        getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId)),
                 hashtags.stream().map(RelatedMostTaggedHashtagDto::new).limit(length).collect(Collectors.toList()));
     }
 
@@ -104,14 +103,14 @@ public class PostQueryServiceJpa implements PostQueryService{
         return postQueryRepository.findAllByHashtagsSlicedForSearchPage(
                 pageable,
                 hashtagRepository.findAllIdByContentIn(hashtagContent),
-                getBlockedMemberByMemberId(memberId));
+                getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
     public RelatedPostFirstDto<VisitPostDto> getPostForVisit(MemberDetails currentMember, Long postId, Pageable pageable) {
 
         Long memberId = getCurrentMemberId(currentMember);
-        List<Long> blockedMemberIds = getBlockedMemberByMemberId(memberId);
+        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         VisitPostDto post = getVisitPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
 
         return new RelatedPostFirstDto<>(
@@ -122,7 +121,7 @@ public class PostQueryServiceJpa implements PostQueryService{
     public Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable) {
 
         return postQueryRepository.findAllRelatedPostByPostId(pageable, memberId,
-                getBlockedMemberByMemberId(memberId), postId);
+                getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), postId);
     }
 
     private VisitPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
@@ -139,12 +138,15 @@ public class PostQueryServiceJpa implements PostQueryService{
                                          List<Long> blockedMemberIds, boolean isAdmin) {
 
         VisitPostDto post = getOneByPostId(postId, blockedMemberIds);
-        Long postMemberId = post.getMember().getMemberId();
-        isExistBlockedMember(memberId, postMemberId);
-        post.setHasAuth(memberId, isAdmin);
-        post.setIsLiked(isExistLikedPost(memberId, postId));
-        post.getMember().setIsFollowed(isExistFollowedMember(memberId, postMemberId));
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
+
+        if (memberId != null) {
+            Long postMemberId = post.getMember().getMemberId();
+            isExistBlockedMember(memberId, postMemberId);
+            post.setHasAuth(memberId, isAdmin);
+            post.setIsLiked(isExistLikedPost(memberId, postId));
+            post.getMember().setIsFollowed(isExistFollowedMember(memberId, postMemberId));
+        }
         return post;
     }
 
@@ -164,9 +166,9 @@ public class PostQueryServiceJpa implements PostQueryService{
         }
     }
 
-    private List<Long> getBlockedMemberByMemberId(Long memberId) {
+    private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {
         if (memberId != null) {
-            return memberRepository.findAllIdByBlockingMemberId(memberId);
+            return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
             return new ArrayList<>();
         }
@@ -181,7 +183,7 @@ public class PostQueryServiceJpa implements PostQueryService{
     }
 
     private void isExistBlockedMember(Long memberId, Long targetMemberId) {
-        if (memberQueryRepository.isExistBlockedMember(memberId, targetMemberId)) {
+        if (memberQueryRepository.isBlockedOrBlockingAndStatus(memberId, targetMemberId, BlockedMemberStatus.A)) {
             throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }

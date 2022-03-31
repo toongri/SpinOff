@@ -5,6 +5,7 @@ import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
@@ -34,7 +35,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
 
         return collectionQueryRepository
                 .findAllSlicedForSearchPageAtAll(keyword, pageable,
-                        getBlockedMemberByMemberId(memberId), memberId);
+                        getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
     @Override
@@ -42,7 +43,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return collectionQueryRepository
-                .findAllSlicedForSearchPageAtCollection(keyword, pageable,getBlockedMemberByMemberId(memberId), memberId);
+                .findAllSlicedForSearchPageAtCollection(keyword, pageable, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
     @Override
@@ -50,7 +51,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException {
 
         Slice<SearchCollectionDto> collections = collectionQueryRepository
-                .findAllSlicedForSearchPageAtCollection(keyword, pageable, getBlockedMemberByMemberId(memberId), memberId);
+                .findAllSlicedForSearchPageAtCollection(keyword, pageable, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
 
         return new SearchFirstDto<>(
                 collections, hashtagQueryRepository.findAllByCollectionIds(length, collections.stream()
@@ -67,7 +68,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
             throws NotExistMemberException {
 
         return collectionQueryRepository.findAllSlicedForMainPage(pageable,
-                memberId, getBlockedMemberByMemberId(memberId));
+                memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
     }
 
     @Override
@@ -86,17 +87,9 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
                 .findAllByFollowedCollectionsSlicedForMainPage(pageable, memberId);
     }
 
-    private List<Long> getFollowedMemberByMemberId(Long memberId) {
+    private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {
         if (memberId != null) {
-            return memberRepository.findAllIdByFollowingMemberId(memberId);
-        } else{
-            return new ArrayList<>();
-        }
-    }
-
-    private List<Long> getBlockedMemberByMemberId(Long memberId) {
-        if (memberId != null) {
-            return memberRepository.findAllIdByBlockingMemberId(memberId);
+            return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
             return new ArrayList<>();
         }

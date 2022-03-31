@@ -1,6 +1,5 @@
 package com.nameless.spin_off.service.member;
 
-import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -17,7 +16,6 @@ import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.member.BlockedMemberRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,8 +33,6 @@ import java.util.stream.Collectors;
 public class MemberServiceJpa implements MemberService {
 
     private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final EmailAuthQueryRepository emailAuthQueryRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final FollowedMemberRepository followedMemberRepository;
     private final BlockedMemberRepository blockedMemberRepository;
@@ -145,7 +141,7 @@ public class MemberServiceJpa implements MemberService {
     }
 
     private void isBlockedOrBlockingAboutAll(Long memberId, Long targetMemberId) {
-        if (memberQueryRepository.isBlockedOrBlockingAboutAll(memberId, targetMemberId)) {
+        if (memberQueryRepository.isBlockedOrBlockingAndStatus(memberId, targetMemberId, BlockedMemberStatus.A)) {
             throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }

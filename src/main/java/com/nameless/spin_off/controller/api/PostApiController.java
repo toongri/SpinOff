@@ -52,12 +52,12 @@ public class PostApiController {
             @ApiImplicitParam(
                     name = "createPostVO",
                     value = "{" +
-                            "\"title\":\"string\"," +
-                            " \"content\":\"string\"," +
-                            " \"movieId\":null," +
+                            "\"title\":\"스프링부트와 aws로 혼자 구현하는 웹 서비스\"," +
+                            " \"content\":\"스프링부트와 aws로 혼자 구현하는 웹 서비스\"," +
+                            " \"movieId\":123," +
                             " \"publicOfPostStatus\": \"A\"," +
-                            " \"hashtagContents\" : []," +
-                            " \"collectionIds\":[]" +
+                            " \"hashtagContents\" : [\"네이버\", \"카카오\", \"구글\", \"네이트\"]," +
+                            " \"collectionIds\":[123, 124, 125, 128]" +
                             "}",
                     required = true,
                     paramType = "formData",

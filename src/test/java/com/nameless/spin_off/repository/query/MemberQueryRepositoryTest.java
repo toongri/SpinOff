@@ -30,8 +30,8 @@ class MemberQueryRepositoryTest {
         memberService.insertBlockedMemberByMemberId(member.getId(), member2.getId(), BlockedMemberStatus.A);
 
         //when
-        Boolean bool1 = memberQueryRepository.isBlockedOrBlockingAboutAll(member.getId(), member2.getId());
-        Boolean bool2 = memberQueryRepository.isBlockedOrBlockingAboutAll(member2.getId(), member.getId());
+        Boolean bool1 = memberQueryRepository.isBlockedOrBlockingAndStatus(member.getId(), member2.getId(), BlockedMemberStatus.A);
+        Boolean bool2 = memberQueryRepository.isBlockedOrBlockingAndStatus(member2.getId(), member.getId(), BlockedMemberStatus.A);
 
         //then
         assertThat(bool1).isTrue();

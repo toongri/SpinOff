@@ -6,7 +6,7 @@ import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.comment.QLikedCommentInPost.likedCommentInPost;
@@ -40,13 +40,13 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
 
         return fetchOne != null;
     }
-    public Long findCommentOwnerId(Long commentId) {
-        return getQueryFactory()
+    public Optional<Long> findCommentOwnerId(Long commentId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(commentInPost.member.id)
                 .from(commentInPost)
                 .where(
                         commentInPost.id.eq(commentId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Boolean isExist(Long id) {
@@ -82,15 +82,5 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst();
 
         return fetchOne != null;
-    }
-
-    public Long countCommentInPost(Long postId, List<Long> blockedMemberIds) {
-        return getQueryFactory()
-                .select(commentInPost.id)
-                .from(commentInPost)
-                .where(
-                        commentInPost.post.id.eq(postId),
-                        commentInPost.member.id.notIn(blockedMemberIds))
-                .fetchCount();
     }
 }

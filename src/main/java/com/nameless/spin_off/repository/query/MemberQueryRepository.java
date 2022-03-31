@@ -1,11 +1,14 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.*;
+import com.nameless.spin_off.dto.MemberDto.FollowingMemberMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
-import com.nameless.spin_off.dto.QMemberDto_SearchAllMemberDto;
+import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.member.QFollowedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -14,12 +17,15 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.help.QComplain.complain;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class MemberQueryRepository extends Querydsl4RepositorySupport {
@@ -28,12 +34,12 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
-    public String findAccountIdByEmail(String email) {
-        return getQueryFactory()
+    public Optional<String> findAccountIdByEmail(String email) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(member.accountId)
                 .from(member)
                 .where(member.email.eq(email))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Boolean isExist(Long id) {
@@ -46,16 +52,28 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isBlockedOrBlockingAboutAll(Long memberId, Long targetMemberId) {
+    public Boolean isBlockedOrBlockingAndStatus(Long memberId, Long targetMemberId, BlockedMemberStatus status) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
                 .from(blockedMember)
                 .where(
-                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A),
+                        blockedMember.blockedMemberStatus.eq(status),
                         (blockedMember.member.id.eq(memberId).and(
                                 blockedMember.blockingMember.id.eq(targetMemberId))).or(
                                 blockedMember.blockingMember.id.eq(memberId).and(
                                         blockedMember.member.id.eq(targetMemberId))))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistBlockedMember(Long blockingMemberId, Long blockedMemberId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(blockedMember)
+                .where(
+                        blockedMember.blockingMember.id.eq(blockingMemberId),
+                        blockedMember.member.id.eq(blockedMemberId))
                 .fetchFirst();
 
         return fetchOne != null;
@@ -84,15 +102,59 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     public Slice<SearchMemberDto> findAllSlicedForSearchPageAtMember(
-            String keyword, Pageable pageable, List<Long> followedMemberIds, List<Long> blockedMembers) {
+            String keyword, Pageable pageable, Long memberId, List<Long> blockedMemberIds) {
 
-        Slice<Member> content = applySlicing(pageable, contentQuery -> contentQuery
-                .selectFrom(member)
-                .where(member.nickname.contains(keyword),
-                        memberNotIn(blockedMembers)));
+        Slice<SearchMemberDto> content = applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QMemberDto_SearchMemberDto(
+                        member.id, member.profileImg, member.nickname, member.accountId, member.bio,
+                        followedMember.count()))
+                .from(member)
+                .leftJoin(member.followingMembers, followedMember)
+                .groupBy(member)
+                .where(
+                        followedMemberNotIn(blockedMemberIds),
+                        member.nickname.contains(keyword),
+                        memberNotIn(blockedMemberIds)));
 
-        return MapContentToDtoForSearchPage(content, followedMemberIds);
+        List<Long> memberIds = getMemberIds(content.getContent());
+
+        Map<Long, List<FollowingMemberMemberDto>> followingMembersAtMember =
+                getFollowingMembersAtMember(memberId, memberIds);
+
+        Map<Long, List<ThumbnailMemberDto>> postsAtMember = getPostsAtMember(memberIds);
+
+        content.getContent().forEach(o -> o.setFollowingMemberAndThumbnails(
+                followingMembersAtMember.get(o.getMemberId()),
+                postsAtMember.get(o.getMemberId())));
+
+        return content;
     }
+
+    private Map<Long, List<ThumbnailMemberDto>> getPostsAtMember(List<Long> memberIds) {
+        return getQueryFactory()
+                .select(new QPostDto_ThumbnailMemberDto(
+                        post.member.id, post.thumbnailUrl))
+                .from(post)
+                .where(
+                        post.member.id.in(memberIds),
+                        post.thumbnailUrl.isNotNull())
+                .fetch().stream().collect(Collectors.groupingBy(ThumbnailMemberDto::getMemberId));
+    }
+
+    private Map<Long, List<FollowingMemberMemberDto>> getFollowingMembersAtMember(Long memberId, List<Long> memberIds) {
+        QFollowedMember ownerFollowedMember = new QFollowedMember("ownerFollowedMember");
+        return getQueryFactory()
+                .select(new QMemberDto_FollowingMemberMemberDto(
+                        followedMember.member.id, member.id, member.popularity, member.nickname))
+                .from(followedMember)
+                .join(followedMember.followingMember, member)
+                .join(member.followingMembers, ownerFollowedMember)
+                .where(
+                        followedMember.member.id.in(memberIds),
+                        ownerFollowedMember.followingMember.id.eq(memberId))
+                .fetch().stream().collect(Collectors.groupingBy(MemberDto.FollowingMemberMemberDto::getMemberId));
+    }
+
 
     public Boolean isExistFollowedMember(Long followingMemberId, Long followedMemberId) {
         Integer fetchOne = getQueryFactory()
@@ -101,18 +163,6 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         followedMember.followingMember.id.eq(followingMemberId),
                         followedMember.member.id.eq(followedMemberId))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
-    public Boolean isExistBlockedMember(Long blockingMemberId, Long blockedMemberId) {
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(blockedMember)
-                .where(
-                        blockedMember.blockingMember.id.eq(blockingMemberId),
-                        blockedMember.member.id.eq(blockedMemberId))
                 .fetchFirst();
 
         return fetchOne != null;
@@ -129,9 +179,12 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    private Slice<SearchMemberDto> MapContentToDtoForSearchPage(
-            Slice<Member> contents, List<Long> followedMemberIds) {
-        return contents.map(content -> new SearchMemberDto(content, followedMemberIds));
+    private List<Long> getMemberIds(List<SearchMemberDto> content) {
+        return content.stream().map(SearchMemberDto::getMemberId).collect(Collectors.toList());
+    }
+
+    private BooleanExpression followedMemberNotIn(List<Long> members) {
+        return members.isEmpty() ? null : followedMember.followingMember.id.notIn(members);
     }
 
     private BooleanExpression memberNotIn(List<Long> members) {

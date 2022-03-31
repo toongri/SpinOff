@@ -10,6 +10,7 @@ import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,15 @@ public class SearchDto {
     @Data
     @NoArgsConstructor
     public static class LastSearchDto {
+
+        @ApiModelProperty(
+                value = "검색 id",
+                example = "123")
         private Long id;
+
+        @ApiModelProperty(
+                value = "검색 내용",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String content;
 
         @QueryProjection

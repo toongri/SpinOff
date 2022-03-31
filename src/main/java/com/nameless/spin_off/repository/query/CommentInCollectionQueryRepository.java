@@ -6,6 +6,8 @@ import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 import static com.nameless.spin_off.entity.comment.QCommentInCollection.commentInCollection;
 import static com.nameless.spin_off.entity.comment.QLikedCommentInCollection.likedCommentInCollection;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
@@ -37,13 +39,13 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
         return fetchOne != null;
     }
 
-    public Long getCommentOwnerId(Long commentId) {
-        return getQueryFactory()
+    public Optional<Long> getCommentOwnerId(Long commentId) {
+        return Optional.ofNullable(getQueryFactory()
                 .select(commentInCollection.member.id)
                 .from(commentInCollection)
                 .where(
                         commentInCollection.id.eq(commentId))
-                .fetchFirst();
+                .fetchFirst());
     }
 
     public Boolean isExist(Long id) {

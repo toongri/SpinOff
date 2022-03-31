@@ -6,22 +6,21 @@ import com.nameless.spin_off.config.auth.dto.profile.ProfileDto;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
-import com.nameless.spin_off.entity.collection.FollowedCollection;
+import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.enums.member.MemberCondition;
-import com.nameless.spin_off.entity.member.*;
+import com.nameless.spin_off.entity.member.EmailAuth;
+import com.nameless.spin_off.entity.member.EmailLinkage;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.AlreadyAccountIdException;
-import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
-import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
-import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
 import com.nameless.spin_off.exception.sign.*;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
-import com.nameless.spin_off.repository.member.*;
+import com.nameless.spin_off.repository.member.EmailAuthRepository;
+import com.nameless.spin_off.repository.member.EmailLinkageRepository;
+import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.EmailAuthQueryRepository;
 import com.nameless.spin_off.repository.query.EmailLinkageQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
@@ -34,10 +33,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.*;
 import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
@@ -60,9 +57,6 @@ public class SignServiceJpa implements SignService{
     private final EmailLinkageRepository emailLinkageRepository;
     private final EmailService emailService;
     private final MemberQueryRepository memberQueryRepository;
-    private final FollowedMemberRepository followedMemberRepository;
-    private final BlockedMemberRepository blockedMemberRepository;
-    private final FollowedCollectionRepository followedCollectionRepository;
     private final ProviderService providerService;
 
     @Transactional
@@ -84,6 +78,7 @@ public class SignServiceJpa implements SignService{
         member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
 
         memberRepository.save(member);
+        collectionRepository.save(Collection.createDefaultCollection(member));
 
         return new MemberLoginResponseDto(
                 member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()), member.getRefreshToken());
@@ -112,6 +107,7 @@ public class SignServiceJpa implements SignService{
     public MemberLoginResponseDto loginBySocial(String authCode, String provider) {
         AccessToken accessToken = providerService.getAccessToken(authCode, provider);
         ProfileDto profile = providerService.getProfile(accessToken.getAccess_token(), provider);
+
         Member member = getMemberByProvider(profile.getEmail(), provider)
                 .orElseGet(() -> saveMember(profile, provider));
 
@@ -219,12 +215,8 @@ public class SignServiceJpa implements SignService{
     @Override
     public boolean sendEmailForAccountId(String email) {
         isCorrectEmail(email);
-        String accountId = memberQueryRepository.findAccountIdByEmail(email);
-        if (accountId == null) {
-            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
-        } else {
-            emailService.sendForAccountId(email, accountId);
-        }
+        emailService.sendForAccountId(email, memberQueryRepository.findAccountIdByEmail(email)
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)));
         return true;
     }
 
@@ -254,46 +246,6 @@ public class SignServiceJpa implements SignService{
     public boolean checkDuplicateAccountId(String accountId) {
         isCorrectAccountId(accountId);
         return emailAuthQueryRepository.isNotExistAccountId(accountId);
-    }
-
-    private void isExistBlock(Long memberId, Long blockedMemberId) {
-        if (memberQueryRepository.isExistBlockedMember(memberId, blockedMemberId)) {
-            throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
-        }
-    }
-
-    private void isExistBlockAndDeletePastBlocked(Long memberId, Long blockedMemberId) {
-        Optional<BlockedMember> optional =
-                memberQueryRepository.findOneByBlockingIdAndBlockedId(memberId, blockedMemberId);
-        if (optional.isPresent()) {
-            BlockedMember blockedMember = optional.get();
-            if (BlockedMemberStatus.A.equals(blockedMember.getBlockedMemberStatus())) {
-                throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
-            } else {
-                blockedMemberRepository.delete(blockedMember);
-            }
-        }
-    }
-
-    private void isExistMember(Long memberId) {
-        if (!memberQueryRepository.isExist(memberId)) {
-            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
-        }
-    }
-
-    private void validateDuplicateAtRegister(String accountId, String nickname, String email) {
-
-        List<Member> memberList = memberRepository
-                .findAllByAccountIdOrNicknameOrEmail(accountId, nickname, email);
-        if (memberList.isEmpty()) {
-
-        } else if (memberList.stream().anyMatch(member -> member.getAccountId().equals(accountId))) {
-            throw new AlreadyAccountIdException(ErrorEnum.ALREADY_ACCOUNT_ID);
-        } else if (memberList.stream().anyMatch(member -> member.getNickname().equals(nickname))) {
-            throw new AlreadyNicknameException(ErrorEnum.ALREADY_NICKNAME);
-        } else {
-            throw new AlreadyEmailException(ErrorEnum.ALREADY_EMAIL);
-        }
     }
 
     private void validateDuplicateAtLinkage(String email, String provider) {
@@ -331,6 +283,7 @@ public class SignServiceJpa implements SignService{
             member = memberBuilder.setGoogleEmail(profile.getEmail()).build();
         }
         memberRepository.save(member);
+        collectionRepository.save(Collection.createDefaultCollection(member));
         return member;
     }
 
@@ -344,12 +297,6 @@ public class SignServiceJpa implements SignService{
         String accountId = userDetails.getUsername();
         return memberRepository.findOneByAccountId(accountId)
                 .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
-    }
-
-    private Member getMemberWithSearch(Long memberId) throws NotExistMemberException {
-        Optional<Member> optionalMember = memberRepository.findOneByIdWithSearch(memberId);
-
-        return optionalMember.orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private void isExistAuthEmail(String email, String authToken) {
@@ -428,35 +375,6 @@ public class SignServiceJpa implements SignService{
 
     private boolean isIncludeAllEnglish(String accountPw) {
         return !MemberCondition.ENGLISH.isNotCorrect(accountPw);
-    }
-
-    private void isExistFollowedMember(Long memberId, Long followedMemberId) {
-        if (memberQueryRepository.isExistFollowedMember(memberId, followedMemberId)) {
-            throw new AlreadyFollowedMemberException(ErrorEnum.ALREADY_FOLLOWED_MEMBER);
-        }
-    }
-
-    private void isBlockedOrBlockingAboutAll(Long memberId, Long targetMemberId) {
-        if (memberQueryRepository.isBlockedOrBlockingAboutAll(memberId, targetMemberId)) {
-            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-        }
-    }
-
-    private List<FollowedCollection> getFollowedCollectionsByFollowingMemberIdAndMemberId(
-            Long memberId, Long followedMemberId) {
-        return followedCollectionRepository
-                .findAllIdByFollowingMemberIdAndMemberId(memberId, followedMemberId)
-                .stream()
-                .map(FollowedCollection::createFollowedCollection)
-                .collect(Collectors.toList());
-    }
-
-    private List<FollowedMember> getFollowedMembersByFollowingMemberIdAndMemberId(Long memberId, Long followedMemberId) {
-        return followedMemberRepository
-                .findAllIdByFollowingMemberIdAndMemberId(memberId, followedMemberId)
-                .stream()
-                .map(FollowedMember::createFollowedMember)
-                .collect(Collectors.toList());
     }
 
     private String getRandomNickname() {

@@ -1,5 +1,6 @@
 package com.nameless.spin_off.repository.member;
 
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,27 +16,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOneByGoogleEmail(String googleEmail);
     Optional<Member> findOneByNaverEmail(String naverEmail);
     Optional<Member> findOneByKakaoEmail(String kakaoEmail);
-
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.roles role " +
-            "WHERE m.googleEmail = :googleEmail")
-    Optional<Member> findByGoogleEmailWithRoles(@Param("googleEmail") String googleEmail);
-
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.roles role " +
-            "WHERE m.naverEmail = :naverEmail")
-    Optional<Member> findByNaverEmailWithRoles(@Param("naverEmail") String naverEmail);
-
-
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.roles role " +
-            "WHERE m.email = :email")
-    Optional<Member> findByEmailWithRoles(@Param("email") String email);
-
-    @Query("SELECT m FROM Member m " +
-            "LEFT JOIN FETCH m.roles role " +
-            "WHERE m.kakaoEmail = :kakaoEmail")
-    Optional<Member> findByKakaoEmailWithRoles(@Param("kakaoEmail") String kakaoEmail);
 
     @Query("SELECT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +
@@ -65,4 +45,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     @Query("SELECT blockingMember.member.id FROM BlockedMember blockingMember " +
             "WHERE blockingMember.blockingMember.id = :id")
     List<Long> findAllIdByBlockingMemberId(@Param("id")Long id);
+
+    @Query("SELECT DISTINCT m.id FROM Member m " +
+            "JOIN m.blockingMembers blockingM " +
+            "JOIN m.blockedMembers blockedM " +
+            "WHERE (blockingM.blockingMember.id = :id AND blockingM.blockedMemberStatus = :status) " +
+            "OR (blockedM.member.id = :id AND blockedM.blockedMemberStatus = :status)")
+    List<Long> findBlockingAllAndBlockedAllByIdAndBlockStatus(@Param("id") Long id,
+                                                              @Param("status") BlockedMemberStatus status);
 }

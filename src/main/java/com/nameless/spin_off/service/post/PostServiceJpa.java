@@ -216,7 +216,7 @@ public class PostServiceJpa implements PostService{
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
-            if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId))) {
+            if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
