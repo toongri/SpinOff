@@ -30,5 +30,6 @@ public class EmailLinkageQueryRepository {
                         emailLinkage.expired.eq(false))
                 .orderBy(emailLinkage.id.desc())
                 .fetchFirst());
+
     }
 }

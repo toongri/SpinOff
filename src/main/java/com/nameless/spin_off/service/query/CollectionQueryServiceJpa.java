@@ -1,11 +1,10 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
@@ -59,8 +58,14 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     }
 
     @Override
-    public List<PostInCollectionDto> getCollectionNamesByMemberId(Long memberId) {
-        return collectionQueryRepository.findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(memberId);
+    public List<PostInCollectionDto> getCollectionsById(Long memberId) {
+        return collectionQueryRepository.findAllByMemberIdOrderByCollectedPostDESC(memberId);
+    }
+
+    @Override
+    public QuickPostInCollectionDto getLatestCollectionNameById(Long memberId) {
+        return collectionQueryRepository.findOneByMemberIdOrderByCollectedPostDESC(memberId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     @Override

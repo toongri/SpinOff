@@ -4,6 +4,7 @@ import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
@@ -104,14 +105,27 @@ public class CollectionApiController {
     @ApiOperation(value = "컬렉션 리스트 조회", notes = "로그인 된 멤버의 컬렉션 리스트 조회")
     @ApiImplicitParams({
     })
-    @GetMapping("/list/name")
-    public SingleApiResult<List<PostInCollectionDto>> getCollectionNamesById(
+    @GetMapping("/all")
+    public SingleApiResult<List<PostInCollectionDto>> getCollectionsById(
             @LoginMember MemberDetails currentMember) {
 
-        log.info("getCollectionNamesById");
+        log.info("getCollectionsById");
         log.info("memberId : {}", currentMember.getId());
 
-        return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
+        return getResult(collectionQueryService.getCollectionsById(currentMember.getId()));
+    }
+
+    @ApiOperation(value = "최근 수정 컬렉션 조회", notes = "로그인 된 멤버의 가장 최근 수정 컬렉션 조회")
+    @ApiImplicitParams({
+    })
+    @GetMapping("/one")
+    public SingleApiResult<QuickPostInCollectionDto> getLatestCollectionNameById(
+            @LoginMember MemberDetails currentMember) {
+
+        log.info("getLatestCollectionNameById");
+        log.info("memberId : {}", currentMember.getId());
+
+        return getResult(collectionQueryService.getLatestCollectionNameById(currentMember.getId()));
     }
 
     @ApiOperation(value = "컬렉션 공개 설정 리스트 조회", notes = "")

@@ -65,13 +65,22 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public List<PostInCollectionDto> findAllCollectionNamesByMemberIdOrderByCollectedPostDESC(Long memberId) {
+    public List<PostInCollectionDto> findAllByMemberIdOrderByCollectedPostDESC(Long memberId) {
         return getQueryFactory()
                 .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title, collection.firstThumbnail))
                 .from(collection)
                 .where(collection.member.id.eq(memberId))
                 .orderBy(collection.lastModifiedDate.desc())
                 .fetch();
+    }
+
+    public Optional<QuickPostInCollectionDto> findOneByMemberIdOrderByCollectedPostDESC(Long memberId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_QuickPostInCollectionDto(collection.id, collection.title))
+                .from(collection)
+                .where(collection.member.id.eq(memberId))
+                .orderBy(collection.lastModifiedDate.desc())
+                .fetchFirst());
     }
 
     public Boolean isExist(Long id) {
