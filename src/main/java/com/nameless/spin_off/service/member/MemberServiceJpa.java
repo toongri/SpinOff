@@ -124,24 +124,26 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
+    public MemberLoginResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
         isCorrectRegisterRequest(requestDto);
         isExistAuthEmail(requestDto.getEmail(), requestDto.getAuthToken());
 
-        Member member = memberRepository.save(Member.buildMember()
+        Member member = Member.buildMember()
                 .setNickname(requestDto.getNickname())
                 .setEmail(requestDto.getEmail())
                 .setAccountId(requestDto.getAccountId())
                 .setAccountPw(passwordEncoder.encode(requestDto.getAccountPw()))
                 .setBirth(requestDto.getBirth())
                 .setName(requestDto.getName())
-                .build());
-
-        return MemberRegisterResponseDto.builder()
-                .id(member.getId())
-                .accountId(member.getAccountId())
                 .build();
+
+        member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
+
+        memberRepository.save(member);
+
+        return new MemberLoginResponseDto(
+                member.getId(), jwtTokenProvider.createToken(requestDto.getAccountId()), member.getRefreshToken());
     }
 
     @Transactional

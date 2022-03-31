@@ -39,8 +39,7 @@ public class SignApiController {
                     dataType = "MemberRegisterRequestDto")
     })
     @PostMapping("/register")
-    public SingleApiResult<MemberRegisterResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) {
-        MemberRegisterResponseDto responseDto = memberService.registerMember(requestDto);
+    public SingleApiResult<MemberLoginResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) {
 
         log.info("register");
         log.info("accountId : {}", requestDto.getAccountId());
@@ -49,7 +48,7 @@ public class SignApiController {
         log.info("nickname : {}", requestDto.getNickname());
         log.info("birth : {}", requestDto.getBirth());
         log.info("email : {}", requestDto.getEmail());
-        return getResult(responseDto);
+        return getResult(memberService.registerMember(requestDto));
     }
 
     @ApiOperation(value = "소셜 유저 생성 및 조회", notes = "")
@@ -72,8 +71,8 @@ public class SignApiController {
     @PostMapping("/login/social/{provider}")
     public SingleApiResult<MemberLoginResponseDto> registerBySocial(
             @RequestParam String authCode, @PathVariable String provider) {
-        MemberLoginResponseDto memberLoginResponseDto = memberService.loginBySocial(authCode, provider);
-        return getResult(memberLoginResponseDto);
+
+        return getResult(memberService.loginBySocial(authCode, provider));
     }
 
     @ApiOperation(value = "유저 조회 및 수정", notes = "")

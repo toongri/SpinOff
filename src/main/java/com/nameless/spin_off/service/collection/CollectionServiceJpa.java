@@ -64,7 +64,6 @@ public class CollectionServiceJpa implements CollectionService {
     public Long insertViewedCollectionByIp(String ip, Long collectionId)
             throws NotExistCollectionException {
 
-        isExistCollection(collectionId);
         if (!isExistCollectionIp(collectionId, ip)) {
             return viewedCollectionByIpRepository.
                     save(ViewedCollectionByIp

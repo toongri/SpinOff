@@ -121,7 +121,6 @@ public class PostServiceJpa implements PostService{
     @Override
     public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
 
-        getPublicOfPost(postId);
         if (!isExistPostIp(postId, ip)) {
             return viewedPostByIpRepository.
                     save(ViewedPostByIp.createViewedPostByIp(ip, Post.createPost(postId))).getId();

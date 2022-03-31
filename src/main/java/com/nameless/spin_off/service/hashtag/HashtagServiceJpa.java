@@ -31,8 +31,6 @@ public class HashtagServiceJpa implements HashtagService{
     @Transactional
     @Override
     public Long insertViewedHashtagByIp(String ip, Long hashtagId) throws NotExistHashtagException {
-
-        isExistHashtag(hashtagId);
         if (!isExistHashtagIp(hashtagId, ip)) {
             return viewedHashtagByIpRepository.
                     save(ViewedHashtagByIp.createViewedHashtagByIp(ip, Hashtag.createHashtag(hashtagId))).getId();

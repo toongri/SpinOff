@@ -14,7 +14,7 @@ public interface MemberService {
     Long insertMemberByMemberVO(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException;
 
-    MemberRegisterResponseDto registerMember(MemberRegisterRequestDto requestDto)
+    MemberLoginResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException;
     MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto);
     MemberLoginResponseDto loginBySocial(String authCode, String provider);
