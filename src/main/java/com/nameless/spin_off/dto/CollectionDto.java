@@ -46,15 +46,21 @@ public class CollectionDto {
         private String thumbnail;
 
         @ApiModelProperty(
+                value = "글 공개 범위",
+                example = "A")
+        private PublicOfCollectionStatus publicOfCollectionStatus;
+
+        @ApiModelProperty(
                 value = "콜렉팅 유무",
                 example = "false")
         private boolean isCollected;
 
         @QueryProjection
-        public PostInCollectionDto(Long id, String title, String thumbnail) {
+        public PostInCollectionDto(Long id, String title, PublicOfCollectionStatus publicOfCollectionStatus, String thumbnail) {
             this.id = id;
             this.title = title;
             this.thumbnail = thumbnail;
+            this.publicOfCollectionStatus = publicOfCollectionStatus;
             this.isCollected = false;
         }
     }

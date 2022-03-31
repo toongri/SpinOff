@@ -67,7 +67,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public List<PostInCollectionDto> findAllByMemberIdOrderByCollectedPostDESC(Long memberId) {
         return getQueryFactory()
-                .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title, collection.firstThumbnail))
+                .select(new QCollectionDto_PostInCollectionDto(collection.id, collection.title,
+                        collection.publicOfCollectionStatus, collection.firstThumbnail))
                 .from(collection)
                 .where(collection.member.id.eq(memberId))
                 .orderBy(collection.lastModifiedDate.desc())
