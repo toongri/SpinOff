@@ -37,7 +37,6 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
-        response.addHeader("isSuccess", String.valueOf(false));
         response.addHeader("code", errorCode);
         response.addHeader("message", errorMessage);
         response.setContentType("application/json;charset=UTF-8");
