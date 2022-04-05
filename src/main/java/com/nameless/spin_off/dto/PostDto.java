@@ -2,7 +2,7 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
-import com.nameless.spin_off.dto.MovieDto.MovieInVisitPostDto;
+import com.nameless.spin_off.dto.MovieDto.MovieInReadPost;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -26,7 +26,7 @@ public class PostDto {
 
     @Data
     @NoArgsConstructor
-    public static class VisitPostDto {
+    public static class ReadPostDto {
 
         @ApiModelProperty(
                 value = "글 id",
@@ -53,7 +53,7 @@ public class PostDto {
                 value = "글 내용",
                 example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String postContent;
-        private MovieInVisitPostDto movie;
+        private MovieInReadPost movie;
 
         @ApiModelProperty(
                 value = "글 공개범위",
@@ -90,10 +90,10 @@ public class PostDto {
         }
 
         @QueryProjection
-        public VisitPostDto(Long postId, Long memberId, String profile, String nickname, String accountId,
-                            String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
-                            String postContent, String movieThumbnail, String movieTitle, String directorName,
-                            Long likedSize, Long commentSize, PublicOfPostStatus publicOfPostStatus) {
+        public ReadPostDto(Long postId, Long memberId, String profile, String nickname, String accountId,
+                           String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
+                           String postContent, String movieThumbnail, String movieTitle, String directorName,
+                           Long likedSize, Long commentSize, PublicOfPostStatus publicOfPostStatus) {
 
             this.postId = postId;
             this.member = new ContentMemberDto(memberId, profile, nickname, accountId);
@@ -102,7 +102,7 @@ public class PostDto {
             this.publicOfPostStatus = publicOfPostStatus;
             this.getLastModifiedDate = getLastModifiedDate;
             this.postContent = postContent;
-            this.movie = new MovieInVisitPostDto(movieThumbnail, movieTitle, directorName);
+            this.movie = new MovieInReadPost(movieThumbnail, movieTitle, directorName);
             this.likedSize = likedSize;
             this.commentSize = commentSize;
         }

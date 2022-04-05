@@ -31,8 +31,6 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "WHERE m.id = :id")
     Optional<Member> findOneByIdWithFollowedMember(@Param("id") Long id);
 
-    List<Member> findAllByAccountIdOrNicknameOrEmail(String accountId, String nickname, String email);
-
     @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.searches " +
             "WHERE m.id = :id")
@@ -43,8 +41,14 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Long> findAllIdByFollowingMemberId(@Param("id")Long id);
 
     @Query("SELECT blockingMember.member.id FROM BlockedMember blockingMember " +
-            "WHERE blockingMember.blockingMember.id = :id")
-    List<Long> findAllIdByBlockingMemberId(@Param("id")Long id);
+            "WHERE blockingMember.blockingMember.id = :id AND blockingMember.blockedMemberStatus = :status")
+    List<Long> findAllIdByBlockingMemberId(@Param("id")Long id,
+                                           @Param("status") BlockedMemberStatus status);
+
+    @Query("SELECT blockedMember.blockingMember.id FROM BlockedMember blockedMember " +
+            "WHERE blockedMember.member.id = :id AND blockedMember.blockedMemberStatus = :status")
+    List<Long> findAllIdByBlockedMemberId(@Param("id")Long id,
+                                           @Param("status") BlockedMemberStatus status);
 
     @Query("SELECT DISTINCT m.id FROM Member m " +
             "LEFT JOIN m.blockingMembers blockingM " +

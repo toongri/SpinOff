@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
@@ -107,37 +106,32 @@ public class PostQueryServiceJpa implements PostQueryService{
     }
 
     @Override
-    public RelatedPostFirstDto<VisitPostDto> getPostForVisit(MemberDetails currentMember, Long postId, Pageable pageable) {
+    public RelatedPostFirstDto<ReadPostDto> getPostForRead(MemberDetails currentMember, Long postId, Pageable pageable) {
 
         Long memberId = getCurrentMemberId(currentMember);
         List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        VisitPostDto post = getVisitPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
+        ReadPostDto post = getReadPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
 
         return new RelatedPostFirstDto<>(
-                post, postQueryRepository.findAllRelatedPostByPostId(pageable, memberId, blockedMemberIds, postId));
+                post, postQueryRepository.findAllRelatedPostByPostId(pageable, blockedMemberIds, postId));
     }
 
     @Override
     public Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable) {
 
-        return postQueryRepository.findAllRelatedPostByPostId(pageable, memberId,
+        return postQueryRepository.findAllRelatedPostByPostId(pageable,
                 getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), postId);
     }
 
-    private VisitPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
-        return postQueryRepository.findOneByPostId(postId, blockedMemberIds)
+    private ReadPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
+        return postQueryRepository.findByIdForRead(postId, blockedMemberIds)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
-    @Override
-    public List<PostInCollectionDto> getCollectionNamesByMemberIdAndPostId(Long memberId, Long postId) {
-        return null;
-    }
+    private ReadPostDto getReadPostDto(Long postId, Long memberId,
+                                       List<Long> blockedMemberIds, boolean isAdmin) {
 
-    private VisitPostDto getVisitPostDto(Long postId, Long memberId,
-                                         List<Long> blockedMemberIds, boolean isAdmin) {
-
-        VisitPostDto post = getOneByPostId(postId, blockedMemberIds);
+        ReadPostDto post = getOneByPostId(postId, blockedMemberIds);
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
 
         if (memberId != null) {

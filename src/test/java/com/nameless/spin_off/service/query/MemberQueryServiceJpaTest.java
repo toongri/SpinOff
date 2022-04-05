@@ -1,10 +1,13 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -19,9 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -335,5 +340,105 @@ public class MemberQueryServiceJpaTest {
         //then
         assertThat(lastSearchesByMember.stream().map(SearchDto.LastSearchDto::getContent).collect(Collectors.toList()))
                 .containsExactly("2", "1", "0");
+    }
+    @Test
+    public void 멤버_조회() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        memberService.insertFollowedMemberByMemberId(member.getId(), memberList.get(0).getId());
+        memberService.insertFollowedMemberByMemberId(member.getId(), memberList.get(1).getId());
+        memberService.insertFollowedMemberByMemberId(member.getId(), memberList.get(2).getId());
+        memberService.insertFollowedMemberByMemberId(member.getId(), memberList.get(3).getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(4).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(5).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(6).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(7).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(8).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(9).getId(), member.getId());
+
+        memberService.insertBlockedMemberByMemberId(memberList.get(4).getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(memberList.get(2).getId(), memberList.get(4).getId(), BlockedMemberStatus.A);
+
+        //when
+        System.out.println("서비스함수");
+        ReadMemberDto memberForRead1 = memberQueryService.getMemberForRead(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                member.getId());
+        System.out.println("서비스함수끝");
+
+        ReadMemberDto memberForRead2 = memberQueryService.getMemberForRead(
+                null,
+                member.getId());
+
+        ReadMemberDto memberForRead3 = memberQueryService.getMemberForRead(
+                MemberDetails.builder()
+                        .id(memberList.get(4).getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                member.getId());
+
+        //then
+
+        assertThat(memberForRead1.getId()).isEqualTo(member.getId());
+        assertThat(memberForRead1.getBio()).isEqualTo(member.getBio());
+        assertThat(memberForRead1.getFollowerSize()).isEqualTo(6);
+        assertThat(memberForRead1.getFollowingSize()).isEqualTo(4);
+        assertThat(memberForRead1.getProfileUrl()).isEqualTo(member.getProfileImg());
+        assertThat(memberForRead1.isFollowed()).isEqualTo(false);
+        assertThat(memberForRead1.isAdmin()).isEqualTo(true);
+
+        assertThat(memberForRead2.getId()).isEqualTo(member.getId());
+        assertThat(memberForRead2.getBio()).isEqualTo(member.getBio());
+        assertThat(memberForRead2.getFollowerSize()).isEqualTo(6);
+        assertThat(memberForRead2.getFollowingSize()).isEqualTo(4);
+        assertThat(memberForRead2.getProfileUrl()).isEqualTo(member.getProfileImg());
+        assertThat(memberForRead2.isFollowed()).isEqualTo(false);
+        assertThat(memberForRead2.isAdmin()).isEqualTo(false);
+
+        assertThat(memberForRead3.getId()).isEqualTo(member.getId());
+        assertThat(memberForRead3.getBio()).isEqualTo(member.getBio());
+        assertThat(memberForRead3.getFollowerSize()).isEqualTo(5);
+        assertThat(memberForRead3.getFollowingSize()).isEqualTo(3);
+        assertThat(memberForRead3.getProfileUrl()).isEqualTo(member.getProfileImg());
+        assertThat(memberForRead3.isFollowed()).isEqualTo(true);
+        assertThat(memberForRead3.isAdmin()).isEqualTo(false);
     }
 }

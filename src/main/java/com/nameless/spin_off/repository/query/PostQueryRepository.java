@@ -171,10 +171,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         member.id.notIn(banList)));
     }
 
-    public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable, Long memberId,
+    public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable,
                                                              List<Long> blockedMemberIds, Long postId) {
-        List<Long> banList = new ArrayList<>(blockedMemberIds);
-        addBanList(memberId, banList);
         QPostedHashtag relatedPostHashtag = new QPostedHashtag("relatedPostHashtag");
 
         return applySlicing(pageable, contentQuery -> contentQuery
@@ -193,9 +191,10 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .groupBy(post)
                 .having(postedHashtag.count().goe(ContentsLengthEnum.RELATED_POST_MIN_TAG.getLength()))
                 .where(
+                        post.id.ne(postId),
                         relatedPostHashtag.post.id.eq(postId),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
-                        member.id.notIn(banList))
+                        member.id.notIn(blockedMemberIds))
                 .orderBy(postedHashtag.count().desc()));
     }
 
@@ -254,9 +253,9 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound())));
     }
 
-    public Optional<VisitPostDto> findOneByPostId(Long postId, List<Long> blockedMemberIds) {
+    public Optional<ReadPostDto> findByIdForRead(Long postId, List<Long> blockedMemberIds) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QPostDto_VisitPostDto(
+                .select(new QPostDto_ReadPostDto(
                         post.id, member.id, member.profileImg, member.nickname, member.accountId, post.title,
                         post.createdDate, post.lastModifiedDate, post.content, movie.thumbnail, movie.title,
                         movie.directorName, likedPost.countDistinct(), commentInPost.countDistinct(), post.publicOfPostStatus))

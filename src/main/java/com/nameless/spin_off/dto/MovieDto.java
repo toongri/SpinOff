@@ -18,12 +18,12 @@ public class MovieDto {
 
     @Data
     @AllArgsConstructor
-    public static class MovieInVisitPostDto {
+    public static class MovieInReadPost {
         private String thumbnail;
         private String title;
         private String directorName;
 
-        public MovieInVisitPostDto(Movie movie) {
+        public MovieInReadPost(Movie movie) {
             this.thumbnail = movie.getThumbnail();
             this.title = movie.getTitle();
             this.directorName = movie.getDirectorName();

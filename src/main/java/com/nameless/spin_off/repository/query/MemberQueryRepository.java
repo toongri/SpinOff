@@ -2,6 +2,7 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.MemberDto.FollowingMemberMemberDto;
+import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
@@ -32,6 +33,24 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
 
     public MemberQueryRepository() {
         super(Member.class);
+    }
+
+    public Optional<ReadMemberDto> findByIdForRead(Long memberId, List<Long> blockedMembers) {
+        QFollowedMember followingMember = new QFollowedMember("followingMember");
+
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QMemberDto_ReadMemberDto(
+                        member.id, member.profileImg, member.bio,
+                        followedMember.countDistinct(), followingMember.countDistinct()))
+                .from(member)
+                .leftJoin(member.followingMembers, followedMember)
+                .leftJoin(member.followedMembers, followingMember)
+                .groupBy(member)
+                .where(
+                        followingMemberNotIn(blockedMembers),
+                        followedMemberNotIn(blockedMembers, followingMember),
+                        member.id.eq(memberId))
+                .fetchFirst());
     }
 
     public Optional<String> findAccountIdByEmail(String email) {
@@ -112,7 +131,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .leftJoin(member.followingMembers, followedMember)
                 .groupBy(member)
                 .where(
-                        followedMemberNotIn(blockedMemberIds),
+                        followingMemberNotIn(blockedMemberIds),
                         member.nickname.contains(keyword),
                         memberNotIn(blockedMemberIds)));
 
@@ -183,8 +202,12 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         return content.stream().map(SearchMemberDto::getMemberId).collect(Collectors.toList());
     }
 
-    private BooleanExpression followedMemberNotIn(List<Long> members) {
+    private BooleanExpression followingMemberNotIn(List<Long> members) {
         return members.isEmpty() ? null : followedMember.followingMember.id.notIn(members);
+    }
+
+    private BooleanExpression followedMemberNotIn(List<Long> members, QFollowedMember followingMember) {
+        return members.isEmpty() ? null : followingMember.member.id.notIn(members);
     }
 
     private BooleanExpression memberNotIn(List<Long> members) {

@@ -1,7 +1,9 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
@@ -9,7 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
+
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @Transactional
@@ -36,6 +41,18 @@ class MemberQueryRepositoryTest {
         //then
         assertThat(bool1).isTrue();
         assertThat(bool2).isTrue();
+    }
+
+    @Test
+    public void readMember체크() throws Exception{
+        //given
+
+        //when
+        assertThatThrownBy(() -> memberQueryRepository.findByIdForRead(0L, Collections.emptyList())
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)))
+                .isInstanceOf(NotExistMemberException.class);
+        //then
+
     }
 
 }

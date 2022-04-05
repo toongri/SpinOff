@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -20,7 +19,6 @@ public interface PostQueryService {
             Pageable pageable, List<String> hashtagContent, Long memberId, int length);
     Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(Pageable pageable, List<String> hashtagContent, Long memberId);
 
-    RelatedPostFirstDto<VisitPostDto> getPostForVisit(MemberDetails currentMember, Long postId, Pageable pageable);
+    RelatedPostFirstDto<ReadPostDto> getPostForRead(MemberDetails currentMember, Long postId, Pageable pageable);
     Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable);
-    List<PostInCollectionDto> getCollectionNamesByMemberIdAndPostId(Long memberId, Long postId);
 }

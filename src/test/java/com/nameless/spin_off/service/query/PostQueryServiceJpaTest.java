@@ -3,13 +3,13 @@ package com.nameless.spin_off.service.query;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CommentDto;
-import com.nameless.spin_off.dto.HashtagDto;
+import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostFirstDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
-import com.nameless.spin_off.dto.PostDto.VisitPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -733,7 +733,7 @@ public class PostQueryServiceJpaTest {
 
         //when
         System.out.println("서비스함수");
-        RelatedPostFirstDto<VisitPostDto> visitPost = postQueryService.getPostForVisit(
+        RelatedPostFirstDto<ReadPostDto> visitPost = postQueryService.getPostForRead(
                 MemberDetails.builder()
                         .id(member.getId())
                         .accountId(member.getAccountId())
@@ -748,8 +748,16 @@ public class PostQueryServiceJpaTest {
 
         System.out.println("서비스함수끝");
 
-        VisitPostDto data = visitPost.getData();
+        ReadPostDto data = visitPost.getData();
         Slice<RelatedPostDto> posts = visitPost.getPosts();
+
+        RelatedPostFirstDto<ReadPostDto> visitPost2 = postQueryService.getPostForRead(
+                null,
+                post.getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+
+        ReadPostDto data2 = visitPost2.getData();
+        Slice<RelatedPostDto> posts2 = visitPost2.getPosts();
 
         //then
         assertThat(data.getMember().getMemberId()).isEqualTo(member.getId());
@@ -760,7 +768,7 @@ public class PostQueryServiceJpaTest {
         assertThat(data.getCommentSize()).isEqualTo(4);
         assertThat(data.getLikedSize()).isEqualTo(4);
         assertThat(data.getPostId()).isEqualTo(post.getId());
-        assertThat(data.getHashtags().stream().map(HashtagDto.ContentHashtagDto::getId).collect(Collectors.toList()))
+        assertThat(data.getHashtags().stream().map(ContentHashtagDto::getId).collect(Collectors.toList()))
                 .contains(hashtagList.get(0).getId(), hashtagList.get(1).getId(), hashtagList.get(2).getId(),
                         hashtagList.get(3).getId(), hashtagList.get(4).getId(), hashtagList.get(5).getId(),
                         hashtagList.get(6).getId(), hashtagList.get(7).getId(), hashtagList.get(8).getId(),
@@ -775,6 +783,29 @@ public class PostQueryServiceJpaTest {
         assertThat(posts.getContent().get(2).getPostId()).isEqualTo(postList.get(7).getId());
         assertThat(posts.hasNext()).isTrue();
         assertThat(posts.getSize()).isEqualTo(3);
-    }
 
+        assertThat(data2.getMember().getMemberId()).isEqualTo(member.getId());
+        assertThat(data2.getMember().getAccountId()).isEqualTo(member.getAccountId());
+        assertThat(data2.getMember().getNickname()).isEqualTo(member.getNickname());
+        assertThat(data2.getMember().getProfile()).isEqualTo(member.getProfileImg());
+
+        assertThat(data2.getCommentSize()).isEqualTo(5);
+        assertThat(data2.getLikedSize()).isEqualTo(5);
+        assertThat(data2.getPostId()).isEqualTo(post.getId());
+        assertThat(data2.getHashtags().stream().map(ContentHashtagDto::getId).collect(Collectors.toList()))
+                .contains(hashtagList.get(0).getId(), hashtagList.get(1).getId(), hashtagList.get(2).getId(),
+                        hashtagList.get(3).getId(), hashtagList.get(4).getId(), hashtagList.get(5).getId(),
+                        hashtagList.get(6).getId(), hashtagList.get(7).getId(), hashtagList.get(8).getId(),
+                        hashtagList.get(9).getId());
+        assertThat(data2.getMovie().getTitle()).isEqualTo(movie.getTitle());
+        assertThat(data2.getMovie().getThumbnail()).isEqualTo(movie.getThumbnail());
+        assertThat(data2.getMovie().getDirectorName()).isEqualTo(movie.getDirectorName());
+        assertThat(data2.getPublicOfPostStatus()).isEqualTo(post.getPublicOfPostStatus());
+
+        assertThat(posts2.getContent().get(0).getPostId()).isEqualTo(postList.get(9).getId());
+        assertThat(posts2.getContent().get(1).getPostId()).isEqualTo(postList.get(8).getId());
+        assertThat(posts2.getContent().get(2).getPostId()).isEqualTo(postList.get(7).getId());
+        assertThat(posts2.hasNext()).isTrue();
+        assertThat(posts2.getSize()).isEqualTo(3);
+    }
 }

@@ -19,6 +19,59 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
+    public static class ReadMemberDto {
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
+        private Long id;
+
+        @ApiModelProperty(
+                value = "프로필 url",
+                example = "fhjdklebneke")
+        private String profileUrl;
+
+        @ApiModelProperty(
+                value = "프로필 설명",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String bio;
+
+        @ApiModelProperty(
+                value = "팔로워 갯수",
+                example = "123")
+        private Long followerSize;
+
+        @ApiModelProperty(
+                value = "팔로잉 갯수",
+                example = "123")
+        private Long followingSize;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        @ApiModelProperty(
+                value = "권한 여부",
+                example = "false")
+        private boolean isAdmin;
+
+        @QueryProjection
+        public ReadMemberDto(Long id, String profileUrl, String bio, Long followerSize, Long followingSize) {
+            this.id = id;
+            this.profileUrl = profileUrl;
+            this.bio = bio;
+            this.followerSize = followerSize;
+            this.followingSize = followingSize;
+        }
+
+        public void setAdmin(Long memberId, boolean isAdmin) {
+            this.isAdmin = this.id.equals(memberId) || isAdmin;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class CommentMemberDto {
         private Long memberId;
         private String profile;

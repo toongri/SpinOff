@@ -3,9 +3,9 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostFirstDto;
-import com.nameless.spin_off.dto.PostDto.VisitPostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
@@ -189,11 +189,11 @@ public class PostApiController {
                     example = "192.168.0.1")
     })
     @GetMapping("/{postId}")
-    public SingleApiResult<RelatedPostFirstDto<VisitPostDto>> getPostForVisit(
+    public SingleApiResult<RelatedPostFirstDto<ReadPostDto>> readPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam String ip,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("getPostForVisit");
+        log.info("readPost");
         log.info("postId : {}", postId);
         log.info("ip : {}", ip);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
@@ -201,7 +201,7 @@ public class PostApiController {
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        RelatedPostFirstDto<VisitPostDto> postForVisit = postQueryService.getPostForVisit(currentMember, postId, pageable);
+        RelatedPostFirstDto<ReadPostDto> postForVisit = postQueryService.getPostForRead(currentMember, postId, pageable);
         postService.insertViewedPostByIp(ip, postId);
         return getResult(postForVisit);
     }

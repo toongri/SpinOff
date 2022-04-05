@@ -5,8 +5,6 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum;
-import com.nameless.spin_off.entity.enums.member.MemberCondition;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
@@ -34,6 +32,28 @@ public class MemberApiController {
 
     private final MemberService memberService;
     private final MemberQueryService memberQueryService;
+
+    @ApiOperation(value = "멤버 마이페이지", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "followedMemberId",
+                    value = "팔로우할 멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @PostMapping("/{memberId}")
+    public SingleApiResult<Long> readOne(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readOne");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("memberId : {}", memberId);
+
+        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+    }
 
     @ApiOperation(value = "멤버 팔로우 생성", notes = "")
     @ApiImplicitParams({
@@ -131,11 +151,11 @@ public class MemberApiController {
         return getResult(memberQueryService.getLastSearchesByMemberLimit(currentMember.getId(), length));
     }
 
-    private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {
-        return !getProviderByEmail(email).equals(provider.getValue()) || MemberCondition.EMAIL.isNotCorrect(email);
-    }
-
-    private String getProviderByEmail(String email) {
-        return email.substring(email.indexOf("@") + 1, email.indexOf("."));
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
     }
 }

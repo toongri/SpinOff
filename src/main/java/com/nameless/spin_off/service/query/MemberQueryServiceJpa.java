@@ -1,10 +1,13 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
-import com.nameless.spin_off.dto.SearchDto;
+import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -59,8 +62,31 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     }
 
     @Override
-    public List<SearchDto.LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) {
+    public List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) {
         return searchQueryRepository.findLastSearchesByMemberIdLimit(memberId, length);
+    }
+
+    @Override
+    public ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        ReadMemberDto memberDto = getByIdForRead(currentMemberId, targetMemberId);
+        if (currentMemberId != null) {
+            memberDto.setFollowed(getExistFollowedMember(currentMemberId, targetMemberId));
+            memberDto.setAdmin(currentMemberId, isCurrentMemberAdmin(currentMember));
+        }
+
+        return memberDto;
+    }
+
+    private Boolean getExistFollowedMember(Long currentMemberId, Long targetMemberId) {
+        return memberQueryRepository.isExistFollowedMember(currentMemberId, targetMemberId);
+    }
+
+    private ReadMemberDto getByIdForRead(Long currentMemberId, Long targetMemberId) {
+        return memberQueryRepository
+                .findByIdForRead(targetMemberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(currentMemberId))
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<SearchMemberDto> data) {
@@ -77,11 +103,19 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         }
     }
 
-    private List<Long> getFollowedMemberByMemberId(Long memberId) {
-        if (memberId != null) {
-            return memberRepository.findAllIdByFollowingMemberId(memberId);
-        } else{
-            return new ArrayList<>();
+    private boolean isCurrentMemberAdmin(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.isAdmin();
+        } else {
+            return false;
+        }
+    }
+
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
         }
     }
 }

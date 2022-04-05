@@ -13,5 +13,6 @@ public interface MemberService {
             throws NotExistMemberException, AlreadyBlockedMemberException, AlreadyFollowedMemberException;
     Long insertSearch(Long memberId, String content, SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException;
+    Long getMemberForRead(Long currentMemberId, Long targetMemberId);
     int updateAllPopularity();
 }
