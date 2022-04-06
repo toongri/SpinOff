@@ -415,6 +415,18 @@ public class MemberQueryServiceJpaTest {
                         .build(),
                 member.getId());
 
+        ReadMemberDto memberForRead6 = memberQueryService.getMemberForRead(
+                MemberDetails.builder()
+                        .id(memberList.get(4).getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                member2.getId());
+
         //then
 
         assertThat(memberForRead1.getId()).isEqualTo(member.getId());
@@ -440,5 +452,44 @@ public class MemberQueryServiceJpaTest {
         assertThat(memberForRead3.getProfileUrl()).isEqualTo(member.getProfileImg());
         assertThat(memberForRead3.isFollowed()).isEqualTo(true);
         assertThat(memberForRead3.isAdmin()).isEqualTo(false);
+
+        assertThat(memberForRead6.getId()).isEqualTo(member2.getId());
+        assertThat(memberForRead6.getBio()).isEqualTo(member2.getBio());
+        assertThat(memberForRead6.getFollowerSize()).isEqualTo(0);
+        assertThat(memberForRead6.getFollowingSize()).isEqualTo(0);
+        assertThat(memberForRead6.getProfileUrl()).isEqualTo(member2.getProfileImg());
+        assertThat(memberForRead6.isFollowed()).isEqualTo(false);
+        assertThat(memberForRead6.isAdmin()).isEqualTo(false);
+
+        ReadMemberDto memberForRead4 = memberQueryService.getMemberForRead(
+                MemberDetails.builder()
+                        .id(memberList.get(5).getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(4).getId());
+
+        assertThat(memberForRead4.isBlocked()).isTrue();
+
+        ReadMemberDto memberForRead5 = memberQueryService.getMemberForRead(
+                MemberDetails.builder()
+                        .id(memberList.get(4).getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(5).getId());
+
+        assertThat(memberForRead5.isBlocking()).isTrue();
+        assertThat(memberForRead3.isAdmin()).isEqualTo(false);
+        assertThat(memberForRead5.getFollowerSize()).isEqualTo(0L);
+        assertThat(memberForRead5.getFollowingSize()).isEqualTo(1L);
     }
 }

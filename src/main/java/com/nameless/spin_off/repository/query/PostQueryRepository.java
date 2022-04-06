@@ -86,7 +86,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .selectOne()
                 .from(post)
                 .join(post.member, member)
-                .leftJoin(member.followingMembers, followedMember)
+                .join(member.followingMembers, followedMember)
                 .where(
                         post.id.eq(postId).and(
                                 followedMember.followingMember.id.eq(memberId)))
@@ -272,6 +272,20 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
+    public Optional<ReadPostDto> findByIdForRead(Long postId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QPostDto_ReadPostDto(
+                        post.id, member.id, member.profileImg, member.nickname, member.accountId, post.title,
+                        post.createdDate, post.lastModifiedDate, post.content, movie.thumbnail, movie.title,
+                        movie.directorName, post.publicOfPostStatus))
+                .from(post)
+                .join(post.member, member)
+                .leftJoin(post.movie, movie)
+                .where(
+                        post.id.eq(postId))
+                .fetchFirst());
+    }
+
     public Slice<SearchPageAtHashtagPostDto> findAllByHashtagsSlicedForSearchPage(
             Pageable pageable, List<Long> hashtagIds, List<Long> blockedMemberIds) {
         return applySlicing(pageable, contentQuery -> contentQuery
@@ -308,11 +322,11 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     }
 
     private BooleanExpression commentMemberNotIn(List<Long> memberIds) {
-        return memberIds.isEmpty() ? null : commentInPost.member.id.notIn(memberIds);
+        return memberIds.isEmpty() ? null : commentInPost.member.id.notIn(memberIds).or(commentInPost.isNull());
     }
 
     private BooleanExpression likedPostMemberNotIn(List<Long> memberIds) {
-        return memberIds.isEmpty() ? null : likedPost.member.id.notIn(memberIds);
+        return memberIds.isEmpty() ? null : likedPost.member.id.notIn(memberIds).or(likedPost.isNull());
     }
     private BooleanExpression memberNotIn(List<Long> members) {
         return members.isEmpty() ? null : member.id.notIn(members);

@@ -106,6 +106,24 @@ public class PostDto {
             this.likedSize = likedSize;
             this.commentSize = commentSize;
         }
+
+        @QueryProjection
+        public ReadPostDto(Long postId, Long memberId, String profile, String nickname, String accountId,
+                           String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
+                           String postContent, String movieThumbnail, String movieTitle, String directorName,
+                           PublicOfPostStatus publicOfPostStatus) {
+
+            this.postId = postId;
+            this.member = new ContentMemberDto(memberId, profile, nickname, accountId);
+            this.postTitle = postTitle;
+            this.createTime = createTime;
+            this.publicOfPostStatus = publicOfPostStatus;
+            this.getLastModifiedDate = getLastModifiedDate;
+            this.postContent = postContent;
+            this.movie = new MovieInReadPost(movieThumbnail, movieTitle, directorName);
+            this.likedSize = 0L;
+            this.commentSize = 0L;
+        }
     }
 
     @Data

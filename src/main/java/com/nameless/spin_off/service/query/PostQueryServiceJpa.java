@@ -125,7 +125,8 @@ public class PostQueryServiceJpa implements PostQueryService{
 
     private ReadPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
         return postQueryRepository.findByIdForRead(postId, blockedMemberIds)
-                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+                .orElseGet(() -> postQueryRepository.findByIdForRead(postId)
+                        .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST)));
     }
 
     private ReadPostDto getReadPostDto(Long postId, Long memberId,

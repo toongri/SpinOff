@@ -130,7 +130,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .selectOne()
                 .from(collection)
                 .join(collection.member, member)
-                .leftJoin(member.followingMembers, followedMember)
+                .join(member.followingMembers, followedMember)
                 .where(
                         collection.id.eq(collectionId).and(
                                 followedMember.followingMember.id.eq(memberId)))
@@ -185,7 +185,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .leftJoin(collection.followingMembers, followedCollection)
                 .groupBy(collection)
                 .where(
-                        followedCollection.member.id.notIn(blockedMembers),
+                        followingCollectionNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
@@ -211,7 +211,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .leftJoin(collection.followingMembers, followedCollection)
                 .groupBy(collection)
                 .where(
-                        followedCollection.member.id.notIn(blockedMembers),
+                        followingCollectionNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
@@ -278,14 +278,6 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         followedCollection.member.id.eq(memberId)));
     }
 
-    private List<Long> getCollectionIds(List<SearchCollectionDto> content) {
-        return content.stream().map(SearchCollectionDto::getCollectionId).collect(Collectors.toList());
-    }
-
-    private List<Long> getCollectionIdsAll(List<SearchAllCollectionDto> content) {
-        return content.stream().map(SearchAllCollectionDto::getCollectionId).collect(Collectors.toList());
-    }
-
     private Map<Long, List<FollowCollectionMemberDto>> getFollowingMembersAtCollection(Long memberId, List<Long> collectionIds) {
         return getQueryFactory()
                 .select(new QCollectionDto_FollowCollectionMemberDto(
@@ -305,6 +297,10 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         }
     }
 
+    private BooleanExpression followingCollectionNotIn(List<Long> members) {
+        return members.isEmpty() ? null : followedCollection.member.id.notIn(members).or(followedCollection.isNull());
+    }
+
     private BooleanExpression memberNotEq(Long memberId) {
         return memberId != null ? member.id.ne(memberId) : null;
     }
@@ -316,5 +312,13 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     }
     private BooleanExpression memberNotIn(List<Long> memberIds) {
         return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
+    }
+
+    private List<Long> getCollectionIds(List<SearchCollectionDto> content) {
+        return content.stream().map(SearchCollectionDto::getCollectionId).collect(Collectors.toList());
+    }
+
+    private List<Long> getCollectionIdsAll(List<SearchAllCollectionDto> content) {
+        return content.stream().map(SearchAllCollectionDto::getCollectionId).collect(Collectors.toList());
     }
 }

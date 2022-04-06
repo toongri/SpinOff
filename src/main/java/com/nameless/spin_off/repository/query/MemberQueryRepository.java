@@ -53,6 +53,17 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
+    public Optional<ReadMemberDto> findByIdForRead(Long memberId) {
+
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QMemberDto_ReadMemberDto(
+                        member.id, member.profileImg, member.bio))
+                .from(member)
+                .where(
+                        member.id.eq(memberId))
+                .fetchFirst());
+    }
+
     public Optional<String> findAccountIdByEmail(String email) {
         return Optional.ofNullable(getQueryFactory()
                 .select(member.accountId)
@@ -93,6 +104,19 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         blockedMember.blockingMember.id.eq(blockingMemberId),
                         blockedMember.member.id.eq(blockedMemberId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistBlockedMemberAndStatus(Long blockingMemberId, Long blockedMemberId, BlockedMemberStatus status) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(blockedMember)
+                .where(
+                        blockedMember.blockingMember.id.eq(blockingMemberId),
+                        blockedMember.member.id.eq(blockedMemberId),
+                        blockedMember.blockedMemberStatus.eq(status))
                 .fetchFirst();
 
         return fetchOne != null;
@@ -203,11 +227,11 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
     }
 
     private BooleanExpression followingMemberNotIn(List<Long> members) {
-        return members.isEmpty() ? null : followedMember.followingMember.id.notIn(members);
+        return members.isEmpty() ? null : followedMember.followingMember.id.notIn(members).or(followedMember.isNull());
     }
 
     private BooleanExpression followedMemberNotIn(List<Long> members, QFollowedMember followingMember) {
-        return members.isEmpty() ? null : followingMember.member.id.notIn(members);
+        return members.isEmpty() ? null : followingMember.member.id.notIn(members).or(followingMember.isNull());
     }
 
     private BooleanExpression memberNotIn(List<Long> members) {

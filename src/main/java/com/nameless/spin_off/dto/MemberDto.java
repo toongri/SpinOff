@@ -18,7 +18,6 @@ import java.util.List;
 public class MemberDto {
 
     @Data
-    @NoArgsConstructor
     public static class ReadMemberDto {
 
         @ApiModelProperty(
@@ -56,6 +55,16 @@ public class MemberDto {
                 example = "false")
         private boolean isAdmin;
 
+        @ApiModelProperty(
+                value = "차단 여부",
+                example = "false")
+        private boolean isBlocking;
+
+        @ApiModelProperty(
+                value = "차단 당함 여부",
+                example = "false")
+        private boolean isBlocked;
+
         @QueryProjection
         public ReadMemberDto(Long id, String profileUrl, String bio, Long followerSize, Long followingSize) {
             this.id = id;
@@ -63,6 +72,19 @@ public class MemberDto {
             this.bio = bio;
             this.followerSize = followerSize;
             this.followingSize = followingSize;
+        }
+
+        @QueryProjection
+        public ReadMemberDto(Long id, String profileUrl, String bio) {
+            this.id = id;
+            this.profileUrl = profileUrl;
+            this.bio = bio;
+            this.followerSize = 0L;
+            this.followingSize = 0L;
+        }
+
+        public ReadMemberDto() {
+            this.isBlocked = true;
         }
 
         public void setAdmin(Long memberId, boolean isAdmin) {

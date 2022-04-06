@@ -69,24 +69,68 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     @Override
     public ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId) {
         Long currentMemberId = getCurrentMemberId(currentMember);
+        List<Long> blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        List<Long> blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        ReadMemberDto memberDto = getReadMemberDto(targetMemberId, blockingIds, blockedIds);
 
-        ReadMemberDto memberDto = getByIdForRead(currentMemberId, targetMemberId);
-        if (currentMemberId != null) {
-            memberDto.setFollowed(getExistFollowedMember(currentMemberId, targetMemberId));
+        if (!memberDto.isBlocked() && currentMemberId != null) {
+            memberDto.setBlocking(isExistBlockedMember(blockedIds, targetMemberId));
             memberDto.setAdmin(currentMemberId, isCurrentMemberAdmin(currentMember));
+            if (!memberDto.isBlocking()) {
+                memberDto.setFollowed(getExistFollowedMember(currentMemberId, targetMemberId));
+            }
         }
 
         return memberDto;
     }
 
-    private Boolean getExistFollowedMember(Long currentMemberId, Long targetMemberId) {
-        return memberQueryRepository.isExistFollowedMember(currentMemberId, targetMemberId);
+    private List<Long> getAllIdByBlockedMemberId(Long currentMemberId) {
+        if (currentMemberId != null) {
+            return memberRepository.findAllIdByBlockedMemberId(currentMemberId, BlockedMemberStatus.A);
+        } else {
+            return new ArrayList<>();
+        }
     }
 
-    private ReadMemberDto getByIdForRead(Long currentMemberId, Long targetMemberId) {
+    private List<Long> getAllIdByBlockingMemberId(Long currentMemberId) {
+        if (currentMemberId != null) {
+            return memberRepository.findAllIdByBlockingMemberId(currentMemberId, BlockedMemberStatus.A);
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    private ReadMemberDto getReadMemberDto(Long targetMemberId, List<Long> blockingIds, List<Long> blockedIds) {
+        if (isExistBlockingMember(blockingIds, targetMemberId)) {
+            return new ReadMemberDto();
+        } else {
+            return getByIdForRead(targetMemberId, blockingIds, blockedIds);
+        }
+    }
+
+    private boolean isExistBlockingMember(List<Long> blockingIds, Long targetMemberId) {
+        return blockingIds.stream().anyMatch(m -> m.equals(targetMemberId));
+    }
+
+    private Boolean isExistBlockedMember(List<Long> blockedIds, Long targetMemberId) {
+        return blockedIds.stream().anyMatch(m -> m.equals(targetMemberId));
+    }
+
+    private Boolean getExistFollowedMember(Long currentMemberId, Long targetMemberId) {
+        if (currentMemberId == null) {
+            return false;
+        } else {
+            return memberQueryRepository.isExistFollowedMember(currentMemberId, targetMemberId);
+        }
+    }
+
+    private ReadMemberDto getByIdForRead(Long targetMemberId,
+                                         List<Long> blockingIds, List<Long> blockedIds) {
+        blockingIds.addAll(blockedIds);
         return memberQueryRepository
-                .findByIdForRead(targetMemberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(currentMemberId))
-                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+                .findByIdForRead(targetMemberId, blockingIds.stream().distinct().collect(Collectors.toList()))
+                .orElseGet(() -> memberQueryRepository.findByIdForRead(targetMemberId)
+                        .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)));
     }
 
     private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<SearchMemberDto> data) {
