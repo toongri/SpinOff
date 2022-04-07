@@ -6,12 +6,10 @@ import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.dto.PostDto.ReadPostDto;
-import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
-import com.nameless.spin_off.dto.PostDto.RelatedPostFirstDto;
-import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
+import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
@@ -19,6 +17,7 @@ import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -45,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -659,26 +659,22 @@ public class PostQueryServiceJpaTest {
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -686,7 +682,6 @@ public class PostQueryServiceJpaTest {
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -694,7 +689,6 @@ public class PostQueryServiceJpaTest {
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -702,7 +696,6 @@ public class PostQueryServiceJpaTest {
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -710,7 +703,6 @@ public class PostQueryServiceJpaTest {
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -719,7 +711,6 @@ public class PostQueryServiceJpaTest {
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
                         hashtagList.get(8))).build());
 
-        em.flush();
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
@@ -807,5 +798,208 @@ public class PostQueryServiceJpaTest {
         assertThat(posts2.getContent().get(2).getPostId()).isEqualTo(postList.get(7).getId());
         assertThat(posts2.hasNext()).isTrue();
         assertThat(posts2.getSize()).isEqualTo(3);
+    }
+    @Test
+    public void 마이페이지_포스트출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        Member member3 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member3);
+
+        Member member4 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member4);
+
+        List<Collection> collectionList = new ArrayList<>();
+        Collection defaultCollection = Collection.createDefaultCollection(member);
+        collectionRepository.save(defaultCollection);
+        collectionList.add(defaultCollection);
+
+        for (int i = 0; i < 4; i++) {
+            collectionList.add(collectionRepository
+                    .save(Collection.createCollection(member, i + "", i + "", PublicOfCollectionStatus.C)));
+        }
+
+        for (int i = 0; i < 5; i++) {
+            collectionList.add(collectionRepository
+                    .save(Collection.createCollection(member, i + "", i + "", PublicOfCollectionStatus.A)));
+        }
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+        em.flush();
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        memberService.insertBlockedMemberByMemberId(member2.getId(), member4.getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        em.clear();
+        //when
+        System.out.println("서비스시작");
+        Slice<MyPagePostDto> post = postQueryService.getPostsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+        System.out.println("서비스끝");
+
+        Slice<MyPagePostDto> post2 = postQueryService.getPostsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member2.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<MyPagePostDto> post3 = postQueryService.getPostsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member3.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<MyPagePostDto> post4 = postQueryService.getPostsByMemberIdSliced(
+                null, member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        //then
+
+        assertThat(post.getContent().stream().map(MyPagePostDto::getId)).containsExactly(
+                postList.get(9).getId(),
+                postList.get(8).getId(),
+                postList.get(7).getId(),
+                postList.get(6).getId(),
+                postList.get(5).getId(),
+                postList.get(4).getId());
+
+        assertThat(post2.getContent().stream().map(MyPagePostDto::getId)).containsExactly(
+                postList.get(8).getId(),
+                postList.get(7).getId(),
+                postList.get(6).getId(),
+                postList.get(5).getId(),
+                postList.get(4).getId(),
+                postList.get(3).getId());
+
+        assertThat(post3.getContent().stream().map(MyPagePostDto::getId)).containsExactly(
+                postList.get(8).getId(),
+                postList.get(7).getId(),
+                postList.get(6).getId(),
+                postList.get(5).getId(),
+                postList.get(4).getId());
+
+        assertThat(post4.getContent().stream().map(MyPagePostDto::getId)).containsExactly(
+                postList.get(8).getId(),
+                postList.get(7).getId(),
+                postList.get(6).getId(),
+                postList.get(5).getId(),
+                postList.get(4).getId());
+
+        assertThatThrownBy(() -> postQueryService.getPostsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member4.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member2.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending())))
+                .isInstanceOf(DontHaveAuthorityException.class);
     }
 }

@@ -17,6 +17,9 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -36,14 +39,14 @@ public class MemberApiController {
     @ApiOperation(value = "멤버 마이페이지", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "followedMemberId",
-                    value = "팔로우할 멤버 id",
+                    name = "memberId",
+                    value = "멤버 id",
                     required = true,
                     paramType = "path",
                     dataType = "Long",
                     example = "123")
     })
-    @PostMapping("/{memberId}")
+    @GetMapping("/{memberId}")
     public SingleApiResult<Long> readOne(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
         Long currentMemberId = getCurrentMemberId(currentMember);
@@ -51,6 +54,102 @@ public class MemberApiController {
         log.info("readOne");
         log.info("currentMemberId : {}", currentMemberId);
         log.info("memberId : {}", memberId);
+
+        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 마이페이지 글", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "page",
+                    value = "페이지 번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "페이지 크기",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123",
+                    allowableValues = "range[0, 100]"),
+            @ApiImplicitParam(
+                    name = "sort",
+                    value = "페이지 정렬",
+                    required = false,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "popularity,desc"),
+    })
+    @GetMapping("/{memberId}/post")
+    public SingleApiResult<Long> readMemberPosts(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readMemberPosts");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+
+        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 마이페이지 컬렉션", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "page",
+                    value = "페이지 번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "페이지 크기",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123",
+                    allowableValues = "range[0, 100]"),
+            @ApiImplicitParam(
+                    name = "sort",
+                    value = "페이지 정렬",
+                    required = false,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "popularity,desc"),
+    })
+    @GetMapping("/{memberId}/collection")
+    public SingleApiResult<Long> readMemberCollections(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readMemberCollections");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("memberId : {}", memberId);
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
 
         return getResult(memberService.getMemberForRead(currentMemberId, memberId));
     }
@@ -120,7 +219,7 @@ public class MemberApiController {
                     example = "A")
     })
     @PostMapping("/search")
-    public SingleApiResult<Long> insertSearchByKeyword(
+    public SingleApiResult<Long> createSearchByKeyword(
             @LoginMember MemberDetails currentMember, @RequestParam String keyword,
             @RequestParam SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException {

@@ -7,6 +7,7 @@ import com.nameless.spin_off.exception.sign.AuthenticationEntryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -27,15 +28,19 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        try{
-            filterChain.doFilter(request,response);
-        } catch (AuthenticationEntryException ex){
+        try {
+            filterChain.doFilter(request, response);
+        } catch (AuthenticationEntryException ex) {
             errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
             errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
             httpStatus = HttpStatus.UNAUTHORIZED;
             log.info("entrypoint exception handler filter");
             writeTokenResponse(response);
-        }catch (RuntimeException ex){
+        } catch (UsernameNotFoundException ex) {
+            errorMessage = ErrorEnum.USERNAME_NOT_FOUND.getMessage();
+            errorCode = ErrorEnum.USERNAME_NOT_FOUND.getCode();
+            httpStatus = HttpStatus.BAD_REQUEST;
+        } catch (RuntimeException ex) {
             errorMessage = ErrorEnum.RUNTIME.getMessage();
             errorCode = ErrorEnum.RUNTIME.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;

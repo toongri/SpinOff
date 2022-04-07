@@ -26,6 +26,34 @@ public class PostDto {
 
     @Data
     @NoArgsConstructor
+    public static class MyPagePostDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
+        private Long id;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String title;
+
+        @ApiModelProperty(
+                value = "글 썸네일",
+                example = "flknsdafl")
+        private String thumbnailUrl;
+
+        @QueryProjection
+        public MyPagePostDto(Long id, String title, String thumbnailUrl) {
+            this.id = id;
+            this.title = title;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
+
+
+    @Data
+    @NoArgsConstructor
     public static class ReadPostDto {
 
         @ApiModelProperty(

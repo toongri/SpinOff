@@ -4,7 +4,8 @@ import java.util.List;
 
 public enum PostPublicEnum {
     DEFAULT_POST_PUBLIC(List.of(PublicOfPostStatus.A)),
-    FOLLOW_POST_PUBLIC(List.of(PublicOfPostStatus.A, PublicOfPostStatus.C));
+    FOLLOW_POST_PUBLIC(List.of(PublicOfPostStatus.A, PublicOfPostStatus.C)),
+    ADMIN_POST_PUBLIC(List.of(PublicOfPostStatus.A, PublicOfPostStatus.B, PublicOfPostStatus.C));
 
     private final List<PublicOfPostStatus> privacyBound;
 

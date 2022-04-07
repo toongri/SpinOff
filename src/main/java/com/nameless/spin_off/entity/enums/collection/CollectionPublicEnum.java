@@ -4,7 +4,8 @@ import java.util.List;
 
 public enum CollectionPublicEnum {
     DEFAULT_COLLECTION_PUBLIC(List.of(PublicOfCollectionStatus.A)),
-    FOLLOW_COLLECTION_PUBLIC(List.of(PublicOfCollectionStatus.A, PublicOfCollectionStatus.C));
+    FOLLOW_COLLECTION_PUBLIC(List.of(PublicOfCollectionStatus.A, PublicOfCollectionStatus.C)),
+    ADMIN_COLLECTION_PUBLIC(List.of(PublicOfCollectionStatus.A, PublicOfCollectionStatus.B, PublicOfCollectionStatus.C));
 
     private final List<PublicOfCollectionStatus> privacyBound;
 

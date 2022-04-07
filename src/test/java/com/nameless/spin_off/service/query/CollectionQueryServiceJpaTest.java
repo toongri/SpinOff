@@ -1,13 +1,18 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -18,16 +23,20 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -784,5 +793,209 @@ public class CollectionQueryServiceJpaTest {
                         List.of(collectionList.get(2).getCollectedPosts().get(2).getPost().getThumbnailUrl(),
                                 collectionList.get(2).getCollectedPosts().get(1).getPost().getThumbnailUrl())
                 );
+    }
+    
+    @Test
+    public void 마이페이지_컬렉션출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        Member member3 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member3);
+
+        Member member4 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member4);
+
+        List<Collection> collectionList = new ArrayList<>();
+        Collection defaultCollection = Collection.createDefaultCollection(member);
+        collectionRepository.save(defaultCollection);
+        collectionList.add(defaultCollection);
+
+        for (int i = 0; i < 4; i++) {
+            collectionList.add(collectionRepository
+                    .save(Collection.createCollection(member, i + "", i + "", PublicOfCollectionStatus.C)));
+        }
+
+        for (int i = 0; i < 5; i++) {
+            collectionList.add(collectionRepository
+                    .save(Collection.createCollection(member, i + "", i + "", PublicOfCollectionStatus.A)));
+        }
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+        em.flush();
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        memberService.insertBlockedMemberByMemberId(member2.getId(), member4.getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        em.clear();
+        //when
+        System.out.println("서비스시작");
+        Slice<MyPageCollectionDto> collection = collectionQueryService.getCollectionsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+        System.out.println("서비스끝");
+
+        Slice<MyPageCollectionDto> collection2 = collectionQueryService.getCollectionsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member2.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<MyPageCollectionDto> collection3 = collectionQueryService.getCollectionsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member3.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<MyPageCollectionDto> collection4 = collectionQueryService.getCollectionsByMemberIdSliced(
+                null, member.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        //then
+
+        assertThat(collection.getContent().stream().map(MyPageCollectionDto::getId)).containsExactly(
+                collectionList.get(0).getId(),
+                collectionList.get(9).getId(),
+                collectionList.get(8).getId(),
+                collectionList.get(7).getId(),
+                collectionList.get(6).getId(),
+                collectionList.get(5).getId());
+
+        assertThat(collection2.getContent().stream().map(MyPageCollectionDto::getId)).containsExactly(
+                collectionList.get(9).getId(),
+                collectionList.get(8).getId(),
+                collectionList.get(7).getId(),
+                collectionList.get(6).getId(),
+                collectionList.get(5).getId(),
+                collectionList.get(4).getId());
+
+        assertThat(collection3.getContent().stream().map(MyPageCollectionDto::getId)).containsExactly(
+                collectionList.get(9).getId(),
+                collectionList.get(8).getId(),
+                collectionList.get(7).getId(),
+                collectionList.get(6).getId(),
+                collectionList.get(5).getId());
+
+        assertThat(collection4.getContent().stream().map(MyPageCollectionDto::getId)).containsExactly(
+                collectionList.get(9).getId(),
+                collectionList.get(8).getId(),
+                collectionList.get(7).getId(),
+                collectionList.get(6).getId(),
+                collectionList.get(5).getId());
+
+        assertThatThrownBy(() -> collectionQueryService.getCollectionsByMemberIdSliced(
+                MemberDetails.builder()
+                        .id(member4.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), member2.getId(),
+                PageRequest.of(0, 6, Sort.by("id").descending())))
+                .isInstanceOf(DontHaveAuthorityException.class);
     }
 }

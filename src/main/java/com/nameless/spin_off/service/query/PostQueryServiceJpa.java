@@ -22,7 +22,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +123,24 @@ public class PostQueryServiceJpa implements PostQueryService{
                 getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), postId);
     }
 
+    @Override
+    public Slice<MyPagePostDto> getPostsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable) {
+
+        if (currentMember != null) {
+            Long currentMemberId = currentMember.getId();
+            isExistBlockedMember(currentMemberId, targetMemberId);
+
+            return postQueryRepository.findAllByMemberIdSliced(
+                    targetMemberId,
+                    pageable,
+                    isExistFollowedMember(currentMemberId, targetMemberId),
+                    isCurrentMemberAdminAtMyPage(currentMember, targetMemberId));
+        } else {
+            return postQueryRepository.findAllByMemberIdSliced(
+                    targetMemberId, pageable, false, false);
+        }
+    }
+
     private ReadPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
         return postQueryRepository.findByIdForRead(postId, blockedMemberIds)
                 .orElseGet(() -> postQueryRepository.findByIdForRead(postId)
@@ -145,6 +163,10 @@ public class PostQueryServiceJpa implements PostQueryService{
         return post;
     }
 
+    private boolean isCurrentMemberAdminAtMyPage(MemberDetails currentMember, Long targetMemberId) {
+        return currentMember.isAdmin() || currentMember.getId().equals(targetMemberId);
+    }
+
     private boolean isCurrentMemberAdmin(MemberDetails currentMember) {
         if (currentMember != null) {
             return currentMember.isAdmin();
@@ -165,7 +187,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         if (memberId != null) {
             return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -173,7 +195,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         if (memberId != null) {
             return memberRepository.findAllIdByFollowingMemberId(memberId);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -187,7 +209,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         if (memberId != null) {
             return movieRepository.findAllIdByFollowingMemberId(memberId);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 

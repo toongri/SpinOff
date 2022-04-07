@@ -5,7 +5,9 @@ import com.nameless.spin_off.config.auth.dto.AccessToken;
 import com.nameless.spin_off.config.auth.dto.profile.ProfileDto;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.MemberLoginRequestDto;
 import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
+import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
@@ -61,7 +63,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public MemberLoginResponseDto registerMember(MemberDto.MemberRegisterRequestDto requestDto)
+    public MemberLoginResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
         isCorrectRegisterRequest(requestDto);
         isExistAuthEmail(requestDto.getEmail(), requestDto.getAuthToken());
@@ -86,7 +88,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public MemberLoginResponseDto loginMember(MemberDto.MemberLoginRequestDto requestDto) {
+    public MemberLoginResponseDto loginMember(MemberLoginRequestDto requestDto) {
         isCorrectLoginRequest(requestDto);
         Member member =
                 memberRepository.findOneByAccountId(requestDto.getAccountId())
@@ -306,14 +308,14 @@ public class SignServiceJpa implements SignService{
         }
     }
 
-    private void isCorrectRegisterRequest(MemberDto.MemberRegisterRequestDto requestDto) {
+    private void isCorrectRegisterRequest(MemberRegisterRequestDto requestDto) {
         isCorrectAccountId(requestDto.getAccountId());
         isCorrectAccountPw(requestDto.getAccountPw());
         isCorrectNickname(requestDto.getNickname());
         isCorrectEmail(requestDto.getEmail());
     }
 
-    private void isCorrectLoginRequest(MemberDto.MemberLoginRequestDto requestDto) {
+    private void isCorrectLoginRequest(MemberLoginRequestDto requestDto) {
         isCorrectAccountId(requestDto.getAccountId());
         isCorrectAccountPw(requestDto.getAccountPw());
     }

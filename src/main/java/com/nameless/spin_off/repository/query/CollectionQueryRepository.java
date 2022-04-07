@@ -24,8 +24,7 @@ import static com.nameless.spin_off.entity.collection.QFollowedCollection.follow
 import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
 import static com.nameless.spin_off.entity.collection.QViewedCollectionByIp.viewedCollectionByIp;
 import static com.nameless.spin_off.entity.comment.QCommentInCollection.commentInCollection;
-import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.DEFAULT_COLLECTION_PUBLIC;
-import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.FOLLOW_COLLECTION_PUBLIC;
+import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.*;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
@@ -35,6 +34,19 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public CollectionQueryRepository() {
         super(Collection.class);
+    }
+
+    public Slice<MyPageCollectionDto> findAllByMemberIdSliced(Long memberId, Pageable pageable,
+                                                              boolean isFollowing, boolean isAdmin) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QCollectionDto_MyPageCollectionDto(
+                        collection.id, collection.title, collection.firstThumbnail, collection.secondThumbnail,
+                        collection.thirdThumbnail, collection.fourthThumbnail))
+                .from(collection)
+                .where(
+                        collection.publicOfCollectionStatus.in(getPrivacyBound(isFollowing, isAdmin)),
+                        collection.member.id.eq(memberId))
+                .orderBy(collection.isDefault.desc()));
     }
 
     public Optional<PublicOfCollectionStatus> findPublicByCollectionId(Long collectionId) {
@@ -294,6 +306,16 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     private void addBanList(Long memberId, List<Long> blockedMemberIds) {
         if (memberId != null) {
             blockedMemberIds.add(memberId);
+        }
+    }
+
+    private List<PublicOfCollectionStatus> getPrivacyBound(boolean isFollowing, boolean isAdmin) {
+        if (isAdmin) {
+            return ADMIN_COLLECTION_PUBLIC.getPrivacyBound();
+        } else if (isFollowing) {
+            return FOLLOW_COLLECTION_PUBLIC.getPrivacyBound();
+        } else {
+            return DEFAULT_COLLECTION_PUBLIC.getPrivacyBound();
         }
     }
 

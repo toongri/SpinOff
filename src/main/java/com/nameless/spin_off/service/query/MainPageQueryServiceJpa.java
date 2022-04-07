@@ -16,7 +16,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -78,7 +78,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         if (memberId != null) {
             return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -86,7 +86,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         if (memberId != null) {
             return memberRepository.findAllIdByFollowingMemberId(memberId);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -94,7 +94,7 @@ public class MainPageQueryServiceJpa implements MainPageQueryService {
         if (memberId != null) {
             return movieRepository.findAllIdByFollowingMemberId(memberId);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 }

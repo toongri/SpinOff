@@ -22,8 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
-import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.DEFAULT_POST_PUBLIC;
-import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.FOLLOW_POST_PUBLIC;
+import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.*;
 import static com.nameless.spin_off.entity.hashtag.QFollowedHashtag.followedHashtag;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
@@ -41,6 +40,17 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
 
     public PostQueryRepository() {
         super(Post.class);
+    }
+
+    public Slice<MyPagePostDto> findAllByMemberIdSliced(Long memberId, Pageable pageable,
+                                                        boolean isFollowing, boolean isAdmin) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QPostDto_MyPagePostDto(
+                        post.id, post.title, post.thumbnailUrl))
+                .from(post)
+                .where(
+                        post.publicOfPostStatus.in(getPrivacyBound(isFollowing, isAdmin)),
+                        post.member.id.eq(memberId)));
     }
 
     public Optional<PublicOfPostStatus> findPublicByPostId(Long postId) {
@@ -311,6 +321,16 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     private void addBanList(Long memberId, List<Long> blockedMemberIds) {
         if (memberId != null) {
             blockedMemberIds.add(memberId);
+        }
+    }
+
+    private List<PublicOfPostStatus> getPrivacyBound(boolean isFollowing, boolean isAdmin) {
+        if (isAdmin) {
+            return ADMIN_POST_PUBLIC.getPrivacyBound();
+        } else if (isFollowing) {
+            return FOLLOW_POST_PUBLIC.getPrivacyBound();
+        } else {
+            return DEFAULT_POST_PUBLIC.getPrivacyBound();
         }
     }
 

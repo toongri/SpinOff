@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -20,4 +21,5 @@ public interface CollectionQueryService {
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
     List<PostInCollectionDto> getCollectionsById(Long memberId);
     QuickPostInCollectionDto getLatestCollectionNameById(Long memberId);
+    Slice<MyPageCollectionDto> getCollectionsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable);
 }
