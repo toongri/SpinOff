@@ -37,7 +37,6 @@ public class CollectedPost extends BaseTimeEntity {
         collectedPost.updatePost(post);
         collectedPost.updateCollection(collection);
         return collectedPost;
-
     }
 
     //==수정 메소드==//

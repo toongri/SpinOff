@@ -2,6 +2,8 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
+import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -10,7 +12,9 @@ import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.query.CollectionQueryService;
 import com.nameless.spin_off.service.query.MemberQueryService;
+import com.nameless.spin_off.service.query.PostQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -18,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +40,8 @@ public class MemberApiController {
 
     private final MemberService memberService;
     private final MemberQueryService memberQueryService;
+    private final PostQueryService postQueryService;
+    private final CollectionQueryService collectionQueryService;
 
     @ApiOperation(value = "멤버 마이페이지", notes = "")
     @ApiImplicitParams({
@@ -91,19 +98,18 @@ public class MemberApiController {
                     example = "popularity,desc"),
     })
     @GetMapping("/{memberId}/post")
-    public SingleApiResult<Long> readMemberPosts(
+    public SingleApiResult<Slice<MyPagePostDto>> readMemberPosts(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("readMemberPosts");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("currentMemberId : {}", getCurrentMemberId(currentMember));
         log.info("memberId : {}", memberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+        return getResult(postQueryService.getPostsByMemberIdSliced(currentMember, memberId, pageable));
     }
 
     @ApiOperation(value = "멤버 마이페이지 컬렉션", notes = "")
@@ -139,19 +145,18 @@ public class MemberApiController {
                     example = "popularity,desc"),
     })
     @GetMapping("/{memberId}/collection")
-    public SingleApiResult<Long> readMemberCollections(
+    public SingleApiResult<Slice<MyPageCollectionDto>> readMemberCollections(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("readMemberCollections");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("currentMemberId : {}", getCurrentMemberId(currentMember));
         log.info("memberId : {}", memberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+        return getResult(collectionQueryService.getCollectionsByMemberIdSliced(currentMember, memberId, pageable));
     }
 
     @ApiOperation(value = "멤버 팔로우 생성", notes = "")

@@ -2,6 +2,7 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.*;
+import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.collection.QFollowedCollection.followedCollection;
 import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
@@ -34,6 +36,25 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public CollectionQueryRepository() {
         super(Collection.class);
+    }
+
+    public List<Long> findAllIdByPostId(Long postId) {
+        return getQueryFactory()
+                .select(collectedPost.collection.id)
+                .from(collectedPost)
+                .where(collectedPost.post.id.eq(postId))
+                .fetch();
+    }
+
+    public List<CollectedPost> findAllIdByPostIdAndMemberId(Long postId, Long memberId) {
+        return getQueryFactory()
+                .select(collectedPost)
+                .from(collectedPost)
+                .join(collectedPost.collection, collection)
+                .where(
+                        collectedPost.post.id.eq(postId),
+                        collection.member.id.eq(memberId))
+                .fetch();
     }
 
     public Slice<MyPageCollectionDto> findAllByMemberIdSliced(Long memberId, Pageable pageable,
@@ -92,6 +113,18 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .select(new QCollectionDto_QuickPostInCollectionDto(collection.id, collection.title))
                 .from(collection)
                 .where(collection.member.id.eq(memberId))
+                .orderBy(collection.lastModifiedDate.desc())
+                .fetchFirst());
+    }
+
+    public Optional<QuickPostInCollectionDto> findOneByMemberIdOrderByCollectedPostDESC(Long memberId,
+                                                                                        List<Long> collectionIds) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_QuickPostInCollectionDto(collection.id, collection.title))
+                .from(collection)
+                .where(
+                        collection.member.id.eq(memberId),
+                        collectionNotIn(collectionIds))
                 .orderBy(collection.lastModifiedDate.desc())
                 .fetchFirst());
     }
@@ -303,6 +336,14 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetch().stream().collect(Collectors.groupingBy(FollowCollectionMemberDto::getCollectionId));
     }
 
+    public long updateLastModifiedDateCollections(List<Long> collectionIds) {
+        return getQueryFactory()
+                .update(collection)
+                .set(collection.lastModifiedDate, LocalDateTime.now())
+                .where(collection.id.in(collectionIds))
+                .execute();
+    }
+
     private void addBanList(Long memberId, List<Long> blockedMemberIds) {
         if (memberId != null) {
             blockedMemberIds.add(memberId);
@@ -322,18 +363,11 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     private BooleanExpression followingCollectionNotIn(List<Long> members) {
         return members.isEmpty() ? null : followedCollection.member.id.notIn(members).or(followedCollection.isNull());
     }
-
-    private BooleanExpression memberNotEq(Long memberId) {
-        return memberId != null ? member.id.ne(memberId) : null;
-    }
-    private BooleanExpression memberIn(List<Long> memberIds) {
-        return memberIds.isEmpty() ? null : member.id.in(memberIds);
-    }
-    private BooleanExpression collectionIn(List<Collection> collections) {
-        return collections.isEmpty() ? null : collection.in(collections);
-    }
     private BooleanExpression memberNotIn(List<Long> memberIds) {
         return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
+    }
+    private BooleanExpression collectionNotIn(List<Long> collectionIds) {
+        return collectionIds.isEmpty() ? null : collection.id.notIn(collectionIds);
     }
 
     private List<Long> getCollectionIds(List<SearchCollectionDto> content) {

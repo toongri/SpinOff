@@ -338,6 +338,52 @@ class CollectionServiceJpaTest {
     }
 
     @Test
+    public void 글_컬렉션_수정() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setHashTags(List.of()).build();
+        postRepository.save(po);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+
+        List<Collection> collectionList = new ArrayList<>();
+        for (int i = 0; i < 5; i++)
+            collectionList.add(Collection.createDefaultCollection(mem2));
+        collectionRepository.saveAll(collectionList);
+        postService.insertCollectedPosts(
+                mem2.getId(), po.getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId(), collectionList.get(2).getId()));
+
+        List<Long> ids = List.of(
+                collectionList.get(2).getId(), collectionList.get(3).getId(), collectionList.get(4).getId());
+
+        em.flush();
+        em.clear();
+
+        //when
+
+        System.out.println("서비스함수");
+        postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
+
+        System.out.println("포스트함수");
+        em.flush();
+        postService.insertViewedPostByIp("33", po.getId());
+        postService.updateAllPopularity();
+        em.flush();
+        List<Collection> collections = collectionRepository.findAllByPostIdWithPost(po.getId());
+        Post post = postRepository.findById(po.getId()).get();
+
+        //then
+        assertThat(collections.size()).isEqualTo(3);
+        assertThat(collections.stream().map(Collection::getId).collect(Collectors.toList()))
+                .containsOnly(collectionList.get(2).getId(), collectionList.get(3).getId(), collectionList.get(4).getId());
+    }
+
+    @Test
     public void 글_컬렉션_등록_예외처리() throws Exception{
 
         //given
@@ -369,8 +415,6 @@ class CollectionServiceJpaTest {
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> postService.insertCollectedPosts(mem.getId(), po.getId(), ids))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
-                .isInstanceOf(AlreadyCollectedPostException.class);//.hasMessageContaining("")
 
         memberService.insertBlockedMemberByMemberId(mem2.getId(), mem.getId(), BlockedMemberStatus.A);
         em.flush();

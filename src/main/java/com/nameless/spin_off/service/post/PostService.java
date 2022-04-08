@@ -27,5 +27,6 @@ public interface PostService {
     List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException;
+    Long insertCollectedPost(Long memberId, Long postId, Long collectionId);
     int updateAllPopularity();
 }

@@ -112,7 +112,7 @@ public class CollectionApiController {
         log.info("getCollectionsById");
         log.info("memberId : {}", currentMember.getId());
 
-        return getResult(collectionQueryService.getCollectionsById(currentMember.getId()));
+        return getResult(collectionQueryService.getCollectionsByMemberId(currentMember.getId()));
     }
 
     @ApiOperation(value = "최근 수정 컬렉션 조회", notes = "로그인 된 멤버의 가장 최근 수정 컬렉션 조회")
@@ -125,7 +125,7 @@ public class CollectionApiController {
         log.info("getLatestCollectionNameById");
         log.info("memberId : {}", currentMember.getId());
 
-        return getResult(collectionQueryService.getLatestCollectionNameById(currentMember.getId()));
+        return getResult(collectionQueryService.getCollectionNameByMemberId(currentMember.getId()));
     }
 
     @ApiOperation(value = "컬렉션 공개 설정 리스트 조회", notes = "")

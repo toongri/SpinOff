@@ -7,11 +7,13 @@ import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -31,6 +33,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     private final MemberRepository memberRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
     private final MemberQueryRepository memberQueryRepository;
+    private final PostQueryRepository postQueryRepository;
 
     @Override
     public Slice<SearchAllCollectionDto> getSearchPageCollectionAtAllSliced(
@@ -62,12 +65,12 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     }
 
     @Override
-    public List<PostInCollectionDto> getCollectionsById(Long memberId) {
+    public List<PostInCollectionDto> getCollectionsByMemberId(Long memberId) {
         return collectionQueryRepository.findAllByMemberIdOrderByCollectedPostDESC(memberId);
     }
 
     @Override
-    public QuickPostInCollectionDto getLatestCollectionNameById(Long memberId) {
+    public QuickPostInCollectionDto getCollectionNameByMemberId(Long memberId) {
         return collectionQueryRepository.findOneByMemberIdOrderByCollectedPostDESC(memberId)
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
@@ -87,6 +90,37 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         } else {
             return collectionQueryRepository.findAllByMemberIdSliced(
                     targetMemberId, pageable, false, false);
+        }
+    }
+
+    @Override
+    public List<PostInCollectionDto> getCollectionsByMemberIdAndPostId(Long memberId, Long postId) {
+
+        isExistPost(postId);
+
+        List<Long> collectionsInPost = collectionQueryRepository.findAllIdByPostId(postId);
+
+        List<PostInCollectionDto> collections =
+                collectionQueryRepository.findAllByMemberIdOrderByCollectedPostDESC(memberId);
+
+        collections.forEach(c -> c.setCollected(collectionsInPost.contains(c.getId())));
+
+        return collections;
+    }
+
+    @Override
+    public QuickPostInCollectionDto getCollectionNameByMemberIdAndPostId(Long memberId, Long postId) {
+        isExistPost(postId);
+
+        return collectionQueryRepository
+                .findOneByMemberIdOrderByCollectedPostDESC(
+                        memberId, collectionQueryRepository.findAllIdByPostId(postId))
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
+    }
+
+    private void isExistPost(Long postId) {
+        if (!postQueryRepository.isExist(postId)) {
+            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         }
     }
 

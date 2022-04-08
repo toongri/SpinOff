@@ -99,7 +99,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<VisitedPostByMember> visitedPostByMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
     //==연관관계 메소드==//
@@ -255,6 +255,12 @@ public class Post {
 
     public void updateAuthorityOfPostStatus(AuthorityOfPostStatus authorityOfPostStatus) {
         this.authorityOfPostStatus = authorityOfPostStatus;
+    }
+
+    public void addAllCollectedPostByIds(List<Long> collectionIds) {
+        this.collectedPosts.addAll(collectionIds.stream()
+                .map(c -> CollectedPost.createCollectedPost(Collection.createCollection(c), this))
+                .collect(Collectors.toList()));
     }
 
     //==비즈니스 로직==//

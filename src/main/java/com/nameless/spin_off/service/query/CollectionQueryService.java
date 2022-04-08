@@ -19,7 +19,10 @@ public interface CollectionQueryService {
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException;
     SearchFirstDto<Slice<SearchCollectionDto>> getSearchPageCollectionAtCollectionSlicedFirst(
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
-    List<PostInCollectionDto> getCollectionsById(Long memberId);
-    QuickPostInCollectionDto getLatestCollectionNameById(Long memberId);
+    List<PostInCollectionDto> getCollectionsByMemberId(Long memberId);
+    QuickPostInCollectionDto getCollectionNameByMemberId(Long memberId);
     Slice<MyPageCollectionDto> getCollectionsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable);
+    List<PostInCollectionDto> getCollectionsByMemberIdAndPostId(Long memberId, Long postId);
+    QuickPostInCollectionDto getCollectionNameByMemberIdAndPostId(Long memberId, Long postId);
+
 }

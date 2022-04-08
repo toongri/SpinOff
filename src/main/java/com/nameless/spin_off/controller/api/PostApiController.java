@@ -2,6 +2,8 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
@@ -17,6 +19,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
+import com.nameless.spin_off.service.query.CollectionQueryService;
 import com.nameless.spin_off.service.query.PostQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -45,6 +48,7 @@ public class PostApiController {
 
     private final PostService postService;
     private final PostQueryService postQueryService;
+    private final CollectionQueryService collectionQueryService;
     private final EnumMapper enumMapper;
 
     @ApiOperation(value = "글 생성", notes = "")
@@ -106,18 +110,51 @@ public class PostApiController {
         return getResult(postService.insertLikedPostByMemberId(currentMember.getId(), postId));
     }
 
-//    @GetMapping("/{postId}/collections")
-//    public PostApiResult<List<PostInCollectionDto>> getCollectionCheckPost(
-//            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
-//
-//        log.info("getCollectionCheckPost");
-//        log.info("memberId : {}", currentMember.getId());
-//        log.info("postId : {}", postId);
-//
-//        return getResult(collectionQueryService.getCollectionNamesByMemberId(currentMember.getId()));
-//    }
+    @ApiOperation(value = "글 컬렉션 리스트 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/collection/all")
+    public SingleApiResult<List<PostInCollectionDto>> readPostInCollections(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
 
-    @ApiOperation(value = "글 컬렉션삽입 생성", notes = "")
+        log.info("readPostInCollections");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
+
+        return getResult(collectionQueryService.getCollectionsByMemberIdAndPostId(currentMember.getId(), postId));
+    }
+
+    @ApiOperation(value = "글 컬렉션 추천 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/collection/one")
+    public SingleApiResult<QuickPostInCollectionDto> readPostInCollection(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
+            throws NotExistMemberException,
+            NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
+
+        log.info("readPostInCollection");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
+
+        return getResult(collectionQueryService.getCollectionNameByMemberIdAndPostId(currentMember.getId(), postId));
+    }
+
+    @ApiOperation(value = "글 컬렉션 리스트 수정", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "postId",
@@ -135,18 +172,49 @@ public class PostApiController {
                     example = "123",
                     allowMultiple = true)
     })
-    @PostMapping("/{postId}/collections")
-    public SingleApiResult<List<Long>> createCollectedAll(
+    @PatchMapping("/{postId}/collection/all")
+    public SingleApiResult<List<Long>> updatePostInCollections(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        log.info("createCollectedAll");
-        log.info("postId : {}", postId);
+        log.info("updatePostInCollections");
         log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
         log.info("collectionIds : {}", collectionIds);
 
         return getResult(postService.insertCollectedPosts(currentMember.getId(), postId, collectionIds));
+    }
+
+    @ApiOperation(value = "글 컬렉션 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "query",
+                    dataType = "long",
+                    example = "123")
+    })
+    @PostMapping("/{postId}/collection/one")
+    public SingleApiResult<Long> createPostInCollection(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam Long collectionId)
+            throws NotExistMemberException,
+            NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
+
+        log.info("createPostInCollection");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
+        log.info("collectionId : {}", collectionId);
+
+        return getResult(postService.insertCollectedPost(currentMember.getId(), postId, collectionId));
     }
 
     @ApiOperation(value = "글 조회", notes = "")

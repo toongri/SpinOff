@@ -51,7 +51,7 @@ public class CollectionServiceJpa implements CollectionService {
     public Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
 
-        hasAuthPost(memberId, collectionId, getPublicOfCollection(collectionId));
+        hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistLikedCollection(memberId, collectionId);
 
         return likedCollectionRepository.save(
@@ -79,7 +79,7 @@ public class CollectionServiceJpa implements CollectionService {
             throws NotExistMemberException, NotExistCollectionException,
             AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
 
-        hasAuthPost(memberId, collectionId, isCorrectIdAndGetPublic(memberId, collectionId));
+        hasAuthCollection(memberId, collectionId, isCorrectIdAndGetPublic(memberId, collectionId));
         isExistFollowedCollection(memberId, collectionId);
 
         return followedCollectionRepository.save(
@@ -104,7 +104,7 @@ public class CollectionServiceJpa implements CollectionService {
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY));
     }
 
-    private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
@@ -117,12 +117,6 @@ public class CollectionServiceJpa implements CollectionService {
             if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
-        }
-    }
-
-    private void isBlockedMemberCollection(Long memberId, Long collectionId) {
-        if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
-            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }
 
@@ -152,11 +146,5 @@ public class CollectionServiceJpa implements CollectionService {
 
     private boolean isExistCollectionIp(Long collectionId, String ip) {
         return collectionQueryRepository.isExistIp(collectionId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
-    }
-
-    private void isExistCollection(Long collectionId) {
-        if (!collectionQueryRepository.isExist(collectionId)) {
-            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
-        }
     }
 }

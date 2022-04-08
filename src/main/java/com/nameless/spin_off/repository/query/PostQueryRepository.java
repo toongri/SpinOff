@@ -5,10 +5,8 @@ import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.enums.ContentsLengthEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
-import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.QPostedHashtag;
 import com.nameless.spin_off.entity.member.QBlockedMember;
-import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -21,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
+import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
 import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.*;
 import static com.nameless.spin_off.entity.hashtag.QFollowedHashtag.followedHashtag;
@@ -119,6 +119,18 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .selectOne()
                 .from(post)
                 .where(post.id.eq(id))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Boolean isExistCollectedPost(Long postId, Long collectionId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(collectedPost)
+                .where(
+                        post.id.eq(postId),
+                        collection.id.eq(collectionId))
                 .fetchFirst();
 
         return fetchOne != null;
@@ -334,13 +346,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         }
     }
 
-    private BooleanExpression memberNotEq(Long memberId) {
-        return memberId != null ? member.id.ne(memberId) : null;
-    }
-    private BooleanExpression memberIn(List<Long> memberIds) {
-        return memberIds.isEmpty() ? null : member.id.in(memberIds);
-    }
-
     private BooleanExpression commentMemberNotIn(List<Long> memberIds) {
         return memberIds.isEmpty() ? null : commentInPost.member.id.notIn(memberIds).or(commentInPost.isNull());
     }
@@ -351,16 +356,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
     private BooleanExpression memberNotIn(List<Long> members) {
         return members.isEmpty() ? null : member.id.notIn(members);
     }
-    private BooleanExpression postedMovieIn(List<Movie> movies) {
-        return movies.isEmpty() ? null : post.movie.in(movies);
-    }
     private BooleanExpression postedMovieNotIn(List<Long> movies) {
         return movies.isEmpty() ? null : post.movie.id.notIn(movies).or(post.movie.isNull());
-    }
-    private BooleanExpression postedHashtagIn(List<Hashtag> hashtags) {
-        return hashtags.isEmpty() ? null : postedHashtag.hashtag.in(hashtags);
-    }
-    private BooleanExpression postedHashtagNotIn(List<Hashtag> hashtags) {
-        return hashtags.isEmpty() ? null : postedHashtag.hashtag.notIn(hashtags).or(post.postedHashtags.isEmpty());
     }
 }

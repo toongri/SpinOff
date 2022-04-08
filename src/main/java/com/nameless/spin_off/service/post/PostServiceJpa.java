@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
@@ -17,13 +18,14 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
+import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
-import com.nameless.spin_off.repository.query.MemberQueryRepository;
+import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.support.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +59,8 @@ public class PostServiceJpa implements PostService{
     private final LikedPostRepository likedPostRepository;
     private final ViewedPostByIpRepository viewedPostByIpRepository;
     private final AwsS3Service awsS3Service;
-    private final MemberQueryRepository memberQueryRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
+    private final CollectedPostRepository collectedPostRepository;
 
     @Transactional
     @Override
@@ -66,10 +69,10 @@ public class PostServiceJpa implements PostService{
             AlreadyPostedHashtagException, AlreadyCollectedPostException,
             IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException {
 
+        List<Long> collectionIds = postVO.getCollectionIds();
         List<String> urls = getUrlByMultipartFile(multipartFiles);
 
-        List<Collection> collections = getCollections(postVO.getCollectionIds());
-        isCorrectCollectionWithOwner(collections, memberId);
+        isCorrectCollectionIds(collectionIds, memberId);
 
         List<Hashtag> hashtags = saveHashtagsByString(postVO.getHashtagContents());
 
@@ -86,8 +89,10 @@ public class PostServiceJpa implements PostService{
                 .setContent(postVO.getContent())
                 .build());
 
-        post.addAllCollectedPost(collections);
-
+        if (!collectionIds.isEmpty()) {
+            post.addAllCollectedPostByIds(collectionIds);
+            collectionQueryRepository.updateLastModifiedDateCollections(collectionIds);
+        }
         return post.getId();
     }
 
@@ -109,12 +114,50 @@ public class PostServiceJpa implements PostService{
             NotExistPostException, AlreadyCollectedPostException {
 
         hasAuthPost(memberId, postId, getPublicOfPost(postId));
-        List<Collection> collections = getCollections(collectionIds);
-        isCorrectCollectionWithOwner(collections, memberId);
+        isCorrectCollectionIds(collectionIds, memberId);
 
-        Post post = findOneByIdWithCollectedPost(postId);
+        List<CollectedPost> collectedPosts = collectionQueryRepository.findAllIdByPostIdAndMemberId(postId, memberId);
+        collectedPostRepository.deleteAll(
+                collectedPosts.stream()
+                        .filter(c -> !collectionIds.contains(c.getCollection().getId()))
+                        .collect(Collectors.toList()));
 
-        return post.insertCollectedPostByCollections(collections);
+        List<Long> collectionIdsInPost = collectedPosts.stream()
+                .filter(c -> collectionIds.contains(c.getCollection().getId()))
+                .map(c -> c.getCollection().getId())
+                .collect(Collectors.toList());
+
+        List<Long> addCollectionIds = collectionIds.stream()
+                .filter(c -> !collectionIdsInPost.contains(c)).collect(Collectors.toList());
+
+        if (addCollectionIds.isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            collectionQueryRepository.updateLastModifiedDateCollections(addCollectionIds);
+
+            return collectedPostRepository.saveAll(
+                    addCollectionIds.stream()
+                            .map(c -> CollectedPost
+                                    .createCollectedPost(Collection.createCollection(c), Post.createPost(postId)))
+                            .collect(Collectors.toList())).stream().map(CollectedPost::getId).collect(Collectors.toList());
+        }
+    }
+
+    @Override
+    public Long insertCollectedPost(Long memberId, Long postId, Long collectionId) {
+        hasAuthPost(memberId, postId, getPublicOfPost(postId));
+        isCorrectCollectionId(memberId, collectionId);
+        isExistCollectedPost(postId, collectionId);
+
+        return collectedPostRepository.save(CollectedPost.createCollectedPost(
+                Collection.createCollection(collectionId),
+                Post.createPost(postId))).getId();
+    }
+
+    private void isExistCollectedPost(Long postId, Long collectionId) {
+        if (postQueryRepository.isExistCollectedPost(postId, collectionId)) {
+            throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
+        }
     }
 
     @Transactional
@@ -199,13 +242,6 @@ public class PostServiceJpa implements PostService{
         return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
     }
 
-    public void isCorrectCollectionWithOwner(List<Collection> collections, Long memberId) {
-        if (!collections.stream()
-                .map(collection -> collection.getMember().getId()).allMatch(memberId1 -> memberId1.equals(memberId))) {
-            throw new NotMatchCollectionException(ErrorEnum.NOT_MATCH_COLLECTION);
-        }
-    }
-
     private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
@@ -222,17 +258,17 @@ public class PostServiceJpa implements PostService{
         }
     }
 
-    private Post findOneByIdWithCollectedPost(Long postId) {
-        return postRepository.findOneByIdWithCollectedPost(postId)
-                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+    private void isCorrectCollectionId(Long memberId, Long collectionId) {
+        if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
+            throw new NotMatchCollectionException(ErrorEnum.NOT_MATCH_COLLECTION);
+        }
     }
 
-    private List<Collection> getCollections(List<Long> collectionIds) {
-        List<Collection> collections = collectionRepository.findAllByIdIn(collectionIds);
+    private void isCorrectCollectionIds(List<Long> collectionIds, Long memberId) {
+        List<Long> collections = collectionRepository.findAllIdByIdIn(collectionIds, memberId);
         if (collections.size() != collectionIds.size()) {
             throw new NotMatchCollectionException(ErrorEnum.NOT_MATCH_COLLECTION);
         }
-        return collections;
     }
 
     private String getThumbnails(List<String> urls) {

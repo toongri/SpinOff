@@ -15,6 +15,10 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE collection.id in :collectIds")
     List<Collection> findAllByIdIn(@Param("collectIds") List<Long> collectIds);
 
+    @Query("SELECT collection.id FROM Collection collection " +
+            "WHERE collection.id in :collectIds AND collection.member.id = :memberId")
+    List<Long> findAllIdByIdIn(@Param("collectIds") List<Long> collectIds, @Param("memberId") Long memberId);
+
     @Query("SELECT DISTINCT collect FROM Collection collect " +
             "LEFT JOIN FETCH collect.collectedPosts collectPost " +
             "LEFT JOIN FETCH collectPost.post post " +

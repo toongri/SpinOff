@@ -75,7 +75,7 @@ public class Collection {
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<FollowedCollection> followingMembers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToMany(mappedBy = "collection", fetch = FetchType.LAZY)
     private List<CollectedPost> collectedPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "collection", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
