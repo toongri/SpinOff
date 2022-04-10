@@ -1,11 +1,14 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.QCommentDto_ContentCommentDto;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.nameless.spin_off.entity.comment.QCommentInCollection.commentInCollection;
@@ -17,6 +20,20 @@ import static com.nameless.spin_off.entity.member.QMember.member;
 public class CommentInCollectionQueryRepository extends Querydsl4RepositorySupport {
     public CommentInCollectionQueryRepository() {
         super(CommentInCollection.class);
+    }
+
+    public List<ContentCommentDto> findAllByCollectionId(Long collectionId) {
+        return getQueryFactory()
+                .select(new QCommentDto_ContentCommentDto(
+                        commentInCollection.id, commentInCollection.member.id, commentInCollection.member.profileImg,
+                        commentInCollection.member.nickname, commentInCollection.content, commentInCollection.createdDate,
+                        commentInCollection.isDeleted, likedCommentInCollection.count(), commentInCollection.parent.id))
+                .from(commentInCollection)
+                .join(commentInCollection.member, member)
+                .leftJoin(commentInCollection.likedCommentInCollections, likedCommentInCollection)
+                .where(commentInCollection.collection.id.eq(collectionId))
+                .orderBy(commentInCollection.id.desc())
+                .fetch();
     }
 
     public Boolean isBlockMembersComment(Long memberId, Long commentId) {

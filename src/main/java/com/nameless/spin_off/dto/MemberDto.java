@@ -93,6 +93,7 @@ public class MemberDto {
     }
 
     @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class CommentMemberDto {
         private Long memberId;
