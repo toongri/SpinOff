@@ -39,7 +39,12 @@ public class CommentDto {
             this.likeSize = likeSize;
             this.parentId = parentId;
         }
-//        public ContentCommentDto(CommentInPost comment, Long memberId, List<Member> blockedMembers,
+
+        public void setChildren(List<ContentCommentDto> children) {
+            if (children != null)
+                this.children = children;
+        }
+        //        public ContentCommentDto(CommentInPost comment, Long memberId, List<Member> blockedMembers,
 //                                 List<Member> followedMembers, boolean isAdmin) {
 //            this.isDeleted = comment.getIsDeleted();
 //

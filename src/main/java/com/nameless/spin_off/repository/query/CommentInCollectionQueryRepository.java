@@ -6,6 +6,7 @@ import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
         super(CommentInCollection.class);
     }
 
-    public List<ContentCommentDto> findAllByCollectionId(Long collectionId) {
+    public List<ContentCommentDto> findAllByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QCommentDto_ContentCommentDto(
                         commentInCollection.id, commentInCollection.member.id, commentInCollection.member.profileImg,
@@ -31,7 +32,10 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
                 .from(commentInCollection)
                 .join(commentInCollection.member, member)
                 .leftJoin(commentInCollection.likedCommentInCollections, likedCommentInCollection)
-                .where(commentInCollection.collection.id.eq(collectionId))
+                .where(
+                        likedCommentInCollectionMemberNotIn(blockedMemberIds),
+                        memberNotIn(blockedMemberIds),
+                        commentInCollection.collection.id.eq(collectionId))
                 .orderBy(commentInCollection.id.desc())
                 .fetch();
     }
@@ -97,5 +101,14 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    private BooleanExpression likedCommentInCollectionMemberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null :
+                likedCommentInCollection.member.id.notIn(memberIds).or(likedCommentInCollection.isNull());
+    }
+
+    private BooleanExpression memberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
 }

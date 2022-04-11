@@ -4,6 +4,7 @@ import com.nameless.spin_off.controller.exhandler.ErrorResult;
 import com.nameless.spin_off.exception.support.CustomRuntimeException;
 import com.nameless.spin_off.exception.support.CustomRuntimeForbiddenException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.impl.FileSizeLimitExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MissingRequestValueException;
@@ -43,6 +44,13 @@ public class ExControllerAdvice {
     public ResponseEntity<ErrorResult> requestHandler(MissingRequestValueException e) {
         log.error("[exceptionHandler] ex", e);
         ErrorResult errorResult = new ErrorResult(MISSING_REQUEST_VALUE.getCode(), MISSING_REQUEST_VALUE.getMessage());
+        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResult> userExHandler(FileSizeLimitExceededException e) {
+        log.error("[exceptionHandler] ex", e);
+        ErrorResult errorResult = new ErrorResult(FILE_SIZE_LIMIT_EXCEEDED.getCode(), FILE_SIZE_LIMIT_EXCEEDED.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 

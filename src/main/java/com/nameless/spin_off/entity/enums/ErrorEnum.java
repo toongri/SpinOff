@@ -7,14 +7,13 @@ import static com.nameless.spin_off.entity.enums.collection.CollectionContentLim
 public enum ErrorEnum {
 
     UNKNOWN("ERR000","알 수 없는 오류"),
-
     //SECURITY
     INVALID_REFRESH_TOKEN("ERR001", "리프레쉬 토큰이 유효하지 않습니다."),
     AUTHENTICATION_ENTRY("ERR002", "접근 권한이 필요합니다. 토큰을 발급해주세요."),
     ACCESS_DENIED("ERR003", "접근 권한이 없습니다."),
     SOCIAL("ERR004", "소셜 로그인에 실패하였습니다. 고객센터에 문의바랍니다."),
     USERNAME_NOT_FOUND("ERR005", "토큰값이 부정확합니다."),
-    DISABLED("ERR006", "계정이 비활성화 되었습니다. 관리자에게 문의하세요."),
+    FILE_SIZE_LIMIT_EXCEEDED("ERR006", "파일 사이즈 제한을 넘었습니다."),
     CREDENTIALS_EXPIRED("ERR007", "비밀번호가 유효기간이 만료되었습니다. 관리자에게 문의하세요."),
     ALREADY_AUTH_EMAIL("ERR008", "해당 이메일은 이미 인증된 이메일입니다. 로그인 후 연동하여 사용해주세요."),
 
