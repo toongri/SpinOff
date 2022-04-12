@@ -44,12 +44,11 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                         followedMember.countDistinct(), followingMember.countDistinct()))
                 .from(member)
                 .leftJoin(member.followingMembers, followedMember)
+                .on(followedMember.followingMember.id.notIn(blockedMembers))
                 .leftJoin(member.followedMembers, followingMember)
+                .on(followingMember.member.id.notIn(blockedMembers))
                 .groupBy(member)
-                .where(
-                        followingMemberNotIn(blockedMembers),
-                        followedMemberNotIn(blockedMembers, followingMember),
-                        member.id.eq(memberId))
+                .where(member.id.eq(memberId))
                 .fetchFirst());
     }
 
@@ -153,9 +152,9 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                         followedMember.count()))
                 .from(member)
                 .leftJoin(member.followingMembers, followedMember)
+                .on(followedMember.followingMember.id.notIn(blockedMemberIds))
                 .groupBy(member)
                 .where(
-                        followingMemberNotIn(blockedMemberIds),
                         member.nickname.contains(keyword),
                         memberNotIn(blockedMemberIds)));
 

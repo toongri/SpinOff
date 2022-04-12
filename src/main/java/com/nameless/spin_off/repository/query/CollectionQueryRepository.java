@@ -228,9 +228,9 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .join(collection.member, member)
                 .leftJoin(collection.followingMembers, followedCollection)
+                .on(followedCollection.member.id.notIn(blockedMembers))
                 .groupBy(collection)
                 .where(
-                        followingCollectionNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
@@ -254,9 +254,9 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .from(collection)
                 .join(collection.member, member)
                 .leftJoin(collection.followingMembers, followedCollection)
+                .on(followedCollection.member.id.notIn(blockedMembers))
                 .groupBy(collection)
                 .where(
-                        followingCollectionNotIn(blockedMembers),
                         collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()),
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));

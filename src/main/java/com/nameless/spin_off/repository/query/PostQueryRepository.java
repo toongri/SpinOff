@@ -285,12 +285,11 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .join(post.member, member)
                 .leftJoin(post.movie, movie)
                 .leftJoin(post.likedPosts, likedPost)
+                .on(likedPost.member.id.notIn(blockedMemberIds))
                 .leftJoin(post.commentInPosts, commentInPost)
+                .on(commentInPost.member.id.notIn(blockedMemberIds))
                 .groupBy(post)
-                .where(
-                        likedPostMemberNotIn(blockedMemberIds),
-                        commentMemberNotIn(blockedMemberIds),
-                        post.id.eq(postId))
+                .where(post.id.eq(postId))
                 .fetchFirst());
     }
 

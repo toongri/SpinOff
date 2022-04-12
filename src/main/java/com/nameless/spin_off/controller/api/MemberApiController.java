@@ -3,6 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
+import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
@@ -54,7 +55,7 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}")
-    public SingleApiResult<Long> readOne(
+    public SingleApiResult<ReadMemberDto> readOne(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
@@ -62,7 +63,7 @@ public class MemberApiController {
         log.info("currentMemberId : {}", currentMemberId);
         log.info("memberId : {}", memberId);
 
-        return getResult(memberService.getMemberForRead(currentMemberId, memberId));
+        return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
     }
 
     @ApiOperation(value = "멤버 마이페이지 글", notes = "")

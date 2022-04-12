@@ -27,29 +27,71 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
     private final CommentInCollectionQueryRepository commentInCollectionQueryRepository;
     private final CollectionQueryRepository collectionQueryRepository;
     private final MemberRepository memberRepository;
+    private List<Long> blockedMemberIds;
+    private Map<Long, List<ContentCommentDto>> children;
+    private List<Long> likedCommentIds;
 
     @Override
     public List<ContentCommentDto> getCommentsByCollectionId(MemberDetails currentMember, Long collectionId) {
 
         Long memberId = getCurrentMemberId(currentMember);
-        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        boolean hasAuth = isAdmin(currentMember);
         hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        likedCommentIds = getAllLikedCommentIdByMemberId(memberId);
+
         List<ContentCommentDto> comments = commentInCollectionQueryRepository
                 .findAllByCollectionId(collectionId, blockedMemberIds);
 
+        comments.forEach(c -> c.setBoolean(
+                                memberId,
+                                hasAuth,
+                                isExistLikedCommentInCollection(c.getCommentId())));
 
-
-        Map<Long, List<ContentCommentDto>> children = comments.stream()
-                .filter(c -> c.getParentId() != null)
+        children = comments.stream()
+                .filter(c -> c.getParentId() != null && !blockedMemberIds.contains(c.getMember().getMemberId()))
                 .collect(Collectors.groupingBy(ContentCommentDto::getParentId));
 
         List<ContentCommentDto> parents = comments.stream()
-                .filter(c -> c.getParentId() == null)
+                .filter(this::isParentComment)
                 .collect(Collectors.toList());
 
         parents.forEach(c -> c.setChildren(children.get(c.getCommentId())));
 
+        return parents;
+    }
 
+    private List<Long> getAllLikedCommentIdByMemberId(Long memberId) {
+        if (memberId != null) {
+            return commentInCollectionQueryRepository.findAllLikedCommentIdByMemberId(memberId);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private Boolean isExistLikedCommentInCollection(Long commentId) {
+        return likedCommentIds.contains(commentId);
+    }
+
+    private boolean isAdmin(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.isAdmin();
+        }
+        return false;
+    }
+
+    public boolean isParentComment(ContentCommentDto commentDto) {
+        if (commentDto.getParentId() == null) {
+            if (blockedMemberIds.contains(commentDto.getMember().getMemberId())) {
+                if (children.get(commentDto.getCommentId()) != null) {
+                    commentDto.setBlocked(true);
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
     }
 
 

@@ -23,6 +23,7 @@ public class CommentDto {
         private boolean isDeleted;
         private boolean isLiked;
         private boolean hasAuth;
+        private boolean isBlocked;
         private Long likeSize;
         private Long parentId;
         private List<ContentCommentDto> children = new ArrayList<>();
@@ -40,49 +41,15 @@ public class CommentDto {
             this.parentId = parentId;
         }
 
+        public void setBoolean(Long memberId, boolean hasAuth, boolean isLiked) {
+            this.hasAuth = hasAuth || member.getMemberId().equals(memberId);
+            this.isLiked = isLiked;
+        }
+
         public void setChildren(List<ContentCommentDto> children) {
             if (children != null)
                 this.children = children;
         }
-        //        public ContentCommentDto(CommentInPost comment, Long memberId, List<Member> blockedMembers,
-//                                 List<Member> followedMembers, boolean isAdmin) {
-//            this.isDeleted = comment.getIsDeleted();
-//
-//            if (!this.isDeleted) {
-//                this.isBlocked = blockedMembers.contains(comment.getMember());
-//
-//                if (!this.isBlocked) {
-//                    this.commentId = comment.getId();
-//                    this.member = new CommentMemberDto(comment.getMember());
-//                    this.content = comment.getContent();
-//                    this.createTime = comment.getCreatedDate();
-//                    this.isDeleted = comment.getIsDeleted();
-//                    this.hasAuth = comment.getMember().getId().equals(memberId) || isAdmin;
-//
-//                    this.likeMembers = getLikedMembers(comment.getLikedCommentInPosts(), blockedMembers, followedMembers);
-//
-//                    this.likeSize = this.likeMembers.size();
-//                    this.isLiked = this.likeMembers
-//                            .stream().anyMatch(contentMemberDto -> contentMemberDto.getMemberId().equals(memberId));
-//
-//                    this.children = comment.getChildren().stream()
-//                            .map(commentInPost -> new ContentCommentDto(
-//                                    commentInPost, memberId, blockedMembers, followedMembers, isAdmin))
-//                            .collect(Collectors.toList());
-//                }
-//            }
-//        }
-
-//        private List<ContentMemberDto> getLikedMembers(List<LikedCommentInPost> likedCommentInPosts,
-//                                                       List<Member> blockedMembers, List<Member> followedMembers) {
-//            return likedCommentInPosts.stream()
-//                    .filter(likedCommentInPost ->
-//                            !blockedMembers.contains(likedCommentInPost.getMember()))
-//                    .map(likedCommentInPost -> new ContentMemberDto(
-//                            likedCommentInPost.getMember(), followedMembers.contains(likedCommentInPost.getMember())))
-//                    .sorted(Comparator.comparing(ContentMemberDto::isFollowed, Comparator.reverseOrder()))
-//                    .collect(Collectors.toList());
-//        }
     }
 
 
