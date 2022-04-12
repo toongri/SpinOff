@@ -8,6 +8,7 @@ import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.MemberLoginRequestDto;
 import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
+import com.nameless.spin_off.dto.MemberDto.SocialLoginResponseDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
@@ -60,6 +61,7 @@ public class SignServiceJpa implements SignService{
     private final EmailService emailService;
     private final MemberQueryRepository memberQueryRepository;
     private final ProviderService providerService;
+    private boolean isRegister;
 
     @Transactional
     @Override
@@ -106,15 +108,17 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public MemberLoginResponseDto loginBySocial(String authCode, String provider) {
+    public SocialLoginResponseDto loginBySocial(String authCode, String provider) {
         AccessToken accessToken = providerService.getAccessToken(authCode, provider);
         ProfileDto profile = providerService.getProfile(accessToken.getAccess_token(), provider);
 
+        isRegister = false;
         Member member = getMemberByProvider(profile.getEmail(), provider)
                 .orElseGet(() -> saveMember(profile, provider));
 
         member.updateRefreshToken(jwtTokenProvider.createRefreshToken());
-        return new MemberLoginResponseDto(
+        return new SocialLoginResponseDto(
+                isRegister,
                 member.getId(),
                 jwtTokenProvider.createToken(member.getAccountId()),
                 member.getRefreshToken());
@@ -286,6 +290,7 @@ public class SignServiceJpa implements SignService{
         }
         memberRepository.save(member);
         collectionRepository.save(Collection.createDefaultCollection(member));
+        isRegister = true;
         return member;
     }
 

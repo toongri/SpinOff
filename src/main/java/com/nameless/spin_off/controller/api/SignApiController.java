@@ -68,7 +68,7 @@ public class SignApiController {
                     example = "dkdklflkn333")
     })
     @PostMapping("/login/social/{provider}")
-    public SingleApiResult<MemberLoginResponseDto> registerBySocial(
+    public SingleApiResult<SocialLoginResponseDto> registerBySocial(
             @RequestParam String authCode, @PathVariable String provider) {
 
         return getResult(signService.loginBySocial(authCode, provider));

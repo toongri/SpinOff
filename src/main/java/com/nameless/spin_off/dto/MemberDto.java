@@ -306,6 +306,15 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
+    public static class SocialLoginResponseDto {
+        private boolean isRegister;
+        private Long id;
+        private String token;
+        private String refreshToken;
+    }
+
+    @Data
+    @AllArgsConstructor
     @Builder
     public static class MemberRegisterResponseDto {
         private Long id;
