@@ -29,6 +29,7 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
                 .where(likedCommentInCollection.member.id.eq(memberId))
                 .fetch();
     }
+
     public List<ContentCommentDto> findAllByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QCommentDto_ContentCommentDto(

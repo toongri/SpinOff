@@ -94,10 +94,9 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         return false;
     }
 
-
     private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
         return collectionQueryRepository.findPublicByCollectionId(collectionId)
-                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY));
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
@@ -121,7 +120,6 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
             }
         }
     }
-
 
     private Long getCurrentMemberId(MemberDetails currentMember) {
         if (currentMember != null) {

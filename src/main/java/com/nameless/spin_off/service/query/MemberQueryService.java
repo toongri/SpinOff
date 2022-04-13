@@ -21,4 +21,5 @@ public interface MemberQueryService {
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
     List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
     ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId);
+    ReadMemberDto getOwnMemberForRead(MemberDetails currentMember);
 }

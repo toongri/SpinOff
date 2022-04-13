@@ -4,6 +4,7 @@ import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
@@ -20,6 +21,7 @@ import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
 import com.nameless.spin_off.service.post.PostService;
 import com.nameless.spin_off.service.query.CollectionQueryService;
+import com.nameless.spin_off.service.query.CommentInPostQueryService;
 import com.nameless.spin_off.service.query.PostQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -49,6 +51,7 @@ public class PostApiController {
     private final PostService postService;
     private final PostQueryService postQueryService;
     private final CollectionQueryService collectionQueryService;
+    private final CommentInPostQueryService commentInPostQueryService;
     private final EnumMapper enumMapper;
 
     @ApiOperation(value = "글 생성", notes = "")
@@ -272,6 +275,28 @@ public class PostApiController {
         RelatedPostFirstDto<ReadPostDto> postForVisit = postQueryService.getPostForRead(currentMember, postId, pageable);
         postService.insertViewedPostByIp(ip, postId);
         return getResult(postForVisit);
+    }
+
+    @ApiOperation(value = "글 댓글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/comment")
+    public SingleApiResult<List<ContentCommentDto>> readCommentInPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+
+        log.info("readCommentInPost");
+        log.info("postId : {}", postId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
+        List<ContentCommentDto> comments = commentInPostQueryService.getCommentsByPostId(currentMember, postId);
+        return getResult(comments);
     }
 
     @ApiOperation(value = "연관 글 조회", notes = "")

@@ -84,6 +84,18 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         return memberDto;
     }
 
+    @Override
+    public ReadMemberDto getOwnMemberForRead(MemberDetails currentMember) {
+        Long currentMemberId = currentMember.getId();
+        List<Long> blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        List<Long> blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        ReadMemberDto memberDto = getByIdForRead(currentMemberId, blockingIds, blockedIds);
+
+        memberDto.setAdmin(currentMemberId, true);
+
+        return memberDto;
+    }
+
     private List<Long> getAllIdByBlockedMemberId(Long currentMemberId) {
         if (currentMemberId != null) {
             return memberRepository.findAllIdByBlockedMemberId(currentMemberId, BlockedMemberStatus.A);

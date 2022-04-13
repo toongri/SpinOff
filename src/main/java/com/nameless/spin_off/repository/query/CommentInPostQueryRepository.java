@@ -1,11 +1,14 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.QCommentDto_ContentCommentDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
@@ -19,6 +22,30 @@ public class CommentInPostQueryRepository extends Querydsl4RepositorySupport {
 
     public CommentInPostQueryRepository() {
         super(CommentInPost.class);
+    }
+
+    public List<Long> findAllLikedCommentIdByMemberId(Long memberId) {
+        return getQueryFactory()
+                .select(likedCommentInPost.commentInPost.id)
+                .from(likedCommentInPost)
+                .where(likedCommentInPost.member.id.eq(memberId))
+                .fetch();
+    }
+
+    public List<ContentCommentDto> findAllByCollectionId(Long postId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QCommentDto_ContentCommentDto(
+                        commentInPost.id, commentInPost.member.id, commentInPost.member.profileImg,
+                        commentInPost.member.nickname, commentInPost.content, commentInPost.createdDate,
+                        commentInPost.isDeleted, likedCommentInPost.count(), commentInPost.parent.id))
+                .from(commentInPost)
+                .join(commentInPost.member, member)
+                .leftJoin(commentInPost.likedCommentInPosts, likedCommentInPost)
+                .on(likedCommentInPost.member.id.notIn(blockedMemberIds))
+                .groupBy(commentInPost)
+                .where(commentInPost.post.id.eq(postId))
+                .orderBy(commentInPost.id.desc())
+                .fetch();
     }
 
     public Boolean isBlockMembersComment(Long memberId, Long commentId) {

@@ -6,6 +6,7 @@ import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -151,6 +152,7 @@ public class PostQueryServiceJpa implements PostQueryService{
                                        List<Long> blockedMemberIds, boolean isAdmin) {
 
         ReadPostDto post = getOneByPostId(postId, blockedMemberIds);
+        hasAuthPost(memberId, postId, post.getPublicOfPostStatus());
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
 
         if (memberId != null) {
@@ -219,5 +221,27 @@ public class PostQueryServiceJpa implements PostQueryService{
 
     private boolean isExistLikedPost(Long memberId, Long postId) {
         return postQueryRepository.isExistLikedPost(memberId, postId);
+    }
+
+    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
+        if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
+            if (memberId != null) {
+                if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+                    throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+                }
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
+            if (memberId == null) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            } else if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
+            if (memberId == null) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            } else if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        }
     }
 }
