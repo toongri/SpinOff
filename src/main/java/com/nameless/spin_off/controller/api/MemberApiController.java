@@ -66,17 +66,6 @@ public class MemberApiController {
         return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
     }
 
-    @ApiOperation(value = "로그인멤버 마이페이지", notes = "")
-    @GetMapping("")
-    public SingleApiResult<ReadMemberDto> readOwnOne(@LoginMember MemberDetails currentMember) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-
-        log.info("readOne");
-        log.info("currentMemberId : {}", currentMemberId);
-
-        return getResult(memberQueryService.getOwnMemberForRead(currentMember));
-    }
-
     @ApiOperation(value = "멤버 마이페이지 글", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
