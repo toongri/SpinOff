@@ -61,6 +61,14 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
+    public Optional<ThumbnailAndPublicPostDto> findThumbnailAndPublicByPostId(Long postId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QPostDto_ThumbnailAndPublicPostDto(post.thumbnailUrl, post.publicOfPostStatus))
+                .from(post)
+                .where(post.id.eq(postId))
+                .fetchFirst());
+    }
+
     public Optional<IdAndPublicPostDto> findPublicPostByCommentId(Long commentId) {
         return Optional.ofNullable(getQueryFactory()
                 .select(new QPostDto_IdAndPublicPostDto(

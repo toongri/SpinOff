@@ -301,6 +301,7 @@ class CollectionServiceJpaTest {
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
@@ -345,6 +346,7 @@ class CollectionServiceJpaTest {
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember().build();
@@ -381,6 +383,227 @@ class CollectionServiceJpaTest {
         assertThat(collections.size()).isEqualTo(3);
         assertThat(collections.stream().map(Collection::getId).collect(Collectors.toList()))
                 .containsOnly(collectionList.get(2).getId(), collectionList.get(3).getId(), collectionList.get(4).getId());
+    }
+
+    @Test
+    public void 글_컬렉션_수정_썸네일() throws Exception{
+
+        //given
+        Member mem = Member.buildMember().build();
+        memberRepository.save(mem);
+        Member mem2 = Member.buildMember().build();
+        memberRepository.save(mem2);
+
+        List<Collection> collectionList = new ArrayList<>();
+        for (int i = 0; i < 10; i++)
+            collectionList.add(collectionRepository.save(Collection.createDefaultCollection(mem2)));
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("0")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("1")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("2")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("3")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("4")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("5")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("6")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("7")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("8")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("9")
+                .setHashTags(List.of()).build()));
+
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(0).getId(),
+                List.of(collectionList.get(0).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(1).getId(),
+                List.of(collectionList.get(1).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(2).getId(),
+                List.of(collectionList.get(1).getId(), collectionList.get(2).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(3).getId(),
+                List.of(collectionList.get(2).getId(), collectionList.get(3).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(4).getId(),
+                List.of(collectionList.get(3).getId(), collectionList.get(4).getId(), collectionList.get(5).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(5).getId(),
+                List.of(collectionList.get(4).getId(), collectionList.get(5).getId(), collectionList.get(6).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(6).getId(),
+                List.of(collectionList.get(5).getId(), collectionList.get(6).getId(),
+                        collectionList.get(7).getId(), collectionList.get(8).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(7).getId(),
+                List.of(collectionList.get(6).getId(), collectionList.get(7).getId(),
+                        collectionList.get(8).getId(), collectionList.get(9).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(8).getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
+                        collectionList.get(2).getId(), collectionList.get(3).getId(),
+                        collectionList.get(4).getId(), collectionList.get(5).getId()));
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(9).getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
+                        collectionList.get(2).getId(), collectionList.get(3).getId(),
+                        collectionList.get(6).getId(), collectionList.get(7).getId(),
+                        collectionList.get(8).getId(), collectionList.get(9).getId()));
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(0).getId(),
+                List.of());
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(1).getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(2).getId(),
+                List.of());
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(3).getId(),
+                List.of(collectionList.get(2).getId(), collectionList.get(3).getId(), collectionList.get(4).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(4).getId(),
+                List.of(collectionList.get(3).getId(), collectionList.get(5).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(5).getId(),
+                List.of(collectionList.get(7).getId(), collectionList.get(8).getId(), collectionList.get(9).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(6).getId(),
+                List.of(collectionList.get(9).getId(), collectionList.get(2).getId(), collectionList.get(8).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(7).getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
+                        collectionList.get(2).getId(), collectionList.get(3).getId(),
+                        collectionList.get(6).getId(), collectionList.get(7).getId(),
+                        collectionList.get(8).getId(), collectionList.get(9).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(8).getId(),
+                List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
+                        collectionList.get(2).getId()));
+
+        em.flush();
+        postService.insertCollectedPosts(
+                mem2.getId(), postList.get(9).getId(),
+                List.of(collectionList.get(6).getId(), collectionList.get(7).getId(),
+                        collectionList.get(8).getId(), collectionList.get(9).getId()));
+
+        em.flush();
+
+        System.out.println("포스트함수");
+        List<Collection> collections = collectionRepository.findAll();
+        System.out.println(collections.size());
+        //then
+
+        assertThat(collections.get(0).getFirstThumbnail()).isEqualTo("7");
+        assertThat(collections.get(0).getSecondThumbnail()).isEqualTo("1");
+        assertThat(collections.get(0).getThirdThumbnail()).isEqualTo("8");
+        assertThat(collections.get(0).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(1).getFirstThumbnail()).isEqualTo("7");
+        assertThat(collections.get(1).getSecondThumbnail()).isEqualTo("8");
+        assertThat(collections.get(1).getThirdThumbnail()).isEqualTo("1");
+        assertThat(collections.get(1).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(2).getFirstThumbnail()).isEqualTo("7");
+        assertThat(collections.get(2).getSecondThumbnail()).isEqualTo("6");
+        assertThat(collections.get(2).getThirdThumbnail()).isEqualTo("8");
+        assertThat(collections.get(2).getFourthThumbnail()).isEqualTo("3");
+
+        assertThat(collections.get(3).getFirstThumbnail()).isEqualTo("7");
+        assertThat(collections.get(3).getSecondThumbnail()).isEqualTo("4");
+        assertThat(collections.get(3).getThirdThumbnail()).isEqualTo("3");
+        assertThat(collections.get(3).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(4).getFirstThumbnail()).isEqualTo("3");
+        assertThat(collections.get(4).getSecondThumbnail()).isEqualTo(null);
+        assertThat(collections.get(4).getThirdThumbnail()).isEqualTo(null);
+        assertThat(collections.get(4).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(5).getFirstThumbnail()).isEqualTo("4");
+        assertThat(collections.get(5).getSecondThumbnail()).isEqualTo(null);
+        assertThat(collections.get(5).getThirdThumbnail()).isEqualTo(null);
+        assertThat(collections.get(5).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(6).getFirstThumbnail()).isEqualTo("9");
+        assertThat(collections.get(6).getSecondThumbnail()).isEqualTo("7");
+        assertThat(collections.get(6).getThirdThumbnail()).isEqualTo(null);
+        assertThat(collections.get(6).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(7).getFirstThumbnail()).isEqualTo("5");
+        assertThat(collections.get(7).getSecondThumbnail()).isEqualTo("9");
+        assertThat(collections.get(7).getThirdThumbnail()).isEqualTo("7");
+        assertThat(collections.get(7).getFourthThumbnail()).isEqualTo(null);
+
+        assertThat(collections.get(8).getFirstThumbnail()).isEqualTo("5");
+        assertThat(collections.get(8).getSecondThumbnail()).isEqualTo("9");
+        assertThat(collections.get(8).getThirdThumbnail()).isEqualTo("7");
+        assertThat(collections.get(8).getFourthThumbnail()).isEqualTo("6");
+
+        assertThat(collections.get(9).getFirstThumbnail()).isEqualTo("6");
+        assertThat(collections.get(9).getSecondThumbnail()).isEqualTo("5");
+        assertThat(collections.get(9).getThirdThumbnail()).isEqualTo("9");
+        assertThat(collections.get(9).getFourthThumbnail()).isEqualTo("7");
+
     }
 
     @Test

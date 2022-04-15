@@ -118,16 +118,9 @@ class PostServiceJpaTest {
         List<Hashtag> prepareHashtags = hashtagRepository.findAll();
         List<Collection> prepareCollections = collectionRepository.findAllById(collectionIds);
 
-
-        int preparePostsSize = preparePosts.size();
-        int prepareHashtagsSize = prepareHashtags.size();
         List<CollectedPost> prepareCollectedPosts1 = prepareCollections.get(0).getCollectedPosts();
         List<CollectedPost> prepareCollectedPosts2 = prepareCollections.get(1).getCollectedPosts();
         List<CollectedPost> prepareCollectedPosts3 = prepareCollections.get(2).getCollectedPosts();
-
-        int prepareCollectedPosts1Size = prepareCollectedPosts1.size();
-        int prepareCollectedPosts2Size = prepareCollectedPosts2.size();
-        int prepareCollectedPosts3Size = prepareCollectedPosts3.size();
 
         em.flush();
         em.clear();
@@ -155,23 +148,17 @@ class PostServiceJpaTest {
         List<Hashtag> postHashtags = hashtagRepository.findAll();
         List<Collection> postCollections = collectionRepository.findAllById(collectionIds);
 
-        int postPostsSize = postPosts.size();
-        int postHashtagsSize = postHashtags.size();
         List<CollectedPost> postCollectedPosts1 = postCollections.get(0).getCollectedPosts();
         List<CollectedPost> postCollectedPosts2 = postCollections.get(1).getCollectedPosts();
         List<CollectedPost> postCollectedPosts3 = postCollections.get(2).getCollectedPosts();
 
-        int postCollectedPosts1Size = postCollectedPosts1.size();
-        int postCollectedPosts2Size = postCollectedPosts2.size();
-        int postCollectedPosts3Size = postCollectedPosts3.size();
-
         //then
 
-        assertThat(preparePostsSize).isEqualTo(postPostsSize - 1);
-        assertThat(prepareHashtagsSize).isEqualTo(postHashtagsSize - 2);
-        assertThat(prepareCollectedPosts1Size).isEqualTo(postCollectedPosts1Size - 1);
-        assertThat(prepareCollectedPosts2Size).isEqualTo(postCollectedPosts2Size - 1);
-        assertThat(prepareCollectedPosts3Size).isEqualTo(postCollectedPosts3Size - 1);
+        assertThat(preparePosts.size()).isEqualTo(postPosts.size() - 1);
+        assertThat(prepareHashtags.size()).isEqualTo(postHashtags.size() - 2);
+        assertThat(prepareCollectedPosts1.size()).isEqualTo(postCollectedPosts1.size() - 1);
+        assertThat(prepareCollectedPosts2.size()).isEqualTo(postCollectedPosts2.size() - 1);
+        assertThat(prepareCollectedPosts3.size()).isEqualTo(postCollectedPosts3.size() - 1);
         assertThat(post1.getPopularity()).isEqualTo(POST_COLLECT.getLatestScore() * POST_COLLECT.getRate() * 3 +
                 POST_VIEW.getRate() * POST_VIEW.getLatestScore());
         assertThat(postPostedHashtagSize).isEqualTo(2);

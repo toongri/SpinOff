@@ -221,6 +221,26 @@ public class PostDto {
     }
 
     @Data
+    public static class ThumbnailAndPublicPostDto {
+
+        @ApiModelProperty(
+                value = "글 썸네일",
+                example = "dlkfhjdkld")
+        private String thumbnail;
+
+        @ApiModelProperty(
+                value = "글 공개범위",
+                example = "A")
+        private PublicOfPostStatus publicOfPostStatus;
+
+        @QueryProjection
+        public ThumbnailAndPublicPostDto(String thumbnail, PublicOfPostStatus publicOfPostStatus) {
+            this.thumbnail = thumbnail;
+            this.publicOfPostStatus = publicOfPostStatus;
+        }
+    }
+
+    @Data
     @NoArgsConstructor
     public static class SearchPageAtAllPostDto {
 

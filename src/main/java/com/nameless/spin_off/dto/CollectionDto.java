@@ -56,7 +56,6 @@ public class CollectionDto {
         }
     }
 
-
     @Data
     @NoArgsConstructor
     public static class QuickPostInCollectionDto {
@@ -67,6 +66,19 @@ public class CollectionDto {
         public QuickPostInCollectionDto(Long id, String title) {
             this.id = id;
             this.title = title;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class PostThumbnailsCollectionDto {
+        private Long collectionId;
+        private String postThumbnail;
+
+        @QueryProjection
+        public PostThumbnailsCollectionDto(Long collectionId, String postThumbnail) {
+            this.collectionId = collectionId;
+            this.postThumbnail = postThumbnail;
         }
     }
 

@@ -1,6 +1,8 @@
 package com.nameless.spin_off.service.post;
 
+import com.nameless.spin_off.dto.CollectionDto.PostThumbnailsCollectionDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.dto.PostDto.ThumbnailAndPublicPostDto;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
@@ -34,10 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
@@ -91,7 +90,7 @@ public class PostServiceJpa implements PostService{
 
         if (!collectionIds.isEmpty()) {
             post.addAllCollectedPostByIds(collectionIds);
-            collectionQueryRepository.updateLastModifiedDateCollections(collectionIds);
+            collectionQueryRepository.updateCollectionsThumbnails(getThumbnails(urls), collectionIds);
         }
         return post.getId();
     }
@@ -113,17 +112,31 @@ public class PostServiceJpa implements PostService{
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
-        hasAuthPost(memberId, postId, getPublicOfPost(postId));
+        ThumbnailAndPublicPostDto publicAndThumbnailOfPost = getPublicAndThumbnailOfPost(postId);
+        hasAuthPost(memberId, postId, publicAndThumbnailOfPost.getPublicOfPostStatus());
         isCorrectCollectionIds(collectionIds, memberId);
 
         List<CollectedPost> collectedPosts = collectionQueryRepository.findAllIdByPostIdAndMemberId(postId, memberId);
-        collectedPostRepository.deleteAll(
-                collectedPosts.stream()
-                        .filter(c -> !collectionIds.contains(c.getCollection().getId()))
-                        .collect(Collectors.toList()));
+
+        List<CollectedPost> collectForDelete = collectedPosts.stream()
+                .filter(c -> !collectionIds.contains(c.getCollection().getId()))
+                .collect(Collectors.toList());
+
+        if (!collectForDelete.isEmpty()) {
+            collectedPostRepository.deleteAll(collectForDelete);
+            List<Long> collectIds = collectForDelete.stream().map(c -> c.getCollection().getId()).collect(Collectors.toList());
+
+            Map<Long, List<PostThumbnailsCollectionDto>> thumbnails =
+                    collectionQueryRepository.findPostThumbnailsByCollectionIds(collectIds)
+                    .stream().collect(Collectors.groupingBy(PostThumbnailsCollectionDto::getCollectionId));
+
+            for (Long collectId : collectIds) {
+                collectionQueryRepository
+                        .resetCollectionThumbnail(collectId, getPostThumbnailsCollectionDtos(thumbnails.get(collectId), collectId));
+            }
+        }
 
         List<Long> collectionIdsInPost = collectedPosts.stream()
-                .filter(c -> collectionIds.contains(c.getCollection().getId()))
                 .map(c -> c.getCollection().getId())
                 .collect(Collectors.toList());
 
@@ -133,13 +146,20 @@ public class PostServiceJpa implements PostService{
         if (addCollectionIds.isEmpty()) {
             return Collections.emptyList();
         } else {
-            collectionQueryRepository.updateLastModifiedDateCollections(addCollectionIds);
-
+            collectionQueryRepository.updateCollectionsThumbnails(publicAndThumbnailOfPost.getThumbnail(), addCollectionIds);
             return collectedPostRepository.saveAll(
                     addCollectionIds.stream()
                             .map(c -> CollectedPost
                                     .createCollectedPost(Collection.createCollection(c), Post.createPost(postId)))
                             .collect(Collectors.toList())).stream().map(CollectedPost::getId).collect(Collectors.toList());
+        }
+    }
+
+    private List<String> getPostThumbnailsCollectionDtos(List<PostThumbnailsCollectionDto> thumbnails, Long collectId) {
+        if (thumbnails == null) {
+            return Collections.emptyList();
+        } else {
+            return thumbnails.stream().map(PostThumbnailsCollectionDto::getPostThumbnail).collect(Collectors.toList());
         }
     }
 
@@ -235,6 +255,11 @@ public class PostServiceJpa implements PostService{
 
     private PublicOfPostStatus getPublicOfPost(Long postId) {
         return postQueryRepository.findPublicByPostId(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+    }
+
+    private ThumbnailAndPublicPostDto getPublicAndThumbnailOfPost(Long postId) {
+        return postQueryRepository.findThumbnailAndPublicByPostId(postId)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 

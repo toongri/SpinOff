@@ -9,6 +9,7 @@ import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAUpdateClause;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -30,6 +31,7 @@ import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class CollectionQueryRepository extends Querydsl4RepositorySupport {
@@ -54,6 +56,18 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         collectedPost.post.id.eq(postId),
                         collection.member.id.eq(memberId))
+                .fetch();
+    }
+
+    public List<PostThumbnailsCollectionDto> findPostThumbnailsByCollectionIds(List<Long> collectionIds) {
+        return getQueryFactory()
+                .select(new QCollectionDto_PostThumbnailsCollectionDto(
+                        collectedPost.collection.id, post.thumbnailUrl))
+                .from(collectedPost)
+                .join(collectedPost.post, post)
+                .where(
+                        collectedPost.collection.id.in(collectionIds))
+                .orderBy(collectedPost.id.desc())
                 .fetch();
     }
 
@@ -336,11 +350,63 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetch().stream().collect(Collectors.groupingBy(FollowCollectionMemberDto::getCollectionId));
     }
 
-    public long updateLastModifiedDateCollections(List<Long> collectionIds) {
-        return getQueryFactory()
-                .update(collection)
-                .set(collection.lastModifiedDate, LocalDateTime.now())
-                .where(collection.id.in(collectionIds))
+    public long updateCollectionsThumbnails(String thumbnail, List<Long> collectionIds) {
+        if (thumbnail == null) {
+            return getQueryFactory()
+                    .update(collection)
+                    .set(collection.lastModifiedDate, LocalDateTime.now())
+                    .where(collection.id.in(collectionIds))
+                    .execute();
+        } else {
+            return getQueryFactory()
+                    .update(collection)
+                    .set(collection.lastModifiedDate, LocalDateTime.now())
+                    .set(collection.fourthThumbnail, collection.thirdThumbnail)
+                    .set(collection.thirdThumbnail, collection.secondThumbnail)
+                    .set(collection.secondThumbnail, collection.firstThumbnail)
+                    .set(collection.firstThumbnail, thumbnail)
+                    .where(collection.id.in(collectionIds))
+                    .execute();
+        }
+    }
+
+    public long resetCollectionThumbnail(Long collectionId, List<String> thumbnails) {
+        int size = thumbnails.size();
+        JPAUpdateClause updateClause = getQueryFactory()
+                .update(collection);
+        if (size >= 4) {
+            updateClause = updateClause
+                    .set(collection.fourthThumbnail, thumbnails.get(3))
+                    .set(collection.thirdThumbnail, thumbnails.get(2))
+                    .set(collection.secondThumbnail, thumbnails.get(1))
+                    .set(collection.firstThumbnail, thumbnails.get(0));
+        } else if (size == 3) {
+            updateClause = updateClause
+                    .setNull(collection.fourthThumbnail)
+                    .set(collection.thirdThumbnail, thumbnails.get(2))
+                    .set(collection.secondThumbnail, thumbnails.get(1))
+                    .set(collection.firstThumbnail, thumbnails.get(0));
+        } else if (size == 2) {
+            updateClause = updateClause
+                    .setNull(collection.fourthThumbnail)
+                    .setNull(collection.thirdThumbnail)
+                    .set(collection.secondThumbnail, thumbnails.get(1))
+                    .set(collection.firstThumbnail, thumbnails.get(0));
+        } else if (size == 1) {
+            updateClause = updateClause
+                    .setNull(collection.fourthThumbnail)
+                    .setNull(collection.thirdThumbnail)
+                    .setNull(collection.secondThumbnail)
+                    .set(collection.firstThumbnail, thumbnails.get(0));
+        } else {
+            updateClause = updateClause
+                    .setNull(collection.fourthThumbnail)
+                    .setNull(collection.thirdThumbnail)
+                    .setNull(collection.secondThumbnail)
+                    .setNull(collection.firstThumbnail);
+        }
+        return updateClause
+                .where(collection.id.eq(collectionId))
                 .execute();
     }
 
