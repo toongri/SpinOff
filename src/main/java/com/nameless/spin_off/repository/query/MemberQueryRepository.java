@@ -40,9 +40,10 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
 
         return Optional.ofNullable(getQueryFactory()
                 .select(new QMemberDto_ReadMemberDto(
-                        member.id, member.profileImg, member.bio,
-                        followedMember.countDistinct(), followingMember.countDistinct()))
+                        member.id, member.nickname, member.accountId, member.profileImg, member.bio,
+                        post.countDistinct(), followedMember.countDistinct(), followingMember.countDistinct()))
                 .from(member)
+                .leftJoin(member.posts, post)
                 .leftJoin(member.followingMembers, followedMember)
                 .on(followedMember.followingMember.id.notIn(blockedMembers))
                 .leftJoin(member.followedMembers, followingMember)
@@ -56,8 +57,9 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
 
         return Optional.ofNullable(getQueryFactory()
                 .select(new QMemberDto_ReadMemberDto(
-                        member.id, member.profileImg, member.bio))
+                        member.id, member.nickname, member.accountId, member.profileImg, member.bio, post.count()))
                 .from(member)
+                .leftJoin(member.posts, post)
                 .where(
                         member.id.eq(memberId))
                 .fetchFirst());

@@ -26,6 +26,16 @@ public class MemberDto {
         private Long id;
 
         @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "toongri")
+        private String nickname;
+
+        @ApiModelProperty(
+                value = "멤버 계정 아이디",
+                example = "jhkim03284")
+        private String accountId;
+
+        @ApiModelProperty(
                 value = "프로필 url",
                 example = "fhjdklebneke")
         private String profileUrl;
@@ -34,6 +44,11 @@ public class MemberDto {
                 value = "프로필 설명",
                 example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
         private String bio;
+
+        @ApiModelProperty(
+                value = "글 갯수",
+                example = "123")
+        private Long postSize;
 
         @ApiModelProperty(
                 value = "팔로워 갯수",
@@ -66,19 +81,26 @@ public class MemberDto {
         private boolean isBlocked;
 
         @QueryProjection
-        public ReadMemberDto(Long id, String profileUrl, String bio, Long followerSize, Long followingSize) {
+        public ReadMemberDto(Long id, String nickname, String accountId, String profileUrl, String bio,
+                             Long postSize, Long followerSize, Long followingSize) {
             this.id = id;
+            this.nickname = nickname;
+            this.accountId = accountId;
             this.profileUrl = profileUrl;
             this.bio = bio;
+            this.postSize = postSize;
             this.followerSize = followerSize;
             this.followingSize = followingSize;
         }
 
         @QueryProjection
-        public ReadMemberDto(Long id, String profileUrl, String bio) {
+        public ReadMemberDto(Long id, String nickname, String accountId, String profileUrl, String bio, Long postSize) {
             this.id = id;
+            this.nickname = nickname;
+            this.accountId = accountId;
             this.profileUrl = profileUrl;
             this.bio = bio;
+            this.postSize = postSize;
             this.followerSize = 0L;
             this.followingSize = 0L;
         }
