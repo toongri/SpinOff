@@ -32,9 +32,8 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
 
     @Transactional
     @Override
-    public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId)
+    public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
-        Long collectionId = commentVO.getCollectionId();
         hasAuthPost(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistCommentInCollection(commentVO.getParentId(), collectionId);
         isBlockMembersComment(memberId, commentVO.getParentId());

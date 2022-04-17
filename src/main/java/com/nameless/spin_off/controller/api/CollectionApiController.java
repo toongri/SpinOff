@@ -5,13 +5,19 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.*;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.query.CollectionQueryService;
+import com.nameless.spin_off.service.query.CommentInCollectionQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -33,6 +39,8 @@ public class CollectionApiController {
 
     private final CollectionService collectionService;
     private final CollectionQueryService collectionQueryService;
+    private final CommentInCollectionQueryService commentInCollectionQueryService;
+    private final CommentInCollectionService commentInCollectionService;
     private final EnumMapper enumMapper;
 
     @ApiOperation(value = "컬렉션 생성", notes = "")
@@ -102,6 +110,78 @@ public class CollectionApiController {
         return getResult(collectionService.insertFollowedCollectionByMemberId(currentMember.getId(), collectionId));
     }
 
+    @ApiOperation(value = "컬렉션 댓글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{collectionId}/comment")
+    public SingleApiResult<List<ContentCommentDto>> readComments(@LoginMember MemberDetails currentMember,
+                                                                 @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyFollowedCollectionException,
+            NotExistCollectionException, CantFollowOwnCollectionException {
+
+        log.info("readComments");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
+        return getResult(commentInCollectionQueryService.getCommentsByCollectionId(currentMember, collectionId));
+    }
+
+    @ApiOperation(value = "컬렉션 댓글 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentVO",
+                    value = "댓글 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "CreateCommentInCollectionVO")
+    })
+    @PostMapping("/{collectionId}/comment")
+    public SingleApiResult<Long> createCommentInCollection(
+            @LoginMember MemberDetails currentMember, @RequestBody CreateCommentInCollectionVO commentVO,
+            @PathVariable Long collectionId)
+            throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
+
+        log.info("createCommentInCollection");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("collectionId : {}", collectionId);
+        log.info("parentId : {}", commentVO.getParentId());
+        log.info("content : {}", commentVO.getContent());
+
+        Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(
+                commentVO, currentMember.getId(), collectionId);
+        return getResult(commentId);
+    }
+
+    @ApiOperation(value = "컬렉션 댓글 좋아요 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentId",
+                    value = "댓글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @PostMapping("/collection/{commentId}/like")
+    public SingleApiResult<Long> createCommentLikeOneInCollection(
+            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
+            NotExistCommentInCollectionException {
+
+        log.info("createCommentLikeOneInCollection");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("commentId : {}", commentId);
+
+        return getResult(commentInCollectionService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
+    }
+
     @ApiOperation(value = "컬렉션 리스트 조회", notes = "로그인 된 멤버의 컬렉션 리스트 조회")
     @ApiImplicitParams({
     })
@@ -137,5 +217,13 @@ public class CollectionApiController {
         log.info("getCollectionPublicCategories");
 
         return enumMapper.get("PublicOfCollectionStatus");
+    }
+
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
     }
 }

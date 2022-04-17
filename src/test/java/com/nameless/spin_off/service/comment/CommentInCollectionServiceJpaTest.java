@@ -68,7 +68,7 @@ class CommentInCollectionServiceJpaTest {
                 .getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
                                 new CreateCommentInCollectionVO(
-                                        collection.getId(), null, "야스히로 라할살"), member.getId()));
+                                        null, "야스히로 라할살"), member.getId(), collection.getId()));
         System.out.println("컬렉션업로드");
         collectionService.insertViewedCollectionByIp("22", collection.getId());
         collectionService.updateAllPopularity();
@@ -101,14 +101,14 @@ class CommentInCollectionServiceJpaTest {
                 commentInCollectionRepository.getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
                                 new CreateCommentInCollectionVO(
-                                        col.getId(), parent.getId(), "요지스타 라할살"), mem.getId()));
+                                        parent.getId(), "요지스타 라할살"), mem.getId(), col.getId()));
 
         System.out.println("서비스함수2");
         CommentInCollection childComment2 =
                 commentInCollectionRepository.getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
                                 new CreateCommentInCollectionVO(
-                                        col.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
+                                        parent.getId(), "슈퍼스타검흰 라할살"), mem.getId(), col.getId()));
 
         em.flush();
         em.clear();
@@ -148,34 +148,34 @@ class CommentInCollectionServiceJpaTest {
         collectionRepository.save(col2);
 
         CreateCommentInCollectionVO commentInCollectionVO1 =
-                new CreateCommentInCollectionVO(0L, -1L, "");
+                new CreateCommentInCollectionVO(-1L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO2 =
-                new CreateCommentInCollectionVO(-1L, 0L, "");
+                new CreateCommentInCollectionVO(0L, "");
 
         CreateCommentInCollectionVO commentInCollectionVO3 =
-                new CreateCommentInCollectionVO(col.getId(), -1L, "");
+                new CreateCommentInCollectionVO(-1L, "");
 
         //when
 
         //then
         assertThatThrownBy(() -> commentInCollectionService
-                .insertCommentInCollectionByCommentVO(commentInCollectionVO2, mem.getId()))
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO2, mem.getId(), 0L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService
-                .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId()))
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId(), -1L))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
         Long aLong = commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(col.getId(), null, ""), mem2.getId());
+                new CreateCommentInCollectionVO(null, ""), mem2.getId(), col.getId());
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(col2.getId(), null, ""), mem.getId()))
+                new CreateCommentInCollectionVO(null, ""), mem.getId(), col2.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(col.getId(), aLong, ""), mem.getId()))
+                new CreateCommentInCollectionVO(aLong, ""), mem.getId(), col.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 

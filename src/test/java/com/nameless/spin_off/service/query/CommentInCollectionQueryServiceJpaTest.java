@@ -62,29 +62,29 @@ class CommentInCollectionQueryServiceJpaTest {
         List<Long> commentIds = new ArrayList<>();
 
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), null, "ddd"), member.getId()));
+                null, "ddd"), member.getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), null, "ddd"), memberList.get(0).getId()));
+                null, "ddd"), memberList.get(0).getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), null, "ddd"), memberList.get(1).getId()));
+                null, "ddd"), memberList.get(1).getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), null, "ddd"), memberList.get(2).getId()));
+                null, "ddd"), memberList.get(2).getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), null, "ddd"), memberList.get(3).getId()));
+                null, "ddd"), memberList.get(3).getId(), defaultCollection.getId()));
 
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(0), "ddd"), member.getId()));
+                commentIds.get(0), "ddd"), member.getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(0), "ddd"), memberList.get(0).getId()));
+                commentIds.get(0), "ddd"), memberList.get(0).getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(0), "ddd"), memberList.get(1).getId()));
+                commentIds.get(0), "ddd"), memberList.get(1).getId(), defaultCollection.getId()));
 
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(2), "ddd"), member.getId()));
+                commentIds.get(2), "ddd"), member.getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(2), "ddd"), memberList.get(0).getId()));
+                commentIds.get(2), "ddd"), memberList.get(0).getId(), defaultCollection.getId()));
         commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CreateCommentInCollectionVO(
-                defaultCollection.getId(), commentIds.get(2), "ddd"), memberList.get(1).getId()));
+                commentIds.get(2), "ddd"), memberList.get(1).getId(), defaultCollection.getId()));
 
         commentInCollectionService.insertLikedCommentByMemberId(memberList.get(1).getId(), commentIds.get(1));
         commentInCollectionService.insertLikedCommentByMemberId(member.getId(), commentIds.get(0));

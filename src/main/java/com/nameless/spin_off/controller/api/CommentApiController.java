@@ -2,13 +2,9 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
-import com.nameless.spin_off.exception.collection.NotExistCollectionException;
-import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
-import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -57,30 +53,6 @@ public class CommentApiController {
         return getResult(commentInPostService.insertCommentInPostByCommentVO(commentVO, currentMember.getId()));
     }
 
-    @ApiOperation(value = "컬렉션 댓글 생성", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "commentVO",
-                    value = "댓글 정보",
-                    required = true,
-                    paramType = "body",
-                    dataType = "CreateCommentInCollectionVO")
-    })
-    @PostMapping("/collection")
-    public SingleApiResult<Long> createOneInCollection(
-            @LoginMember MemberDetails currentMember, @RequestBody CreateCommentInCollectionVO commentVO)
-            throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
-
-        log.info("createOneInCollection");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("collectionId : {}", commentVO.getCollectionId());
-        log.info("parentId : {}", commentVO.getParentId());
-        log.info("content : {}", commentVO.getContent());
-
-        Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(commentVO, currentMember.getId());
-        return getResult(commentId);
-    }
-
     @ApiOperation(value = "글 댓글 좋아요 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -101,28 +73,5 @@ public class CommentApiController {
         log.info("commentId : {}", commentId);
 
         return getResult(commentInPostService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
-    }
-
-    @ApiOperation(value = "컬렉션 댓글 좋아요 생성", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "commentId",
-                    value = "댓글 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @PostMapping("/collection/{commentId}/like")
-    public SingleApiResult<Long> createLikeOneInCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
-            throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
-            NotExistCommentInCollectionException {
-
-        log.info("createLikeOneInCollection");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("commentId : {}", commentId);
-
-        return getResult(commentInCollectionService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
     }
 }
