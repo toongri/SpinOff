@@ -33,9 +33,8 @@ public class CommentInPostServiceJpa implements CommentInPostService {
 
     @Transactional
     @Override
-    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId)
+    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
-        Long postId = commentVO.getPostId();
         hasAuthPost(memberId, postId, getPublicOfPost(postId));
         isExistCommentInPost(commentVO.getParentId(), postId);
         isBlockMembersComment(memberId, commentVO.getParentId());

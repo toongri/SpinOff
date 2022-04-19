@@ -7,7 +7,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 
 public interface CommentInPostService {
-    Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId)
+    Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException;
     Long insertLikedCommentByMemberId(Long memberId, Long commentId) throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException;
 }

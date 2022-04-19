@@ -59,13 +59,6 @@ public class CommentDto {
     public static class CreateCommentInPostVO {
 
         @ApiModelProperty(
-                value = "글 id",
-                required = true,
-                example = "123",
-                dataType = "Long")
-        private Long postId;
-
-        @ApiModelProperty(
                 value = "댓글 id",
                 example = "123",
                 dataType = "Long")

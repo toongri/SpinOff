@@ -121,12 +121,12 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/comment")
-    public SingleApiResult<List<ContentCommentDto>> readComments(@LoginMember MemberDetails currentMember,
-                                                                 @PathVariable Long collectionId)
+    public SingleApiResult<List<ContentCommentDto>> readCommentsInCollection(@LoginMember MemberDetails currentMember,
+                                                                             @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,
             NotExistCollectionException, CantFollowOwnCollectionException {
 
-        log.info("readComments");
+        log.info("readCommentsInCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
 
@@ -169,7 +169,7 @@ public class CollectionApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @PostMapping("/collection/{commentId}/like")
+    @PostMapping("/comment/{commentId}/like")
     public SingleApiResult<Long> createCommentLikeOneInCollection(
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,

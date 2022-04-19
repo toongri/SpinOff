@@ -163,7 +163,7 @@ class CommentInCollectionServiceJpaTest {
                 .insertCommentInCollectionByCommentVO(commentInCollectionVO2, mem.getId(), 0L))
                 .isInstanceOf(NotExistCollectionException.class);//.hasMessageContaining("")
         assertThatThrownBy(() -> commentInCollectionService
-                .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId(), -1L))
+                .insertCommentInCollectionByCommentVO(commentInCollectionVO3, mem.getId(), col.getId()))
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
         Long aLong = commentInCollectionService.insertCommentInCollectionByCommentVO(

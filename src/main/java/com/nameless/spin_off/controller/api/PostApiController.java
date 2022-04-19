@@ -5,6 +5,7 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
@@ -15,10 +16,13 @@ import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
+import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
+import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.exception.post.*;
+import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.post.PostService;
 import com.nameless.spin_off.service.query.CollectionQueryService;
 import com.nameless.spin_off.service.query.CommentInPostQueryService;
@@ -52,6 +56,7 @@ public class PostApiController {
     private final PostQueryService postQueryService;
     private final CollectionQueryService collectionQueryService;
     private final CommentInPostQueryService commentInPostQueryService;
+    private final CommentInPostService commentInPostService;
     private final EnumMapper enumMapper;
 
     @ApiOperation(value = "글 생성", notes = "")
@@ -288,15 +293,61 @@ public class PostApiController {
                     example = "123")
     })
     @GetMapping("/{postId}/comment")
-    public SingleApiResult<List<ContentCommentDto>> readCommentInPost(
+    public SingleApiResult<List<ContentCommentDto>> readCommentsInPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
 
-        log.info("readCommentInPost");
+        log.info("readCommentsInPost");
         log.info("postId : {}", postId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
 
-        List<ContentCommentDto> comments = commentInPostQueryService.getCommentsByPostId(currentMember, postId);
-        return getResult(comments);
+        return getResult(commentInPostQueryService.getCommentsByPostId(currentMember, postId));
+    }
+
+    @ApiOperation(value = "글 댓글 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentVO",
+                    value = "댓글 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "CreateCommentInPostVO")
+    })
+    @PostMapping("/{postId}/comment")
+    public SingleApiResult<Long> createCommentInPost(
+            @LoginMember MemberDetails currentMember, @RequestBody CreateCommentInPostVO commentVO,
+            @PathVariable Long postId)
+            throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
+
+        log.info("createCommentInPost");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
+        log.info("parentId : {}", commentVO.getParentId());
+        log.info("content : {}", commentVO.getContent());
+
+        return getResult(commentInPostService.insertCommentInPostByCommentVO(
+                commentVO, currentMember.getId(), postId));
+    }
+
+    @ApiOperation(value = "글 댓글 좋아요 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentId",
+                    value = "댓글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @PostMapping("/comment/{commentId}/like")
+    public SingleApiResult<Long> createCommentLikeOneInPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
+
+        log.info("createCommentLikeOneInPost");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("commentId : {}", commentId);
+
+        return getResult(commentInPostService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
     }
 
     @ApiOperation(value = "연관 글 조회", notes = "")

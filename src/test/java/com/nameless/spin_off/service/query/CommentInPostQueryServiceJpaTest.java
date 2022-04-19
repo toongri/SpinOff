@@ -65,29 +65,29 @@ class CommentInPostQueryServiceJpaTest {
         List<Long> commentIds = new ArrayList<>();
 
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), null, "ddd"), member.getId()));
+                null, "ddd"), member.getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), null, "ddd"), memberList.get(0).getId()));
+                null, "ddd"), memberList.get(0).getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), null, "ddd"), memberList.get(1).getId()));
+                null, "ddd"), memberList.get(1).getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), null, "ddd"), memberList.get(2).getId()));
+                null, "ddd"), memberList.get(2).getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), null, "ddd"), memberList.get(3).getId()));
+                null, "ddd"), memberList.get(3).getId(), post.getId()));
 
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(0), "ddd"), member.getId()));
+                commentIds.get(0), "ddd"), member.getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(0), "ddd"), memberList.get(0).getId()));
+                commentIds.get(0), "ddd"), memberList.get(0).getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(0), "ddd"), memberList.get(1).getId()));
+                commentIds.get(0), "ddd"), memberList.get(1).getId(), post.getId()));
 
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(2), "ddd"), member.getId()));
+                commentIds.get(2), "ddd"), member.getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(2), "ddd"), memberList.get(0).getId()));
+                commentIds.get(2), "ddd"), memberList.get(0).getId(), post.getId()));
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
-                post.getId(), commentIds.get(2), "ddd"), memberList.get(1).getId()));
+                commentIds.get(2), "ddd"), memberList.get(1).getId(), post.getId()));
 
         commentInPostService.insertLikedCommentByMemberId(memberList.get(1).getId(), commentIds.get(1));
         commentInPostService.insertLikedCommentByMemberId(member.getId(), commentIds.get(0));

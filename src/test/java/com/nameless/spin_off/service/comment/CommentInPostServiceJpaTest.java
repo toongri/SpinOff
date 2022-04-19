@@ -59,7 +59,7 @@ class CommentInPostServiceJpaTest {
         //when
         System.out.println("서비스함수");
         Long commentId = commentInPostService.insertCommentInPostByCommentVO(
-                new CommentDto.CreateCommentInPostVO(po.getId(), null, "야스히로 라할살"), mem.getId());
+                new CommentDto.CreateCommentInPostVO(null, "야스히로 라할살"), mem.getId(), po.getId());
 
         System.out.println("포스트업로드");
         em.flush();
@@ -93,13 +93,13 @@ class CommentInPostServiceJpaTest {
         CommentInPost childComment1 = commentInPostRepository.getById(
                 commentInPostService.insertCommentInPostByCommentVO(
                         new CommentDto.CreateCommentInPostVO(
-                                po.getId(), parent.getId(), "요지스타 라할살"), mem.getId()));
+                                parent.getId(), "요지스타 라할살"), mem.getId(), po.getId()));
 
         System.out.println("서비스함수2");
         CommentInPost childComment2 = commentInPostRepository.getById(
                 commentInPostService.insertCommentInPostByCommentVO(
                         new CommentDto.CreateCommentInPostVO(
-                                po.getId(), parent.getId(), "슈퍼스타검흰 라할살"), mem.getId()));
+                                parent.getId(), "슈퍼스타검흰 라할살"), mem.getId(), po.getId()));
 
         em.flush();
         em.clear();
@@ -144,30 +144,30 @@ class CommentInPostServiceJpaTest {
         postRepository.save(post2);
 
         CommentDto.CreateCommentInPostVO commentInPostVO1 =
-                new CommentDto.CreateCommentInPostVO(0L, 0L, "");
+                new CommentDto.CreateCommentInPostVO(0L, "");
         CommentDto.CreateCommentInPostVO commentInPostVO2 =
-                new CommentDto.CreateCommentInPostVO(0L, 0L, "");
+                new CommentDto.CreateCommentInPostVO(0L, "");
         CommentDto.CreateCommentInPostVO commentInPostVO3 =
-                new CommentDto.CreateCommentInPostVO(post.getId(), 0L, "");
+                new CommentDto.CreateCommentInPostVO(0L, "");
 
         //when
 
         //then
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2, mem.getId()))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO2, mem.getId(), 0L))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3, mem.getId()))
+        assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(commentInPostVO3, mem.getId(), post.getId()))
                 .isInstanceOf(NotExistCommentInPostException.class);//.hasMessageContaining("")
 
         Long aLong = commentInPostService.insertCommentInPostByCommentVO(
-                new CommentDto.CreateCommentInPostVO(post.getId(), null, ""), mem2.getId());
+                new CommentDto.CreateCommentInPostVO(null, ""), mem2.getId(), post.getId());
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
-                new CommentDto.CreateCommentInPostVO(post2.getId(), null, ""), mem.getId()))
+                new CommentDto.CreateCommentInPostVO(null, ""), mem.getId(), post2.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> commentInPostService.insertCommentInPostByCommentVO(
-                new CommentDto.CreateCommentInPostVO(post.getId(), aLong, ""), mem.getId()))
+                new CommentDto.CreateCommentInPostVO(aLong, ""), mem.getId(), post.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
