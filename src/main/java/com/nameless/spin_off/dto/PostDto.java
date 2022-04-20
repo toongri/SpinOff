@@ -109,11 +109,11 @@ public class PostDto {
                 example = "false")
         private boolean isLiked;
 
-        public void setIsLiked(boolean isLiked) {
+        public void setLiked(boolean isLiked) {
             this.isLiked = isLiked;
         }
 
-        public void setHasAuth(Long memberId, boolean isAdmin) {
+        public void setAuth(Long memberId, boolean isAdmin) {
             this.hasAuth = this.member.getMemberId().equals(memberId) || isAdmin;
         }
 
@@ -386,6 +386,59 @@ public class PostDto {
     }
 
     @Data
+    @AllArgsConstructor
+    public static class CollectedPostFirstDto<T> {
+        private T data;
+        private Slice<CollectedPostDto> posts;
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class CollectedPostDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "123")
+        private Long postId;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String postTitle;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
+        private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
+        private String memberNickname;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
+        private String memberProfileImgUrl;
+
+        @ApiModelProperty(
+                value = "글 썸네일 이미지 주소",
+                example = "www.naver.com")
+        private String thumbnailUrl;
+
+        @QueryProjection
+        public CollectedPostDto(Long postId, String title, Long memberId, String memberNickname,
+                              String memberProfileImgUrl, String thumbnailUrl) {
+            this.postId = postId;
+            this.postTitle = title;
+            this.memberId = memberId;
+            this.memberNickname = memberNickname;
+            this.memberProfileImgUrl = memberProfileImgUrl;
+            this.thumbnailUrl = thumbnailUrl;
+        }
+    }
+
+    @Data
     @NoArgsConstructor
     public static class RelatedPostDto {
 
@@ -428,19 +481,6 @@ public class PostDto {
             this.memberNickname = memberNickname;
             this.memberProfileImgUrl = memberProfileImgUrl;
             this.thumbnailUrl = thumbnailUrl;
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(postId);
-        }
-
-        @Override
-        public boolean equals(Object mainPagePostDto) {
-            if (mainPagePostDto instanceof MainPagePostDto) {
-                return ((MainPagePostDto) mainPagePostDto).postId.equals(postId);
-            }
-            return false;
         }
     }
 

@@ -6,7 +6,10 @@ import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.PostDto;
-import com.nameless.spin_off.dto.PostDto.*;
+import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
+import com.nameless.spin_off.dto.PostDto.ReadPostDto;
+import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
+import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
@@ -723,7 +726,7 @@ public class PostQueryServiceJpaTest {
 
         //when
         System.out.println("서비스함수");
-        RelatedPostFirstDto<ReadPostDto> visitPost = postQueryService.getPostForRead(
+        ReadPostDto data = postQueryService.getPostForRead(
                 MemberDetails.builder()
                         .id(member.getId())
                         .accountId(member.getAccountId())
@@ -733,21 +736,18 @@ public class PostQueryServiceJpaTest {
                                 .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
                                 .collect(Collectors.toSet()))
                         .build(),
-                post.getId(),
-                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+                post.getId());
 
         System.out.println("서비스함수끝");
 
-        ReadPostDto data = visitPost.getData();
-        Slice<RelatedPostDto> posts = visitPost.getPosts();
+        Slice<RelatedPostDto> posts = postQueryService.getRelatedPostsSliced(
+                member.getId(), post.getId(), PageRequest.of(0, 3, Sort.by("popularity").descending()));
 
-        RelatedPostFirstDto<ReadPostDto> visitPost2 = postQueryService.getPostForRead(
-                null,
-                post.getId(),
-                PageRequest.of(0, 3, Sort.by("popularity").descending()));
 
-        ReadPostDto data2 = visitPost2.getData();
-        Slice<RelatedPostDto> posts2 = visitPost2.getPosts();
+        ReadPostDto data2 = postQueryService.getPostForRead(null, post.getId());
+
+        Slice<RelatedPostDto> posts2 = postQueryService.getRelatedPostsSliced(
+                null, post.getId(), PageRequest.of(0, 3, Sort.by("popularity").descending()));
 
         //then
         assertThat(data.getMember().getMemberId()).isEqualTo(member.getId());

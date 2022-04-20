@@ -95,7 +95,7 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
-            if (!collectionQueryRepository.isFollowMembersCollection(memberId, collectionId)) {
+            if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){

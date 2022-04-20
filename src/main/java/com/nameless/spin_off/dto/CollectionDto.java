@@ -1,5 +1,6 @@
 package com.nameless.spin_off.dto;
 
+import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.annotations.ApiModelProperty;
@@ -7,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -298,6 +300,106 @@ public class CollectionDto {
         }
     }
 
+    @Data
+    @NoArgsConstructor
+    public static class ReadCollectionDto {
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                example = "123")
+        private Long collectionId;
+        private ContentMemberDto member;
+
+        @ApiModelProperty(
+                value = "글 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String collectionTitle;
+
+        @ApiModelProperty(
+                value = "컬렉션 생성 시간",
+                example = "2022-03-31T09:31:47.021Z")
+        private LocalDateTime createTime;
+
+        @ApiModelProperty(
+                value = "컬렉션 수정 시간",
+                example = "2022-03-31T09:31:47.021Z")
+        private LocalDateTime getLastModifiedDate;
+
+        @ApiModelProperty(
+                value = "컬렉션 내용",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String collectionContent;
+
+        @ApiModelProperty(
+                value = "컬렉션 공개범위",
+                example = "A")
+        private PublicOfCollectionStatus publicOfCollectionStatus;
+
+        @ApiModelProperty(
+                value = "권한 여부",
+                example = "false")
+        private boolean hasAuth;
+
+        @ApiModelProperty(
+                value = "좋아요 갯수",
+                example = "123")
+        private Long likedSize;
+
+        @ApiModelProperty(
+                value = "댓글 갯수",
+                example = "123")
+        private Long commentSize;
+
+        @ApiModelProperty(
+                value = "팔로우 갯수",
+                example = "123")
+        private Long followedSize;
+
+        @ApiModelProperty(
+                value = "글 갯수",
+                example = "123")
+        private Long postSize;
+
+        @ApiModelProperty(
+                value = "좋아요 여부",
+                example = "false")
+        private boolean isLiked;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        public void setLiked(boolean isLiked) {
+            this.isLiked = isLiked;
+        }
+
+        public void setFollowed(boolean isFollowed) {
+            this.isFollowed = isFollowed;
+        }
+
+        public void setAuth(Long memberId, boolean isAdmin) {
+            this.hasAuth = this.member.getMemberId().equals(memberId) || isAdmin;
+        }
+
+        @QueryProjection
+        public ReadCollectionDto(Long collectionId, Long memberId, String profile, String nickname, String accountId,
+                           String collectionTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
+                           String collectionContent, PublicOfCollectionStatus publicOfCollectionStatus,
+                           Long likedSize, Long commentSize, Long followedSize, Long postSize) {
+
+            this.collectionId = collectionId;
+            this.member = new ContentMemberDto(memberId, profile, nickname, accountId);
+            this.collectionTitle = collectionTitle;
+            this.createTime = createTime;
+            this.publicOfCollectionStatus = publicOfCollectionStatus;
+            this.getLastModifiedDate = getLastModifiedDate;
+            this.collectionContent = collectionContent;
+            this.likedSize = likedSize;
+            this.commentSize = commentSize;
+            this.followedSize = followedSize;
+            this.postSize = postSize;
+        }
+    }
 
     @Data
     @AllArgsConstructor

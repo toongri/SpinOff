@@ -2,8 +2,10 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -86,7 +88,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
                     targetMemberId,
                     pageable,
                     isExistFollowedMember(currentMemberId, targetMemberId),
-                    isCurrentMemberAdminAtMyPage(currentMember, targetMemberId));
+                    hasAdminOfContent(currentMember, targetMemberId));
         } else {
             return collectionQueryRepository.findAllByMemberIdSliced(
                     targetMemberId, pageable, false, false);
@@ -118,10 +120,64 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
+    @Override
+    public ReadCollectionDto getCollectionForRead(MemberDetails currentMember, Long collectionId) {
+        Long memberId = getCurrentMemberId(currentMember);
+        return getReadCollectionDto(collectionId, memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId),
+                isCurrentMemberAdmin(currentMember));
+    }
+
+    @Override
+    public Slice<CollectedPostDto> getCollectedPostsSliced(MemberDetails currentMember, Long collectionId, Pageable pageable) {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        IdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
+        List<Long> blockedIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(currentMemberId);
+        hasAuthCollection(currentMemberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
+                blockedIds.contains(publicAndMemberIdByCollectionId.getId()));
+        if (currentMember != null) {
+            return postQueryRepository.findAllCollectedPostByCollectionId(
+                    pageable,
+                    collectionId,
+                    blockedIds,
+                    isExistFollowedCollection(currentMemberId, collectionId),
+                    hasAdminOfContent(currentMember, publicAndMemberIdByCollectionId.getId()));
+        } else {
+            return postQueryRepository.findAllCollectedPostByCollectionId(
+                    pageable, collectionId, Collections.emptyList(), false, false);
+        }
+    }
+
+    private IdAndPublicCollectionDto getPublicAndMemberIdByCollectionId(Long collectionId) {
+        return collectionQueryRepository.findCollectionOwnerIdAndPublic(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
+    }
+
+    private ReadCollectionDto getReadCollectionDto(Long collectionId, Long memberId,
+                                               List<Long> blockedMemberIds, boolean isAdmin) {
+
+        ReadCollectionDto collection = getOneByCollectionId(collectionId, blockedMemberIds);
+        hasAuthCollection(memberId, collectionId, collection.getPublicOfCollectionStatus(),
+                blockedMemberIds.contains(collection.getMember().getMemberId()));
+
+        if (memberId != null) {
+            collection.setAuth(memberId, isAdmin);
+            collection.setLiked(isExistLikedCollection(memberId, collectionId));
+            collection.setFollowed(isExistFollowedCollection(memberId, collectionId));
+            collection.getMember().setFollowed(isExistFollowedMember(memberId, collection.getMember().getMemberId()));
+        }
+        return collection;
+    }
+
     private void isExistPost(Long postId) {
         if (!postQueryRepository.isExist(postId)) {
             throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         }
+    }
+
+    private ReadCollectionDto getOneByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
+        return collectionQueryRepository.findByIdForRead(collectionId, blockedMemberIds)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     @Override
@@ -156,10 +212,34 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         }
     }
 
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
+    }
+
     private boolean isExistFollowedMember(Long memberId, Long followedMemberId) {
         if (memberId != null) {
             return memberQueryRepository.isExistFollowedMember(memberId, followedMemberId);
         } else{
+            return false;
+        }
+    }
+
+    private boolean isExistLikedCollection(Long memberId, Long collectionId) {
+        return collectionQueryRepository.isExistLikedCollection(memberId, collectionId);
+    }
+
+    private boolean isExistFollowedCollection(Long memberId, Long collectionId) {
+        return collectionQueryRepository.isExistFollowedCollection(memberId, collectionId);
+    }
+
+    private boolean isCurrentMemberAdmin(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.isAdmin();
+        } else {
             return false;
         }
     }
@@ -170,7 +250,30 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         }
     }
 
-    private boolean isCurrentMemberAdminAtMyPage(MemberDetails currentMember, Long targetMemberId) {
+    private boolean hasAdminOfContent(MemberDetails currentMember, Long targetMemberId) {
         return currentMember.isAdmin() || currentMember.getId().equals(targetMemberId);
+    }
+
+    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus,
+                                   boolean isBlocked) {
+        if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
+            if (memberId != null) {
+                if (isBlocked) {
+                    throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+                }
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
+            if (memberId == null) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            } else if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
+            if (memberId == null) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            } else if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        }
     }
 }

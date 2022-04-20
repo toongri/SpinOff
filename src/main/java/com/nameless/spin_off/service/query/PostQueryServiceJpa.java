@@ -107,14 +107,12 @@ public class PostQueryServiceJpa implements PostQueryService{
     }
 
     @Override
-    public RelatedPostFirstDto<ReadPostDto> getPostForRead(MemberDetails currentMember, Long postId, Pageable pageable) {
+    public ReadPostDto getPostForRead(MemberDetails currentMember, Long postId) {
 
         Long memberId = getCurrentMemberId(currentMember);
         List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        ReadPostDto post = getReadPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
 
-        return new RelatedPostFirstDto<>(
-                post, postQueryRepository.findAllRelatedPostByPostId(pageable, blockedMemberIds, postId));
+        return getReadPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
     }
 
     @Override
@@ -156,11 +154,9 @@ public class PostQueryServiceJpa implements PostQueryService{
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
 
         if (memberId != null) {
-            Long postMemberId = post.getMember().getMemberId();
-            isExistBlockedMember(memberId, postMemberId);
-            post.setHasAuth(memberId, isAdmin);
-            post.setIsLiked(isExistLikedPost(memberId, postId));
-            post.getMember().setIsFollowed(isExistFollowedMember(memberId, postMemberId));
+            post.setAuth(memberId, isAdmin);
+            post.setLiked(isExistLikedPost(memberId, postId));
+            post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
         }
         return post;
     }
@@ -233,7 +229,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!postQueryRepository.isFollowMembersPost(memberId, postId)) {
+            } else if (!postQueryRepository.isFollowMembersOrOwnerPost(memberId, postId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){

@@ -2,21 +2,26 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.MainPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchAllCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.SearchCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
@@ -51,6 +56,9 @@ public class CollectionQueryServiceJpaTest {
     @Autowired CollectionService collectionService;
     @Autowired CollectionQueryService collectionQueryService;
     @Autowired MemberService memberService;
+    @Autowired MovieRepository movieRepository;
+    @Autowired HashtagRepository hashtagRepository;
+    @Autowired CommentInCollectionService commentInCollectionService;
 
     @Test
     public void 전체검색_컬렉션_테스트_멤버_단일_팔로우() throws Exception{
@@ -997,5 +1005,270 @@ public class CollectionQueryServiceJpaTest {
                         .build(), member2.getId(),
                 PageRequest.of(0, 6, Sort.by("id").descending())))
                 .isInstanceOf(DontHaveAuthorityException.class);
+    }
+    
+    @Test
+    public void 컬렉션_조회() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail",
+                GenreOfMovieStatus.A, null, null, null);
+
+        movieRepository.save(movie);
+
+        List<String> urls = List.of("a", "b", "c", "d", "e");
+
+        List<Hashtag> hashtagList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            hashtagList.add(Hashtag.createHashtag(i+""));
+        }
+        hashtagRepository.saveAll(hashtagList);
+
+        Post post = Post.buildPost()
+                .setMember(member)
+                .setMovie(movie)
+                .setTitle("postTitle")
+                .setContent("postContent")
+                .setPostPublicStatus(PublicOfPostStatus.A)
+                .setUrls(urls)
+                .setThumbnailUrl(urls.get(0))
+                .setHashTags(hashtagList)
+                .build();
+        postRepository.save(post);
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8))).build());
+
+        postList.add(Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8), hashtagList.get(9))).build());
+        postRepository.saveAll(postList);
+
+        List<Collection> collectionList = new ArrayList<>();
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.B)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.C)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+
+        Long dfdd = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
+                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(3).getId(),
+                collectionList.get(0).getId());
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
+                .CreateCommentInCollectionVO(dfdd, "dfdd"), memberList.get(3).getId(),
+                collectionList.get(0).getId());
+        Long dfdd1 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
+                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(5).getId(),
+                collectionList.get(0).getId());
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
+                .CreateCommentInCollectionVO(dfdd1, "dfdd"), memberList.get(0).getId(),
+                collectionList.get(0).getId());
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
+                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(8).getId(),
+                collectionList.get(0).getId());
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(member.getId(), member2.getId());
+        memberService.insertBlockedMemberByMemberId(member2.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+
+        collectionService.insertLikedCollectionByMemberId(member.getId(), collectionList.get(0).getId());
+        collectionService.insertLikedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
+        collectionService.insertLikedCollectionByMemberId(member2.getId(), collectionList.get(0).getId());
+
+        collectionService.insertFollowedCollectionByMemberId(member2.getId(), collectionList.get(0).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(3).getId(), collectionList.get(0).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
+
+        for (Post post1 : postList) {
+            postService.insertCollectedPosts(member.getId(), post1.getId(),
+                    List.of(collectionList.get(0).getId(), collectionList.get(1).getId(), collectionList.get(2).getId()));
+        }
+
+        em.flush();
+        em.clear();
+        
+        //when
+        System.out.println("서비스함수");
+        ReadCollectionDto collectionForRead = collectionQueryService.getCollectionForRead(
+                MemberDetails.builder()
+                        .id(member2.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), collectionList.get(0).getId());
+        System.out.println("서비스함수끝");
+
+        Slice<CollectedPostDto> collectedPosts = collectionQueryService.getCollectedPostsSliced(
+                MemberDetails.builder()
+                        .id(member2.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), collectionList.get(0).getId(), PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<CollectedPostDto> collectedPosts2 = collectionQueryService.getCollectedPostsSliced(
+                null, collectionList.get(0).getId(), PageRequest.of(0, 6, Sort.by("id").descending()));
+
+        Slice<CollectedPostDto> collectedPosts3 = collectionQueryService.getCollectedPostsSliced(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(), collectionList.get(0).getId(), PageRequest.of(0, 10, Sort.by("id").descending()));
+
+        collectionQueryService.getCollectionForRead(MemberDetails.builder()
+                .id(member.getId())
+                .accountId(member.getAccountId())
+                .accountPw(member.getAccountPw())
+                .authorities(member.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), collectionList.get(3).getId());
+
+        ReadCollectionDto collectionForRead2 = collectionQueryService.getCollectionForRead(
+                null, collectionList.get(0).getId());
+
+        //then
+        assertThat(collectionForRead.getCommentSize()).isEqualTo(4L);
+        assertThat(collectionForRead.getLikedSize()).isEqualTo(2L);
+        assertThat(collectionForRead.getFollowedSize()).isEqualTo(2L);
+        assertThat(collectionForRead.getPostSize()).isEqualTo(9L);
+        assertThat(collectionForRead.getMember().isFollowed()).isTrue();
+        assertThat(collectionForRead.isFollowed()).isTrue();
+
+        assertThat(collectionForRead2.getCommentSize()).isEqualTo(5L);
+        assertThat(collectionForRead2.getLikedSize()).isEqualTo(3L);
+        assertThat(collectionForRead2.getFollowedSize()).isEqualTo(3L);
+        assertThat(collectionForRead2.getPostSize()).isEqualTo(10L);
+        assertThat(collectionForRead2.getMember().isFollowed()).isFalse();
+        assertThat(collectionForRead2.isFollowed()).isFalse();
+
+        assertThatThrownBy(() -> collectionQueryService.getCollectionForRead(MemberDetails.builder()
+                .id(member2.getId())
+                .accountId(member.getAccountId())
+                .accountPw(member.getAccountPw())
+                .authorities(member.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), collectionList.get(1).getId())).isInstanceOf(DontHaveAuthorityException.class);
+
+        List<CollectedPostDto> content = collectedPosts.getContent();
+        List<CollectedPostDto> content2 = collectedPosts2.getContent();
+        List<CollectedPostDto> content3 = collectedPosts3.getContent();
+
+        assertThat(content.stream().map(CollectedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(8).getId(), postList.get(7).getId(), postList.get(6).getId(),
+                        postList.get(5).getId(), postList.get(4).getId(), postList.get(3).getId());
+
+        assertThat(content2.stream().map(CollectedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(9).getId(), postList.get(8).getId(), postList.get(7).getId(),
+                        postList.get(6).getId(), postList.get(5).getId(), postList.get(4).getId());
+
+        assertThat(content3.stream().map(CollectedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(9).getId(), postList.get(8).getId(), postList.get(7).getId(),
+                        postList.get(6).getId(), postList.get(5).getId(), postList.get(4).getId(),
+                        postList.get(3).getId(), postList.get(2).getId(), postList.get(1).getId(),
+                        postList.get(0).getId());
+
+
     }
 }

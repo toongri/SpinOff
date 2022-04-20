@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.data.domain.Pageable;
@@ -24,5 +25,6 @@ public interface CollectionQueryService {
     Slice<MyPageCollectionDto> getCollectionsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable);
     List<PostInCollectionDto> getCollectionsByMemberIdAndPostId(Long memberId, Long postId);
     QuickPostInCollectionDto getCollectionNameByMemberIdAndPostId(Long memberId, Long postId);
-
+    ReadCollectionDto getCollectionForRead(MemberDetails currentMember, Long collectionId);
+    Slice<CollectedPostDto> getCollectedPostsSliced(MemberDetails currentMember, Long collectionId, Pageable pageable);
 }

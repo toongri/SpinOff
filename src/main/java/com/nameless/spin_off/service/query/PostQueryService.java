@@ -19,7 +19,9 @@ public interface PostQueryService {
             Pageable pageable, List<String> hashtagContent, Long memberId, int length);
     Slice<SearchPageAtHashtagPostDto> getPostsByHashtagsSlicedForSearchPage(Pageable pageable, List<String> hashtagContent, Long memberId);
 
-    RelatedPostFirstDto<ReadPostDto> getPostForRead(MemberDetails currentMember, Long postId, Pageable pageable);
+    ReadPostDto getPostForRead(MemberDetails currentMember, Long postId);
     Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable);
     Slice<MyPagePostDto> getPostsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable);
+
+
 }

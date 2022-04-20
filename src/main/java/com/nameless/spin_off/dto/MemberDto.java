@@ -165,7 +165,7 @@ public class MemberDto {
             this.accountId = accountId;
         }
 
-        public void setIsFollowed(boolean isFollowed) {
+        public void setFollowed(boolean isFollowed) {
             this.isFollowed = isFollowed;
         }
 

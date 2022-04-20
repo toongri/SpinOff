@@ -40,6 +40,29 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
+    public Optional<ReadCollectionDto> findByIdForRead(Long collectionId, List<Long> blockedMemberIds) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_ReadCollectionDto(
+                        collection.id, member.id, member.profileImg, member.nickname, member.accountId, collection.title,
+                        collection.createdDate, collection.lastModifiedDate, collection.content,
+                        collection.publicOfCollectionStatus, likedCollection.countDistinct(),
+                        commentInCollection.countDistinct(), followedCollection.countDistinct(),
+                        collectedPost.countDistinct()))
+                .from(collection)
+                .join(collection.member, member)
+                .leftJoin(collection.likedCollections, likedCollection)
+                .on(likedCollection.member.id.notIn(blockedMemberIds))
+                .leftJoin(collection.commentInCollections, commentInCollection)
+                .on(commentInCollection.member.id.notIn(blockedMemberIds))
+                .leftJoin(collection.followingMembers, followedCollection)
+                .on(followedCollection.member.id.notIn(blockedMemberIds))
+                .leftJoin(collection.collectedPosts, collectedPost)
+                .on(collectedPost.post.member.id.notIn(blockedMemberIds))
+                .groupBy(collection)
+                .where(collection.id.eq(collectionId))
+                .fetchFirst());
+    }
+
     public List<Long> findAllIdByPostId(Long postId) {
         return getQueryFactory()
                 .select(collectedPost.collection.id)
@@ -184,15 +207,16 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isFollowMembersCollection(Long memberId, Long collectionId) {
+    public Boolean isFollowMembersOrOwnerCollection(Long memberId, Long collectionId) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
                 .from(collection)
                 .join(collection.member, member)
-                .join(member.followingMembers, followedMember)
+                .leftJoin(member.followingMembers, followedMember)
                 .where(
                         collection.id.eq(collectionId).and(
-                                followedMember.followingMember.id.eq(memberId)))
+                                followedMember.followingMember.id.eq(memberId).or(
+                                        member.id.eq(memberId))))
                 .fetchFirst();
 
         return fetchOne != null;

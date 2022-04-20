@@ -109,7 +109,7 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!collectionQueryRepository.isFollowMembersCollection(memberId, collectionId)) {
+            } else if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){

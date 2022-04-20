@@ -42,6 +42,21 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
+    public Slice<CollectedPostDto> findAllCollectedPostByCollectionId(Pageable pageable, Long collectionId,
+                                                                      List<Long> blockedMemberIds, boolean isFollowing,
+                                                                      boolean isAdmin) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QPostDto_CollectedPostDto(
+                        post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
+                .from(post)
+                .join(post.member, member)
+                .join(post.collectedPosts, collectedPost)
+                .on(collectedPost.collection.id.eq(collectionId))
+                .where(
+                        post.publicOfPostStatus.in(getPrivacyBound(isFollowing, isAdmin)),
+                        memberNotIn(blockedMemberIds)));
+    }
+
     public Slice<MyPagePostDto> findAllByMemberIdSliced(Long memberId, Pageable pageable,
                                                         boolean isFollowing, boolean isAdmin) {
         return applySlicing(pageable, contentQuery -> contentQuery
@@ -99,15 +114,16 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isFollowMembersPost(Long memberId, Long postId) {
+    public Boolean isFollowMembersOrOwnerPost(Long memberId, Long postId) {
         Integer fetchOne = getQueryFactory()
                 .selectOne()
                 .from(post)
                 .join(post.member, member)
-                .join(member.followingMembers, followedMember)
+                .leftJoin(member.followingMembers, followedMember)
                 .where(
                         post.id.eq(postId).and(
-                                followedMember.followingMember.id.eq(memberId)))
+                                followedMember.followingMember.id.eq(memberId).or(
+                                        member.id.eq(memberId))))
                 .fetchFirst();
 
         return fetchOne != null;
