@@ -41,7 +41,20 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
-    public List<MembersByContentDto> findAllLikedMemberByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
+    public List<MembersByContentDto> findAllFollowMemberByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(followedCollection)
+                .join(followedCollection.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        followedCollection.collection.id.eq(collectionId))
+                .orderBy(followedCollection.id.desc())
+                .fetch();
+    }
+
+    public List<MembersByContentDto> findAllLikeMemberByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MembersByContentDto(
                         member.id, member.profileImg, member.nickname, member.accountId))

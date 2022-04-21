@@ -181,7 +181,20 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         hasAuthCollection(memberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
                 blockedIds.contains(publicAndMemberIdByCollectionId.getId()));
 
-        List<MembersByContentDto> members = getAllLikedMemberByCollectionId(collectionId, blockedIds);
+        return getMembersByContentDtos(getLikeMembersByCollectionId(collectionId, blockedIds), memberId);
+    }
+
+    @Override
+    public List<MembersByContentDto> getFollowCollectionMembers(Long memberId, Long collectionId) {
+        List<Long> blockedIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        IdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
+        hasAuthCollection(memberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
+                blockedIds.contains(publicAndMemberIdByCollectionId.getId()));
+
+        return getMembersByContentDtos(getFollowMembersByCollectionId(collectionId, blockedIds), memberId);
+    }
+
+    private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
         List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
         members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
         return members.stream()
@@ -199,8 +212,12 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         }
     }
 
-    private List<MembersByContentDto> getAllLikedMemberByCollectionId(Long collectionId, List<Long> blockedIds) {
-        return collectionQueryRepository.findAllLikedMemberByCollectionId(collectionId, blockedIds);
+    private List<MembersByContentDto> getFollowMembersByCollectionId(Long collectionId, List<Long> blockedIds) {
+        return collectionQueryRepository.findAllFollowMemberByCollectionId(collectionId, blockedIds);
+    }
+
+    private List<MembersByContentDto> getLikeMembersByCollectionId(Long collectionId, List<Long> blockedIds) {
+        return collectionQueryRepository.findAllLikeMemberByCollectionId(collectionId, blockedIds);
     }
 
     private IdAndPublicCollectionDto getPublicAndMemberIdByCollectionId(Long collectionId) {

@@ -208,6 +208,30 @@ public class CollectionApiController {
         return getResult(collectionService.insertFollowedCollectionByMemberId(currentMember.getId(), collectionId));
     }
 
+    @ApiOperation(value = "컬렉션 팔로우 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{collectionId}/follow")
+    public SingleApiResult<List<MembersByContentDto>> readFollowAll(@LoginMember MemberDetails currentMember,
+                                                                  @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyLikedCollectionException,
+            NotExistCollectionException {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readLikeAll");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", currentMemberId);
+
+        return getResult(collectionQueryService.getFollowCollectionMembers(currentMemberId, collectionId));
+    }
+
     @ApiOperation(value = "컬렉션 댓글 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(

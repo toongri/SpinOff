@@ -29,4 +29,5 @@ public interface CollectionQueryService {
     ReadCollectionDto getCollectionForRead(MemberDetails currentMember, Long collectionId);
     Slice<CollectedPostDto> getCollectedPostsSliced(MemberDetails currentMember, Long collectionId, Pageable pageable);
     List<MembersByContentDto> getLikeCollectionMembers(Long memberId, Long collectionId);
+    List<MembersByContentDto> getFollowCollectionMembers(Long memberId, Long collectionId);
 }
