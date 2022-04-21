@@ -1,6 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
@@ -38,6 +39,19 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public CollectionQueryRepository() {
         super(Collection.class);
+    }
+
+    public List<MembersByContentDto> findAllLikedMemberByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(likedCollection)
+                .join(likedCollection.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        likedCollection.collection.id.eq(collectionId))
+                .orderBy(likedCollection.id.desc())
+                .fetch();
     }
 
     public Optional<ReadCollectionDto> findByIdForRead(Long collectionId, List<Long> blockedMemberIds) {

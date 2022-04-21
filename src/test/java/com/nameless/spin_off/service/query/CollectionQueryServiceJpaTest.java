@@ -4,6 +4,7 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
@@ -1269,6 +1270,85 @@ public class CollectionQueryServiceJpaTest {
                         postList.get(3).getId(), postList.get(2).getId(), postList.get(1).getId(),
                         postList.get(0).getId());
 
+
+    }
+
+    @Test
+    public void 컬렉션_좋아요_멤버출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        List<Collection> collectionList = new ArrayList<>();
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.B)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.C)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member2.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        collectionService.insertLikedCollectionByMemberId(member.getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(member2.getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(memberList.get(3).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(memberList.get(7).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(memberList.get(9).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertLikedCollectionByMemberId(memberList.get(4).getId(), collectionList.get(0).getId());
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members =
+                collectionQueryService.getLikeCollectionMembers(member2.getId(), collectionList.get(0).getId());
+        System.out.println("서비스함수끝");
+
+        //then
+        assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member2.getId(), member.getId(), memberList.get(4).getId(), memberList.get(9).getId(),
+                        memberList.get(7).getId(), memberList.get(3).getId());
+
+        assertThat(members.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false, false, false, false);
+
+        assertThat(members.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, true, false, false, false, false);
 
     }
 }

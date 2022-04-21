@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -27,4 +28,5 @@ public interface CollectionQueryService {
     QuickPostInCollectionDto getCollectionNameByMemberIdAndPostId(Long memberId, Long postId);
     ReadCollectionDto getCollectionForRead(MemberDetails currentMember, Long collectionId);
     Slice<CollectedPostDto> getCollectedPostsSliced(MemberDetails currentMember, Long collectionId, Pageable pageable);
+    List<MembersByContentDto> getLikeCollectionMembers(Long memberId, Long collectionId);
 }

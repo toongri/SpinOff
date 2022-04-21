@@ -179,7 +179,7 @@ public class PostApiController {
                     example = "123",
                     allowMultiple = true)
     })
-    @PatchMapping("/{postId}/collection/all")
+    @PutMapping("/{postId}/collection/all")
     public SingleApiResult<List<Long>> updatePostInCollections(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
             throws NotExistMemberException,
@@ -233,28 +233,6 @@ public class PostApiController {
                     paramType = "path",
                     dataType = "Long",
                     example = "123"),
-            @ApiImplicitParam(
-                    name = "page",
-                    value = "페이지 번호",
-                    required = true,
-                    paramType = "query",
-                    dataType = "int",
-                    example = "123"),
-            @ApiImplicitParam(
-                    name = "size",
-                    value = "페이지 크기",
-                    required = true,
-                    paramType = "query",
-                    dataType = "int",
-                    example = "123",
-                    allowableValues = "range[0, 100]"),
-            @ApiImplicitParam(
-                    name = "sort",
-                    value = "페이지 정렬",
-                    required = false,
-                    paramType = "query",
-                    dataType = "string",
-                    example = "popularity,desc"),
             @ApiImplicitParam(
                     name = "ip",
                     value = "ip주소",

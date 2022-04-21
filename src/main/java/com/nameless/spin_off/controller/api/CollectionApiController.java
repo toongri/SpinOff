@@ -5,8 +5,11 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.ReadCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
+import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
@@ -24,6 +27,10 @@ import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -66,6 +73,73 @@ public class CollectionApiController {
         return getResult(collectionService.insertCollectionByCollectionVO(collectionVO, currentMember.getId()));
     }
 
+    @ApiOperation(value = "컬렉션 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{collectionId}")
+    public SingleApiResult<ReadCollectionDto> readOne(
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId) {
+
+        log.info("readOne");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+        return getResult(collectionQueryService.getCollectionForRead(currentMember, collectionId));
+    }
+
+    @ApiOperation(value = "컬렉션 글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "page",
+                    value = "페이지 번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "페이지 크기",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
+                    example = "123",
+                    allowableValues = "range[0, 100]"),
+            @ApiImplicitParam(
+                    name = "sort",
+                    value = "페이지 정렬",
+                    required = false,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "popularity,desc")
+    })
+    @GetMapping("/{collectionId}/post")
+    public SingleApiResult<Slice<CollectedPostDto>> readCollectedPostAll(
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId,
+            @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
+
+        log.info("readCollectedPostAll");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+        log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
+        log.info("pageable.getPageSize() : {}", pageable.getPageSize());
+        log.info("pageable.getSort() : {}", pageable.getSort());
+
+        return getResult(collectionQueryService.getCollectedPostsSliced(currentMember, collectionId, pageable));
+    }
+
     @ApiOperation(value = "컬렉션 좋아요 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -86,6 +160,30 @@ public class CollectionApiController {
         log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionService.insertLikedCollectionByMemberId(currentMember.getId(), collectionId));
+    }
+
+    @ApiOperation(value = "컬렉션 좋아요 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{collectionId}/like")
+    public SingleApiResult<List<MembersByContentDto>> readLikeAll(@LoginMember MemberDetails currentMember,
+                                                                  @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyLikedCollectionException,
+            NotExistCollectionException {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readLikeAll");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", currentMemberId);
+
+        return getResult(collectionQueryService.getLikeCollectionMembers(currentMemberId, collectionId));
     }
 
     @ApiOperation(value = "컬렉션 팔로우 생성", notes = "")

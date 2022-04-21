@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -111,6 +113,30 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     }
 
     @Override
+    public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(Pageable pageable, Long memberId)
+            throws NotExistMemberException {
+
+        return collectionQueryRepository.findAllSlicedForMainPage(pageable,
+                memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
+    }
+
+    @Override
+    public Slice<MainPageCollectionDto> getCollectionsByFollowedMemberSlicedForMainPage(
+            Pageable pageable, Long memberId) throws NotExistMemberException {
+
+        return collectionQueryRepository
+                .findAllByFollowedMemberSlicedForMainPage(pageable, memberId);
+    }
+
+    @Override
+    public Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsSlicedForMainPage(
+            Pageable pageable, Long memberId) throws NotExistMemberException {
+
+        return collectionQueryRepository
+                .findAllByFollowedCollectionsSlicedForMainPage(pageable, memberId);
+    }
+
+    @Override
     public QuickPostInCollectionDto getCollectionNameByMemberIdAndPostId(Long memberId, Long postId) {
         isExistPost(postId);
 
@@ -148,6 +174,35 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         }
     }
 
+    @Override
+    public List<MembersByContentDto> getLikeCollectionMembers(Long memberId, Long collectionId) {
+        List<Long> blockedIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        IdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
+        hasAuthCollection(memberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
+                blockedIds.contains(publicAndMemberIdByCollectionId.getId()));
+
+        List<MembersByContentDto> members = getAllLikedMemberByCollectionId(collectionId, blockedIds);
+        List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
+        members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
+        return members.stream()
+                .sorted(
+                        Comparator.comparing(MembersByContentDto::isOwn)
+                                .thenComparing(MembersByContentDto::isFollowed).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getAllIdByFollowingMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByFollowingMemberId(memberId);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<MembersByContentDto> getAllLikedMemberByCollectionId(Long collectionId, List<Long> blockedIds) {
+        return collectionQueryRepository.findAllLikedMemberByCollectionId(collectionId, blockedIds);
+    }
+
     private IdAndPublicCollectionDto getPublicAndMemberIdByCollectionId(Long collectionId) {
         return collectionQueryRepository.findCollectionOwnerIdAndPublic(collectionId)
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
@@ -178,30 +233,6 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     private ReadCollectionDto getOneByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
         return collectionQueryRepository.findByIdForRead(collectionId, blockedMemberIds)
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
-    }
-
-    @Override
-    public Slice<MainPageCollectionDto> getCollectionsSlicedForMainPage(Pageable pageable, Long memberId)
-            throws NotExistMemberException {
-
-        return collectionQueryRepository.findAllSlicedForMainPage(pageable,
-                memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId));
-    }
-
-    @Override
-    public Slice<MainPageCollectionDto> getCollectionsByFollowedMemberSlicedForMainPage(
-            Pageable pageable, Long memberId) throws NotExistMemberException {
-
-        return collectionQueryRepository
-                .findAllByFollowedMemberSlicedForMainPage(pageable, memberId);
-    }
-
-    @Override
-    public Slice<MainPageCollectionDto> getCollectionsByFollowedCollectionsSlicedForMainPage(
-            Pageable pageable, Long memberId) throws NotExistMemberException {
-
-        return collectionQueryRepository
-                .findAllByFollowedCollectionsSlicedForMainPage(pageable, memberId);
     }
 
     private List<Long> getBlockingAllAndBlockedAllByIdAndBlockStatusA(Long memberId) {

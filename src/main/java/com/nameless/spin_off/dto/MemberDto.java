@@ -131,6 +131,54 @@ public class MemberDto {
 
     @Data
     @NoArgsConstructor
+    public static class MembersByContentDto {
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
+        private Long memberId;
+
+        @ApiModelProperty(
+                value = "멤버 프로필 이미지 주소",
+                example = "www.naver.com")
+        private String profile;
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "퉁그리")
+        private String nickname;
+
+        @ApiModelProperty(
+                value = "멤버 아이디",
+                example = "spinoff2322")
+        private String accountId;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        @ApiModelProperty(
+                value = "소유 여부",
+                example = "false")
+        private boolean isOwn;
+
+        @QueryProjection
+        public MembersByContentDto(Long memberId, String profile, String nickname, String accountId) {
+            this.memberId = memberId;
+            this.profile = profile;
+            this.nickname = nickname;
+            this.accountId = accountId;
+        }
+
+        public void setFollowedAndOwn(boolean isFollowed, Long memberId) {
+            this.isFollowed = isFollowed;
+            this.isOwn = this.memberId.equals(memberId);
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class ContentMemberDto {
 
         @ApiModelProperty(
@@ -168,15 +216,6 @@ public class MemberDto {
         public void setFollowed(boolean isFollowed) {
             this.isFollowed = isFollowed;
         }
-
-        public ContentMemberDto(Member member, boolean isFollowed) {
-            this.memberId = member.getId();
-            this.profile = member.getProfileImg();
-            this.nickname = member.getNickname();
-            this.accountId = member.getAccountId();
-            this.isFollowed = isFollowed;
-        }
-
     }
 
     @Data
