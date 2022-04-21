@@ -6,6 +6,7 @@ import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ReadPostDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
@@ -13,6 +14,7 @@ import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.entity.enums.EnumMapper;
 import com.nameless.spin_off.entity.enums.EnumMapperValue;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
+import com.nameless.spin_off.exception.collection.AlreadyLikedCollectionException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
@@ -115,6 +117,30 @@ public class PostApiController {
         log.info("postId : {}", postId);
 
         return getResult(postService.insertLikedPostByMemberId(currentMember.getId(), postId));
+    }
+
+    @ApiOperation(value = "컬렉션 좋아요 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/like")
+    public SingleApiResult<List<MembersByContentDto>> readLikeAll(@LoginMember MemberDetails currentMember,
+                                                                  @PathVariable Long postId)
+            throws NotExistMemberException, AlreadyLikedCollectionException,
+            NotExistCollectionException {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readLikeAll");
+        log.info("postId : {}", postId);
+        log.info("memberId : {}", currentMemberId);
+
+        return getResult(collectionQueryService.getLikeCollectionMembers(currentMemberId, postId));
     }
 
     @ApiOperation(value = "글 컬렉션 리스트 조회", notes = "")

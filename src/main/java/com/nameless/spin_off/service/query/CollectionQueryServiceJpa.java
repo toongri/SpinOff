@@ -149,8 +149,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     @Override
     public ReadCollectionDto getCollectionForRead(MemberDetails currentMember, Long collectionId) {
         Long memberId = getCurrentMemberId(currentMember);
-        return getReadCollectionDto(collectionId, memberId, getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId),
-                isCurrentMemberAdmin(currentMember));
+        return getReadCollectionDto(collectionId, memberId, isCurrentMemberAdmin(currentMember));
     }
 
     @Override
@@ -225,9 +224,8 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
-    private ReadCollectionDto getReadCollectionDto(Long collectionId, Long memberId,
-                                               List<Long> blockedMemberIds, boolean isAdmin) {
-
+    private ReadCollectionDto getReadCollectionDto(Long collectionId, Long memberId, boolean isAdmin) {
+        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         ReadCollectionDto collection = getOneByCollectionId(collectionId, blockedMemberIds);
         hasAuthCollection(memberId, collectionId, collection.getPublicOfCollectionStatus(),
                 blockedMemberIds.contains(collection.getMember().getMemberId()));

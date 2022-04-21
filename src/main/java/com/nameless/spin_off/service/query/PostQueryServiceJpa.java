@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
@@ -24,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,7 +62,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         return postQueryRepository
                 .findAllByFollowedHashtagsSlicedForMainPage(pageable,
-                        getFollowedMovieByMemberId(memberId), getFollowedMemberByMemberId(memberId),
+                        getFollowedMovieByMemberId(memberId), getAllIdByFollowingMemberId(memberId),
                         getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
@@ -71,7 +73,7 @@ public class PostQueryServiceJpa implements PostQueryService{
 
         return postQueryRepository
                 .findAllByFollowedMoviesSlicedForMainPage(pageable,
-                        getFollowedMemberByMemberId(memberId), getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
+                        getAllIdByFollowingMemberId(memberId), getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
 
     @Override
@@ -110,9 +112,8 @@ public class PostQueryServiceJpa implements PostQueryService{
     public ReadPostDto getPostForRead(MemberDetails currentMember, Long postId) {
 
         Long memberId = getCurrentMemberId(currentMember);
-        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
-        return getReadPostDto(postId, memberId, blockedMemberIds, isCurrentMemberAdmin(currentMember));
+        return getReadPostDto(postId, memberId, isCurrentMemberAdmin(currentMember));
     }
 
     @Override
@@ -140,17 +141,40 @@ public class PostQueryServiceJpa implements PostQueryService{
         }
     }
 
+    @Override
+    public List<MembersByContentDto> getLikePostMembers(Long memberId, Long postId) {
+        List<Long> blockedIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        IdAndPublicPostDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByPostId(postId);
+        hasAuthPost(memberId, postId, publicAndMemberIdByCollectionId.getPublicOfPostStatus(),
+                blockedIds.contains(publicAndMemberIdByCollectionId.getPostId()));
+
+        return getMembersByContentDtos(getLikeMembersByPostId(postId, blockedIds), memberId);
+    }
+
+    private List<MembersByContentDto> getLikeMembersByPostId(Long postId, List<Long> blockedIds) {
+        return postQueryRepository.findAllLikeMemberByPostId(postId, blockedIds);
+    }
+
+    private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
+        List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
+        members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
+        return members.stream()
+                .sorted(
+                        Comparator.comparing(MembersByContentDto::isOwn)
+                                .thenComparing(MembersByContentDto::isFollowed).reversed())
+                .collect(Collectors.toList());
+    }
+
     private ReadPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
         return postQueryRepository.findByIdForRead(postId, blockedMemberIds)
                 .orElseGet(() -> postQueryRepository.findByIdForRead(postId)
                         .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST)));
     }
 
-    private ReadPostDto getReadPostDto(Long postId, Long memberId,
-                                       List<Long> blockedMemberIds, boolean isAdmin) {
-
+    private ReadPostDto getReadPostDto(Long postId, Long memberId, boolean isAdmin) {
+        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         ReadPostDto post = getOneByPostId(postId, blockedMemberIds);
-        hasAuthPost(memberId, postId, post.getPublicOfPostStatus());
+        hasAuthPost(memberId, postId, post.getPublicOfPostStatus(), blockedMemberIds.contains(post.getMember().getMemberId()));
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
 
         if (memberId != null) {
@@ -159,6 +183,11 @@ public class PostQueryServiceJpa implements PostQueryService{
             post.getMember().setFollowed(isExistFollowedMember(memberId, post.getMember().getMemberId()));
         }
         return post;
+    }
+
+    private IdAndPublicPostDto getPublicAndMemberIdByPostId(Long postId) {
+        return postQueryRepository.findOwnerIdAndPublicByPostId(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private boolean isCurrentMemberAdminAtMyPage(MemberDetails currentMember, Long targetMemberId) {
@@ -189,7 +218,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         }
     }
 
-    private List<Long> getFollowedMemberByMemberId(Long memberId) {
+    private List<Long> getAllIdByFollowingMemberId(Long memberId) {
         if (memberId != null) {
             return memberRepository.findAllIdByFollowingMemberId(memberId);
         } else{
@@ -219,10 +248,10 @@ public class PostQueryServiceJpa implements PostQueryService{
         return postQueryRepository.isExistLikedPost(memberId, postId);
     }
 
-    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
+    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus, boolean isBlocked) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (memberId != null) {
-                if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+                if (isBlocked) {
                     throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
                 }
             }

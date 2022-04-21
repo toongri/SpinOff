@@ -70,15 +70,15 @@ public class CommentInPostServiceJpa implements CommentInPostService {
 
     private IdAndPublicPostDto getPublicAndIdPostByCommentId(Long commentId) {
         return postQueryRepository
-                .findPublicPostByCommentId(commentId)
+                .findPostOwnerIdAndPublicByCommentId(commentId)
                 .orElseThrow(() -> new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST));
     }
 
     private void isBlockMembersComment(Long memberId, Long commentId) {
-        if (commentId == null) {
-
-        } else if (commentInPostQueryRepository.isBlockMembersComment(memberId, commentId)) {
-            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        if (commentId != null) {
+            if (commentInPostQueryRepository.isBlockMembersComment(memberId, commentId)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
         }
     }
 

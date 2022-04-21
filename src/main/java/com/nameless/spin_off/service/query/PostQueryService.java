@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -22,6 +23,6 @@ public interface PostQueryService {
     ReadPostDto getPostForRead(MemberDetails currentMember, Long postId);
     Slice<RelatedPostDto> getRelatedPostsSliced(Long memberId, Long postId, Pageable pageable);
     Slice<MyPagePostDto> getPostsByMemberIdSliced(MemberDetails currentMember, Long targetMemberId, Pageable pageable);
-
+    List<MembersByContentDto> getLikePostMembers(Long memberId, Long postId);
 
 }

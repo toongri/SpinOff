@@ -1,5 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.enums.ContentsLengthEnum;
@@ -40,6 +41,20 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
 
     public PostQueryRepository() {
         super(Post.class);
+    }
+
+
+    public List<MembersByContentDto> findAllLikeMemberByPostId(Long postId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(likedPost)
+                .join(likedPost.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        likedPost.post.id.eq(postId))
+                .orderBy(likedPost.id.desc())
+                .fetch();
     }
 
     public Slice<CollectedPostDto> findAllCollectedPostByCollectionId(Pageable pageable, Long collectionId,
@@ -84,7 +99,16 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<IdAndPublicPostDto> findPublicPostByCommentId(Long commentId) {
+    public Optional<IdAndPublicPostDto> findOwnerIdAndPublicByPostId(Long postId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QPostDto_IdAndPublicPostDto(
+                        post.id, post.publicOfPostStatus))
+                .from(post)
+                .where(post.id.eq(postId))
+                .fetchFirst());
+    }
+
+    public Optional<IdAndPublicPostDto> findPostOwnerIdAndPublicByCommentId(Long commentId) {
         return Optional.ofNullable(getQueryFactory()
                 .select(new QPostDto_IdAndPublicPostDto(
                         post.id, post.publicOfPostStatus))
