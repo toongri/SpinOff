@@ -142,9 +142,19 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<IdAndPublicCollectionDto> findPublicAndIdByCommentId(Long commentId) {
+    public Optional<CollectionIdAndOwnerIdAndPublicCollectionDto> findPublicAndOwnerIdAndIdByCommentId(Long commentId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QCollectionDto_IdAndPublicCollectionDto(
+                .select(new QCollectionDto_CollectionIdAndOwnerIdAndPublicCollectionDto(
+                        collection.id, collection.member.id, collection.publicOfCollectionStatus))
+                .from(commentInCollection)
+                .join(commentInCollection.collection, collection)
+                .where(commentInCollection.id.eq(commentId))
+                .fetchFirst());
+    }
+
+    public Optional<CollectionIdAndPublicCollectionDto> findPublicAndIdByCommentId(Long commentId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QCollectionDto_CollectionIdAndPublicCollectionDto(
                         collection.id, collection.publicOfCollectionStatus))
                 .from(commentInCollection)
                 .join(commentInCollection.collection, collection)
@@ -152,9 +162,9 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<IdAndPublicCollectionDto> findCollectionOwnerIdAndPublic(Long collectionId) {
+    public Optional<OwnerIdAndPublicCollectionDto> findCollectionOwnerIdAndPublic(Long collectionId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QCollectionDto_IdAndPublicCollectionDto(
+                .select(new QCollectionDto_OwnerIdAndPublicCollectionDto(
                         collection.member.id, collection.publicOfCollectionStatus))
                 .from(collection)
                 .where(

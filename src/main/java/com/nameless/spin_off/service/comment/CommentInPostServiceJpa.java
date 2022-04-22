@@ -1,7 +1,7 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
-import com.nameless.spin_off.dto.PostDto.IdAndPublicPostDto;
+import com.nameless.spin_off.dto.PostDto.PostIdAndPublicPostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.comment.LikedCommentInPost;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
@@ -52,7 +52,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
     public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        IdAndPublicPostDto idAndPublic = getPublicAndIdPostByCommentId(commentId);
+        PostIdAndPublicPostDto idAndPublic = getPublicAndIdPostByCommentId(commentId);
         hasAuthPost(memberId, idAndPublic.getPostId(), idAndPublic.getPublicOfPostStatus());
         isBlockMembersComment(memberId, commentId);
         isExistLikedCommentInPost(memberId, commentId);
@@ -68,9 +68,9 @@ public class CommentInPostServiceJpa implements CommentInPostService {
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
-    private IdAndPublicPostDto getPublicAndIdPostByCommentId(Long commentId) {
+    private PostIdAndPublicPostDto getPublicAndIdPostByCommentId(Long commentId) {
         return postQueryRepository
-                .findPostOwnerIdAndPublicByCommentId(commentId)
+                .findPostIdAndPublicByCommentId(commentId)
                 .orElseThrow(() -> new NotExistCommentInPostException(ErrorEnum.NOT_EXIST_COMMENT_IN_POST));
     }
 

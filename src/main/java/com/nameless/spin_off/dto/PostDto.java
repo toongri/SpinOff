@@ -201,7 +201,22 @@ public class PostDto {
     }
 
     @Data
-    public static class IdAndPublicPostDto {
+    public static class PostIdAndOwnerIdAndPublicPostDto {
+        private Long postId;
+        private Long postOwnerId;
+        private PublicOfPostStatus publicOfPostStatus;
+
+        @QueryProjection
+        public PostIdAndOwnerIdAndPublicPostDto(Long postId, Long postOwnerId,
+                                                            PublicOfPostStatus publicOfPostStatus) {
+            this.postId = postId;
+            this.postOwnerId = postOwnerId;
+            this.publicOfPostStatus = publicOfPostStatus;
+        }
+    }
+
+    @Data
+    public static class PostIdAndPublicPostDto {
 
         @ApiModelProperty(
                 value = "글 id",
@@ -214,8 +229,28 @@ public class PostDto {
         private PublicOfPostStatus publicOfPostStatus;
 
         @QueryProjection
-        public IdAndPublicPostDto(Long postId, PublicOfPostStatus publicOfPostStatus) {
+        public PostIdAndPublicPostDto(Long postId, PublicOfPostStatus publicOfPostStatus) {
             this.postId = postId;
+            this.publicOfPostStatus = publicOfPostStatus;
+        }
+    }
+
+    @Data
+    public static class PostOwnerIdAndPublicPostDto {
+
+        @ApiModelProperty(
+                value = "글 멤버 id",
+                example = "123")
+        private Long postOwnerId;
+
+        @ApiModelProperty(
+                value = "글 공개범위",
+                example = "A")
+        private PublicOfPostStatus publicOfPostStatus;
+
+        @QueryProjection
+        public PostOwnerIdAndPublicPostDto(Long postOwnerId, PublicOfPostStatus publicOfPostStatus) {
+            this.postOwnerId = postOwnerId;
             this.publicOfPostStatus = publicOfPostStatus;
         }
     }

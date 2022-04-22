@@ -1,11 +1,14 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.QCommentDto_ContentCommentDto;
+import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,6 +23,19 @@ import static com.nameless.spin_off.entity.member.QMember.member;
 public class CommentInCollectionQueryRepository extends Querydsl4RepositorySupport {
     public CommentInCollectionQueryRepository() {
         super(CommentInCollection.class);
+    }
+
+    public List<MembersByContentDto> findAllLikeMemberByCommentId(Long commentId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(likedCommentInCollection)
+                .join(likedCommentInCollection.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        likedCommentInCollection.commentInCollection.id.eq(commentId))
+                .orderBy(likedCommentInCollection.id.desc())
+                .fetch();
     }
 
     public List<Long> findAllLikedCommentIdByMemberId(Long memberId) {
@@ -107,5 +123,9 @@ public class CommentInCollectionQueryRepository extends Querydsl4RepositorySuppo
                 .fetchFirst();
 
         return fetchOne != null;
+    }
+
+    private BooleanExpression memberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
 }

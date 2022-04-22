@@ -1,7 +1,10 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.CollectionIdAndOwnerIdAndPublicCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -15,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -36,8 +40,9 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
 
         Long memberId = getCurrentMemberId(currentMember);
         boolean hasAuth = isAdmin(currentMember);
-        hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        OwnerIdAndPublicCollectionDto publicAndId = getPublicAndMemberIdByCollectionId(collectionId);
+        hasAuthCollection(memberId, collectionId, publicAndId.getPublicOfCollectionStatus(), publicAndId.getCollectionOwnerId());
         likedCommentIds = getAllLikedCommentIdByMemberId(memberId);
 
         List<ContentCommentDto> comments = commentInCollectionQueryRepository
@@ -59,6 +64,39 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         parents.forEach(c -> c.setChildren(children.get(c.getCommentId())));
 
         return parents;
+    }
+
+    @Override
+    public List<MembersByContentDto> getLikeCommentMembers(Long memberId, Long commentId) {
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        CollectionIdAndOwnerIdAndPublicCollectionDto collectionInfo =
+                getCollectionIdAndOwnerIdAndPublicCollectionDto(commentId);
+        hasAuthCollection(memberId, collectionInfo.getCollectionId(), collectionInfo.getPublicOfCollectionStatus(),
+                collectionInfo.getCollectionOwnerId());
+
+        return getMembersByContentDtos(getLikeMembersByCommentId(commentId), memberId);
+    }
+
+    private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
+        List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
+        members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
+        return members.stream()
+                .sorted(
+                        Comparator.comparing(MembersByContentDto::isOwn)
+                                .thenComparing(MembersByContentDto::isFollowed).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private List<MembersByContentDto> getLikeMembersByCommentId(Long commentId) {
+        return commentInCollectionQueryRepository.findAllLikeMemberByCommentId(commentId, blockedMemberIds);
+    }
+
+    private List<Long> getAllIdByFollowingMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByFollowingMemberId(memberId);
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private List<Long> getAllLikedCommentIdByMemberId(Long memberId) {
@@ -94,15 +132,21 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         return false;
     }
 
-    private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
-        return collectionQueryRepository.findPublicByCollectionId(collectionId)
+    private CollectionIdAndOwnerIdAndPublicCollectionDto getCollectionIdAndOwnerIdAndPublicCollectionDto(Long commentId) {
+        return collectionQueryRepository.findPublicAndOwnerIdAndIdByCommentId(commentId)
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
-    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+    private OwnerIdAndPublicCollectionDto getPublicAndMemberIdByCollectionId(Long collectionId) {
+        return collectionQueryRepository.findCollectionOwnerIdAndPublic(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
+    }
+
+    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus,
+                                   Long collectionOwnerId) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (memberId != null) {
-                if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
+                if (blockedMemberIds.contains(collectionOwnerId)) {
                     throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
                 }
             }

@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.dto.CollectionDto.IdAndPublicCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.CollectionIdAndPublicCollectionDto;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
@@ -34,7 +34,7 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
     @Override
     public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
-        hasAuthPost(memberId, collectionId, getPublicOfCollection(collectionId));
+        hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistCommentInCollection(commentVO.getParentId(), collectionId);
         isBlockMembersComment(memberId, commentVO.getParentId());
 
@@ -51,8 +51,8 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
     public Long insertLikedCommentByMemberId(Long memberId, Long commentId)
             throws NotExistMemberException, NotExistCommentInCollectionException, AlreadyLikedCommentInCollectionException {
 
-        IdAndPublicCollectionDto publicAndId = getPublicAndIdCollectionByCommentId(commentId);
-        hasAuthPost(memberId, publicAndId.getId(), publicAndId.getPublicOfCollectionStatus());
+        CollectionIdAndPublicCollectionDto publicAndId = getPublicAndIdCollectionByCommentId(commentId);
+        hasAuthCollection(memberId, publicAndId.getCollectionId(), publicAndId.getPublicOfCollectionStatus());
         isBlockMembersComment(memberId, commentId);
         isExistLikedCommentInCollection(memberId, commentId);
 
@@ -83,13 +83,13 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
-    private IdAndPublicCollectionDto getPublicAndIdCollectionByCommentId(Long commentId) {
+    private CollectionIdAndPublicCollectionDto getPublicAndIdCollectionByCommentId(Long commentId) {
         return collectionQueryRepository
                 .findPublicAndIdByCommentId(commentId)
                 .orElseThrow(() -> new NotExistCommentInCollectionException(ErrorEnum.NOT_EXIST_COMMENT_IN_COLLECTION));
     }
 
-    private void hasAuthPost(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);

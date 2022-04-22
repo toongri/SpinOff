@@ -40,6 +40,7 @@ public class PostQueryServiceJpa implements PostQueryService{
     private final MovieRepository movieRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
+    private List<Long> blockedMemberIds;
 
     @Override
     public Slice<SearchPageAtAllPostDto> getPostsSlicedForSearchPagePostAtAll(
@@ -65,7 +66,6 @@ public class PostQueryServiceJpa implements PostQueryService{
                         getFollowedMovieByMemberId(memberId), getAllIdByFollowingMemberId(memberId),
                         getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId), memberId);
     }
-
 
     @Override
     public Slice<MainPagePostDto> getPostsByFollowedMovieSlicedForMainPage(
@@ -143,16 +143,16 @@ public class PostQueryServiceJpa implements PostQueryService{
 
     @Override
     public List<MembersByContentDto> getLikePostMembers(Long memberId, Long postId) {
-        List<Long> blockedIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        IdAndPublicPostDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByPostId(postId);
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        PostOwnerIdAndPublicPostDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByPostId(postId);
         hasAuthPost(memberId, postId, publicAndMemberIdByCollectionId.getPublicOfPostStatus(),
-                blockedIds.contains(publicAndMemberIdByCollectionId.getPostId()));
+                publicAndMemberIdByCollectionId.getPostOwnerId());
 
-        return getMembersByContentDtos(getLikeMembersByPostId(postId, blockedIds), memberId);
+        return getMembersByContentDtos(getLikeMembersByPostId(postId), memberId);
     }
 
-    private List<MembersByContentDto> getLikeMembersByPostId(Long postId, List<Long> blockedIds) {
-        return postQueryRepository.findAllLikeMemberByPostId(postId, blockedIds);
+    private List<MembersByContentDto> getLikeMembersByPostId(Long postId) {
+        return postQueryRepository.findAllLikeMemberByPostId(postId, blockedMemberIds);
     }
 
     private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
@@ -165,16 +165,16 @@ public class PostQueryServiceJpa implements PostQueryService{
                 .collect(Collectors.toList());
     }
 
-    private ReadPostDto getOneByPostId(Long postId, List<Long> blockedMemberIds) {
+    private ReadPostDto getOneByPostId(Long postId) {
         return postQueryRepository.findByIdForRead(postId, blockedMemberIds)
                 .orElseGet(() -> postQueryRepository.findByIdForRead(postId)
                         .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST)));
     }
 
     private ReadPostDto getReadPostDto(Long postId, Long memberId, boolean isAdmin) {
-        List<Long> blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        ReadPostDto post = getOneByPostId(postId, blockedMemberIds);
-        hasAuthPost(memberId, postId, post.getPublicOfPostStatus(), blockedMemberIds.contains(post.getMember().getMemberId()));
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        ReadPostDto post = getOneByPostId(postId);
+        hasAuthPost(memberId, postId, post.getPublicOfPostStatus(), post.getMember().getMemberId());
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
 
         if (memberId != null) {
@@ -185,7 +185,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         return post;
     }
 
-    private IdAndPublicPostDto getPublicAndMemberIdByPostId(Long postId) {
+    private PostOwnerIdAndPublicPostDto getPublicAndMemberIdByPostId(Long postId) {
         return postQueryRepository.findOwnerIdAndPublicByPostId(postId)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
@@ -248,10 +248,10 @@ public class PostQueryServiceJpa implements PostQueryService{
         return postQueryRepository.isExistLikedPost(memberId, postId);
     }
 
-    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus, boolean isBlocked) {
+    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (memberId != null) {
-                if (isBlocked) {
+                if (blockedMemberIds.contains(postOwnerId)) {
                     throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
                 }
             }

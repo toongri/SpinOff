@@ -1233,14 +1233,12 @@ public class CollectionQueryServiceJpaTest {
         assertThat(collectionForRead.getFollowedSize()).isEqualTo(2L);
         assertThat(collectionForRead.getPostSize()).isEqualTo(9L);
         assertThat(collectionForRead.getMember().isFollowed()).isTrue();
-        assertThat(collectionForRead.isFollowed()).isTrue();
 
         assertThat(collectionForRead2.getCommentSize()).isEqualTo(5L);
         assertThat(collectionForRead2.getLikedSize()).isEqualTo(3L);
         assertThat(collectionForRead2.getFollowedSize()).isEqualTo(3L);
         assertThat(collectionForRead2.getPostSize()).isEqualTo(10L);
         assertThat(collectionForRead2.getMember().isFollowed()).isFalse();
-        assertThat(collectionForRead2.isFollowed()).isFalse();
 
         assertThatThrownBy(() -> collectionQueryService.getCollectionForRead(MemberDetails.builder()
                 .id(member2.getId())

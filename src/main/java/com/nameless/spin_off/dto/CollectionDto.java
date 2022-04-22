@@ -124,13 +124,40 @@ public class CollectionDto {
     }
 
     @Data
-    public static class IdAndPublicCollectionDto {
-        private Long id;
+    public static class OwnerIdAndPublicCollectionDto {
+        private Long collectionOwnerId;
         private PublicOfCollectionStatus publicOfCollectionStatus;
 
         @QueryProjection
-        public IdAndPublicCollectionDto(Long id, PublicOfCollectionStatus publicOfCollectionStatus) {
-            this.id = id;
+        public OwnerIdAndPublicCollectionDto(Long collectionOwnerId, PublicOfCollectionStatus publicOfCollectionStatus) {
+            this.collectionOwnerId = collectionOwnerId;
+            this.publicOfCollectionStatus = publicOfCollectionStatus;
+        }
+    }
+
+    @Data
+    public static class CollectionIdAndPublicCollectionDto {
+        private Long collectionId;
+        private PublicOfCollectionStatus publicOfCollectionStatus;
+
+        @QueryProjection
+        public CollectionIdAndPublicCollectionDto(Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+            this.collectionId = collectionId;
+            this.publicOfCollectionStatus = publicOfCollectionStatus;
+        }
+    }
+
+    @Data
+    public static class CollectionIdAndOwnerIdAndPublicCollectionDto {
+        private Long collectionId;
+        private Long collectionOwnerId;
+        private PublicOfCollectionStatus publicOfCollectionStatus;
+
+        @QueryProjection
+        public CollectionIdAndOwnerIdAndPublicCollectionDto(Long collectionId, Long collectionOwnerId,
+                                                            PublicOfCollectionStatus publicOfCollectionStatus) {
+            this.collectionId = collectionId;
+            this.collectionOwnerId = collectionOwnerId;
             this.publicOfCollectionStatus = publicOfCollectionStatus;
         }
     }
@@ -364,17 +391,8 @@ public class CollectionDto {
                 example = "false")
         private boolean isLiked;
 
-        @ApiModelProperty(
-                value = "팔로우 여부",
-                example = "false")
-        private boolean isFollowed;
-
         public void setLiked(boolean isLiked) {
             this.isLiked = isLiked;
-        }
-
-        public void setFollowed(boolean isFollowed) {
-            this.isFollowed = isFollowed;
         }
 
         public void setAuth(Long memberId, boolean isAdmin) {

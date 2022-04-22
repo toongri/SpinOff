@@ -1,7 +1,7 @@
 package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
-import com.nameless.spin_off.dto.CollectionDto.IdAndPublicCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.collection.LikedCollection;
@@ -133,11 +133,11 @@ public class CollectionServiceJpa implements CollectionService {
     }
 
     private PublicOfCollectionStatus isCorrectIdAndGetPublic(Long memberId, Long collectionId) {
-        IdAndPublicCollectionDto idAndPublic = collectionQueryRepository
+        OwnerIdAndPublicCollectionDto idAndPublic = collectionQueryRepository
                 .findCollectionOwnerIdAndPublic(collectionId)
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
 
-        if (idAndPublic.getId().equals(memberId)) {
+        if (idAndPublic.getCollectionOwnerId().equals(memberId)) {
             throw new CantFollowOwnCollectionException(ErrorEnum.CANT_FOLLOW_OWN_COLLECTION);
         } else {
             return idAndPublic.getPublicOfCollectionStatus();

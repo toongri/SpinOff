@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CommentDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
@@ -21,6 +22,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -136,5 +138,101 @@ class CommentInPostQueryServiceJpaTest {
         assertThat(comments2.get(4).isHasAuth()).isFalse();
         assertThat(comments2.get(4).getChildren().stream().map(CommentDto.ContentCommentDto::getCommentId)).containsExactly(
                 commentIds.get(7), commentIds.get(6), commentIds.get(5));
+    }
+
+    @Test
+    public void 글_댓글_좋아요_멤버출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        List<Long> commentIds = new ArrayList<>();
+
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+                null, "ddd"), member.getId(), postList.get(0).getId()));
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member2.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        commentInPostService.insertLikedCommentByMemberId(member.getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(5).getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(member2.getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(3).getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(7).getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(9).getId(), commentIds.get(0));
+        em.flush();
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(4).getId(), commentIds.get(0));
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members =
+                commentInPostQueryService.getLikeCommentMembers(member2.getId(), commentIds.get(0));
+        System.out.println("서비스함수끝");
+
+        //then
+        assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member2.getId(), member.getId(), memberList.get(4).getId(), memberList.get(9).getId(),
+                        memberList.get(7).getId(), memberList.get(3).getId());
+
+        assertThat(members.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false, false, false, false);
+
+        assertThat(members.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, true, false, false, false, false);
+
     }
 }

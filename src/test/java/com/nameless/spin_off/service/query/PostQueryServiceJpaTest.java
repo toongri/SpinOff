@@ -5,6 +5,7 @@ import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.PostDto.ReadPostDto;
@@ -1000,5 +1001,96 @@ public class PostQueryServiceJpaTest {
                         .build(), member2.getId(),
                 PageRequest.of(0, 6, Sort.by("id").descending())))
                 .isInstanceOf(DontHaveAuthorityException.class);
+    }
+
+    @Test
+    public void 포스트_좋아요_멤버출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member2.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        postService.insertLikedPostByMemberId(member.getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(memberList.get(5).getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(member2.getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(memberList.get(3).getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(memberList.get(7).getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(memberList.get(9).getId(), postList.get(0).getId());
+        em.flush();
+        postService.insertLikedPostByMemberId(memberList.get(4).getId(), postList.get(0).getId());
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members =
+                postQueryService.getLikePostMembers(member2.getId(), postList.get(0).getId());
+        System.out.println("서비스함수끝");
+
+        //then
+        assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member2.getId(), member.getId(), memberList.get(4).getId(), memberList.get(9).getId(),
+                        memberList.get(7).getId(), memberList.get(3).getId());
+
+        assertThat(members.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false, false, false, false);
+
+        assertThat(members.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, true, false, false, false, false);
+
     }
 }

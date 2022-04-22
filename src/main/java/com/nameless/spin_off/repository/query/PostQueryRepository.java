@@ -99,18 +99,18 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<IdAndPublicPostDto> findOwnerIdAndPublicByPostId(Long postId) {
+    public Optional<PostOwnerIdAndPublicPostDto> findOwnerIdAndPublicByPostId(Long postId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QPostDto_IdAndPublicPostDto(
-                        post.id, post.publicOfPostStatus))
+                .select(new QPostDto_PostOwnerIdAndPublicPostDto(
+                        post.member.id, post.publicOfPostStatus))
                 .from(post)
                 .where(post.id.eq(postId))
                 .fetchFirst());
     }
 
-    public Optional<IdAndPublicPostDto> findPostOwnerIdAndPublicByCommentId(Long commentId) {
+    public Optional<PostIdAndPublicPostDto> findPostIdAndPublicByCommentId(Long commentId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QPostDto_IdAndPublicPostDto(
+                .select(new QPostDto_PostIdAndPublicPostDto(
                         post.id, post.publicOfPostStatus))
                 .from(commentInPost)
                 .join(commentInPost.post, post)
