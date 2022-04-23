@@ -216,7 +216,7 @@ public class PostApiController {
         log.info("postId : {}", postId);
         log.info("collectionIds : {}", collectionIds);
 
-        return getResult(postService.insertCollectedPosts(currentMember.getId(), postId, collectionIds));
+        return getResult(postService.updateCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
 
     @ApiOperation(value = "글 컬렉션 생성", notes = "")
@@ -347,6 +347,29 @@ public class PostApiController {
         log.info("commentId : {}", commentId);
 
         return getResult(commentInPostService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
+    }
+
+    @ApiOperation(value = "글 댓글 좋아요 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentId",
+                    value = "댓글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/comment/{commentId}/like")
+    public SingleApiResult<List<MembersByContentDto>> readCommentLikeMembersInPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readCommentLikeMembersInPost");
+        log.info("memberId : {}", currentMemberId);
+        log.info("commentId : {}", commentId);
+
+        return getResult(commentInPostQueryService.getLikeCommentMembers(currentMemberId, commentId));
     }
 
     @ApiOperation(value = "연관 글 조회", notes = "")

@@ -1049,7 +1049,7 @@ public class PostQueryServiceJpaTest {
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
 
-        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+        postList.add(postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
@@ -1080,6 +1080,8 @@ public class PostQueryServiceJpaTest {
         List<MembersByContentDto> members =
                 postQueryService.getLikePostMembers(member2.getId(), postList.get(0).getId());
         System.out.println("서비스함수끝");
+        assertThatThrownBy(() -> postQueryService.getLikePostMembers(memberList.get(5).getId(), postList.get(3).getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
 
         //then
         assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))

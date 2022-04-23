@@ -45,11 +45,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .authorizeRequests()
                         .antMatchers("/api/member/search").hasRole("USER")
-                        .antMatchers("/api/member").hasRole("USER")
+                        .antMatchers("/api/collection/one").hasRole("USER")
+                        .antMatchers("/api/collection/all").hasRole("USER")
 
-                        .antMatchers(HttpMethod.GET,"/api/hashtag/most-popular").permitAll()
+                        .antMatchers(HttpMethod.GET,"/api/hashtag/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/member/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
+                        .antMatchers(HttpMethod.GET, "/api/collection/**").permitAll()
+                        .antMatchers(HttpMethod.GET, "/api/movie/**").permitAll()
 
                         .antMatchers("/api/collection/**").hasRole("USER")
                         .antMatchers("/api/comment/**").hasRole("USER")

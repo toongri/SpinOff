@@ -3,11 +3,13 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.MostPopularHashtag;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedHashtagException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.service.hashtag.HashtagService;
+import com.nameless.spin_off.service.query.HashtagQueryService;
 import com.nameless.spin_off.service.query.SearchQueryService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
@@ -30,6 +32,7 @@ public class HashtagApiController {
 
     private final HashtagService hashtagService;
     private final SearchQueryService searchQueryService;
+    private final HashtagQueryService hashtagQueryService;
 
     @ApiOperation(value = "해시태그 팔로우 생성", notes = "")
     @ApiImplicitParams({
@@ -52,6 +55,28 @@ public class HashtagApiController {
         return getResult(hashtagService.insertFollowedHashtagByHashtagId(currentMember.getId(), hashtagId));
     }
 
+    @ApiOperation(value = "해시태그 팔로우 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "hashtagId",
+                    value = "해시태그 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{hashtagId}/follow")
+    public SingleApiResult<List<MembersByContentDto>> readFollowMembers(@LoginMember MemberDetails currentMember,
+                                                                        @PathVariable Long hashtagId)
+            throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowMembers");
+        log.info("hashtagId : {}", hashtagId);
+        log.info("memberId : {}", currentMemberId);
+
+        return getResult(hashtagQueryService.getFollowHashtagMembers(currentMemberId, hashtagId));
+    }
+
     @ApiOperation(value = "가장 인기있는 해시태그 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -69,5 +94,13 @@ public class HashtagApiController {
         log.info("length : {}", length);
 
         return getResult(searchQueryService.getMostPopularHashtagLimit(length));
+    }
+
+    private Long getCurrentMemberId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getId();
+        } else {
+            return null;
+        }
     }
 }

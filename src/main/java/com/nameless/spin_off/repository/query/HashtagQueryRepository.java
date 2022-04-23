@@ -2,10 +2,13 @@ package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.QHashtagDto_ContentHashtagDto;
 import com.nameless.spin_off.dto.QHashtagDto_RelatedMostTaggedHashtagDto;
+import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,7 @@ import static com.nameless.spin_off.entity.hashtag.QFollowedHashtag.followedHash
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
 import static com.nameless.spin_off.entity.hashtag.QViewedHashtagByIp.viewedHashtagByIp;
+import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QPost.post;
 
@@ -25,6 +29,19 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
 
     public HashtagQueryRepository() {
         super(Hashtag.class);
+    }
+
+    public List<MembersByContentDto> findAllFollowMemberByHashtagId(Long hashtagId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(followedHashtag)
+                .join(followedHashtag.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        followedHashtag.hashtag.id.eq(hashtagId))
+                .orderBy(followedHashtag.id.desc())
+                .fetch();
     }
 
     public Boolean isExist(Long id) {
@@ -141,5 +158,8 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         viewedHashtagByIp.createdDate.after(time))
                 .fetch();
+    }
+    private BooleanExpression memberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
 }

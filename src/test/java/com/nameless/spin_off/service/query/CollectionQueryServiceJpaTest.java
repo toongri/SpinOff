@@ -1168,7 +1168,7 @@ public class CollectionQueryServiceJpaTest {
         collectionService.insertFollowedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
 
         for (Post post1 : postList) {
-            postService.insertCollectedPosts(member.getId(), post1.getId(),
+            postService.updateCollectedPosts(member.getId(), post1.getId(),
                     List.of(collectionList.get(0).getId(), collectionList.get(1).getId(), collectionList.get(2).getId()));
         }
 
@@ -1308,7 +1308,7 @@ public class CollectionQueryServiceJpaTest {
         collectionList.add(collectionRepository
                 .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.C)));
         collectionList.add(collectionRepository
-                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+                .save(Collection.createCollection(member2, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
 
         memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
         em.flush();
@@ -1337,9 +1337,96 @@ public class CollectionQueryServiceJpaTest {
                 collectionQueryService.getLikeCollectionMembers(member2.getId(), collectionList.get(0).getId());
         System.out.println("서비스함수끝");
 
+        assertThatThrownBy(() -> collectionQueryService
+                .getLikeCollectionMembers(memberList.get(5).getId(), collectionList.get(3).getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
         //then
         assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
                 .containsExactly(member2.getId(), member.getId(), memberList.get(4).getId(), memberList.get(9).getId(),
+                        memberList.get(7).getId(), memberList.get(3).getId());
+
+        assertThat(members.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false, false, false, false);
+
+        assertThat(members.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, true, false, false, false, false);
+
+    }
+
+    @Test
+    public void 컬렉션_팔로우_멤버출력() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        List<Collection> collectionList = new ArrayList<>();
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.B)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.C)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member2, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), memberList.get(8).getId());
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member2.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(8).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(member2.getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(3).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(7).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(9).getId(), collectionList.get(0).getId());
+        em.flush();
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(4).getId(), collectionList.get(0).getId());
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members =
+                collectionQueryService.getFollowCollectionMembers(member2.getId(), collectionList.get(0).getId());
+        System.out.println("서비스함수끝");
+
+        assertThatThrownBy(() -> collectionQueryService
+                .getFollowCollectionMembers(memberList.get(5).getId(), collectionList.get(3).getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
+        //then
+        assertThat(members.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member2.getId(), memberList.get(8).getId(), memberList.get(4).getId(), memberList.get(9).getId(),
                         memberList.get(7).getId(), memberList.get(3).getId());
 
         assertThat(members.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))

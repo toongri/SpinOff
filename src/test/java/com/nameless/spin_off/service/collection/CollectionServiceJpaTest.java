@@ -320,7 +320,7 @@ class CollectionServiceJpaTest {
         //when
 
         System.out.println("서비스함수");
-        postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
+        postService.updateCollectedPosts(mem2.getId(), po.getId(), ids);
 
         System.out.println("포스트함수");
         em.flush();
@@ -356,7 +356,7 @@ class CollectionServiceJpaTest {
         for (int i = 0; i < 5; i++)
             collectionList.add(Collection.createDefaultCollection(mem2));
         collectionRepository.saveAll(collectionList);
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), po.getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId(), collectionList.get(2).getId()));
 
@@ -369,7 +369,7 @@ class CollectionServiceJpaTest {
         //when
 
         System.out.println("서비스함수");
-        postService.insertCollectedPosts(mem2.getId(), po.getId(), ids);
+        postService.updateCollectedPosts(mem2.getId(), po.getId(), ids);
 
         System.out.println("포스트함수");
         em.flush();
@@ -441,47 +441,47 @@ class CollectionServiceJpaTest {
                 .setThumbnailUrl("9")
                 .setHashTags(List.of()).build()));
 
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(0).getId(),
                 List.of(collectionList.get(0).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(1).getId(),
                 List.of(collectionList.get(1).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(2).getId(),
                 List.of(collectionList.get(1).getId(), collectionList.get(2).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(3).getId(),
                 List.of(collectionList.get(2).getId(), collectionList.get(3).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(4).getId(),
                 List.of(collectionList.get(3).getId(), collectionList.get(4).getId(), collectionList.get(5).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(5).getId(),
                 List.of(collectionList.get(4).getId(), collectionList.get(5).getId(), collectionList.get(6).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(6).getId(),
                 List.of(collectionList.get(5).getId(), collectionList.get(6).getId(),
                         collectionList.get(7).getId(), collectionList.get(8).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(7).getId(),
                 List.of(collectionList.get(6).getId(), collectionList.get(7).getId(),
                         collectionList.get(8).getId(), collectionList.get(9).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(8).getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
                         collectionList.get(2).getId(), collectionList.get(3).getId(),
                         collectionList.get(4).getId(), collectionList.get(5).getId()));
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(9).getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
                         collectionList.get(2).getId(), collectionList.get(3).getId(),
@@ -493,42 +493,42 @@ class CollectionServiceJpaTest {
 
         //when
         System.out.println("서비스함수");
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(0).getId(),
                 List.of());
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(1).getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(2).getId(),
                 List.of());
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(3).getId(),
                 List.of(collectionList.get(2).getId(), collectionList.get(3).getId(), collectionList.get(4).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(4).getId(),
                 List.of(collectionList.get(3).getId(), collectionList.get(5).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(5).getId(),
                 List.of(collectionList.get(7).getId(), collectionList.get(8).getId(), collectionList.get(9).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(6).getId(),
                 List.of(collectionList.get(9).getId(), collectionList.get(2).getId(), collectionList.get(8).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(7).getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
                         collectionList.get(2).getId(), collectionList.get(3).getId(),
@@ -536,13 +536,13 @@ class CollectionServiceJpaTest {
                         collectionList.get(8).getId(), collectionList.get(9).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(8).getId(),
                 List.of(collectionList.get(0).getId(), collectionList.get(1).getId(),
                         collectionList.get(2).getId()));
 
         em.flush();
-        postService.insertCollectedPosts(
+        postService.updateCollectedPosts(
                 mem2.getId(), postList.get(9).getId(),
                 List.of(collectionList.get(6).getId(), collectionList.get(7).getId(),
                         collectionList.get(8).getId(), collectionList.get(9).getId()));
@@ -632,16 +632,16 @@ class CollectionServiceJpaTest {
 
         //when
         //then
-        assertThatThrownBy(() -> postService.insertCollectedPosts(-1L, po.getId(), ids))
+        assertThatThrownBy(() -> postService.updateCollectedPosts(-1L, po.getId(), ids))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), 0L, ids))
+        assertThatThrownBy(() -> postService.updateCollectedPosts(mem2.getId(), 0L, ids))
                 .isInstanceOf(NotExistPostException.class);//.hasMessageContaining("")
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem.getId(), po.getId(), ids))
+        assertThatThrownBy(() -> postService.updateCollectedPosts(mem.getId(), po.getId(), ids))
                 .isInstanceOf(NotMatchCollectionException.class);//.hasMessageContaining("")
 
         memberService.insertBlockedMemberByMemberId(mem2.getId(), mem.getId(), BlockedMemberStatus.A);
         em.flush();
-        assertThatThrownBy(() -> postService.insertCollectedPosts(mem2.getId(), po.getId(), ids))
+        assertThatThrownBy(() -> postService.updateCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 }

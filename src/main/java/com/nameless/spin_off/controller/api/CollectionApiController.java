@@ -304,6 +304,29 @@ public class CollectionApiController {
         return getResult(commentInCollectionService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
     }
 
+    @ApiOperation(value = "컬렉션 댓글 좋아요 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "commentId",
+                    value = "댓글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/comment/{commentId}/like")
+    public SingleApiResult<List<MembersByContentDto>> readCommentLikeMembersInCollection(
+            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
+            NotExistCommentInCollectionException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readCommentLikeMembersInCollection");
+        log.info("memberId : {}", currentMemberId);
+        log.info("commentId : {}", commentId);
+
+        return getResult(commentInCollectionQueryService.getLikeCommentMembers(currentMemberId, commentId));
+    }
+
     @ApiOperation(value = "컬렉션 리스트 조회", notes = "로그인 된 멤버의 컬렉션 리스트 조회")
     @ApiImplicitParams({
     })

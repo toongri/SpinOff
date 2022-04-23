@@ -108,7 +108,7 @@ public class PostServiceJpa implements PostService{
 
     @Transactional
     @Override
-    public List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+    public List<Long> updateCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException {
 
@@ -155,14 +155,7 @@ public class PostServiceJpa implements PostService{
         }
     }
 
-    private List<String> getPostThumbnailsCollectionDtos(List<PostThumbnailsCollectionDto> thumbnails, Long collectId) {
-        if (thumbnails == null) {
-            return Collections.emptyList();
-        } else {
-            return thumbnails.stream().map(PostThumbnailsCollectionDto::getPostThumbnail).collect(Collectors.toList());
-        }
-    }
-
+    @Transactional
     @Override
     public Long insertCollectedPost(Long memberId, Long postId, Long collectionId) {
         hasAuthPost(memberId, postId, getPublicOfPost(postId));
@@ -228,6 +221,14 @@ public class PostServiceJpa implements PostService{
         alreadySavedHashtags.addAll(anotherTags);
 
         return alreadySavedHashtags;
+    }
+
+    private List<String> getPostThumbnailsCollectionDtos(List<PostThumbnailsCollectionDto> thumbnails, Long collectId) {
+        if (thumbnails == null) {
+            return Collections.emptyList();
+        } else {
+            return thumbnails.stream().map(PostThumbnailsCollectionDto::getPostThumbnail).collect(Collectors.toList());
+        }
     }
 
     private void isNotContainCantChar(List<String> hashtagContents) {

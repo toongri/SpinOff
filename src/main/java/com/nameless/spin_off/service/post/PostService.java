@@ -24,7 +24,7 @@ public interface PostService {
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException;
     Long insertViewedPostByIp(String ip, Long postId)
             throws NotExistPostException;
-    List<Long> insertCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
+    List<Long> updateCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException;
     Long insertCollectedPost(Long memberId, Long postId, Long collectionId);

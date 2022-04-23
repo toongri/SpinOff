@@ -1,11 +1,14 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
+import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
 import com.nameless.spin_off.dto.QMovieDto_SearchAllMovieDto;
 import com.nameless.spin_off.dto.QMovieDto_SearchMovieDto;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Repository;
@@ -13,6 +16,7 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QFollowedMovie.followedMovie;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.movie.QViewedMovieByIp.viewedMovieByIp;
@@ -22,6 +26,19 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public MovieQueryRepository() {
         super(Movie.class);
+    }
+
+    public List<MembersByContentDto> findAllFollowMemberByMovieId(Long movieId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(followedMovie)
+                .join(followedMovie.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        followedMovie.movie.id.eq(movieId))
+                .orderBy(followedMovie.id.desc())
+                .fetch();
     }
 
     public Boolean isExist(Long id) {
@@ -83,5 +100,8 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
                 .where(
                         viewedMovieByIp.createdDate.after(time))
                 .fetch();
+    }
+    private BooleanExpression memberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
 }
