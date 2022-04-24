@@ -1,10 +1,7 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.*;
-import com.nameless.spin_off.dto.MemberDto.FollowingMemberMemberDto;
-import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
@@ -33,6 +30,32 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
 
     public MemberQueryRepository() {
         super(Member.class);
+    }
+
+    public List<MembersByContentDto> findAllFollowedMemberByMemberId(Long memberId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(followedMember)
+                .join(followedMember.member, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        followedMember.followingMember.id.eq(memberId))
+                .orderBy(followedMember.id.desc())
+                .fetch();
+    }
+
+    public List<MembersByContentDto> findAllFollowingMemberByMemberId(Long memberId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MembersByContentDto(
+                        member.id, member.profileImg, member.nickname, member.accountId))
+                .from(followedMember)
+                .join(followedMember.followingMember, member)
+                .where(
+                        memberNotIn(blockedMemberIds),
+                        followedMember.member.id.eq(memberId))
+                .orderBy(followedMember.id.desc())
+                .fetch();
     }
 
     public Optional<ReadMemberDto> findByIdForRead(Long memberId, List<Long> blockedMembers) {

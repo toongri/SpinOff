@@ -67,8 +67,15 @@ public class MovieQueryServiceJpa implements MovieQueryService{
 
     @Override
     public List<MembersByContentDto> getFollowMovieMembers(Long memberId, Long movieId) {
+        isExistMovie(movieId);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         return getMembersByContentDtos(getFollowMembersByMovieId(movieId), memberId);
+    }
+
+    private void isExistMovie(Long movieId) {
+        if (!movieQueryRepository.isExist(movieId)) {
+            throw new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE);
+        }
     }
 
     private SearchMovieAboutFirstMovieDto getMovieForSearchPageFirst(Slice<SearchMovieDto> movies)

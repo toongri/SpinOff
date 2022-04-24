@@ -3,6 +3,7 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
@@ -180,6 +181,94 @@ public class MemberApiController {
         log.info("followedMemberId : {}", followedMemberId);
 
         return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), followedMemberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로워 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/follower")
+    public SingleApiResult<List<MembersByContentDto>> readFollowersByMemberId(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowersByMemberId");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowingMembersByMemberId(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/following")
+    public SingleApiResult<List<MembersByContentDto>> readFollowingsByMemberId(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowingsByMemberId");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowedMembersByMemberId(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로우 영화 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/movie")
+    public SingleApiResult<List<MembersByContentDto>> readFollowMoviesByMemberId(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowersByMemberId");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowMoviesByMemberId(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/hashtag")
+    public SingleApiResult<List<MembersByContentDto>> readFollowHashtagsByMemberId(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowingsByMemberId");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowHashtagsByMemberId(currentMemberId, memberId));
     }
 
     @ApiOperation(value = "멤버 차단 생성", notes = "")

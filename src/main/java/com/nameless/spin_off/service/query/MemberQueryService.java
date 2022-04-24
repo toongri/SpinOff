@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
@@ -21,4 +22,8 @@ public interface MemberQueryService {
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
     List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
     ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId);
+    List<MembersByContentDto> getFollowedMembersByMemberId(Long currentMemberId, Long targetMemberId);
+    List<MembersByContentDto> getFollowingMembersByMemberId(Long currentMemberId, Long targetMemberId);
+    List<MembersByContentDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);
+    List<MembersByContentDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
 }

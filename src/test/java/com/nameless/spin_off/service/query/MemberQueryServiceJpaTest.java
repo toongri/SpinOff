@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
@@ -12,6 +13,7 @@ import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -33,6 +35,7 @@ import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 //@Rollback(value = false)
 @SpringBootTest
@@ -491,5 +494,187 @@ public class MemberQueryServiceJpaTest {
         assertThat(memberForRead3.isAdmin()).isEqualTo(false);
         assertThat(memberForRead5.getFollowerSize()).isEqualTo(0L);
         assertThat(memberForRead5.getFollowingSize()).isEqualTo(1L);
+    }
+
+    @Test
+    public void 멤버_팔로잉_조회() throws Exception{
+
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(member.getId(), member2.getId());
+        em.flush();
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), memberList.get(2).getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(member2.getId(), memberList.get(4).getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(member2.getId(), memberList.get(6).getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(member2.getId(), memberList.get(8).getId());
+        em.flush();
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(4).getId(), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(6).getId(), BlockedMemberStatus.A);
+
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members1 = memberQueryService
+                .getFollowedMembersByMemberId(member2.getId(), member2.getId());
+        System.out.println("서비스함수끝");
+        List<MembersByContentDto> members2 = memberQueryService
+                .getFollowedMembersByMemberId(member.getId(), member2.getId());
+        List<MembersByContentDto> members3 = memberQueryService
+                .getFollowedMembersByMemberId(member.getId(), memberList.get(4).getId());
+
+        //then
+        assertThatThrownBy(() -> memberQueryService
+                .getFollowedMembersByMemberId(memberList.get(4).getId(), member.getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
+        assertThat(members1.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(memberList.get(8).getId(), memberList.get(6).getId(), memberList.get(4).getId(),
+                        memberList.get(2).getId(), member.getId());
+        assertThat(members1.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false);
+        assertThat(members1.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, true, true, true, true);
+
+        assertThat(members2.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member.getId(), memberList.get(8).getId(), memberList.get(2).getId());
+        assertThat(members2.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false);
+        assertThat(members2.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false);
+
+        assertThat(members3.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly();
+        assertThat(members3.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly();
+        assertThat(members3.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly();
+    }
+
+    @Test
+    public void 멤버_팔로워_조회() throws Exception{
+
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(""+i).build());
+        }
+        memberRepository.saveAll(memberList);
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(member.getId(), member2.getId());
+        em.flush();
+
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), member2.getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(memberList.get(4).getId(), member2.getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(memberList.get(6).getId(), member2.getId());
+        em.flush();
+        memberService.insertFollowedMemberByMemberId(memberList.get(8).getId(), member2.getId());
+        em.flush();
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
+        em.flush();
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(4).getId(), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(6).getId(), BlockedMemberStatus.A);
+
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수");
+        List<MembersByContentDto> members1 = memberQueryService
+                .getFollowingMembersByMemberId(member2.getId(), member2.getId());
+        System.out.println("서비스함수끝");
+        List<MembersByContentDto> members2 = memberQueryService
+                .getFollowingMembersByMemberId(member.getId(), member2.getId());
+        List<MembersByContentDto> members3 = memberQueryService
+                .getFollowingMembersByMemberId(member.getId(), memberList.get(4).getId());
+
+        //then
+        assertThatThrownBy(() -> memberQueryService
+                .getFollowingMembersByMemberId(memberList.get(4).getId(), member.getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
+        assertThat(members1.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member.getId(), memberList.get(8).getId(), memberList.get(6).getId(), memberList.get(4).getId(),
+                        memberList.get(2).getId());
+        assertThat(members1.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false);
+        assertThat(members1.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, false, false, false, false);
+
+        assertThat(members2.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(member.getId(), memberList.get(8).getId(), memberList.get(2).getId());
+        assertThat(members2.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false);
+        assertThat(members2.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false);
+
+        assertThat(members3.stream().map(MembersByContentDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly();
+        assertThat(members3.stream().map(MembersByContentDto::isOwn).collect(Collectors.toList()))
+                .containsExactly();
+        assertThat(members3.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly();
     }
 }

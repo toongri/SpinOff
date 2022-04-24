@@ -2,17 +2,20 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
-import com.nameless.spin_off.dto.MemberDto;
+import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
+import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import com.nameless.spin_off.repository.query.MemberQueryRepository;
+import com.nameless.spin_off.repository.query.MovieQueryRepository;
 import com.nameless.spin_off.repository.query.SearchQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +24,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +37,9 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     private final SearchQueryRepository searchQueryRepository;
     private final MemberRepository memberRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
+    private final MovieQueryRepository movieQueryRepository;
+    List<Long> blockingIds;
+    List<Long> blockedIds;
 
     @Override
     public Slice<SearchMemberDto> getSearchPageMemberAtMemberSliced(
@@ -54,7 +62,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     }
 
     @Override
-    public Slice<MemberDto.SearchAllMemberDto> getSearchPageMemberAtAllSliced(
+    public Slice<SearchAllMemberDto> getSearchPageMemberAtAllSliced(
             String keyword, Pageable pageable, Long memberId) throws NotExistMemberException {
 
         return memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, pageable,
@@ -69,9 +77,9 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     @Override
     public ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId) {
         Long currentMemberId = getCurrentMemberId(currentMember);
-        List<Long> blockingIds = getAllIdByBlockedMemberId(currentMemberId);
-        List<Long> blockedIds = getAllIdByBlockingMemberId(currentMemberId);
-        ReadMemberDto memberDto = getReadMemberDto(targetMemberId, blockingIds, blockedIds);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        ReadMemberDto memberDto = getReadMemberDto(targetMemberId);
 
         if (!memberDto.isBlocked() && currentMemberId != null) {
             memberDto.setBlocking(isExistBlockedMember(blockedIds, targetMemberId));
@@ -84,11 +92,52 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         return memberDto;
     }
 
+    @Override
+    public List<MembersByContentDto> getFollowedMembersByMemberId(Long currentMemberId, Long targetMemberId) {
+        isExistMember(targetMemberId);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        isBlockingMember(targetMemberId);
+        return getMembersByContentDtos(findAllFollowedMemberByMemberId(targetMemberId), currentMemberId);
+    }
+
+    @Override
+    public List<MembersByContentDto> getFollowingMembersByMemberId(Long currentMemberId, Long targetMemberId) {
+        isExistMember(targetMemberId);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        isBlockingMember(targetMemberId);
+
+        return getMembersByContentDtos(findAllFollowingMemberByMemberId(targetMemberId), currentMemberId);
+    }
+
+    @Override
+    public List<MembersByContentDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId) {
+        isExistMember(targetMemberId);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        isBlockingMember(targetMemberId);
+    }
+
+    @Override
+    public List<MembersByContentDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId) {
+        isExistMember(targetMemberId);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        isBlockingMember(targetMemberId);
+    }
+
+    private void isBlockingMember(Long targetMemberId) {
+        if (blockingIds.contains(targetMemberId)) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+    }
+
     private List<Long> getAllIdByBlockedMemberId(Long currentMemberId) {
         if (currentMemberId != null) {
             return memberRepository.findAllIdByBlockedMemberId(currentMemberId, BlockedMemberStatus.A);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
@@ -96,19 +145,57 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         if (currentMemberId != null) {
             return memberRepository.findAllIdByBlockingMemberId(currentMemberId, BlockedMemberStatus.A);
         } else {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
-    private ReadMemberDto getReadMemberDto(Long targetMemberId, List<Long> blockingIds, List<Long> blockedIds) {
-        if (isExistBlockingMember(blockingIds, targetMemberId)) {
+    private void isExistMember(Long targetMemberId) {
+        if (!memberQueryRepository.isExist(targetMemberId)) {
+            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
+        }
+    }
+
+    private ReadMemberDto getReadMemberDto(Long targetMemberId) {
+        if (isExistBlockingMember(targetMemberId)) {
             return new ReadMemberDto();
         } else {
-            return getByIdForRead(targetMemberId, blockingIds, blockedIds);
+            return getByIdForRead(targetMemberId);
         }
     }
 
-    private boolean isExistBlockingMember(List<Long> blockingIds, Long targetMemberId) {
+    private List<MembersByContentDto> findAllFollowedMemberByMemberId(Long targetMemberId) {
+        return memberQueryRepository.findAllFollowedMemberByMemberId(targetMemberId, getBlockedAndBlockingIds());
+    }
+
+    private List<MembersByContentDto> findAllFollowingMemberByMemberId(Long targetMemberId) {
+        return memberQueryRepository.findAllFollowingMemberByMemberId(targetMemberId, getBlockedAndBlockingIds());
+    }
+
+    private List<Long> getBlockedAndBlockingIds() {
+        List<Long> blockIds = new ArrayList<>(blockingIds);
+        blockIds.addAll(blockedIds);
+        return blockIds.stream().distinct().collect(Collectors.toList());
+    }
+
+    private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
+        List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
+        members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
+        return members.stream()
+                .sorted(
+                        Comparator.comparing(MembersByContentDto::isOwn)
+                                .thenComparing(MembersByContentDto::isFollowed).reversed())
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getAllIdByFollowingMemberId(Long memberId) {
+        if (memberId != null) {
+            return memberRepository.findAllIdByFollowingMemberId(memberId);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private boolean isExistBlockingMember(Long targetMemberId) {
         return blockingIds.stream().anyMatch(m -> m.equals(targetMemberId));
     }
 
@@ -124,11 +211,11 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         }
     }
 
-    private ReadMemberDto getByIdForRead(Long targetMemberId,
-                                         List<Long> blockingIds, List<Long> blockedIds) {
-        blockingIds.addAll(blockedIds);
+    private ReadMemberDto getByIdForRead(Long targetMemberId) {
+        List<Long> blockIds = new ArrayList<>(blockedIds);
+        blockIds.addAll(blockedIds);
         return memberQueryRepository
-                .findByIdForRead(targetMemberId, blockingIds.stream().distinct().collect(Collectors.toList()))
+                .findByIdForRead(targetMemberId, blockIds.stream().distinct().collect(Collectors.toList()))
                 .orElseGet(() -> memberQueryRepository.findByIdForRead(targetMemberId)
                         .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)));
     }
@@ -143,7 +230,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         if (memberId != null) {
             return memberRepository.findBlockingAllAndBlockedAllByIdAndBlockStatus(memberId, BlockedMemberStatus.A);
         } else{
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
     }
 
