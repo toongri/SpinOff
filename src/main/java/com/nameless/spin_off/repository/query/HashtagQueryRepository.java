@@ -1,9 +1,11 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
+import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.QHashtagDto_ContentHashtagDto;
+import com.nameless.spin_off.dto.QHashtagDto_FollowHashtagDto;
 import com.nameless.spin_off.dto.QHashtagDto_RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -29,6 +31,18 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
 
     public HashtagQueryRepository() {
         super(Hashtag.class);
+    }
+
+    public List<FollowHashtagDto> findAllFollowHashtagsByMemberId(Long memberId) {
+        return getQueryFactory()
+                .select(new QHashtagDto_FollowHashtagDto(
+                        hashtag.id, hashtag.content))
+                .from(followedHashtag)
+                .join(followedHashtag.hashtag, hashtag)
+                .where(
+                        followedHashtag.member.id.eq(memberId))
+                .orderBy(followedHashtag.id.desc())
+                .fetch();
     }
 
     public List<MembersByContentDto> findAllFollowMemberByHashtagId(Long hashtagId, List<Long> blockedMemberIds) {

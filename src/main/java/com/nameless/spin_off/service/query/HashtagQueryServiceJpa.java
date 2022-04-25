@@ -2,7 +2,9 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
+import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import lombok.RequiredArgsConstructor;
@@ -40,8 +42,15 @@ public class HashtagQueryServiceJpa implements HashtagQueryService {
 
     @Override
     public List<MembersByContentDto> getFollowHashtagMembers(Long memberId, Long hashtagId) {
+        isExistHashtag(hashtagId);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         return getMembersByContentDtos(getFollowMembersByHashtagId(hashtagId), memberId);
+    }
+
+    private void isExistHashtag(Long hashtagId) {
+        if (!hashtagQueryRepository.isExist(hashtagId)) {
+            throw new NotExistHashtagException(ErrorEnum.NOT_EXIST_HASHTAG);
+        }
     }
 
     private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {

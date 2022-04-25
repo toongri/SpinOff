@@ -11,6 +11,32 @@ public class HashtagDto {
 
     @Data
     @NoArgsConstructor
+    public static class FollowHashtagDto {
+
+        @ApiModelProperty(
+                value = "해시태그 id",
+                example = "123")
+        private Long id;
+
+        @ApiModelProperty(
+                value = "해시태그 컨텐츠",
+                example = "스프링부트와_aws로_혼자_구현하는_웹_서비스")
+        private String content;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        @QueryProjection
+        public FollowHashtagDto(Long id, String content) {
+            this.id = id;
+            this.content = content;
+        }
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class ContentHashtagDto {
 
         @ApiModelProperty(
@@ -19,7 +45,7 @@ public class HashtagDto {
         private Long id;
 
         @ApiModelProperty(
-                value = "해시태그 id",
+                value = "해시태그 컨텐츠",
                 example = "스프링부트와_aws로_혼자_구현하는_웹_서비스")
         private String content;
 

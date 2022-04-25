@@ -11,5 +11,4 @@ public interface HashtagQueryService {
     List<RelatedMostTaggedHashtagDto> getHashtagsByMemberIds(int length, List<Long> memberIds);
     List<RelatedMostTaggedHashtagDto> getHashtagsByCollectionIds(int length, List<Long> collectionIds);
     List<MembersByContentDto> getFollowHashtagMembers(Long memberId, Long hashtagId);
-
 }
