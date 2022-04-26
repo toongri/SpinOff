@@ -17,5 +17,5 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT followedMovie.movie.id FROM FollowedMovie followedMovie " +
             "WHERE followedMovie.member.id = :id")
-    List<Long> findAllIdByFollowingMemberId(@Param("id") Long id);
+    List<Long> findAllIdByFollowingMemberId(@Param("id")Long id);
 }

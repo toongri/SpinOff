@@ -3,8 +3,10 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
+import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
@@ -238,7 +240,7 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/movie")
-    public SingleApiResult<List<MembersByContentDto>> readFollowMoviesByMemberId(
+    public SingleApiResult<List<FollowMovieDto>> readFollowMoviesByMemberId(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
         Long currentMemberId = getCurrentMemberId(currentMember);
@@ -260,7 +262,7 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/hashtag")
-    public SingleApiResult<List<MembersByContentDto>> readFollowHashtagsByMemberId(
+    public SingleApiResult<List<FollowHashtagDto>> readFollowHashtagsByMemberId(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
         Long currentMemberId = getCurrentMemberId(currentMember);

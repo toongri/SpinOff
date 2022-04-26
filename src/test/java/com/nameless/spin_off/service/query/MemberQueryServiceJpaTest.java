@@ -2,23 +2,32 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
+import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
+import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
+import com.nameless.spin_off.service.movie.MovieService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -49,6 +58,10 @@ public class MemberQueryServiceJpaTest {
     @Autowired CollectionRepository collectionRepository;
     @Autowired PostRepository postRepository;
     @Autowired MemberQueryService memberQueryService;
+    @Autowired MovieService movieService;
+    @Autowired MovieRepository movieRepository;
+    @Autowired HashtagRepository hashtagRepository;
+    @Autowired HashtagService hashtagService;
 
     @Test
     public void 유저검색() throws Exception{
@@ -676,5 +689,185 @@ public class MemberQueryServiceJpaTest {
                 .containsExactly();
         assertThat(members3.stream().map(MembersByContentDto::isFollowed).collect(Collectors.toList()))
                 .containsExactly();
+    }
+    
+    @Test
+    public void 멤버_팔로우_영화_리스트_출력() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        List<Movie> movieList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
+                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
+                    null, null));
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+        }
+        memberRepository.saveAll(memberList);
+        movieRepository.saveAll(movieList);
+
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(6).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(2).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        //when
+        List<FollowMovieDto> movies1 = memberQueryService.getFollowMoviesByMemberId(null, memberList.get(1).getId());
+        List<FollowMovieDto> movies2 = memberQueryService.getFollowMoviesByMemberId(memberList.get(2).getId(), memberList.get(1).getId());
+        List<FollowMovieDto> movies3 = memberQueryService.getFollowMoviesByMemberId(member.getId(), memberList.get(2).getId());
+
+        assertThatThrownBy(() -> memberQueryService.getFollowMoviesByMemberId(memberList.get(2).getId(), member.getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
+        //then
+        assertThat(movies1.stream().map(FollowMovieDto::getId).collect(Collectors.toList()))
+                .containsExactly(movieList.get(2).getId(), movieList.get(3).getId(), movieList.get(4).getId(),
+                        movieList.get(5).getId(), movieList.get(6).getId(), movieList.get(7).getId());
+
+        assertThat(movies1.stream().map(FollowMovieDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false, false);
+
+        assertThat(movies2.stream().map(FollowMovieDto::getId).collect(Collectors.toList()))
+                .containsExactly(movieList.get(3).getId(), movieList.get(4).getId(), movieList.get(5).getId(),
+                        movieList.get(6).getId(), movieList.get(7).getId(), movieList.get(2).getId());
+
+        assertThat(movies2.stream().map(FollowMovieDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, true, true, true, true, false);
+
+        assertThat(movies3.stream().map(FollowMovieDto::getId).collect(Collectors.toList()))
+                .containsExactly(movieList.get(3).getId(), movieList.get(4).getId(),
+                        movieList.get(5).getId(), movieList.get(6).getId(), movieList.get(7).getId());
+
+        assertThat(movies3.stream().map(FollowMovieDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false);
+    }
+
+    @Test
+    public void 멤버_팔로우_해시태그_리스트_출력() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        List<Hashtag> hashtagList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            hashtagList.add(Hashtag.createHashtag(keyword + i));
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+        }
+        memberRepository.saveAll(memberList);
+        hashtagRepository.saveAll(hashtagList);
+
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(2).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(3).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(4).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(5).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(6).getId(), hashtagList.get(7).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(6).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(2).getId(), hashtagList.get(6).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(3).getId(), hashtagList.get(6).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(4).getId(), hashtagList.get(6).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(5).getId(), hashtagList.get(6).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(5).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(2).getId(), hashtagList.get(5).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(3).getId(), hashtagList.get(5).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(4).getId(), hashtagList.get(5).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(4).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(2).getId(), hashtagList.get(4).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(3).getId(), hashtagList.get(4).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(3).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(2).getId(), hashtagList.get(3).getId());
+        hashtagService.insertFollowedHashtagByHashtagId(memberList.get(1).getId(), hashtagList.get(2).getId());
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberList.get(2).getId(), BlockedMemberStatus.A);
+        em.flush();
+
+        //when
+        List<FollowHashtagDto> hashtags1 = memberQueryService.getFollowHashtagsByMemberId(null, memberList.get(1).getId());
+        List<FollowHashtagDto> hashtags2 = memberQueryService.getFollowHashtagsByMemberId(memberList.get(2).getId(), memberList.get(1).getId());
+        List<FollowHashtagDto> hashtags3 = memberQueryService.getFollowHashtagsByMemberId(member.getId(), memberList.get(2).getId());
+
+        assertThatThrownBy(() -> memberQueryService.getFollowHashtagsByMemberId(memberList.get(2).getId(), member.getId()))
+                .isInstanceOf(DontHaveAuthorityException.class);
+
+        //then
+        assertThat(hashtags1.stream().map(FollowHashtagDto::getId).collect(Collectors.toList()))
+                .containsExactly(hashtagList.get(2).getId(), hashtagList.get(3).getId(), hashtagList.get(4).getId(),
+                        hashtagList.get(5).getId(), hashtagList.get(6).getId(), hashtagList.get(7).getId());
+
+        assertThat(hashtags1.stream().map(FollowHashtagDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false, false);
+
+        assertThat(hashtags2.stream().map(FollowHashtagDto::getId).collect(Collectors.toList()))
+                .containsExactly(hashtagList.get(3).getId(), hashtagList.get(4).getId(), hashtagList.get(5).getId(),
+                        hashtagList.get(6).getId(), hashtagList.get(7).getId(), hashtagList.get(2).getId());
+
+        assertThat(hashtags2.stream().map(FollowHashtagDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, true, true, true, true, false);
+
+        assertThat(hashtags3.stream().map(FollowHashtagDto::getId).collect(Collectors.toList()))
+                .containsExactly(hashtagList.get(3).getId(), hashtagList.get(4).getId(),
+                        hashtagList.get(5).getId(), hashtagList.get(6).getId(), hashtagList.get(7).getId());
+
+        assertThat(hashtags3.stream().map(FollowHashtagDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false, false, false);
     }
 }

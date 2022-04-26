@@ -4,6 +4,7 @@ import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,39 @@ import java.util.List;
 import static com.nameless.spin_off.entity.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNAIL_NUMBER;
 
 public class MovieDto {
+
+    @Data
+    @NoArgsConstructor
+    public static class FollowMovieDto {
+
+        @ApiModelProperty(
+                value = "영화 id",
+                example = "123")
+        private Long id;
+
+        @ApiModelProperty(
+                value = "영화 제목",
+                example = "스프링부트와_aws로_혼자_구현하는_웹_서비스")
+        private String title;
+
+        @ApiModelProperty(
+                value = "영화 썸네일",
+                example = "스프링부트와_aws로_혼자_구현하는_웹_서비스")
+        private String thumbnail;
+
+        @ApiModelProperty(
+                value = "팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        @QueryProjection
+        public FollowMovieDto(Long id, String title, String thumbnail) {
+            this.id = id;
+            this.title = title;
+            this.thumbnail = thumbnail;
+        }
+
+    }
 
     @Data
     @AllArgsConstructor

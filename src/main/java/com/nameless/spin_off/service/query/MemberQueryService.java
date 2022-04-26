@@ -1,10 +1,12 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -24,6 +26,6 @@ public interface MemberQueryService {
     ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId);
     List<MembersByContentDto> getFollowedMembersByMemberId(Long currentMemberId, Long targetMemberId);
     List<MembersByContentDto> getFollowingMembersByMemberId(Long currentMemberId, Long targetMemberId);
-    List<MembersByContentDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);
-    List<MembersByContentDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
+    List<FollowHashtagDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);
+    List<FollowMovieDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
 }

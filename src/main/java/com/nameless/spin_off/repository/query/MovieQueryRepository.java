@@ -1,9 +1,11 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
+import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
+import com.nameless.spin_off.dto.QMovieDto_FollowMovieDto;
 import com.nameless.spin_off.dto.QMovieDto_SearchAllMovieDto;
 import com.nameless.spin_off.dto.QMovieDto_SearchMovieDto;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -26,6 +28,18 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public MovieQueryRepository() {
         super(Movie.class);
+    }
+
+    public List<FollowMovieDto> findAllFollowMoviesByMemberId(Long memberId) {
+        return getQueryFactory()
+                .select(new QMovieDto_FollowMovieDto(
+                        movie.id, movie.title, movie.directorName))
+                .from(followedMovie)
+                .join(followedMovie.movie, movie)
+                .where(
+                        followedMovie.member.id.eq(memberId))
+                .orderBy(followedMovie.id.desc())
+                .fetch();
     }
 
     public List<MembersByContentDto> findAllFollowMemberByMovieId(Long movieId, List<Long> blockedMemberIds) {
