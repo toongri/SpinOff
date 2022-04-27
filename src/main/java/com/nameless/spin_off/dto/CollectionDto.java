@@ -17,6 +17,71 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
+    public static class FollowCollectionDto {
+
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                example = "123")
+        private Long id;
+
+        @ApiModelProperty(
+                value = "멤버 accountId",
+                example = "toongri")
+        private String accountId;
+
+        @ApiModelProperty(
+                value = "컬렉션 제목",
+                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스")
+        private String title;
+
+        @ApiModelProperty(
+                value = "컬렉션 썸네일",
+                example = "[\"www.naver.com\",\"www.kakao.com\",\"www.google.com\",\"www.nate.com\"]")
+        private List<String> thumbnailUrls = new ArrayList<>();
+
+        @ApiModelProperty(
+                value = "컬렉션 팔로우 여부",
+                example = "false")
+        private boolean isFollowed;
+
+        @ApiModelProperty(
+                value = "컬렉션 소유 여부",
+                example = "false")
+        private boolean isOwn;
+
+        @QueryProjection
+        public FollowCollectionDto(Long id, String title, String accountId,
+                                   String thumbnail1, String thumbnail2, String thumbnail3, String thumbnail4) {
+
+            this.id = id;
+            this.accountId = accountId;
+            this.title = title;
+            if (thumbnail1 != null) {
+                thumbnailUrls.add(thumbnail1);
+
+                if (thumbnail2 != null) {
+                    thumbnailUrls.add(thumbnail2);
+
+                    if (thumbnail3 != null) {
+                        thumbnailUrls.add(thumbnail3);
+
+                        if (thumbnail4 != null) {
+                            thumbnailUrls.add(thumbnail4);
+                        }
+                    }
+                }
+            }
+        }
+
+        public void setFollowedAndOwn(boolean isFollowed, String accountId) {
+            this.isFollowed = isFollowed;
+            this.isOwn = this.accountId.equals(accountId);
+        }
+    }
+
+
+    @Data
+    @NoArgsConstructor
     public static class MyPageCollectionDto {
 
         @ApiModelProperty(

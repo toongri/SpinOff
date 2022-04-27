@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
@@ -28,4 +29,5 @@ public interface MemberQueryService {
     List<MembersByContentDto> getFollowingMembersByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowHashtagDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowMovieDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
+    List<FollowCollectionDto> getFollowCollectionsByMemberId(MemberDetails currentMember, Long targetMemberId);
 }

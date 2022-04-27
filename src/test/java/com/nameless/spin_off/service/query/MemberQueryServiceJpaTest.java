@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
@@ -10,6 +11,7 @@ import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
@@ -28,6 +30,7 @@ import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.hashtag.HashtagService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
+import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -62,6 +65,7 @@ public class MemberQueryServiceJpaTest {
     @Autowired MovieRepository movieRepository;
     @Autowired HashtagRepository hashtagRepository;
     @Autowired HashtagService hashtagService;
+    @Autowired PostService postService;
 
     @Test
     public void 유저검색() throws Exception{
@@ -869,5 +873,277 @@ public class MemberQueryServiceJpaTest {
 
         assertThat(hashtags3.stream().map(FollowHashtagDto::isFollowed).collect(Collectors.toList()))
                 .containsExactly(false, false, false, false, false);
+    }
+    
+    @Test
+    public void 팔로우_컬렉션_리스트_출력() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member);
+
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccountId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memberNickname").build();
+
+        memberRepository.save(member2);
+
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setAccountId(keyword+i).build());
+        }
+        memberRepository.saveAll(memberList);
+        List<String> urls = List.of("a", "b", "c", "d", "e");
+
+        List<Hashtag> hashtagList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            hashtagList.add(Hashtag.createHashtag(i+""));
+        }
+        hashtagRepository.saveAll(hashtagList);
+
+        Post post = Post.buildPost()
+                .setMember(member)
+                .setTitle("postTitle")
+                .setContent("postContent")
+                .setPostPublicStatus(PublicOfPostStatus.A)
+                .setUrls(urls)
+                .setThumbnailUrl(urls.get(0))
+                .setHashTags(hashtagList)
+                .build();
+        postRepository.save(post);
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7))).build());
+
+        postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8))).build());
+
+        postList.add(Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8), hashtagList.get(9))).build());
+        postRepository.saveAll(postList);
+
+        List<Collection> collectionList = new ArrayList<>();
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.B)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.C)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(memberList.get(5), 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+        collectionList.add(collectionRepository
+                .save(Collection.createCollection(member2, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
+
+        memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(memberList.get(2).getId(), member.getId());
+        memberService.insertFollowedMemberByMemberId(member.getId(), member2.getId());
+        memberService.insertBlockedMemberByMemberId(memberList.get(3).getId(), memberList.get(5).getId(), BlockedMemberStatus.A);
+
+        collectionService.insertFollowedCollectionByMemberId(member.getId(), collectionList.get(3).getId());
+        collectionService.insertFollowedCollectionByMemberId(member2.getId(), collectionList.get(0).getId());
+        collectionService.insertFollowedCollectionByMemberId(member2.getId(), collectionList.get(2).getId());
+        collectionService.insertFollowedCollectionByMemberId(member2.getId(), collectionList.get(3).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(2).getId(), collectionList.get(0).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(2).getId(), collectionList.get(2).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(2).getId(), collectionList.get(3).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(2).getId(), collectionList.get(4).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(3).getId(), collectionList.get(0).getId());
+        collectionService.insertFollowedCollectionByMemberId(memberList.get(5).getId(), collectionList.get(0).getId());
+
+        for (Post post1 : postList) {
+            postService.updateCollectedPosts(member.getId(), post1.getId(),
+                    List.of(collectionList.get(0).getId(), collectionList.get(2).getId()));
+            postService.updateCollectedPosts(member2.getId(), post1.getId(),
+                    List.of(collectionList.get(4).getId()));
+            postService.updateCollectedPosts(memberList.get(5).getId(), post1.getId(),
+                    List.of(collectionList.get(3).getId()));
+        }
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수");
+        List<FollowCollectionDto> collections1 = memberQueryService.getFollowCollectionsByMemberId(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(2).getId());
+        System.out.println("서비스함수끝");
+
+        List<FollowCollectionDto> collections2 = memberQueryService.getFollowCollectionsByMemberId(
+                null,
+                memberList.get(2).getId());
+
+        List<FollowCollectionDto> collections3 = memberQueryService.getFollowCollectionsByMemberId(
+                MemberDetails.builder()
+                        .id(memberList.get(2).getId())
+                        .accountId(memberList.get(2).getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(2).getId());
+
+        List<FollowCollectionDto> collections4 = memberQueryService.getFollowCollectionsByMemberId(
+                MemberDetails.builder()
+                        .id(memberList.get(3).getId())
+                        .accountId(memberList.get(3).getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(2).getId());
+
+        List<FollowCollectionDto> collections5 = memberQueryService.getFollowCollectionsByMemberId(
+                MemberDetails.builder()
+                        .id(memberList.get(3).getId())
+                        .accountId(memberList.get(3).getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(5).getId());
+
+        //then
+        assertThat(collections1.stream().map(FollowCollectionDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(true, false, false);
+
+        assertThat(collections1.stream().map(FollowCollectionDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, true, false);
+
+        assertThat(collections1.stream().map(FollowCollectionDto::getId).collect(Collectors.toList()))
+                .containsExactly(collectionList.get(0).getId(), collectionList.get(3).getId(),
+                        collectionList.get(4).getId());
+
+        assertThat(collections2.stream().map(FollowCollectionDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false, false, false);
+
+        assertThat(collections2.stream().map(FollowCollectionDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(false, false, false);
+
+        assertThat(collections2.stream().map(FollowCollectionDto::getId).collect(Collectors.toList()))
+                .containsExactly(collectionList.get(4).getId(), collectionList.get(3).getId(),
+                        collectionList.get(0).getId());
+
+        assertThat(collections3.stream().map(FollowCollectionDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false, false, false);
+
+        assertThat(collections3.stream().map(FollowCollectionDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, true, true);
+
+        assertThat(collections3.stream().map(FollowCollectionDto::getId).collect(Collectors.toList()))
+                .containsExactly(collectionList.get(4).getId(), collectionList.get(3).getId(),
+                        collectionList.get(0).getId());
+
+        assertThat(collections4.stream().map(FollowCollectionDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false, false);
+
+        assertThat(collections4.stream().map(FollowCollectionDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true, false);
+
+        assertThat(collections4.stream().map(FollowCollectionDto::getId).collect(Collectors.toList()))
+                .containsExactly(collectionList.get(0).getId(), collectionList.get(4).getId());
+
+        assertThat(collections5.stream().map(FollowCollectionDto::isOwn).collect(Collectors.toList()))
+                .containsExactly(false);
+
+        assertThat(collections5.stream().map(FollowCollectionDto::isFollowed).collect(Collectors.toList()))
+                .containsExactly(true);
+
+        assertThat(collections5.stream().map(FollowCollectionDto::getId).collect(Collectors.toList()))
+                .containsExactly(collectionList.get(0).getId());
+
+        assertThatThrownBy(() -> memberQueryService.getFollowCollectionsByMemberId(
+                MemberDetails.builder()
+                        .id(memberList.get(5).getId())
+                        .accountId(memberList.get(5).getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),
+                memberList.get(3).getId())).isInstanceOf(DontHaveAuthorityException.class);
+        
     }
 }

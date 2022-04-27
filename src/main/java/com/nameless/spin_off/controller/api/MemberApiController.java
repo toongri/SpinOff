@@ -2,6 +2,7 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
@@ -239,7 +240,7 @@ public class MemberApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @GetMapping("/{memberId}/movie")
+    @GetMapping("/{memberId}/follow/movie")
     public SingleApiResult<List<FollowMovieDto>> readFollowMoviesByMemberId(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
@@ -251,7 +252,7 @@ public class MemberApiController {
         return getResult(memberQueryService.getFollowMoviesByMemberId(currentMemberId, memberId));
     }
 
-    @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
+    @ApiOperation(value = "멤버 팔로우 해시태그 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "memberId",
@@ -261,7 +262,7 @@ public class MemberApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @GetMapping("/{memberId}/hashtag")
+    @GetMapping("/{memberId}/follow/hashtag")
     public SingleApiResult<List<FollowHashtagDto>> readFollowHashtagsByMemberId(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
@@ -271,6 +272,28 @@ public class MemberApiController {
         log.info("targetMemberId : {}", memberId);
 
         return getResult(memberQueryService.getFollowHashtagsByMemberId(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로우 컬렉션 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/follow/collection")
+    public SingleApiResult<List<FollowCollectionDto>> readFollowCollectionsByMemberId(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowCollectionsByMemberId");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowCollectionsByMemberId(currentMember, memberId));
     }
 
     @ApiOperation(value = "멤버 차단 생성", notes = "")

@@ -41,6 +41,31 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
+    public List<Long> findAllFollowedCollectionIdByMemberId(Long memberId) {
+        return getQueryFactory()
+                .select(followedCollection.collection.id)
+                .from(followedCollection)
+                .where(followedCollection.member.id.eq(memberId))
+                .fetch();
+
+    }
+
+    public List<FollowCollectionDto> findAllFollowCollectionByMemberId(Long memberId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QCollectionDto_FollowCollectionDto(
+                        collection.id, collection.title, member.accountId, collection.firstThumbnail,
+                        collection.secondThumbnail, collection.thirdThumbnail, collection.fourthThumbnail))
+                .from(followedCollection)
+                .join(followedCollection.collection, collection)
+                .join(collection.member, member)
+                .where(
+                        collectionMemberNotIn(blockedMemberIds),
+                        followedCollection.member.id.eq(memberId),
+                        collection.publicOfCollectionStatus.in(DEFAULT_COLLECTION_PUBLIC.getPrivacyBound()))
+                .orderBy(followedCollection.id.desc())
+                .fetch();
+    }
+
     public List<MembersByContentDto> findAllFollowMemberByCollectionId(Long collectionId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MembersByContentDto(
@@ -493,6 +518,11 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
     private BooleanExpression memberNotIn(List<Long> memberIds) {
         return memberIds.isEmpty() ? null : member.id.notIn(memberIds);
     }
+
+    private BooleanExpression collectionMemberNotIn(List<Long> memberIds) {
+        return memberIds.isEmpty() ? null : collection.member.id.notIn(memberIds);
+    }
+
     private BooleanExpression collectionNotIn(List<Long> collectionIds) {
         return collectionIds.isEmpty() ? null : collection.id.notIn(collectionIds);
     }

@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
@@ -17,10 +18,7 @@ import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
-import com.nameless.spin_off.repository.query.HashtagQueryRepository;
-import com.nameless.spin_off.repository.query.MemberQueryRepository;
-import com.nameless.spin_off.repository.query.MovieQueryRepository;
-import com.nameless.spin_off.repository.query.SearchQueryRepository;
+import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -44,6 +42,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     private final HashtagQueryRepository hashtagQueryRepository;
     private final MovieRepository movieRepository;
     private final MovieQueryRepository movieQueryRepository;
+    private final CollectionQueryRepository collectionQueryRepository;
     List<Long> blockingIds;
     List<Long> blockedIds;
 
@@ -131,6 +130,18 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         return getMoviesByMemberId(findAllFollowedMoviesByMemberId(targetMemberId), currentMemberId);
     }
 
+    @Override
+    public List<FollowCollectionDto> getFollowCollectionsByMemberId(MemberDetails currentMember, Long targetMemberId) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        isExistMember(targetMemberId);
+        blockingIds = getAllIdByBlockedMemberId(currentMemberId);
+        blockedIds = getAllIdByBlockingMemberId(currentMemberId);
+        isBlockingMember(targetMemberId);
+
+        return getCollectionsByContentDtos(findAllFollowCollectionByMemberId(targetMemberId), currentMemberId,
+                getCurrentMemberAccountId(currentMember));
+    }
+
     private void isBlockingMember(Long targetMemberId, Long currentMemberId) {
         if (currentMemberId != null) {
             if (memberQueryRepository.isExistBlockingMember(targetMemberId, currentMemberId, BlockedMemberStatus.A)) {
@@ -175,6 +186,10 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         }
     }
 
+    private List<FollowCollectionDto> findAllFollowCollectionByMemberId(Long targetMemberId) {
+        return collectionQueryRepository.findAllFollowCollectionByMemberId(targetMemberId, getBlockedAndBlockingIds());
+    }
+
     private List<FollowMovieDto> findAllFollowedMoviesByMemberId(Long targetMemberId) {
         return movieQueryRepository.findAllFollowMoviesByMemberId(targetMemberId);
     }
@@ -215,6 +230,17 @@ public class MemberQueryServiceJpa implements MemberQueryService {
                 .collect(Collectors.toList());
     }
 
+    private List<FollowCollectionDto> getCollectionsByContentDtos(List<FollowCollectionDto> collections,
+                                                                  Long memberId, String accountId) {
+        List<Long> followingCollectionIds = getAllCollectionIdByFollowingMemberId(memberId);
+        collections.forEach(m -> m.setFollowedAndOwn(followingCollectionIds.contains(m.getId()), accountId));
+        return collections.stream()
+                .sorted(
+                        Comparator.comparing(FollowCollectionDto::isOwn)
+                                .thenComparing(FollowCollectionDto::isFollowed).reversed())
+                .collect(Collectors.toList());
+    }
+
     private List<MembersByContentDto> getMembersByContentDtos(List<MembersByContentDto> members, Long memberId) {
         List<Long> followingMemberIds = getAllIdByFollowingMemberId(memberId);
         members.forEach(m -> m.setFollowedAndOwn(followingMemberIds.contains(m.getMemberId()), memberId));
@@ -236,6 +262,14 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     private List<Long> getAllMovieIdByFollowingMemberId(Long memberId) {
         if (memberId != null) {
             return movieRepository.findAllIdByFollowingMemberId(memberId);
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    private List<Long> getAllCollectionIdByFollowingMemberId(Long memberId) {
+        if (memberId != null) {
+            return collectionQueryRepository.findAllFollowedCollectionIdByMemberId(memberId);
         } else {
             return Collections.emptyList();
         }
@@ -293,6 +327,14 @@ public class MemberQueryServiceJpa implements MemberQueryService {
             return currentMember.isAdmin();
         } else {
             return false;
+        }
+    }
+
+    private String getCurrentMemberAccountId(MemberDetails currentMember) {
+        if (currentMember != null) {
+            return currentMember.getUsername();
+        } else {
+            return null;
         }
     }
 
