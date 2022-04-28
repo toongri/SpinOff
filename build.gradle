@@ -63,13 +63,17 @@ dependencies {
 
 	implementation "com.h2database:h2:${H2Version}"
 	implementation "org.mariadb.jdbc:mariadb-java-client:${mariaDBVersion}"
-	implementation "org.apache.commons:commons-lang3:3.0" //
+	implementation "org.apache.commons:commons-lang3:3.0"
 
 	implementation 'io.jsonwebtoken:jjwt:0.9.1' //jwt
 	implementation "com.google.code.gson:gson:${gsonVersion}"//gson
 	//swagger 추가
 	implementation "io.springfox:springfox-swagger2:${swaggerVersion}"
 	implementation "io.springfox:springfox-swagger-ui:${swaggerVersion}"
+
+	//영화 진흥위원회 api
+	implementation files('libs/kobis-opcl-rest-v1.0.jar')
+	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
 
 	implementation "com.github.gavlyukovskiy:p6spy-spring-boot-starter:${p6spyVersion}"//개발용 코드 서비스시엔 성능비교 후 사용 필수
 }
