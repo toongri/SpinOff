@@ -1,6 +1,5 @@
 package com.nameless.spin_off.dto;
 
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
 import com.querydsl.core.annotations.QueryProjection;
@@ -123,11 +122,11 @@ public class MovieDto {
         private Long movieId;
         private String title;
         private String imageUrl;
-        private List<GenreOfMovieStatus> genreOfMovieStatuses = new ArrayList<>();
+        private List<String> genreOfMovieStatuses = new ArrayList<>();
 
         @QueryProjection
         public SearchAllMovieDto(Long movieId, String title, String imageUrl,
-                                 GenreOfMovieStatus firstGenre, GenreOfMovieStatus secondGenre) {
+                                 String firstGenre, String secondGenre) {
             this.movieId = movieId;
             this.title = title;
             this.imageUrl = imageUrl;
@@ -153,6 +152,7 @@ public class MovieDto {
         public RelatedSearchMovieDto(Long movieId, String title, String imageUrl) {
             this.movieId = movieId;
             this.title = title;
+            this.imageUrl = imageUrl;
         }
     }
 }

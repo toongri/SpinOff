@@ -1,7 +1,6 @@
 package com.nameless.spin_off.entity.movie;
 
 import com.nameless.spin_off.entity.enums.ContentsTimeEnum;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
 import lombok.AccessLevel;
@@ -33,6 +32,7 @@ public class Movie extends BaseTimeEntity {
     private String directorName;
 
     private Double popularity;
+    private Integer year;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<FollowedMovie> followingMembers = new ArrayList<>();
@@ -43,17 +43,13 @@ public class Movie extends BaseTimeEntity {
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<ViewedMovieByIp> viewedMovieByIps = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    private GenreOfMovieStatus firstGenreOfMovieStatus;
+    private String firstGenreOfMovieStatus;
 
-    @Enumerated(EnumType.STRING)
-    private GenreOfMovieStatus secondGenreOfMovieStatus;
+    private String secondGenreOfMovieStatus;
 
-    @Enumerated(EnumType.STRING)
-    private GenreOfMovieStatus thirdGenreOfMovieStatus;
+    private String thirdGenreOfMovieStatus;
 
-    @Enumerated(EnumType.STRING)
-    private GenreOfMovieStatus fourthGenreOfMovieStatus;
+    private String fourthGenreOfMovieStatus;
 
     //==연관관계 메소드==//
     private Long addViewedMovieByIp(String ip) {
@@ -74,12 +70,13 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Movie createMovie(Long id, String title, String imageUrl, GenreOfMovieStatus firstGenreOfMovieStatus,
-                                    GenreOfMovieStatus secondGenreOfMovieStatus,
-                                    GenreOfMovieStatus thirdGenreOfMovieStatus,
-                                    GenreOfMovieStatus fourthGenreOfMovieStatus) {
+    public static Movie createMovie(Long id, String title, String imageUrl, String firstGenreOfMovieStatus, Integer year,
+                                    String secondGenreOfMovieStatus,
+                                    String thirdGenreOfMovieStatus,
+                                    String fourthGenreOfMovieStatus) {
 
         Movie movie = new Movie();
+        movie.updateYear(year);
         movie.updateId(id);
         movie.updateTitle(title);
         movie.updateImageUrl(imageUrl);
@@ -101,6 +98,9 @@ public class Movie extends BaseTimeEntity {
     public void updatePopularityZero() {
         popularity = 0.0;
     }
+    public void updateYear(Integer year) {
+        this.year = year;
+    }
 
     public void updatePopularity() {
         popularity = executeViewScore() + executeFollowScore() + executePostScore();
@@ -114,16 +114,16 @@ public class Movie extends BaseTimeEntity {
     private void updateId(Long id) {
         this.id = id;
     }
-    private void updateFirstGenreOfMovieStatus(GenreOfMovieStatus firstGenreOfMovieStatus) {
+    private void updateFirstGenreOfMovieStatus(String firstGenreOfMovieStatus) {
         this.firstGenreOfMovieStatus = firstGenreOfMovieStatus;
     }
-    private void updateSecondGenreOfMovieStatus(GenreOfMovieStatus secondGenreOfMovieStatus) {
+    private void updateSecondGenreOfMovieStatus(String secondGenreOfMovieStatus) {
         this.secondGenreOfMovieStatus = secondGenreOfMovieStatus;
     }
-    private void updateThirdGenreOfMovieStatus(GenreOfMovieStatus thirdGenreOfMovieStatus) {
+    private void updateThirdGenreOfMovieStatus(String thirdGenreOfMovieStatus) {
         this.thirdGenreOfMovieStatus = thirdGenreOfMovieStatus;
     }
-    private void updateFourthGenreOfMovieStatus(GenreOfMovieStatus fourthGenreOfMovieStatus) {
+    private void updateFourthGenreOfMovieStatus(String fourthGenreOfMovieStatus) {
         this.fourthGenreOfMovieStatus = fourthGenreOfMovieStatus;
     }
 
