@@ -48,6 +48,7 @@ dependencies {
 
 	implementation "org.springframework.boot:spring-boot-starter-data-jpa:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-web:${springFrameworkBootVersion}"
+	implementation "org.springframework.boot:spring-boot-starter-batch:${springFrameworkBootVersion}"
 	implementation "org.springframework.boot:spring-boot-starter-thymeleaf:${springFrameworkBootVersion}"
 	developmentOnly "org.springframework.boot:spring-boot-devtools:${springFrameworkBootVersion}"
 	testImplementation "org.springframework.boot:spring-boot-starter-test:${springFrameworkBootVersion}"

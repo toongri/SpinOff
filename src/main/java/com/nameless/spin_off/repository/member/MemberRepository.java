@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,4 +58,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
             "OR (blockedM.member.id = :id AND blockedM.blockedMemberStatus = :status)")
     List<Long> findBlockingAllAndBlockedAllByIdAndBlockStatus(@Param("id") Long id,
                                                               @Param("status") BlockedMemberStatus status);
+
+    @Query("SELECT m FROM Member m " +
+            "JOIN FETCH m.followingMembers followingM " +
+            "LEFT JOIN FETCH m.blockingMembers blockingM " +
+            "LEFT JOIN FETCH m.complains complainM " +
+            "WHERE (followingM.createdDate > :time)")
+    List<Member> findAllByViewAfterTime(@Param("time") LocalDateTime time);
 }

@@ -43,7 +43,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
-
     public List<MembersByContentDto> findAllLikeMemberByPostId(Long postId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MembersByContentDto(

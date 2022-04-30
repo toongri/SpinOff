@@ -92,14 +92,6 @@ public class MemberServiceJpa implements MemberService {
         return member.addSearch(content, searchedByMemberStatus);
     }
 
-    @Override
-    public Long getMemberForRead(Long currentMemberId, Long targetMemberId) {
-
-
-
-        return null;
-    }
-
     @Transactional
     @Override
     public int updateAllPopularity() {

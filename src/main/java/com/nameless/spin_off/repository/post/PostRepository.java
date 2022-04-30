@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
@@ -13,4 +15,9 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "LEFT JOIN FETCH post.collectedPosts collectedPost " +
             "WHERE post.id = :id")
     Optional<Post> findOneByIdWithCollectedPost(@Param("id") Long id);
+
+    @Query("SELECT p FROM Post p " +
+            "JOIN FETCH p.viewedPostByIps view " +
+            "WHERE (view.createdDate > :time)")
+    List<Post> findAllByViewAfterTime(@Param("time") LocalDateTime time);
 }
