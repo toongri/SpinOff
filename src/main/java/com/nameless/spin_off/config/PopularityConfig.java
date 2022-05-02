@@ -17,6 +17,8 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,7 +41,6 @@ public class PopularityConfig {
     private final CollectionRepository collectionRepository;
     private final HashtagRepository hashtagRepository;
     private final MovieRepository movieRepository;
-
 
     @Bean
     public Job popularityJob(
@@ -68,9 +69,9 @@ public class PopularityConfig {
         log.info("********** This is popularityMemberJob");
         return stepBuilderFactory.get("popularityMemberJob")  // 2_1
                 .<Member, Member> chunk(100)  // 2_2
-                .reader()  // 2_3
-                .processor()  // 2_4
-                .writer()  // 2_5
+                .reader(popularityMemberReader())  // 2_3
+                .processor(this.popularityMemberProcessor())  // 2_4
+                .writer(this.popularityMemberWriter())  // 2_5
                 .build();  // 2_6
     }
 
@@ -81,9 +82,9 @@ public class PopularityConfig {
         log.info("********** This is popularityPostJob");
         return stepBuilderFactory.get("popularityPostJob")  // 3_1
                 .<Post, Post> chunk(100)  // 3_2
-                .reader()  // 3_3
-                .processor()  // 3_4
-                .writer()  // 3_5
+                .reader(popularityPostReader())  // 3_3
+                .processor(this.popularityPostProcessor())  // 3_4
+                .writer(this.popularityPostWriter())  // 3_5
                 .build();  // 3_6
     }
 
@@ -94,9 +95,9 @@ public class PopularityConfig {
         log.info("********** This is popularityCollectionJob");
         return stepBuilderFactory.get("popularityCollectionJob")  // 4_1
                 .<Collection, Collection> chunk(100)  // 4_2
-                .reader()  // 4_3
-                .processor()  // 4_4
-                .writer()  // 4_5
+                .reader(popularityCollectionReader())  // 4_3
+                .processor(this.popularityCollectionProcessor())  // 4_4
+                .writer(this.popularityCollectionWriter())  // 4_5
                 .build();  // 4_6
     }
 
@@ -107,9 +108,9 @@ public class PopularityConfig {
         log.info("********** This is popularityHashtagJob");
         return stepBuilderFactory.get("popularityHashtagJob")  // 5_1
                 .<Hashtag, Hashtag> chunk(100)  // 5_2
-                .reader()  // 5_3
-                .processor()  // 5_4
-                .writer()  // 5_5
+                .reader(popularityHashtagReader())  // 5_3
+                .processor(this.popularityHashtagProcessor())  // 5_4
+                .writer(this.popularityHashtagWriter())  // 5_5
                 .build();  // 5_6
     }
 
@@ -120,9 +121,9 @@ public class PopularityConfig {
         log.info("********** This is popularityMovieJob");
         return stepBuilderFactory.get("popularityMovieJob")  // 6_1
                 .<Movie, Movie> chunk(10)  // 6_2
-                .reader()  // 6_3
-                .processor()  // 6_4
-                .writer()  // 6_5
+                .reader(popularityMovieReader())  // 6_3
+                .processor(this.popularityMovieProcessor())  // 6_4
+                .writer(this.popularityMovieWriter())  // 6_5
                 .build();  // 6_6
     }
 
@@ -169,5 +170,86 @@ public class PopularityConfig {
         List<Movie> activeMovies = movieRepository.findAllByViewAfterTime(MOVIE_VIEW.getOldestDate());
         log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
         return new ListItemReader<>(activeMovies);  // 3
+    }
+
+    public ItemProcessor<Member, Member> popularityMemberProcessor() {
+        return new ItemProcessor<Member, Member>() {  // 1
+            @Override
+            public Member process(Member member) throws Exception {
+                log.info("********** This is popularityMemberProcessor");
+                member.updatePopularity();
+                return member;  // 2
+            }
+        };
+    }
+
+
+    public ItemProcessor<Post, Post> popularityPostProcessor() {
+        return new ItemProcessor<Post, Post>() {  // 1
+            @Override
+            public Post process(Post post) throws Exception {
+                log.info("********** This is popularityPostProcessor");
+                post.updatePopularity();
+                return post;  // 2
+            }
+        };
+    }
+
+    public ItemProcessor<Collection, Collection> popularityCollectionProcessor() {
+        return new ItemProcessor<Collection, Collection>() {  // 1
+            @Override
+            public Collection process(Collection collection) throws Exception {
+                log.info("********** This is popularityCollectionProcessor");
+                collection.updatePopularity();
+                return collection;  // 2
+            }
+        };
+    }
+
+    public ItemProcessor<Hashtag, Hashtag> popularityHashtagProcessor() {
+        return new ItemProcessor<Hashtag, Hashtag>() {  // 1
+            @Override
+            public Hashtag process(Hashtag hashtag) throws Exception {
+                log.info("********** This is popularityHashtagProcessor");
+                hashtag.updatePopularity();
+                return hashtag;  // 2
+            }
+        };
+    }
+
+    public ItemProcessor<Movie, Movie> popularityMovieProcessor() {
+        return new ItemProcessor<Movie, Movie>() {  // 1
+            @Override
+            public Movie process(Movie movie) throws Exception {
+                log.info("********** This is popularityMovieProcessor");
+                movie.updatePopularity();
+                return movie;  // 2
+            }
+        };
+    }
+
+    public ItemWriter<Member> popularityMemberWriter() {
+        log.info("********** This is popularityMemberWriter");
+        return (memberRepository::saveAll);
+    }
+
+    public ItemWriter<Post> popularityPostWriter() {
+        log.info("********** This is popularityPostWriter");
+        return (postRepository::saveAll);
+    }
+
+    public ItemWriter<Collection> popularityCollectionWriter() {
+        log.info("********** This is popularityCollectionWriter");
+        return (collectionRepository::saveAll);
+    }
+
+    public ItemWriter<Hashtag> popularityHashtagWriter() {
+        log.info("********** This is popularityHashtagWriter");
+        return (hashtagRepository::saveAll);
+    }
+
+    public ItemWriter<Movie> popularityMovieWriter() {
+        log.info("********** This is popularityMovieWriter");
+        return (movieRepository::saveAll);
     }
 }
