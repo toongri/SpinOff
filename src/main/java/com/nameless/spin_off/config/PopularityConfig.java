@@ -41,31 +41,24 @@ public class PopularityConfig {
     private final CollectionRepository collectionRepository;
     private final HashtagRepository hashtagRepository;
     private final MovieRepository movieRepository;
+    private final JobBuilderFactory jobBuilderFactory;
+    private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    public Job popularityJob(
-            JobBuilderFactory jobBuilderFactory,
-            Step popularityMemberJob,
-            Step popularityPostJob,
-            Step popularityCollectionJob,
-            Step popularityHashtagJob,
-            Step popularityMovieJob
-    ) {
+    public Job popularityJob() {
         log.info("********** This is popularityJob");
         return jobBuilderFactory.get("popularityJob")  // 1_1
                 .preventRestart()  // 1_2
-                .start(popularityMemberJob)  // 1_3
-                .next(popularityPostJob) // 1_4
-                .next(popularityCollectionJob) // 1_5
-                .next(popularityHashtagJob) // 1_6
-                .next(popularityMovieJob) // 1_7
+                .start(popularityMemberJob())  // 1_3
+                .next(popularityPostJob()) // 1_4
+                .next(popularityCollectionJob()) // 1_5
+                .next(popularityHashtagJob()) // 1_6
+                .next(popularityMovieJob()) // 1_7
                 .build(); // 1_8
     }
 
     @Bean
-    public Step popularityMemberJob(
-            StepBuilderFactory stepBuilderFactory
-    ) {
+    public Step popularityMemberJob() {
         log.info("********** This is popularityMemberJob");
         return stepBuilderFactory.get("popularityMemberJob")  // 2_1
                 .<Member, Member> chunk(100)  // 2_2
@@ -76,9 +69,7 @@ public class PopularityConfig {
     }
 
     @Bean
-    public Step popularityPostJob(
-            StepBuilderFactory stepBuilderFactory
-    ) {
+    public Step popularityPostJob() {
         log.info("********** This is popularityPostJob");
         return stepBuilderFactory.get("popularityPostJob")  // 3_1
                 .<Post, Post> chunk(100)  // 3_2
@@ -89,9 +80,7 @@ public class PopularityConfig {
     }
 
     @Bean
-    public Step popularityCollectionJob(
-            StepBuilderFactory stepBuilderFactory
-    ) {
+    public Step popularityCollectionJob() {
         log.info("********** This is popularityCollectionJob");
         return stepBuilderFactory.get("popularityCollectionJob")  // 4_1
                 .<Collection, Collection> chunk(100)  // 4_2
@@ -102,9 +91,7 @@ public class PopularityConfig {
     }
 
     @Bean
-    public Step popularityHashtagJob(
-            StepBuilderFactory stepBuilderFactory
-    ) {
+    public Step popularityHashtagJob() {
         log.info("********** This is popularityHashtagJob");
         return stepBuilderFactory.get("popularityHashtagJob")  // 5_1
                 .<Hashtag, Hashtag> chunk(100)  // 5_2
@@ -115,9 +102,7 @@ public class PopularityConfig {
     }
 
     @Bean
-    public Step popularityMovieJob(
-            StepBuilderFactory stepBuilderFactory
-    ) {
+    public Step popularityMovieJob() {
         log.info("********** This is popularityMovieJob");
         return stepBuilderFactory.get("popularityMovieJob")  // 6_1
                 .<Movie, Movie> chunk(10)  // 6_2
