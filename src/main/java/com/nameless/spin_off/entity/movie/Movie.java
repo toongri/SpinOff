@@ -70,12 +70,14 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Movie createMovie(Long id, String title, String imageUrl, String firstGenreOfMovieStatus, Integer year,
+    public static Movie createMovie(Long id, String title, String imageUrl, Integer year, String directorName,
+                                    String firstGenreOfMovieStatus,
                                     String secondGenreOfMovieStatus,
                                     String thirdGenreOfMovieStatus,
                                     String fourthGenreOfMovieStatus) {
 
         Movie movie = new Movie();
+        movie.updateDirectorName(directorName);
         movie.updateYear(year);
         movie.updateId(id);
         movie.updateTitle(title);
@@ -87,6 +89,7 @@ public class Movie extends BaseTimeEntity {
         movie.updateFourthGenreOfMovieStatus(fourthGenreOfMovieStatus);
         return movie;
     }
+
     public static Movie createMovie(Long id) {
         Movie movie = new Movie();
         movie.updateId(id);
@@ -95,6 +98,9 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateDirectorName(String directorName) {
+        this.directorName = directorName;
+    }
     public void updatePopularityZero() {
         popularity = 0.0;
     }
