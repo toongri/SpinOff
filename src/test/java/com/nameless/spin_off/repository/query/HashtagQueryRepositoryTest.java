@@ -3,7 +3,6 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -526,9 +525,8 @@ public class HashtagQueryRepositoryTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
-                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
-                    null, null));
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
+                    "A", "C", null, null));
         }
         memberRepository.saveAll(memberList);
         movieRepository.saveAll(movieList);

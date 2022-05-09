@@ -89,9 +89,9 @@ class SearchQueryServiceJpaTest {
 
         memberService.insertFollowedMemberByMemberId(memberId2, memberId);
 
-        Movie mov = movieRepository.save(Movie.createMovie(0L, keyword+"asfd", "",
+        Movie mov = movieRepository.save(Movie.createMovie(0L, keyword+"asfd", "", null, null,
                 null, null, null, null));
-        Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", "",
+        Movie mov2 = movieRepository.save(Movie.createMovie(1L, keyword+"h2tr", "", null, null,
                 null, null, null, null));
 
         movieService.insertViewedMovieByIp("aa", mov.getId());

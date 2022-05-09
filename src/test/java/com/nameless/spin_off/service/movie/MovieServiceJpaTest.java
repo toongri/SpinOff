@@ -32,9 +32,9 @@ class MovieServiceJpaTest {
     public void 영화_조회수_증가() throws Exception{
 
         //given
-        Movie mov = movieRepository.save(Movie.createMovie(0L, "", "", null, null, null, null));
-        Movie mov2 = movieRepository.save(Movie.createMovie(1L, "", "", null, null, null, null));
-        Movie mov3 = movieRepository.save(Movie.createMovie(2L, "", "", null, null, null, null));
+        Movie mov = movieRepository.save(Movie.createMovie(0L, "", "", null, null, null, null, null, null));
+        Movie mov2 = movieRepository.save(Movie.createMovie(1L, "", "", null, null, null, null, null, null));
+        Movie mov3 = movieRepository.save(Movie.createMovie(2L, "", "", null, null, null, null, null, null));
 
         em.flush();
         em.clear();
@@ -70,7 +70,7 @@ class MovieServiceJpaTest {
         Member member = Member.buildMember().build();
         Long memberId = memberRepository.save(member).getId();
         Movie movie = Movie.createMovie(
-                0L, "abc", "d", null, null,
+                0L, "abc", "d", null, null, null, null,
                 null, null);
         Long movieId = movieRepository.save(movie).getId();
 
@@ -106,7 +106,7 @@ class MovieServiceJpaTest {
         //given
         Member member = Member.buildMember().build();
         Long memberId = memberRepository.save(member).getId();
-        Movie movie = Movie.createMovie(0L, "abc", "d", null, null, null, null);
+        Movie movie = Movie.createMovie(0L, "abc", "d", null, null, null, null, null, null);
         Long movieId = movieRepository.save(movie).getId();
 
         em.flush();

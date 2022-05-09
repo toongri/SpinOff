@@ -12,6 +12,9 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 25MB
+  batch:
+    job:
+      enabled: false
 cloud:
   aws:
     s3:

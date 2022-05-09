@@ -1,4 +1,7 @@
 spring:
+  batch:
+    job:
+      enabled: false
   oauth:
     err: test
     default: test

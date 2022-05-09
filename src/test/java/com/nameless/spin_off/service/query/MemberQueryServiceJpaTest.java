@@ -14,7 +14,6 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -468,7 +467,7 @@ public class MemberQueryServiceJpaTest {
         assertThat(memberForRead3.getId()).isEqualTo(member.getId());
         assertThat(memberForRead3.getBio()).isEqualTo(member.getBio());
         assertThat(memberForRead3.getFollowerSize()).isEqualTo(5);
-        assertThat(memberForRead3.getFollowingSize()).isEqualTo(3);
+        assertThat(memberForRead3.getFollowingSize()).isEqualTo(4);
         assertThat(memberForRead3.getProfileUrl()).isEqualTo(member.getProfileImg());
         assertThat(memberForRead3.isFollowed()).isEqualTo(true);
         assertThat(memberForRead3.isAdmin()).isEqualTo(false);
@@ -722,9 +721,8 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
-                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
-                    null, null));
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
+                    "A", "C", null, null));
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);

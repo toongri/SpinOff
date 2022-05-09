@@ -15,7 +15,6 @@ import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -215,7 +214,7 @@ public class PostQueryServiceJpaTest {
         memberRepository.save(member2);
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, " ", " ",
+            movieList.add(Movie.createMovie((long) i, " ", " ", null, null,
                     null, null, null, null));
         }
         movieList = movieRepository.saveAll(movieList);
@@ -611,8 +610,8 @@ public class PostQueryServiceJpaTest {
         }
         memberRepository.saveAll(memberList);
 
-        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail",
-                GenreOfMovieStatus.A, null, null, null);
+        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail", null, null,
+                "A", null, null, null);
 
         movieRepository.save(movie);
 

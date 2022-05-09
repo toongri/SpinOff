@@ -3,7 +3,6 @@ package com.nameless.spin_off.repository.movie;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -56,9 +55,8 @@ public class MovieQueryRepositoryTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
-                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
-                    null, null));
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
+                    "A", "C", null, null));
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
         }
 
@@ -129,11 +127,11 @@ public class MovieQueryRepositoryTest {
                         movieList.get(2).getId());
         assertThat(content.stream().map(MovieDto.SearchAllMovieDto::getGenreOfMovieStatuses).collect(Collectors.toList()))
                 .containsExactly(
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C),
-                        List.of(GenreOfMovieStatus.A, GenreOfMovieStatus.C));
+                        List.of("A", "C"),
+                        List.of("A", "C"),
+                        List.of("A", "C"),
+                        List.of("A", "C"),
+                        List.of("A", "C"),
+                        List.of("A", "C"));
     }
 }

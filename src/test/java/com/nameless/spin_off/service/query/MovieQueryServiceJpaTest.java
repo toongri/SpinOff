@@ -7,7 +7,6 @@ import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.movie.GenreOfMovieStatus;
 import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -67,8 +66,8 @@ class MovieQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
-                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
+                    "A", "C",
                     null, null));
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
         }
@@ -156,8 +155,8 @@ class MovieQueryServiceJpaTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "",
-                    GenreOfMovieStatus.A, GenreOfMovieStatus.C,
+            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
+                    "A", "C",
                     null, null));
         }
         memberRepository.saveAll(memberList);
