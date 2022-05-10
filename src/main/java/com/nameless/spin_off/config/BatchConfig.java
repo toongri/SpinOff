@@ -34,7 +34,7 @@ import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 @Slf4j  // log 사용을 위한 lombok Annotation
 @RequiredArgsConstructor
 @Configuration
-public class PopularityConfig {
+public class BatchConfig {
 
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
@@ -55,6 +55,26 @@ public class PopularityConfig {
                 .next(popularityHashtagJob()) // 1_6
                 .next(popularityMovieJob()) // 1_7
                 .build(); // 1_8
+    }
+
+    @Bean
+    public Job movieJob() {
+        log.info("********** This is movieJob");
+        return jobBuilderFactory.get("movieJob")  // 1_1
+                .preventRestart()  // 1_2
+                .start(popularityMemberJob())  // 1_3
+                .build(); // 1_8
+    }
+
+    @Bean
+    public Step movieStepJob() {
+        log.info("********** This is movieStepJob");
+        return stepBuilderFactory.get("movieStepJob")  // 2_1
+                .<Member, Member> chunk(100)  // 2_2
+                .reader(popularityMemberReader())  // 2_3
+                .processor(this.popularityMemberProcessor())  // 2_4
+                .writer(this.popularityMemberWriter())  // 2_5
+                .build();  // 2_6
     }
 
     @Bean
@@ -110,6 +130,15 @@ public class PopularityConfig {
                 .processor(this.popularityMovieProcessor())  // 6_4
                 .writer(this.popularityMovieWriter())  // 6_5
                 .build();  // 6_6
+    }
+
+    @Bean
+    @StepScope  // 1
+    public ListItemReader<Member> movieReader() {
+        log.info("********** This is movieReader");
+        List<Member> activeMembers = memberRepository.findAllByViewAfterTime(MEMBER_FOLLOW.getOldestDate());
+        log.info("          - activeMember SIZE : " + activeMembers.size());  // 2
+        return new ListItemReader<>(activeMembers);  // 3
     }
 
     @Bean

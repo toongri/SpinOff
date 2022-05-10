@@ -21,16 +21,16 @@ import java.util.Map;
 public class SchedulerConfig {
 
     private final JobLauncher jobLauncher;
-    private final PopularityConfig popularityConfig;
+    private final BatchConfig batchConfig;
 
     @Scheduled(fixedDelay = 10800000)
-    public void runJob() {
+    public void popularityJob() {
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
         JobParameters jobParameters = new JobParameters(confMap);
 
         try {
-            jobLauncher.run(popularityConfig.popularityJob(), jobParameters);
+            jobLauncher.run(batchConfig.popularityJob(), jobParameters);
         } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException |
                 JobParametersInvalidException | JobRestartException e) {
             log.error(e.getMessage());

@@ -26,13 +26,12 @@ public class Movie extends BaseTimeEntity {
     private Long id;
 
     private String title;
-
     private String thumbnail;
-
     private String directorName;
-
-    private Double popularity;
     private Integer year;
+    private String naverUrl;
+    private String nation;
+    private Double popularity;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<FollowedMovie> followingMembers = new ArrayList<>();
@@ -70,23 +69,15 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==생성 메소드==//
-    public static Movie createMovie(Long id, String title, String imageUrl, Integer year, String directorName,
-                                    String firstGenreOfMovieStatus,
-                                    String secondGenreOfMovieStatus,
-                                    String thirdGenreOfMovieStatus,
-                                    String fourthGenreOfMovieStatus) {
+    public static Movie createMovie(Long id, String title, Integer year, String directorName, String nation) {
 
         Movie movie = new Movie();
         movie.updateDirectorName(directorName);
         movie.updateYear(year);
+        movie.updateNation(nation);
         movie.updateId(id);
         movie.updateTitle(title);
-        movie.updateImageUrl(imageUrl);
         movie.updatePopularityZero();
-        movie.updateFirstGenreOfMovieStatus(firstGenreOfMovieStatus);
-        movie.updateSecondGenreOfMovieStatus(secondGenreOfMovieStatus);
-        movie.updateThirdGenreOfMovieStatus(thirdGenreOfMovieStatus);
-        movie.updateFourthGenreOfMovieStatus(fourthGenreOfMovieStatus);
         return movie;
     }
 
@@ -98,6 +89,12 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateNation(String nation) {
+        this.nation = nation;
+    }
+    public void updateNaverUrl(String naverUrl) {
+        this.naverUrl = naverUrl;
+    }
     public void updateDirectorName(String directorName) {
         this.directorName = directorName;
     }
@@ -119,6 +116,24 @@ public class Movie extends BaseTimeEntity {
     }
     private void updateId(Long id) {
         this.id = id;
+    }
+
+    public void updateGenres(List<String> genres) {
+        if (genres.size() > 3) {
+            updateFirstGenreOfMovieStatus(genres.get(0));
+            updateSecondGenreOfMovieStatus(genres.get(1));
+            updateThirdGenreOfMovieStatus(genres.get(2));
+            updateFourthGenreOfMovieStatus(genres.get(3));
+        } else if (genres.size() == 3) {
+            updateFirstGenreOfMovieStatus(genres.get(0));
+            updateSecondGenreOfMovieStatus(genres.get(1));
+            updateThirdGenreOfMovieStatus(genres.get(2));
+        } else if (genres.size() == 2) {
+            updateFirstGenreOfMovieStatus(genres.get(0));
+            updateSecondGenreOfMovieStatus(genres.get(1));
+        } else if (genres.size() == 1) {
+            updateFirstGenreOfMovieStatus(genres.get(0));
+        }
     }
     private void updateFirstGenreOfMovieStatus(String firstGenreOfMovieStatus) {
         this.firstGenreOfMovieStatus = firstGenreOfMovieStatus;
