@@ -525,8 +525,7 @@ public class HashtagQueryRepositoryTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
-                    "A", "C", null, null));
+            movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
         }
         memberRepository.saveAll(memberList);
         movieRepository.saveAll(movieList);

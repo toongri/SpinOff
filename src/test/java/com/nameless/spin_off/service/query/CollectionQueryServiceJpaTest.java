@@ -1035,8 +1035,7 @@ public class CollectionQueryServiceJpaTest {
             memberList.add(Member.buildMember().setNickname(""+i).build());
         }
         memberRepository.saveAll(memberList);
-        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail", null, null,
-                "A", null, null, null);
+        Movie movie = Movie.createMovie(0L, "movietitle", null, null, null);
 
         movieRepository.save(movie);
 

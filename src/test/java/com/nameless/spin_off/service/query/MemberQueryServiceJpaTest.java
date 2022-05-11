@@ -721,8 +721,7 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, keyword + i, i + "", null, null,
-                    "A", "C", null, null));
+            movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             memberList.add(Member.buildMember().setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);

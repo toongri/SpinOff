@@ -61,6 +61,8 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+kobis:
+  key: key
 org:
   gradle:
     daemon: false

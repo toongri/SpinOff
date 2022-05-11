@@ -1,6 +1,7 @@
 package com.nameless.spin_off.config.movie;
 
 import com.nameless.spin_off.entity.movie.Movie;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,19 +18,29 @@ import java.util.*;
 @Service
 public class MovieApiService {
 
+    @Value("${kobis.key}")
+    private String key;
+
     public List<Movie> findAllNew() {
 
         HashMap<String, Object> result = new HashMap<String, Object>();
-        String jsonInString = "";
         List<Movie> newMovieList = new ArrayList<>();
+        int itemPerPage = 100;
+        int curPage = 1;
         try {
             RestTemplate restTemplate = new RestTemplate();
 
             HttpHeaders header = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(header);
-            String url = "http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json";
+            String url = "http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json";
 
-            UriComponents uri = UriComponentsBuilder.fromHttpUrl(url+"?"+"key=f5eef3421c602c6cb7ea224104795888&targetDt=20210802").build();
+            UriComponents uri = UriComponentsBuilder
+                    .fromHttpUrl(
+                            url + "?" +
+                                    "key=" + key + "&" +
+                                    "itemPerPage=" + itemPerPage + "&" +
+                                    "curPage=" + curPage)
+                    .build();
 
             //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);

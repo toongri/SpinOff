@@ -214,8 +214,7 @@ public class PostQueryServiceJpaTest {
         memberRepository.save(member2);
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            movieList.add(Movie.createMovie((long) i, " ", " ", null, null,
-                    null, null, null, null));
+            movieList.add(Movie.createMovie((long) i, " ", null, null, null));
         }
         movieList = movieRepository.saveAll(movieList);
 
@@ -610,8 +609,7 @@ public class PostQueryServiceJpaTest {
         }
         memberRepository.saveAll(memberList);
 
-        Movie movie = Movie.createMovie(0L, "movietitle", "moviethumbnail", null, null,
-                "A", null, null, null);
+        Movie movie = Movie.createMovie(0L, "movietitle", null, null, null);
 
         movieRepository.save(movie);
 
