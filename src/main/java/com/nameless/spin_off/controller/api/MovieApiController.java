@@ -2,11 +2,14 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.config.movie.MovieApiService;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
+import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMovieException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
+import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.service.movie.MovieService;
 import com.nameless.spin_off.service.query.MovieQueryService;
 import io.swagger.annotations.Api;
@@ -17,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
@@ -30,6 +34,18 @@ public class MovieApiController {
 
     private final MovieService movieService;
     private final MovieQueryService movieQueryService;
+    private final MovieApiService movieApiService;
+    private final MovieRepository movieRepository;
+
+    @GetMapping("/test")
+    public List<Movie> test() {
+        List<Movie> allNew = movieApiService.findAllNew();
+        List<Movie> news = new ArrayList<>();
+        for (Movie movie : allNew) {
+            movieApiService.updateThumbnailAndUrlByMovie(movie);
+        }
+        return  movieRepository.saveAll(allNew);
+    }
 
     @ApiOperation(value = "영화 팔로우 생성", notes = "")
     @ApiImplicitParams({

@@ -22,6 +22,10 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
 
     @Query("SELECT m FROM Movie m " +
             "JOIN FETCH m.viewedMovieByIps view " +
-            "WHERE (view.createdDate > :time)")
+            "WHERE view.createdDate > :time")
     List<Movie> findAllByViewAfterTime(@Param("time") LocalDateTime time);
+
+    @Query("SELECT m.id FROM Movie m " +
+            "WHERE m.id in :ids")
+    List<Long> findAllIdsById(@Param("ids") List<Long> ids);
 }

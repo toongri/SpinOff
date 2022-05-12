@@ -10,11 +10,34 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Slice;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.nameless.spin_off.entity.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNAIL_NUMBER;
 
 public class MovieDto {
+
+    @Data
+    public static class NaverMoviesResponseDto {
+
+        private int display;
+        private List<NaverMovie> items;
+//        private Item[] items;
+        @Data
+        @NoArgsConstructor
+        @AllArgsConstructor
+        public static class NaverMovie {
+            private String title;
+            private String link;
+            private String image;
+            private String subtitle;
+            private Date pubDate;
+            private String director;
+            private String actor;
+            private float userRating;
+        }
+    }
+
 
     @Data
     @NoArgsConstructor

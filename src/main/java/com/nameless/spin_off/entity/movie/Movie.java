@@ -108,7 +108,7 @@ public class Movie extends BaseTimeEntity {
     public void updatePopularity() {
         popularity = executeViewScore() + executeFollowScore() + executePostScore();
     }
-    private void updateImageUrl(String imageUrl) {
+    public void updateImageUrl(String imageUrl) {
         this.thumbnail = imageUrl;
     }
     private void updateTitle(String title) {
