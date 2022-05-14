@@ -41,13 +41,14 @@ public class MovieApiService {
     @Value("${kobis.key}")
     private String key;
     private String kobisUrl = "http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json";
+    private String kobisInfoUrl = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
     private String naverUrl = "https://openapi.naver.com/v1/search/movie.json";
 
     public List<Movie> findAllNew() {
 
-        HashMap<String, Object> result = new HashMap<String, Object>();
         List<Movie> newMovieList = new ArrayList<>();
-        for (int curPage = 1; curPage <= API_REQUEST_NUMBER_MAX.getValue(); curPage++) {
+        int startPage = 1;
+        for (int curPage = 0; curPage < API_REQUEST_NUMBER_MAX.getValue(); curPage++) {
             try {
                 HttpHeaders header = new HttpHeaders();
                 HttpEntity<?> entity = new HttpEntity<>(header);
@@ -57,14 +58,11 @@ public class MovieApiService {
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
                                         "itemPerPage=" + API_REQUEST_LENGTH_MAX.getValue() + "&" +
-                                        "curPage=" + curPage)
+                                        "curPage=" + startPage + curPage)
                         .build();
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-                result.put("statusCode", resultMap.getStatusCodeValue()); //http status code를 확인
-                result.put("header", resultMap.getHeaders()); //헤더 정보 확인
-                result.put("body", resultMap.getBody()); //실제 데이터 정보 확인
 
                 LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>)lm.get("movieList");
@@ -115,9 +113,68 @@ public class MovieApiService {
         return newMovieList;
     }
 
-    public void updateThumbnailAndUrlByMovie(Movie movie) {
-        HashMap<String, Object> result = new HashMap<String, Object>();
+    public void updateActorsMovie(Movie movie) {
+        try {
+            HttpHeaders header = new HttpHeaders();
+            HttpEntity<?> entity = new HttpEntity<>(header);
 
+            UriComponents uri = UriComponentsBuilder
+                    .fromHttpUrl(
+                            kobisInfoUrl + "?" +
+                                    "key=" + key + "&" +
+                                    "movieCd=" + movie.getId())
+                    .build();
+
+            //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
+            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+
+            LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieListResult");
+            ArrayList<Map> movieList = (ArrayList<Map>)lm.get("movieList");
+            List<Movie> newPartMovieList = new ArrayList<>();
+
+            for (Map obj : movieList) {
+                ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
+                String director = getDirector(directors);
+
+
+                Movie movie = Movie.createMovie(Long.parseLong(String.valueOf(obj.get("movieCd"))),
+                        String.valueOf(obj.get("movieNm")),
+                        Integer.parseInt(String.valueOf(obj.get("prdtYear"))),
+                        director, String.valueOf(obj.get("repNationNm")));
+
+                List<String> genres = Arrays.asList(String.valueOf(obj.get("genreAlt")).split(","));
+
+                movie.updateGenres(genres);
+                newPartMovieList.add(movie);
+            }
+
+            List<Long> movieIds = newPartMovieList.stream().map(Movie::getId).collect(Collectors.toList());
+
+            List<Long> allIdsById = movieRepository.findAllIdsById(movieIds);
+
+            List<Movie> resultMovieList = newPartMovieList
+                    .stream()
+                    .filter(m -> m.getDirectorName() != null)
+                    .filter(m -> !allIdsById.contains(m.getId()))
+                    .collect(Collectors.toList());
+
+            if (resultMovieList.isEmpty()) {
+                break;
+            }
+
+            newMovieList.addAll(resultMovieList);
+
+        } catch (HttpClientErrorException | HttpServerErrorException e) {
+            log.info("kobisMovieError");
+            log.info("statusCode : {}", e.getRawStatusCode());
+            log.info("body : {}", e.getStatusText());
+        } catch (Exception e) {
+            log.debug("kobisMovieError");
+            log.debug("예상하지 못한 에러, 데이터 오류 : {}", e.toString());
+        }
+    }
+
+    public void updateThumbnailAndUrlByMovie(Movie movie) {
         try {
             HttpHeaders headers = new HttpHeaders(); // 헤더에 key들을 담아준다.
             headers.set("X-Naver-Client-Id", naverClientId);
