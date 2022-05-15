@@ -32,6 +32,7 @@ public class Movie extends BaseTimeEntity {
     private String naverUrl;
     private String nation;
     private Double popularity;
+    private String actors;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<FollowedMovie> followingMembers = new ArrayList<>();
@@ -89,6 +90,9 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateActors(String actors) {
+        this.actors = actors;
+    }
     public void updateNation(String nation) {
         this.nation = nation;
     }

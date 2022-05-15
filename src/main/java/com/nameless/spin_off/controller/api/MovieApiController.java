@@ -38,11 +38,12 @@ public class MovieApiController {
     private final MovieRepository movieRepository;
 
     @GetMapping("/test")
-    public List<Movie> test() {
-        List<Movie> allNew = movieApiService.findAllNew();
+    public List<Movie> test(int startPage) {
+        List<Movie> allNew = movieApiService.findAllNew(startPage);
         List<Movie> news = new ArrayList<>();
         for (Movie movie : allNew) {
             movieApiService.updateThumbnailAndUrlByMovie(movie);
+            movieApiService.updateActorsMovie(movie);
         }
         return  movieRepository.saveAll(allNew);
     }

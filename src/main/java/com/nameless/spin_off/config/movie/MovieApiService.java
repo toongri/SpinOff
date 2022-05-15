@@ -44,10 +44,9 @@ public class MovieApiService {
     private String kobisInfoUrl = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
     private String naverUrl = "https://openapi.naver.com/v1/search/movie.json";
 
-    public List<Movie> findAllNew() {
+    public List<Movie> findAllNew(int startPage) {
 
         List<Movie> newMovieList = new ArrayList<>();
-        int startPage = 1;
         for (int curPage = 0; curPage < API_REQUEST_NUMBER_MAX.getValue(); curPage++) {
             try {
                 HttpHeaders header = new HttpHeaders();
@@ -64,8 +63,8 @@ public class MovieApiService {
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
 
-                LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieListResult");
-                ArrayList<Map> movieList = (ArrayList<Map>)lm.get("movieList");
+                LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
+                ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
                 List<Movie> newPartMovieList = new ArrayList<>();
 
                 for (Map obj : movieList) {
@@ -104,9 +103,12 @@ public class MovieApiService {
                 log.info("kobisMovieError");
                 log.info("statusCode : {}", e.getRawStatusCode());
                 log.info("body : {}", e.getStatusText());
+            } catch (NumberFormatException e) {
+                log.debug("kobisMovieDataError");
+                log.debug("데이터 오류 : {}", e.toString());
             } catch (Exception e) {
                 log.debug("kobisMovieError");
-                log.debug("예상하지 못한 에러, 데이터 오류 : {}", e.toString());
+                log.debug("예상하지 못한 에러 : {}", e.toString());
             }
         }
 
@@ -128,49 +130,22 @@ public class MovieApiService {
             //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
 
-            LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieListResult");
-            ArrayList<Map> movieList = (ArrayList<Map>)lm.get("movieList");
-            List<Movie> newPartMovieList = new ArrayList<>();
+            LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieInfoResult");
+            Map movieInfo = (Map)lm.get("movieInfo");
 
-            for (Map obj : movieList) {
-                ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
-                String director = getDirector(directors);
-
-
-                Movie movie = Movie.createMovie(Long.parseLong(String.valueOf(obj.get("movieCd"))),
-                        String.valueOf(obj.get("movieNm")),
-                        Integer.parseInt(String.valueOf(obj.get("prdtYear"))),
-                        director, String.valueOf(obj.get("repNationNm")));
-
-                List<String> genres = Arrays.asList(String.valueOf(obj.get("genreAlt")).split(","));
-
-                movie.updateGenres(genres);
-                newPartMovieList.add(movie);
-            }
-
-            List<Long> movieIds = newPartMovieList.stream().map(Movie::getId).collect(Collectors.toList());
-
-            List<Long> allIdsById = movieRepository.findAllIdsById(movieIds);
-
-            List<Movie> resultMovieList = newPartMovieList
-                    .stream()
-                    .filter(m -> m.getDirectorName() != null)
-                    .filter(m -> !allIdsById.contains(m.getId()))
-                    .collect(Collectors.toList());
-
-            if (resultMovieList.isEmpty()) {
-                break;
-            }
-
-            newMovieList.addAll(resultMovieList);
+            ArrayList<Map> actors = (ArrayList<Map>) (movieInfo.get("actors"));
+            movie.updateActors(getActors(actors));
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.info("kobisMovieError");
+            log.info("kobisInfoMovieError");
             log.info("statusCode : {}", e.getRawStatusCode());
             log.info("body : {}", e.getStatusText());
-        } catch (Exception e) {
-            log.debug("kobisMovieError");
-            log.debug("예상하지 못한 에러, 데이터 오류 : {}", e.toString());
+        } catch (NumberFormatException e) {
+            log.debug("kobisInfoMovieDataError");
+            log.debug("데이터 오류 : {}", e.toString());
+        }  catch (Exception e) {
+            log.debug("kobisInfoMovieError");
+            log.debug("예상하지 못한 에러 : {}", e.toString());
         }
     }
 
@@ -195,22 +170,40 @@ public class MovieApiService {
 
             assert response != null;
             TimeUnit.MILLISECONDS.sleep(500);
+
             if (response.getDisplay() == 1) {
                 log.debug("one naver movie");
                 log.debug("movie Id : {}", movie.getId());
                 log.debug("movie Title : {}", movie.getTitle());
                 NaverMovie naverMovie = response.getItems().get(0);
 
-                if (movie.getTitle().replace(" ", "").equals(naverMovie.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")) &&
-                        movie.getDirectorName().contains(List.of(naverMovie.getDirector().split("\\|")).get(0))) {
+                if (movie.getTitle().length() >= 4) {
+                    if (movie.getTitle().replace(" ", "").equals(naverMovie.getTitle()
+                            .replace("<b>", "").replace("</b>", "")
+                            .replace(" ", ""))) {
+
+                        log.debug("movie link : {}", naverMovie.getLink());
+                        log.debug("movie image : {}", naverMovie.getImage());
+
+                        movie.updateNaverUrl(naverMovie.getLink());
+                        movie.updateImageUrl(naverMovie.getImage());
+                    } else {
+                        throw new CantCorrectMovieUrlException();
+                    }
+                } else {
+                    if (movie.getTitle().replace(" ", "").equals(naverMovie.getTitle()
+                        .replace("<b>", "").replace("</b>", "")
+                        .replace(" ", "")) && isContains(movie, naverMovie)) {
 
                     log.debug("movie link : {}", naverMovie.getLink());
                     log.debug("movie image : {}", naverMovie.getImage());
 
                     movie.updateNaverUrl(naverMovie.getLink());
                     movie.updateImageUrl(naverMovie.getImage());
-                } else {
-                    throw new CantCorrectMovieUrlException();
+                    } else {
+                        throw new CantCorrectMovieUrlException();
+                    }
+
                 }
 
             } else if (response.getDisplay() > 1) {
@@ -218,11 +211,20 @@ public class MovieApiService {
                 log.debug("movie Id : {}", movie.getId());
                 log.debug("movie Title : {}", movie.getTitle());
 
-                NaverMovie naverMovie = response.getItems()
-                        .stream()
-                        .filter(i -> movie.getTitle().replace(" ", "").equals(i.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")))
-                        .filter(i -> movie.getDirectorName().contains(List.of(i.getDirector().split("\\|")).get(0)))
-                        .findFirst().orElseThrow(CantCorrectMovieUrlException::new);
+                NaverMovie naverMovie;
+
+                if (movie.getTitle().length() < 4) {
+                    naverMovie = response.getItems()
+                            .stream()
+                            .filter(i -> movie.getTitle().replace(" ", "").equals(i.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")))
+                            .filter(i -> isContains(movie, i))
+                            .findFirst().orElseThrow(CantCorrectMovieUrlException::new);
+                } else {
+                    naverMovie = response.getItems()
+                            .stream()
+                            .filter(i -> movie.getTitle().replace(" ", "").equals(i.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")))
+                            .findFirst().orElseThrow(CantCorrectMovieUrlException::new);
+                }
 
                 log.debug("movie link : {}", naverMovie.getLink());
                 log.debug("movie image : {}", naverMovie.getImage());
@@ -242,9 +244,45 @@ public class MovieApiService {
             log.info("naverMovieError");
             log.info("statusCode : {}", e.getRawStatusCode());
             log.info("body : {}", e.getStatusText());
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
+            log.debug("naverMovieDataError");
+            log.debug("데이터 오류 : {}", e.toString());
+        }  catch (Exception e) {
             log.error("naverMovieError");
             log.error("예상하지 못한 에러 : {}", e.toString());
+        }
+    }
+
+    private boolean isContains(Movie movie, NaverMovie i) {
+        for (String str : List.of(i.getDirector().split("\\|"))) {
+            if (movie.getDirectorName().replace(" ", "").contains(str.replace(" ", ""))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private String getActors(ArrayList<Map> actors) {
+        if (!actors.isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            int cnt = 0;
+            for (Map map : actors) {
+                stringBuilder.append(String.valueOf(map.get("peopleNm")));
+                String cast = String.valueOf(map.get("cast"));
+                if (!cast.equals("")) {
+                    stringBuilder.append(" - ");
+                    stringBuilder.append(cast);
+                }
+                stringBuilder.append(", ");
+                cnt++;
+                if (cnt == 3) {
+                    break;
+                }
+            }
+            stringBuilder.setLength(stringBuilder.length() - 2);
+            return stringBuilder.toString();
+        } else {
+            return null;
         }
     }
 
