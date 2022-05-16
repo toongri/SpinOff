@@ -1,7 +1,9 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
+import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
@@ -70,6 +72,11 @@ public class MovieQueryServiceJpa implements MovieQueryService{
         isExistMovie(movieId);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         return getMembersByContentDtos(getFollowMembersByMovieId(movieId), memberId);
+    }
+
+    @Override
+    public MovieDto.ReadMovieDto getMovieForRead(MemberDetails currentMember, Long movieId) {
+        return null;
     }
 
     private void isExistMovie(Long movieId) {
