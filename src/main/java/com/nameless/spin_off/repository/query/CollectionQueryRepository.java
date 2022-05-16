@@ -335,10 +335,12 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
 
-        Map<Long, List<FollowCollectionMemberDto>> followingMembers =
-                getFollowingMembersAtCollection(memberId, getCollectionIdsAll(content.getContent()));
+        if (memberId != null) {
+            Map<Long, List<FollowCollectionMemberDto>> followingMembers =
+                    getFollowingMembersAtCollection(memberId, getCollectionIdsAll(content.getContent()));
 
-        content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+            content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+        }
 
         return content;
     }
@@ -361,10 +363,12 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                         collection.title.contains(keyword),
                         memberNotIn(blockedMembers)));
 
-        Map<Long, List<FollowCollectionMemberDto>> followingMembers =
-                getFollowingMembersAtCollection(memberId, getCollectionIds(content.getContent()));
+        if (memberId != null) {
+            Map<Long, List<FollowCollectionMemberDto>> followingMembers =
+                    getFollowingMembersAtCollection(memberId, getCollectionIds(content.getContent()));
 
-        content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+            content.getContent().forEach(o -> o.setFollowingMember(followingMembers.get(o.getCollectionId())));
+        }
 
         return content;
     }
