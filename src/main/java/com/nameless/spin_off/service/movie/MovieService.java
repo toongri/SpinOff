@@ -10,4 +10,5 @@ public interface MovieService {
     Long insertFollowedMovieByMovieId(Long memberId, Long movieId)
             throws NotExistMemberException, NotExistMovieException, AlreadyFollowedMovieException;
     int updateAllPopularity();
+    int updateMovieApi(int startPage);
 }

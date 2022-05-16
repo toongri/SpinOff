@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.movie;
 
+import com.nameless.spin_off.config.movie.MovieApiService;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
@@ -31,6 +32,7 @@ public class MovieServiceJpa implements MovieService{
     private final MovieQueryRepository movieQueryRepository;
     private final ViewedMovieByIpRepository viewedMovieByIpRepository;
     private final FollowedMovieRepository followedMovieRepository;
+    private final MovieApiService movieApiService;
 
     @Transactional
     @Override
@@ -67,6 +69,17 @@ public class MovieServiceJpa implements MovieService{
             movie.updatePopularity();
         }
         return movies.size();
+    }
+
+    @Transactional
+    @Override
+    public int updateMovieApi(int startPage) {
+        List<Movie> allNew = movieApiService.findAllNew(startPage);
+        for (Movie movie : allNew) {
+            movieApiService.updateThumbnailAndUrlByMovie(movie);
+            movieApiService.updateActorsMovie(movie);
+        }
+        return movieRepository.saveAll(allNew).size();
     }
 
 

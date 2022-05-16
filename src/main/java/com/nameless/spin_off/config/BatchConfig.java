@@ -1,5 +1,6 @@
 package com.nameless.spin_off.config;
 
+import com.nameless.spin_off.config.movie.MovieApiService;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
@@ -41,6 +42,7 @@ public class BatchConfig {
     private final CollectionRepository collectionRepository;
     private final HashtagRepository hashtagRepository;
     private final MovieRepository movieRepository;
+    private final MovieApiService movieApiService;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
@@ -58,23 +60,12 @@ public class BatchConfig {
     }
 
     @Bean
-    public Job movieJob() {
-        log.info("********** This is movieJob");
-        return jobBuilderFactory.get("movieJob")  // 1_1
+    public Job movieApiJob() {
+        log.info("********** This is movieApiJob");
+        return jobBuilderFactory.get("movieApiJob")  // 1_1
                 .preventRestart()  // 1_2
-                .start(popularityMemberJob())  // 1_3
+                .start(movieApiStepJob())  // 1_3
                 .build(); // 1_8
-    }
-
-    @Bean
-    public Step movieStepJob() {
-        log.info("********** This is movieStepJob");
-        return stepBuilderFactory.get("movieStepJob")  // 2_1
-                .<Member, Member> chunk(100)  // 2_2
-                .reader(popularityMemberReader())  // 2_3
-                .processor(this.popularityMemberProcessor())  // 2_4
-                .writer(this.popularityMemberWriter())  // 2_5
-                .build();  // 2_6
     }
 
     @Bean
@@ -133,12 +124,14 @@ public class BatchConfig {
     }
 
     @Bean
-    @StepScope  // 1
-    public ListItemReader<Member> movieReader() {
-        log.info("********** This is movieReader");
-        List<Member> activeMembers = memberRepository.findAllByViewAfterTime(MEMBER_FOLLOW.getOldestDate());
-        log.info("          - activeMember SIZE : " + activeMembers.size());  // 2
-        return new ListItemReader<>(activeMembers);  // 3
+    public Step movieApiStepJob() {
+        log.info("********** This is movieApiStepJob");
+        return stepBuilderFactory.get("movieApiStepJob")  // 6_1
+                .<Movie, Movie> chunk(10)  // 6_2
+                .reader(movieApiReader())  // 6_3
+                .processor(this.movieApiProcessor())  // 6_4
+                .writer(this.movieApiWriter())  // 6_5
+                .build();  // 6_6
     }
 
     @Bean
@@ -186,6 +179,15 @@ public class BatchConfig {
         return new ListItemReader<>(activeMovies);  // 3
     }
 
+    @Bean
+    @StepScope  // 1
+    public ListItemReader<Movie> movieApiReader() {
+        log.info("********** This is movieApiReader");
+        List<Movie> activeMovies = movieApiService.findAllNew(1);
+        log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
+        return new ListItemReader<>(activeMovies);  // 3
+    }
+
     public ItemProcessor<Member, Member> popularityMemberProcessor() {
         return new ItemProcessor<Member, Member>() {  // 1
             @Override
@@ -196,7 +198,6 @@ public class BatchConfig {
             }
         };
     }
-
 
     public ItemProcessor<Post, Post> popularityPostProcessor() {
         return new ItemProcessor<Post, Post>() {  // 1
@@ -242,6 +243,18 @@ public class BatchConfig {
         };
     }
 
+    public ItemProcessor<Movie, Movie> movieApiProcessor() {
+        return new ItemProcessor<Movie, Movie>() {  // 1
+            @Override
+            public Movie process(Movie movie) throws Exception {
+                log.info("********** This is movieApiProcessor");
+                movieApiService.updateThumbnailAndUrlByMovie(movie);
+                movieApiService.updateActorsMovie(movie);
+                return movie;  // 2
+            }
+        };
+    }
+
     public ItemWriter<Member> popularityMemberWriter() {
         log.info("********** This is popularityMemberWriter");
         return (memberRepository::saveAll);
@@ -264,6 +277,11 @@ public class BatchConfig {
 
     public ItemWriter<Movie> popularityMovieWriter() {
         log.info("********** This is popularityMovieWriter");
+        return (movieRepository::saveAll);
+    }
+
+    public ItemWriter<Movie> movieApiWriter() {
+        log.info("********** This is movieApiWriter");
         return (movieRepository::saveAll);
     }
 }
