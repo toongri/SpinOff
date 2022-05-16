@@ -1,6 +1,6 @@
 spring:
   profiles:
-    include: oauth, local, aws
+    include: oauth, real, aws
   jpa:
     open-in-view: false
     properties:
