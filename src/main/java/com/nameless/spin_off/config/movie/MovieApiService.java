@@ -23,7 +23,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_LENGTH_MAX;
 import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_NUMBER_MAX;
 
 @Slf4j
@@ -44,7 +43,7 @@ public class MovieApiService {
     private String kobisInfoUrl = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
     private String naverUrl = "https://openapi.naver.com/v1/search/movie.json";
 
-    public List<Movie> findAllNew(int startPage) {
+    public List<Movie> findAllNew(int startPage, int size) {
 
         List<Movie> newMovieList = new ArrayList<>();
         for (int curPage = 0; curPage < API_REQUEST_NUMBER_MAX.getValue(); curPage++) {
@@ -56,7 +55,7 @@ public class MovieApiService {
                         .fromHttpUrl(
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
-                                        "itemPerPage=" + API_REQUEST_LENGTH_MAX.getValue() + "&" +
+                                        "itemPerPage=" + size + "&" +
                                         "curPage=" + (startPage + curPage))
                         .build();
 

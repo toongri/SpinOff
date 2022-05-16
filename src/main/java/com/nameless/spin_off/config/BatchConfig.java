@@ -29,6 +29,7 @@ import java.util.List;
 import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
 import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
 import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
+import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_NUMBER_MAX;
 import static com.nameless.spin_off.entity.enums.movie.MovieScoreEnum.MOVIE_VIEW;
 import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
 
@@ -183,7 +184,7 @@ public class BatchConfig {
     @StepScope  // 1
     public ListItemReader<Movie> movieApiReader() {
         log.info("********** This is movieApiReader");
-        List<Movie> activeMovies = movieApiService.findAllNew(1);
+        List<Movie> activeMovies = movieApiService.findAllNew(1, API_REQUEST_NUMBER_MAX.getValue());
         log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
         return new ListItemReader<>(activeMovies);  // 3
     }

@@ -39,11 +39,18 @@ public class MovieApiController {
                     required = true,
                     paramType = "path",
                     dataType = "int",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "size",
+                    value = "api size",
+                    required = true,
+                    paramType = "query",
+                    dataType = "int",
                     example = "123")
     })
     @PostMapping("/kobis/{startPage}")
-    public int test(@PathVariable int startPage) {
-        return movieService.updateMovieApi(startPage);
+    public int test(@PathVariable int startPage, int size) {
+        return movieService.updateMovieApi(startPage, size);
     }
 
     @ApiOperation(value = "영화 팔로우 생성", notes = "")

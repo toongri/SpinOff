@@ -73,8 +73,8 @@ public class MovieServiceJpa implements MovieService{
 
     @Transactional
     @Override
-    public int updateMovieApi(int startPage) {
-        List<Movie> allNew = movieApiService.findAllNew(startPage);
+    public int updateMovieApi(int startPage, int size) {
+        List<Movie> allNew = movieApiService.findAllNew(startPage, size);
         for (Movie movie : allNew) {
             movieApiService.updateThumbnailAndUrlByMovie(movie);
             movieApiService.updateActorsMovie(movie);
