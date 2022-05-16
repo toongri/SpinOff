@@ -12,6 +12,7 @@ import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchAllFirstDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -229,7 +230,7 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/all/{keyword}/first")
-    public SingleApiResult<SearchFirstDto<SearchAllDto>> getLastSearchesByMemberFirst(
+    public SingleApiResult<SearchFirstDto<SearchAllFirstDto>> getLastSearchesByMemberFirst(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword, @RequestParam int length,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
@@ -272,28 +273,6 @@ public class SearchApiController {
                     allowableValues = "range[0, 100]"),
             @ApiImplicitParam(
                     name = "post_sort",
-                    value = "페이지 정렬",
-                    required = false,
-                    paramType = "query",
-                    dataType = "string",
-                    example = "popularity,desc"),
-            @ApiImplicitParam(
-                    name = "collection_page",
-                    value = "페이지 번호",
-                    required = true,
-                    paramType = "query",
-                    dataType = "int",
-                    example = "123"),
-            @ApiImplicitParam(
-                    name = "collection_size",
-                    value = "페이지 크기",
-                    required = true,
-                    paramType = "query",
-                    dataType = "int",
-                    example = "123",
-                    allowableValues = "range[0, 100]"),
-            @ApiImplicitParam(
-                    name = "collection_sort",
                     value = "페이지 정렬",
                     required = false,
                     paramType = "query",
@@ -349,8 +328,6 @@ public class SearchApiController {
             @LoginMember MemberDetails currentMember, @PathVariable String keyword,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
-            @Qualifier("collection") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
-                    Pageable collectionPageable,
             @Qualifier("member") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable memberPageable,
             @Qualifier("movie") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
@@ -361,7 +338,6 @@ public class SearchApiController {
                 searchQueryService.getSearchPageDataAtAll(
                         keyword, getMemberId(currentMember),
                         postPageable,
-                        collectionPageable,
                         memberPageable,
                         moviePageable));
     }
@@ -739,7 +715,7 @@ public class SearchApiController {
                 .getSearchPageCollectionAtCollectionSlicedFirst(keyword, pageable, getMemberId(currentMember), length));
     }
 
-    @ApiOperation(value = "키워드 컬렉션 검색 최초 조회", notes = "")
+    @ApiOperation(value = "키워드 컬렉션 검색 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "keyword",

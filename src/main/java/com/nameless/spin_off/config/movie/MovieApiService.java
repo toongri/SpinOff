@@ -57,7 +57,7 @@ public class MovieApiService {
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
                                         "itemPerPage=" + API_REQUEST_LENGTH_MAX.getValue() + "&" +
-                                        "curPage=" + startPage + curPage)
+                                        "curPage=" + (startPage + curPage))
                         .build();
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
@@ -70,7 +70,6 @@ public class MovieApiService {
                 for (Map obj : movieList) {
                     ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
                     String director = getDirector(directors);
-
 
                     Movie movie = Movie.createMovie(Long.parseLong(String.valueOf(obj.get("movieCd"))),
                             String.valueOf(obj.get("movieNm")),

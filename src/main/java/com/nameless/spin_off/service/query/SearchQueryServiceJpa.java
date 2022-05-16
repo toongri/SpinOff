@@ -7,6 +7,7 @@ import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
+import com.nameless.spin_off.dto.SearchDto.SearchAllFirstDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.enums.ErrorEnum;
 import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
@@ -71,21 +72,19 @@ public class SearchQueryServiceJpa implements SearchQueryService {
 
     @Override
     public SearchAllDto getSearchPageDataAtAll(
-            String keyword, Long memberId, Pageable postPageable, Pageable collectionPageable,
-            Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
+            String keyword, Long memberId, Pageable postPageable, Pageable memberPageable, Pageable moviePageable)
+            throws NotExistMemberException {
 
         List<Long> blockedMembers = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
 
         return new SearchAllDto(
                 postQueryRepository.findAllSlicedForSearchPageAtAll(keyword, postPageable, blockedMembers),
-                collectionQueryRepository.findAllSlicedForSearchPageAtAll(
-                        keyword, collectionPageable, blockedMembers, memberId),
                 movieQueryRepository.findAllSlicedForSearchPageAtAll(keyword, moviePageable),
                 memberQueryRepository.findAllSlicedForSearchPageAtAll(keyword, memberPageable, blockedMembers));
     }
 
     @Override
-    public SearchFirstDto<SearchAllDto> getSearchPageDataAtAllFirst(
+    public SearchFirstDto<SearchAllFirstDto> getSearchPageDataAtAllFirst(
             String keyword, Long memberId, int length, Pageable postPageable, Pageable collectionPageable,
             Pageable memberPageable, Pageable moviePageable) throws NotExistMemberException {
 
@@ -95,7 +94,7 @@ public class SearchQueryServiceJpa implements SearchQueryService {
                 keyword, postPageable, blockedMembers);
 
         return new SearchFirstDto<>(
-                new SearchAllDto(
+                new SearchAllFirstDto(
                 posts,
                 collectionQueryRepository.findAllSlicedForSearchPageAtAll(
                         keyword, collectionPageable, blockedMembers, memberId),

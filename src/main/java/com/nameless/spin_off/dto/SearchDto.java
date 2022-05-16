@@ -7,6 +7,7 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedSearchHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.RelatedSearchMemberDto;
 import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
 import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
+import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtAllPostDto;
 import com.querydsl.core.annotations.QueryProjection;
@@ -29,10 +30,18 @@ public class SearchDto {
 
     @Data
     @AllArgsConstructor
-    public static class SearchAllDto {
+    public static class SearchAllFirstDto {
         private Slice<SearchPageAtAllPostDto> posts;
         private Slice<SearchAllCollectionDto> collections;
-        private Slice<MovieDto.SearchAllMovieDto> movies;
+        private Slice<SearchAllMovieDto> movies;
+        private Slice<SearchAllMemberDto> members;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class SearchAllDto {
+        private Slice<SearchPageAtAllPostDto> posts;
+        private Slice<SearchAllMovieDto> movies;
         private Slice<SearchAllMemberDto> members;
     }
 

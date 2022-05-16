@@ -167,12 +167,6 @@ public class PostServiceJpa implements PostService{
                 Post.createPost(postId))).getId();
     }
 
-    private void isExistCollectedPost(Long postId, Long collectionId) {
-        if (postQueryRepository.isExistCollectedPost(postId, collectionId)) {
-            throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
-        }
-    }
-
     @Transactional
     @Override
     public Long insertViewedPostByIp(String ip, Long postId) throws NotExistPostException {
@@ -228,6 +222,12 @@ public class PostServiceJpa implements PostService{
             return Collections.emptyList();
         } else {
             return thumbnails.stream().map(PostThumbnailsCollectionDto::getPostThumbnail).collect(Collectors.toList());
+        }
+    }
+
+    private void isExistCollectedPost(Long postId, Long collectionId) {
+        if (postQueryRepository.isExistCollectedPost(postId, collectionId)) {
+            throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
         }
     }
 

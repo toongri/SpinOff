@@ -81,16 +81,25 @@ public class CollectionApiController {
                     required = true,
                     paramType = "path",
                     dataType = "Long",
-                    example = "123")
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "ip",
+                    value = "ip주소",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "192.168.0.1")
     })
     @GetMapping("/{collectionId}")
     public SingleApiResult<ReadCollectionDto> readOne(
-            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId) {
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestParam String ip) {
 
         log.info("readOne");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
-        return getResult(collectionQueryService.getCollectionForRead(currentMember, collectionId));
+        ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
+        collectionService.insertViewedCollectionByIp(ip, collectionId);
+        return getResult(collection);
     }
 
     @ApiOperation(value = "컬렉션 글 조회", notes = "")
