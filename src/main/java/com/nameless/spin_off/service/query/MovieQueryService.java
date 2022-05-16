@@ -1,9 +1,11 @@
 package com.nameless.spin_off.service.query;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import org.springframework.data.domain.Pageable;
@@ -17,4 +19,5 @@ public interface MovieQueryService {
     SearchFirstDto<SearchMovieFirstDto> getSearchPageMovieAtMovieSlicedFirst(
             String keyword, Pageable pageable, int length) throws NotExistMovieException;
     List<MembersByContentDto> getFollowMovieMembers(Long memberId, Long movieId);
+    PostDto.ReadPostDto getMovieForRead(MemberDetails currentMember, Long movieId);
 }
