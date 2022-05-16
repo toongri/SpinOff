@@ -41,7 +41,7 @@ public class MovieApiController {
                     dataType = "int",
                     example = "123")
     })
-    @PutMapping("/kobis/{startPage}")
+    @PostMapping("/kobis/{startPage}")
     public int test(@PathVariable int startPage) {
         return movieService.updateMovieApi(startPage);
     }
