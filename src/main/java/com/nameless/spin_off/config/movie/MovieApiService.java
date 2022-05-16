@@ -55,7 +55,7 @@ public class MovieApiService {
                         .fromHttpUrl(
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
-                                        "itemPerPage=" + API_REQUEST_LENGTH_MAX + "&" +
+                                        "itemPerPage=" + API_REQUEST_LENGTH_MAX.getValue() + "&" +
                                         "curPage=" + (startPage + curPage))
                         .build();
 
