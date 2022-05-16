@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_NUMBER_MAX;
+import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_LENGTH_MAX;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -46,7 +46,7 @@ public class MovieApiService {
     public List<Movie> findAllNew(int startPage, int size) {
 
         List<Movie> newMovieList = new ArrayList<>();
-        for (int curPage = 0; curPage < API_REQUEST_NUMBER_MAX.getValue(); curPage++) {
+        for (int curPage = 0; curPage < size; curPage++) {
             try {
                 HttpHeaders header = new HttpHeaders();
                 HttpEntity<?> entity = new HttpEntity<>(header);
@@ -55,7 +55,7 @@ public class MovieApiService {
                         .fromHttpUrl(
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
-                                        "itemPerPage=" + size + "&" +
+                                        "itemPerPage=" + API_REQUEST_LENGTH_MAX + "&" +
                                         "curPage=" + (startPage + curPage))
                         .build();
 
