@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;

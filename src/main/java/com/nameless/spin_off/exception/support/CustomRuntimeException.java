@@ -1,6 +1,6 @@
 package com.nameless.spin_off.exception.support;
 
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 
 public class CustomRuntimeException extends RuntimeException{
 

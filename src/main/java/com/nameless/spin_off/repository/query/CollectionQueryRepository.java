@@ -5,8 +5,8 @@ import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -28,7 +28,6 @@ import static com.nameless.spin_off.entity.collection.QFollowedCollection.follow
 import static com.nameless.spin_off.entity.collection.QLikedCollection.likedCollection;
 import static com.nameless.spin_off.entity.collection.QViewedCollectionByIp.viewedCollectionByIp;
 import static com.nameless.spin_off.entity.comment.QCommentInCollection.commentInCollection;
-import static com.nameless.spin_off.entity.enums.collection.CollectionPublicEnum.*;
 import static com.nameless.spin_off.entity.member.QBlockedMember.blockedMember;
 import static com.nameless.spin_off.entity.member.QFollowedMember.followedMember;
 import static com.nameless.spin_off.entity.member.QMember.member;

@@ -1,7 +1,7 @@
 package com.nameless.spin_off.repository.comment;
 
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collection.CollectedPostRepository;

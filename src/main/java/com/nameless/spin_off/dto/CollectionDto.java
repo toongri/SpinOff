@@ -1,7 +1,7 @@
 package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
-import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;

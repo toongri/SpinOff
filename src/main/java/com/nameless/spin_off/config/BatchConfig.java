@@ -26,12 +26,12 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
-import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
-import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
-import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_NUMBER_MAX;
-import static com.nameless.spin_off.entity.enums.movie.MovieScoreEnum.MOVIE_VIEW;
-import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
+import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
+import static com.nameless.spin_off.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
+import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
+import static com.nameless.spin_off.enums.movie.MovieApiEnum.API_REQUEST_NUMBER_MAX;
+import static com.nameless.spin_off.enums.movie.MovieScoreEnum.MOVIE_VIEW;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_VIEW;
 
 @Slf4j  // log 사용을 위한 lombok Annotation
 @RequiredArgsConstructor

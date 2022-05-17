@@ -13,9 +13,9 @@ import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -45,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
+import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

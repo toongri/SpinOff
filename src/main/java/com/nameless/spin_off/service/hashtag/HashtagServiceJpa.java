@@ -1,7 +1,7 @@
 package com.nameless.spin_off.service.hashtag;
 
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.hashtag.HashtagScoreEnum;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.ViewedHashtagByIp;
@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
 @Service
 @RequiredArgsConstructor

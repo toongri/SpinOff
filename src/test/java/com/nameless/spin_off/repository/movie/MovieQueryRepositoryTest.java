@@ -3,7 +3,7 @@ package com.nameless.spin_off.repository.movie;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus.A;
+import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

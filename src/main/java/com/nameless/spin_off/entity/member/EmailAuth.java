@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.member;
 
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;

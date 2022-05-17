@@ -6,9 +6,9 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.collection.LikedCollection;
 import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum;
-import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.collection.CollectionScoreEnum;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
 @Service
 @RequiredArgsConstructor

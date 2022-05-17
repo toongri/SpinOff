@@ -2,8 +2,8 @@ package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
@@ -23,8 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_COMMENT;
-import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_COMMENT;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

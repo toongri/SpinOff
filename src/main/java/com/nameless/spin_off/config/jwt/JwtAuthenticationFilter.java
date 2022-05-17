@@ -1,6 +1,6 @@
 package com.nameless.spin_off.config.jwt;
 
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.exception.sign.AuthenticationEntryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

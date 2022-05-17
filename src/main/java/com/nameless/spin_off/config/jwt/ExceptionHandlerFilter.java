@@ -2,7 +2,7 @@ package com.nameless.spin_off.config.jwt;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameless.spin_off.controller.exhandler.ErrorResult;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.exception.sign.AuthenticationEntryException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_COLLECT;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_COLLECT;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest

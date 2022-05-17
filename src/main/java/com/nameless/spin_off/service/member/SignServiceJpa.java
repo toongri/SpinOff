@@ -5,14 +5,11 @@ import com.nameless.spin_off.config.auth.dto.AccessToken;
 import com.nameless.spin_off.config.auth.dto.profile.ProfileDto;
 import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto;
-import com.nameless.spin_off.dto.MemberDto.MemberLoginRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberLoginResponseDto;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
-import com.nameless.spin_off.dto.MemberDto.SocialLoginResponseDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
-import com.nameless.spin_off.entity.enums.member.MemberCondition;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.EmailLinkage;
 import com.nameless.spin_off.entity.member.Member;
@@ -39,10 +36,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.*;
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.*;
+import static com.nameless.spin_off.enums.ContentsLengthEnum.*;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
 
 @Slf4j
 @Service
@@ -127,7 +123,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public MemberDto.TokenResponseDto reIssue(MemberDto.TokenRequestDto requestDto) {
+    public TokenResponseDto reIssue(MemberDto.TokenRequestDto requestDto) {
         if (!jwtTokenProvider.validateTokenExpiration(requestDto.getRefreshToken())) {
             throw new InvalidRefreshTokenException(ErrorEnum.INVALID_REFRESH_TOKEN);
         }
@@ -140,7 +136,7 @@ public class SignServiceJpa implements SignService{
         String refreshToken = jwtTokenProvider.createRefreshToken();
         member.updateRefreshToken(refreshToken);
 
-        return new MemberDto.TokenResponseDto(accessToken, refreshToken);
+        return new TokenResponseDto(accessToken, refreshToken);
     }
 
     @Transactional

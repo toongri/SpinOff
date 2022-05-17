@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.member;
 
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

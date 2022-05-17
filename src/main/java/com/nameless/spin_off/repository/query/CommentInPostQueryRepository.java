@@ -7,7 +7,7 @@ import com.nameless.spin_off.dto.QCommentDto_ContentCommentDto;
 import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
 import com.nameless.spin_off.dto.QPostDto_PostIdAndOwnerIdAndPublicPostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;

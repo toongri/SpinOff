@@ -1,8 +1,8 @@
 package com.nameless.spin_off.service.movie;
 
 import com.nameless.spin_off.config.movie.MovieApiService;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.movie.MovieScoreEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -21,7 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
 @Service
 @RequiredArgsConstructor

@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import org.springframework.stereotype.Repository;

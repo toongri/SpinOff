@@ -1,9 +1,9 @@
 package com.nameless.spin_off.service.help;
 
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.help.ComplainStatus;
-import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.help.ComplainStatus;
+import com.nameless.spin_off.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -24,9 +24,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.A;
-import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.B;
-import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
+import static com.nameless.spin_off.enums.help.ContentTypeStatus.A;
+import static com.nameless.spin_off.enums.help.ContentTypeStatus.B;
+import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

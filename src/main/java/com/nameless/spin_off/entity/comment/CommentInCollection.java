@@ -1,7 +1,7 @@
 package com.nameless.spin_off.entity.comment;
 
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;

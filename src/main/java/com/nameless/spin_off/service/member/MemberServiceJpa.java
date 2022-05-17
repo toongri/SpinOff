@@ -1,10 +1,10 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.entity.collection.FollowedCollection;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.member.MemberScoreEnum;
-import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.MemberScoreEnum;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;

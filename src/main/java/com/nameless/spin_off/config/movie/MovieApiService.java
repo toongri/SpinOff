@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.movie.MovieApiEnum.API_REQUEST_LENGTH_MAX;
+import static com.nameless.spin_off.enums.movie.MovieApiEnum.API_REQUEST_LENGTH_MAX;
 
 @Slf4j
 @RequiredArgsConstructor

@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.google;
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.kakao;
+import static com.nameless.spin_off.enums.member.EmailLinkageServiceEnum.google;
+import static com.nameless.spin_off.enums.member.EmailLinkageServiceEnum.kakao;
 
 @Component
 @RequiredArgsConstructor

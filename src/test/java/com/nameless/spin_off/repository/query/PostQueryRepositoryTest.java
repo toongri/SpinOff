@@ -1,6 +1,6 @@
 package com.nameless.spin_off.repository.query;
 
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

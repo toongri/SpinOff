@@ -7,7 +7,7 @@ import com.nameless.spin_off.config.auth.dto.profile.GoogleProfile;
 import com.nameless.spin_off.config.auth.dto.profile.KakaoProfile;
 import com.nameless.spin_off.config.auth.dto.profile.NaverProfile;
 import com.nameless.spin_off.config.auth.dto.profile.ProfileDto;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.exception.sign.SocialException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,8 +17,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.google;
-import static com.nameless.spin_off.entity.enums.member.EmailLinkageServiceEnum.kakao;
+import static com.nameless.spin_off.enums.member.EmailLinkageServiceEnum.google;
+import static com.nameless.spin_off.enums.member.EmailLinkageServiceEnum.kakao;
 
 @Slf4j
 @Service

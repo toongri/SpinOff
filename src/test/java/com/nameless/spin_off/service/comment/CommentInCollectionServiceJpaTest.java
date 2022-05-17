@@ -3,8 +3,8 @@ package com.nameless.spin_off.service.comment;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.entity.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
@@ -27,8 +27,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_COMMENT;
-import static com.nameless.spin_off.entity.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
+import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.COLLECTION_COMMENT;
+import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

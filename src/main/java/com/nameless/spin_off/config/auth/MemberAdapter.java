@@ -1,7 +1,7 @@
 package com.nameless.spin_off.config.auth;
 
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.entity.member.Member;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

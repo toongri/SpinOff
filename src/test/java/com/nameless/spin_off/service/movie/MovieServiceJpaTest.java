@@ -13,8 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 
-import static com.nameless.spin_off.entity.enums.movie.MovieScoreEnum.MOVIE_FOLLOW;
-import static com.nameless.spin_off.entity.enums.movie.MovieScoreEnum.MOVIE_VIEW;
+import static com.nameless.spin_off.enums.movie.MovieScoreEnum.MOVIE_FOLLOW;
+import static com.nameless.spin_off.enums.movie.MovieScoreEnum.MOVIE_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 

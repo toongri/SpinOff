@@ -1,6 +1,6 @@
 package com.nameless.spin_off.entity.hashtag;
 
-import com.nameless.spin_off.entity.enums.ContentsTimeEnum;
+import com.nameless.spin_off.enums.ContentsTimeEnum;
 import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -12,8 +12,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.nameless.spin_off.entity.enums.hashtag.HashtagScoreEnum.*;
 
 @Entity
 @Getter

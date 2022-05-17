@@ -1,7 +1,7 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
-import com.nameless.spin_off.entity.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.sign.IncorrectAccountIdException;

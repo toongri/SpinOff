@@ -3,7 +3,7 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.member.QFollowedMember;

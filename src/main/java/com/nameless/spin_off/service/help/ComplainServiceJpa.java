@@ -1,8 +1,8 @@
 package com.nameless.spin_off.service.help;
 
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.help.ComplainStatus;
-import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.help.ComplainStatus;
+import com.nameless.spin_off.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.entity.help.Complain;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -24,8 +24,6 @@ import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.nameless.spin_off.entity.enums.help.ContentTypeStatus.*;
 
 @Service
 @RequiredArgsConstructor

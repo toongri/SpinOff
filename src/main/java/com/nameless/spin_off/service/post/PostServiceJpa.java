@@ -5,8 +5,8 @@ import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ThumbnailAndPublicPostDto;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
@@ -39,11 +39,11 @@ import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
-import static com.nameless.spin_off.entity.enums.ContentsLengthEnum.POST_IMAGE_MAX;
-import static com.nameless.spin_off.entity.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
-import static com.nameless.spin_off.entity.enums.hashtag.HashtagCondition.CONTENT;
-import static com.nameless.spin_off.entity.enums.post.PostScoreEnum.POST_VIEW;
+import static com.nameless.spin_off.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
+import static com.nameless.spin_off.enums.ContentsLengthEnum.POST_IMAGE_MAX;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
+import static com.nameless.spin_off.enums.hashtag.HashtagCondition.CONTENT;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_VIEW;
 
 @Service
 @RequiredArgsConstructor

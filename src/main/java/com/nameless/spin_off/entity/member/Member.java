@@ -3,12 +3,12 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.help.ComplainStatus;
-import com.nameless.spin_off.entity.enums.help.ContentTypeStatus;
-import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.help.ComplainStatus;
+import com.nameless.spin_off.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.help.Complain;
@@ -31,7 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.nameless.spin_off.entity.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
+import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 
 @Entity
 @Getter

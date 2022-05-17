@@ -9,8 +9,8 @@ import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllDto;
 import com.nameless.spin_off.dto.SearchDto.SearchAllFirstDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.search.IncorrectLengthRelatedKeywordException;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -25,8 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.entity.enums.search.SearchEnum.RELATED_SEARCH_KEYWORD_MAX_STR;
-import static com.nameless.spin_off.entity.enums.search.SearchEnum.RELATED_SEARCH_KEYWORD_MIN_STR;
+import static com.nameless.spin_off.enums.search.SearchEnum.RELATED_SEARCH_KEYWORD_MAX_STR;
+import static com.nameless.spin_off.enums.search.SearchEnum.RELATED_SEARCH_KEYWORD_MIN_STR;
 
 @Service
 @RequiredArgsConstructor

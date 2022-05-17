@@ -1,6 +1,6 @@
 package com.nameless.spin_off.config.member;
 
-import com.nameless.spin_off.entity.enums.member.AuthorityOfMemberStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
 import lombok.Builder;
 import lombok.ToString;
 import org.springframework.security.core.GrantedAuthority;

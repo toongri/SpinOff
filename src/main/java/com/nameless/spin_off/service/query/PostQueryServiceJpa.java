@@ -5,10 +5,10 @@ import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
@@ -176,6 +176,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         ReadPostDto post = getOneByPostId(postId);
         hasAuthPost(memberId, postId, post.getPublicOfPostStatus(), post.getMember().getMemberId());
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
+        post.setPostedMedias(postQueryRepository.findAllPostedMediaByPostId(postId));
 
         if (memberId != null) {
             post.setAuth(memberId, isAdmin);
