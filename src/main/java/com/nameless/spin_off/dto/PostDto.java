@@ -3,11 +3,11 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.dto.HashtagDto.ContentHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.ContentMemberDto;
 import com.nameless.spin_off.dto.MovieDto.MovieInReadPost;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.post.AlreadyPostedHashtagException;
 import com.nameless.spin_off.exception.post.IncorrectContentOfPostException;
 import com.nameless.spin_off.exception.post.IncorrectTitleOfPostException;
@@ -53,6 +53,28 @@ public class PostDto {
 
     @Data
     @NoArgsConstructor
+    public static class PostedMediaDto {
+
+        @ApiModelProperty(
+                value = "이미지 id",
+                example = "123")
+        private Long postedMediaId;
+
+        @ApiModelProperty(
+                value = "이미지 url",
+                example = "123")
+        private String url;
+
+        @QueryProjection
+        public PostedMediaDto(Long postedMediaId, String url) {
+            this.postedMediaId = postedMediaId;
+            this.url = url;
+        }
+    }
+
+
+    @Data
+    @NoArgsConstructor
     public static class ReadPostDto {
 
         @ApiModelProperty(
@@ -91,6 +113,7 @@ public class PostDto {
                 value = "권한 여부",
                 example = "false")
         private boolean hasAuth;
+        private List<PostedMediaDto> postedMedias;
         private List<ContentHashtagDto> hashtags;
 
         @ApiModelProperty(

@@ -3,12 +3,12 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.*;
-import com.nameless.spin_off.entity.enums.ContentsLengthEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.QPostedHashtag;
 import com.nameless.spin_off.entity.member.QBlockedMember;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.ContentsLengthEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,6 @@ import java.util.Optional;
 import static com.nameless.spin_off.entity.collection.QCollectedPost.collectedPost;
 import static com.nameless.spin_off.entity.collection.QCollection.collection;
 import static com.nameless.spin_off.entity.comment.QCommentInPost.commentInPost;
-import static com.nameless.spin_off.entity.enums.post.PostPublicEnum.*;
 import static com.nameless.spin_off.entity.hashtag.QFollowedHashtag.followedHashtag;
 import static com.nameless.spin_off.entity.hashtag.QHashtag.hashtag;
 import static com.nameless.spin_off.entity.hashtag.QPostedHashtag.postedHashtag;
@@ -34,7 +33,9 @@ import static com.nameless.spin_off.entity.movie.QFollowedMovie.followedMovie;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.post.QLikedPost.likedPost;
 import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.entity.post.QPostedMedia.postedMedia;
 import static com.nameless.spin_off.entity.post.QViewedPostByIp.viewedPostByIp;
+import static com.nameless.spin_off.enums.post.PostPublicEnum.*;
 
 @Repository
 public class PostQueryRepository extends Querydsl4RepositorySupport {
@@ -96,6 +97,15 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .from(post)
                 .where(post.id.eq(postId))
                 .fetchFirst());
+    }
+
+    public List<PostedMediaDto> findAllPostedMediaByPostId(Long postId) {
+        return getQueryFactory()
+                .select(new QPostDto_PostedMediaDto(
+                        postedMedia.id, postedMedia.url))
+                .from(postedMedia)
+                .where(postedMedia.post.id.eq(postId))
+                .fetch();
     }
 
     public Optional<PostOwnerIdAndPublicPostDto> findOwnerIdAndPublicByPostId(Long postId) {
@@ -240,6 +250,24 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         member.id.notIn(banList)));
     }
 
+    public Slice<RelatedPostDto> findAllRelatedPostByMovieId(Pageable pageable,
+                                                            List<Long> blockedMemberIds, Long movieId) {
+        return applySlicing(pageable, contentQuery -> contentQuery
+                .select(new QPostDto_RelatedPostDto(
+                        post.id,
+                        post.title,
+                        member.id,
+                        member.nickname,
+                        member.profileImg,
+                        post.thumbnailUrl))
+                .from(post)
+                .join(post.member, member)
+                .where(
+                        post.movie.id.eq(movieId),
+                        post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
+                        memberNotIn(blockedMemberIds)));
+    }
+
     public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable,
                                                              List<Long> blockedMemberIds, Long postId) {
         QPostedHashtag relatedPostHashtag = new QPostedHashtag("relatedPostHashtag");
@@ -263,7 +291,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         post.id.ne(postId),
                         relatedPostHashtag.post.id.eq(postId),
                         post.publicOfPostStatus.in(DEFAULT_POST_PUBLIC.getPrivacyBound()),
-                        member.id.notIn(blockedMemberIds))
+                        memberNotIn(blockedMemberIds))
                 .orderBy(postedHashtag.count().desc()));
     }
 

@@ -1,10 +1,10 @@
 package com.nameless.spin_off.entity.collection;
 
 import com.nameless.spin_off.entity.comment.CommentInCollection;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.sun.istack.NotNull;
@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 import static com.nameless.spin_off.enums.collection.CollectionContentLimitEnum.CONTENT_LENGTH_MAX;
 import static com.nameless.spin_off.enums.collection.CollectionContentLimitEnum.TITLE_LENGTH_MAX;
+import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.*;
 
 @Entity
 @Getter

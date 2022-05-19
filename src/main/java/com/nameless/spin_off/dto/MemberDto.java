@@ -18,7 +18,6 @@ import java.util.List;
 public class MemberDto {
 
     @Data
-    @AllArgsConstructor
     public static class MovieMemberDto {
 
         @ApiModelProperty(
@@ -35,6 +34,13 @@ public class MemberDto {
                 value = "프로필 url",
                 example = "fhjdklebneke")
         private String profileUrl;
+
+        @QueryProjection
+        public MovieMemberDto(Long id, String nickname, String profileUrl) {
+            this.id = id;
+            this.nickname = nickname;
+            this.profileUrl = profileUrl;
+        }
     }
 
 

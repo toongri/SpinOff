@@ -1,13 +1,12 @@
 package com.nameless.spin_off.repository.query;
 
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
+import com.nameless.spin_off.dto.MemberDto.MovieMemberDto;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
+import com.nameless.spin_off.dto.MovieDto.ReadMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
-import com.nameless.spin_off.dto.QMemberDto_MembersByContentDto;
-import com.nameless.spin_off.dto.QMovieDto_FollowMovieDto;
-import com.nameless.spin_off.dto.QMovieDto_SearchAllMovieDto;
-import com.nameless.spin_off.dto.QMovieDto_SearchMovieDto;
+import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -17,17 +16,51 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static com.nameless.spin_off.entity.member.QMember.member;
 import static com.nameless.spin_off.entity.movie.QFollowedMovie.followedMovie;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.movie.QViewedMovieByIp.viewedMovieByIp;
+import static com.nameless.spin_off.entity.post.QPost.post;
 
 @Repository
 public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public MovieQueryRepository() {
         super(Movie.class);
+    }
+
+    public List<MovieMemberDto> findMembersByMovieId(Long movieId, List<Long> blockedMemberIds) {
+        return getQueryFactory()
+                .select(new QMemberDto_MovieMemberDto(
+                        member.id, member.nickname, member.profileImg))
+                .from(member)
+                .join(member.posts, post)
+                .join(post.movie, movie)
+                .where(memberNotIn(blockedMemberIds), movie.id.eq(movieId))
+                .groupBy(member)
+                .orderBy(post.popularity.max().desc())
+                .limit(3)
+                .fetch();
+    }
+
+    public Optional<ReadMovieDto> findByIdForRead(Long movieId, List<Long> blockedMemberIds) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(new QMovieDto_ReadMovieDto(
+                        movie.id, movie.title, movie.thumbnail, movie.naverUrl, movie.nation, movie.directorName,
+                        movie.actors, movie.firstGenreOfMovieStatus, movie.secondGenreOfMovieStatus,
+                        movie.thirdGenreOfMovieStatus, movie.fourthGenreOfMovieStatus, post.countDistinct(),
+                        followedMovie.countDistinct()))
+                .from(movie)
+                .leftJoin(movie.taggedPosts, post)
+                .on(post.member.id.notIn(blockedMemberIds))
+                .leftJoin(movie.followingMembers, followedMovie)
+                .on(followedMovie.member.id.notIn(blockedMemberIds))
+                .groupBy(movie)
+                .where(movie.id.eq(movieId))
+                .fetchFirst());
+
     }
 
     public List<FollowMovieDto> findAllFollowMoviesByMemberId(Long memberId) {

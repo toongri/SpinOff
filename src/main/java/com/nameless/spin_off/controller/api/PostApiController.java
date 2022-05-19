@@ -404,7 +404,7 @@ public class PostApiController {
                     dataType = "string",
                     example = "popularity,desc")
     })
-    @GetMapping("/{postId}/related")
+    @GetMapping("/{postId}/post")
     public SingleApiResult<Slice<RelatedPostDto>> getRelatedPostsSliced(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {

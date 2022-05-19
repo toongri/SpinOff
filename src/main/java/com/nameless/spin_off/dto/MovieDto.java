@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.nameless.spin_off.entity.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNAIL_NUMBER;
+import static com.nameless.spin_off.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNAIL_NUMBER;
 
 public class MovieDto {
 
@@ -60,9 +60,9 @@ public class MovieDto {
         @ApiModelProperty(
                 value = "영화 장르",
                 example = "로맨스")
-        private List<String> genres;
+        private List<String> genres = new ArrayList<>();
 
-        private List<MovieMemberDto> members;
+        private List<MovieMemberDto> members = new ArrayList<>();
 
         @ApiModelProperty(
                 value = "태그 갯수",
@@ -94,6 +94,19 @@ public class MovieDto {
             this.actors = actors;
             this.taggedSize = taggedSize;
             this.followedSize = followedSize;
+
+            if (firstGenre != null) {
+                genres.add(firstGenre);
+                if (secondGenre != null) {
+                    genres.add(secondGenre);
+                    if (thirdGenre != null) {
+                        genres.add(thirdGenre);
+                        if (fourthGenre != null) {
+                            genres.add(fourthGenre);
+                        }
+                    }
+                }
+            }
         }
     }
 

@@ -1,10 +1,10 @@
 package com.nameless.spin_off.service.help;
 
+import com.nameless.spin_off.entity.help.Complain;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.help.ComplainStatus;
 import com.nameless.spin_off.enums.help.ContentTypeStatus;
-import com.nameless.spin_off.entity.help.Complain;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
@@ -13,29 +13,18 @@ import com.nameless.spin_off.exception.member.AlreadyComplainException;
 import com.nameless.spin_off.exception.member.NotExistDMException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
-import com.nameless.spin_off.repository.comment.CommentInPostRepository;
 import com.nameless.spin_off.repository.help.ComplainRepository;
-import com.nameless.spin_off.repository.member.DirectMessageRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.query.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.nameless.spin_off.enums.help.ContentTypeStatus.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class ComplainServiceJpa implements ComplainService{
-
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
-    private final CollectionRepository collectionRepository;
-    private final DirectMessageRepository directMessageRepository;
-    private final CommentInCollectionRepository commentInCollectionRepository;
-    private final CommentInPostRepository commentInPostRepository;
     private final MemberQueryRepository memberQueryRepository;
     private final PostQueryRepository postQueryRepository;
     private final CollectionQueryRepository collectionQueryRepository;

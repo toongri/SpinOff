@@ -4,13 +4,13 @@ import com.nameless.spin_off.dto.PostDto.PostBuilder;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.post.AuthorityOfPostStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.post.AuthorityOfPostStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 import static com.nameless.spin_off.enums.post.PostContentLimitEnum.CONTENT_LENGTH_MAX;
 import static com.nameless.spin_off.enums.post.PostContentLimitEnum.TITLE_LENGTH_MAX;
+import static com.nameless.spin_off.enums.post.PostScoreEnum.*;
 
 @Entity
 @Getter
