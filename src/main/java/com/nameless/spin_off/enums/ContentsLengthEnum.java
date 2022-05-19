@@ -7,7 +7,7 @@ public enum ContentsLengthEnum {
     ACCOUNT_ID_MIN(6),
     ACCOUNT_ID_MAX(12),
     ACCOUNT_PW_MIN(8),
-    ACCOUNT_PW_MAX(100),
+    ACCOUNT_PW_MAX(16),
     NICKNAME_MIN(2),
     NICKNAME_MAX(8),
     EMAIL_TOKEN(8),

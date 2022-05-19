@@ -7,12 +7,12 @@ import com.nameless.spin_off.config.jwt.JwtTokenProvider;
 import com.nameless.spin_off.dto.MemberDto;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
-import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.EmailLinkage;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
+import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.exception.member.AlreadyAccountIdException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.security.InvalidRefreshTokenException;
@@ -39,6 +39,7 @@ import java.util.UUID;
 import static com.nameless.spin_off.enums.ContentsLengthEnum.*;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
+import static com.nameless.spin_off.enums.member.EmailLinkageServiceEnum.*;
 
 @Slf4j
 @Service
@@ -334,7 +335,7 @@ public class SignServiceJpa implements SignService{
     }
 
     private void isCorrectAccountPw(String accountPw) {
-        isAccountPwCombination(accountPw);
+//        isAccountPwCombination(accountPw);
         if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
             throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }

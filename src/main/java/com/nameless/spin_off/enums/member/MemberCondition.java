@@ -6,7 +6,7 @@ import static com.nameless.spin_off.enums.ContentsLengthEnum.*;
 
 public enum MemberCondition {
     ACCOUNT_ID("^[a-zA-Z0-9_./]{" + ACCOUNT_ID_MIN.getLength() + "," + ACCOUNT_ID_MAX.getLength() + "}$"),
-    ACCOUNT_PW("^[a-zA-Z0-9:!\"#$%&'()*+,-./:=?@[＼;]^_`{|}~]{" +
+    ACCOUNT_PW("^[a-zA-Z0-9:!\"#$%&'()*+,-./:;<=>?@[＼]^_`{|}~]{" +
             ACCOUNT_PW_MIN.getLength() + "," + ACCOUNT_PW_MAX.getLength() + "}$"),
     NICKNAME("^[a-z0-9A-Z가-힣_,.]{" + NICKNAME_MIN.getLength() + "," + NICKNAME_MAX.getLength() + "}$"),
     CELL_PHONE("^01(?:0|1|[6-9])-\\d{3,4}-\\d{4}"),
