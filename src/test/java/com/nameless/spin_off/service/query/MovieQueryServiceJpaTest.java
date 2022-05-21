@@ -7,14 +7,15 @@ import com.nameless.spin_off.dto.MovieDto.ReadMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
 import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -29,6 +30,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -621,7 +623,255 @@ class MovieQueryServiceJpaTest {
         assertThat(movieForRead5.getMembers().stream().map(MovieMemberDto::getId)).containsExactly();
         assertThat(movieForRead1.getGenres()).containsExactly("7", "8", "9", "10");
         assertThat(movieForRead4.getGenres()).containsExactly("5", "6", "7", "8");
+    }
 
+    @Test
+    public void 영화태그_포스트_출력() throws Exception{
+        //given
+        String keyword = "가나다라";
+        Member member = Member.buildMember().build();
+        memberRepository.save(member);
+        List<Hashtag> hashtagList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            hashtagList.add(Hashtag.createHashtag(i+""));
+        }
+        hashtagRepository.saveAll(hashtagList);
+
+        List<Member> memberList = new ArrayList<>();
+        List<Movie> movieList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
+            movieList.get(i).updateGenres(List.of("" + i, "" + (i + 1), "" + (i + 2), "" + (i + 3)));
+        }
+        memberRepository.saveAll(memberList);
+        movieRepository.saveAll(movieList);
+
+        em.flush();
+
+        List<Post> postList = new ArrayList<>();
+
+        Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(3))
+                .setHashTags(List.of(hashtagList.get(0))).build();
+        postRepository.save(build);
+        postList.add(build);
+
+        em.flush();
+
+        Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(4))
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build();
+        postRepository.save(build1);
+        postList.add(build1);
+        em.flush();
+
+        Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build();
+        postRepository.save(build2);
+        postList.add(build2);
+        em.flush();
+
+        Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setMovie(movieList.get(7))
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3)))
+                .build();
+
+        postRepository.save(build3);
+        postList.add(build3);
+        em.flush();
+
+        Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4)))
+                .build();
+
+        postRepository.save(build4);
+        postList.add(build4);
+        em.flush();
+
+        Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(7))
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5)))
+                .build();
+
+        postRepository.save(build5);
+        postList.add(build5);
+        em.flush();
+
+        Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6)))
+                .build();
+
+        postRepository.save(build6);
+        postList.add(build6);
+        em.flush();
+
+        Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(7))
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7)))
+                .build();
+
+        postRepository.save(build7);
+        postList.add(build7);
+        em.flush();
+
+        Post build8 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(7))
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8)))
+                .build();
+        postRepository.save(build8);
+        postList.add(build8);
+        em.flush();
+
+        Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setMovie(movieList.get(7))
+                .setHashTags(List.of(
+                        hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
+                        hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7),
+                        hashtagList.get(8), hashtagList.get(9)))
+                .build();
+        postRepository.save(build9);
+        postList.add(build9);
+        em.flush();
+
+        for (int i = 1; i < 12; i++) {
+            postList.get(0).insertViewedPostByIp(""+i%6);
+            postList.get(1).insertViewedPostByIp(""+i%9);
+            postList.get(2).insertViewedPostByIp(""+i%8);
+            postList.get(3).insertViewedPostByIp(""+0);
+            postList.get(4).insertViewedPostByIp(""+i%7);
+            postList.get(5).insertViewedPostByIp(""+i%3);
+            postList.get(6).insertViewedPostByIp(""+i%2);
+            postList.get(7).insertViewedPostByIp(""+i%4);
+            postList.get(8).insertViewedPostByIp(""+i%10);
+            postList.get(9).insertViewedPostByIp(""+i%5);
+            em.flush();
+        }
+
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(6).getId(), movieList.get(7).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(5).getId(), movieList.get(6).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(4).getId(), movieList.get(5).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(3).getId(), movieList.get(4).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(2).getId(), movieList.get(3).getId());
+        movieService.insertFollowedMovieByMovieId(memberList.get(1).getId(), movieList.get(2).getId());
+
+        memberService.insertBlockedMemberByMemberId
+                (memberList.get(8).getId(), memberList.get(2).getId(), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId
+                (memberList.get(8).getId(), memberList.get(3).getId(), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId
+                (memberList.get(8).getId(), memberList.get(4).getId(), BlockedMemberStatus.A);
+
+        em.flush();
+        em.clear();
+        for (Movie movie : movieList) {
+            movieService.insertViewedMovieByIp("22", movie.getId());
+            hashtagService.insertViewedHashtagByIp(movie.getId()+"", hashtagList.get(2).getId());
+            hashtagService.insertViewedHashtagByIp(movie.getId()+"", hashtagList.get(4).getId());
+        }
+        movieService.insertViewedMovieByIp("1", movieList.get(6).getId());
+        movieService.insertViewedMovieByIp("2", movieList.get(6).getId());
+        movieService.insertViewedMovieByIp("3", movieList.get(5).getId());
+        movieService.insertViewedMovieByIp("1", movieList.get(5).getId());
+
+        em.flush();
+        em.clear();
+        movieService.updateAllPopularity();
+        postService.updateAllPopularity();
+        collectionService.updateAllPopularity();
+        hashtagService.updateAllPopularity();
+        memberService.updateAllPopularity();
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스 시작");
+        Slice<RelatedPostDto> popularity1 = movieQueryService.getRelatedPostsByMovieIdSliced(member.getId(), movieList.get(7).getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+        System.out.println("서비스 끝");
+        Slice<RelatedPostDto> popularity2 = movieQueryService.getRelatedPostsByMovieIdSliced(null, movieList.get(7).getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+        Slice<RelatedPostDto> popularity3 = movieQueryService.getRelatedPostsByMovieIdSliced(memberList.get(8).getId(), movieList.get(7).getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+
+        Slice<RelatedPostDto> id1 = movieQueryService.getRelatedPostsByMovieIdSliced(member.getId(), movieList.get(7).getId(),
+                PageRequest.of(0, 3, Sort.by("id").descending()));
+        Slice<RelatedPostDto> id2 = movieQueryService.getRelatedPostsByMovieIdSliced(memberList.get(8).getId(), movieList.get(7).getId(),
+                PageRequest.of(0, 3, Sort.by("id").descending()));
+
+        Slice<RelatedPostDto> popularity4 = movieQueryService.getRelatedPostsByMovieIdSliced(member.getId(), movieList.get(5).getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+        Slice<RelatedPostDto> popularity5 = movieQueryService.getRelatedPostsByMovieIdSliced(null, movieList.get(5).getId(),
+                PageRequest.of(0, 3, Sort.by("popularity").descending()));
+
+        //then
+        assertThat(popularity1.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(8).getId(), postList.get(9).getId(), postList.get(7).getId());
+
+        assertThat(popularity2.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(8).getId(), postList.get(9).getId(), postList.get(7).getId());
+
+        assertThat(popularity3.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(8).getId(), postList.get(9).getId(), postList.get(5).getId());
+
+        assertThat(id1.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(9).getId(), postList.get(8).getId(), postList.get(7).getId());
+
+        assertThat(id2.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly(postList.get(9).getId(), postList.get(8).getId(), postList.get(5).getId());
+
+        assertThat(popularity4.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly();
+
+        assertThat(popularity5.stream().map(RelatedPostDto::getPostId).collect(Collectors.toList()))
+                .containsExactly();
 
     }
 }
