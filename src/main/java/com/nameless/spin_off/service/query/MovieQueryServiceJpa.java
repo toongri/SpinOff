@@ -1,22 +1,20 @@
 package com.nameless.spin_off.service.query;
 
-import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.MovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchAllMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchMovieAboutFirstMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchMovieDto;
-import com.nameless.spin_off.dto.MovieDto.SearchMovieFirstDto;
+import com.nameless.spin_off.dto.MemberDto.MovieMemberDto;
+import com.nameless.spin_off.dto.MovieDto.*;
+import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
-import com.nameless.spin_off.entity.enums.ErrorEnum;
-import com.nameless.spin_off.entity.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.query.HashtagQueryRepository;
 import com.nameless.spin_off.repository.query.MovieQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -38,6 +36,7 @@ public class MovieQueryServiceJpa implements MovieQueryService{
     private final MovieRepository movieRepository;
     private final HashtagQueryRepository hashtagQueryRepository;
     private final MemberRepository memberRepository;
+    private final PostQueryRepository postQueryRepository;
     private List<Long> blockedMemberIds;
 
     @Override
@@ -75,8 +74,40 @@ public class MovieQueryServiceJpa implements MovieQueryService{
     }
 
     @Override
-    public MovieDto.ReadMovieDto getMovieForRead(MemberDetails currentMember, Long movieId) {
-        return null;
+    public ReadMovieDto getMovieForRead(Long memberId, Long movieId) {
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        ReadMovieDto movie = getMovie(movieId);
+        movie.setMembers(getMembersByMovieId(movieId));
+        movie.setFollowed(getExistFollowedMovie(memberId, movieId));
+
+        return movie;
+    }
+
+    @Override
+    public Slice<RelatedPostDto> getRelatedPostsByMovieIdSliced(Long memberId, Long movieId, Pageable pageable) {
+        blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
+        return getAllRelatedPostByMovieId(movieId, pageable);
+    }
+
+    private Slice<RelatedPostDto> getAllRelatedPostByMovieId(Long movieId, Pageable pageable) {
+        return postQueryRepository.findAllRelatedPostByMovieId(pageable, blockedMemberIds, movieId);
+    }
+
+    private List<MovieMemberDto> getMembersByMovieId(Long movieId) {
+        return movieQueryRepository.findMembersByMovieId(movieId, blockedMemberIds);
+    }
+
+    private ReadMovieDto getMovie(Long movieId) {
+        return movieQueryRepository.findByIdForRead(movieId, blockedMemberIds)
+                .orElseThrow(() -> new NotExistMovieException(ErrorEnum.NOT_EXIST_MOVIE));
+    }
+
+    private Boolean getExistFollowedMovie(Long memberId, Long movieId) {
+        if (memberId != null) {
+            return movieQueryRepository.isExistFollowedMovie(memberId, movieId);
+        } else {
+            return false;
+        }
     }
 
     private void isExistMovie(Long movieId) {
