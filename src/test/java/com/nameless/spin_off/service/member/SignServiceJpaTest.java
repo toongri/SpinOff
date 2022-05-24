@@ -1,9 +1,9 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
-import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.exception.sign.IncorrectAccountIdException;
 import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
 import com.nameless.spin_off.exception.sign.IncorrectEmailException;
@@ -101,18 +101,6 @@ class SignServiceJpaTest {
 
         memberRegisterRequestDto.setAccountId("abcdefgt");
         memberRegisterRequestDto.setAccountPw("가나다라마바사아");
-        assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("125123223");
-        assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("asbdsddd");
-        assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
-                .isInstanceOf(IncorrectAccountPwException.class);
-
-        memberRegisterRequestDto.setAccountPw("!@%!@#%@@#@");
         assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
                 .isInstanceOf(IncorrectAccountPwException.class);
 
