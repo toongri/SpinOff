@@ -2,6 +2,7 @@ package com.nameless.spin_off.service.support;
 
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,8 +22,17 @@ import java.util.UUID;
 public class AwsS3Service {
     private final AmazonS3Client amazonS3Client;
 
+    @Value("${AWS_S3_BUCKET_URL}")
+    private String AWS_S3_BUCKET_URL;
+
     @Value("${cloud.aws.s3.bucket}")
     public String bucket;  // S3 버킷 이름
+
+    public void deleteFile(String fileName){
+        String url = fileName.substring(AWS_S3_BUCKET_URL.length() + 1);
+        DeleteObjectRequest request = new DeleteObjectRequest(bucket, url);
+        amazonS3Client.deleteObject(request);
+    }
 
     public String upload(MultipartFile multipartFile, String dirName) throws IOException {
         File uploadFile = convert(multipartFile)  // 파일 변환할 수 없으면 에러

@@ -1,8 +1,9 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -148,5 +149,30 @@ class MemberServiceJpaTest {
                 .isInstanceOf(AlreadyBlockedMemberException.class);
         assertThatThrownBy(() -> memberService.insertBlockedMemberByMemberId(memberId, -1L, BlockedMemberStatus.A))
                 .isInstanceOf(NotExistMemberException.class);
+    }
+    
+    @Test
+    public void 멤버_정보_수정() throws Exception{
+        //given
+        Member member = Member.buildMember().build();
+        Long memberId = memberRepository.save(member).getId();
+        em.flush();
+        
+        //when
+        Long count = memberService.updateMemberInfo(memberId, new MemberInfoDto("1", "member/2", "3", "4", "5"));
+        em.flush();
+
+        Long count2 = memberService.updateMemberInfo(memberId, new MemberInfoDto("0", "member/2", "2", "3", "5"));
+        em.flush();
+
+        Long count3 = memberService.updateMemberInfo(memberId, new MemberInfoDto("0", "member/2", "2", "3", "5"));
+        em.flush();
+
+
+        //then
+        assertThat(count).isEqualTo(5L);
+        assertThat(count2).isEqualTo(3L);
+        assertThat(count3).isEqualTo(0L);
+
     }
 }

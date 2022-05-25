@@ -74,7 +74,7 @@ public class SignApiController {
         return getResult(signService.loginBySocial(authCode, provider));
     }
 
-    @ApiOperation(value = "유저 조회 및 수정", notes = "")
+    @ApiOperation(value = "로그인", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "requestDto",
@@ -221,7 +221,7 @@ public class SignApiController {
                     example = "spinoff232@gmail.com")
     })
     @GetMapping("/forget/account-id")
-    public SingleApiResult<Boolean> findMemberAccountId(@RequestParam String email) {
+    public SingleApiResult<Boolean> readMemberAccountId(@RequestParam String email) {
         return getResult(signService.sendEmailForAccountId(email));
     }
 
@@ -236,7 +236,7 @@ public class SignApiController {
                     example = "spinoff232")
     })
     @PatchMapping("/forget/account-pw")
-    public SingleApiResult<Boolean> findMemberAccountPw(@RequestParam String accountId) {
+    public SingleApiResult<Boolean> readMemberAccountPw(@RequestParam String accountId) {
         return getResult(signService.sendEmailForAccountPw(accountId));
     }
 

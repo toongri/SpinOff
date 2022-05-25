@@ -5,6 +5,7 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
@@ -47,6 +48,53 @@ public class MemberApiController {
     private final MemberQueryService memberQueryService;
     private final PostQueryService postQueryService;
     private final CollectionQueryService collectionQueryService;
+
+    @ApiOperation(value = "멤버 정보 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/info")
+    public SingleApiResult<ReadMemberDto> readInfo(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readOne");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("memberId : {}", memberId);
+
+        return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
+    }
+
+    @ApiOperation(value = "멤버 정보 수정", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberInfoRequestDto",
+                    value = "멤버 업데이트 요청",
+                    required = true,
+                    paramType = "body",
+                    dataType = "MemberInfoDto")
+    })
+    @PutMapping("/info")
+    public SingleApiResult<Long> updateInfo(
+            @LoginMember MemberDetails currentMember, @RequestBody MemberInfoDto memberInfoRequestDto) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readOne");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("accountId : {}", memberInfoRequestDto.getAccountId());
+        log.info("nickname : {}", memberInfoRequestDto.getNickname());
+        log.info("profileUrl : {}", memberInfoRequestDto.getProfileUrl());
+        log.info("bio : {}", memberInfoRequestDto.getBio());
+        log.info("website : {}", memberInfoRequestDto.getWebsite());
+
+        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
+    }
 
     @ApiOperation(value = "멤버 마이페이지", notes = "")
     @ApiImplicitParams({

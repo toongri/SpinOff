@@ -3,12 +3,6 @@ package com.nameless.spin_off.entity.member;
 import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
 import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.help.ComplainStatus;
-import com.nameless.spin_off.enums.help.ContentTypeStatus;
-import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.help.Complain;
@@ -16,6 +10,12 @@ import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.help.ComplainStatus;
+import com.nameless.spin_off.enums.help.ContentTypeStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
@@ -52,6 +52,7 @@ public class Member extends BaseTimeEntity {
     private String email;
     private String profileImg;
     private String bio;
+    private String website;
     private String googleEmail;
     private String naverEmail;
     private String kakaoEmail;
@@ -234,6 +235,10 @@ public class Member extends BaseTimeEntity {
 
     public void updateProfileImg(String profileImg) {
         this.profileImg = profileImg;
+    }
+
+    public void updateWebsite(String website) {
+        this.website = website;
     }
 
     public void updateAccountId(String accountId) {

@@ -18,6 +18,37 @@ import java.util.List;
 public class MemberDto {
 
     @Data
+    @AllArgsConstructor
+    public static class MemberInfoDto {
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "toongri")
+        private String nickname;
+
+        @ApiModelProperty(
+                value = "프로필 url",
+                example = "fhjdklebneke")
+        private String profileUrl;
+
+        @ApiModelProperty(
+                value = "프로필 id",
+                example = "fhjdklebneke")
+        private String accountId;
+
+        @ApiModelProperty(
+                value = "프로필 웹사이트url",
+                example = "www.nvaer.com")
+        private String website;
+
+        @ApiModelProperty(
+                value = "프로필 소개",
+                example = "fhjdklebneke")
+        private String bio;
+    }
+
+
+    @Data
     public static class MovieMemberDto {
 
         @ApiModelProperty(
