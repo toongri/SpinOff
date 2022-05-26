@@ -61,6 +61,7 @@ public class MovieApiService {
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+                log.info(resultMap.toString());
 
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
