@@ -61,10 +61,12 @@ public class MovieApiService {
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+                log.info("resultMap : {}", resultMap.toString());
 
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
                 List<Movie> newPartMovieList = new ArrayList<>();
+                log.info("movieList size : {}", movieList.size());
 
                 for (Map obj : movieList) {
                     ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
@@ -83,19 +85,22 @@ public class MovieApiService {
 
                 List<Long> movieIds = newPartMovieList.stream().map(Movie::getId).collect(Collectors.toList());
 
-                List<Long> allIdsById = movieRepository.findAllIdsById(movieIds);
+                List<Long> alreadyMovieIds = movieRepository.findAllIdsById(movieIds);
 
+                log.info("alreadyMovieIds size : {}", alreadyMovieIds.size());
                 List<Movie> resultMovieList = newPartMovieList
                         .stream()
                         .filter(m -> m.getDirectorName() != null)
-                        .filter(m -> !allIdsById.contains(m.getId()))
+                        .filter(m -> !alreadyMovieIds.contains(m.getId()))
                         .collect(Collectors.toList());
 
                 if (resultMovieList.isEmpty()) {
                     break;
                 }
 
+                log.info("resultMovieList size : {}", resultMovieList.size());
                 newMovieList.addAll(resultMovieList);
+                log.info("newMovieList size : {}", newMovieList.size());
 
             } catch (HttpClientErrorException | HttpServerErrorException e) {
                 log.error("kobisMovieError");
