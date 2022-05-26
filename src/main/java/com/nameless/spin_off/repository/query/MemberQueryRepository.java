@@ -3,10 +3,10 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.*;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.member.QFollowedMember;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.repository.support.Querydsl4RepositorySupport;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import org.springframework.data.domain.Pageable;
@@ -183,21 +183,23 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                         member.nickname.contains(keyword),
                         memberNotIn(blockedMemberIds)));
 
-        List<Long> memberIds = getMemberIds(content.getContent());
+        if (memberId != null) {
+            List<Long> memberIds = getMemberIds(content.getContent());
 
-        Map<Long, List<FollowingMemberMemberDto>> followingMembersAtMember =
-                getFollowingMembersAtMember(memberId, memberIds);
+            Map<Long, List<FollowingMemberMemberDto>> followingMembersAtMember =
+                    findAllFollowingMemberAtMember(memberId, memberIds);
 
-        Map<Long, List<ThumbnailMemberDto>> postsAtMember = getPostsAtMember(memberIds);
+            Map<Long, List<ThumbnailMemberDto>> postsAtMember = findAllPostAtMember(memberIds);
 
-        content.getContent().forEach(o -> o.setFollowingMemberAndThumbnails(
-                followingMembersAtMember.get(o.getMemberId()),
-                postsAtMember.get(o.getMemberId())));
+            content.getContent().forEach(o -> o.setFollowingMemberAndThumbnails(
+                    followingMembersAtMember.get(o.getMemberId()),
+                    postsAtMember.get(o.getMemberId())));
+        }
 
         return content;
     }
 
-    private Map<Long, List<ThumbnailMemberDto>> getPostsAtMember(List<Long> memberIds) {
+    private Map<Long, List<ThumbnailMemberDto>> findAllPostAtMember(List<Long> memberIds) {
         return getQueryFactory()
                 .select(new QPostDto_ThumbnailMemberDto(
                         post.member.id, post.thumbnailUrl))
@@ -208,7 +210,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .fetch().stream().collect(Collectors.groupingBy(ThumbnailMemberDto::getMemberId));
     }
 
-    private Map<Long, List<FollowingMemberMemberDto>> getFollowingMembersAtMember(Long memberId, List<Long> memberIds) {
+    private Map<Long, List<FollowingMemberMemberDto>> findAllFollowingMemberAtMember(Long memberId, List<Long> memberIds) {
         QFollowedMember ownerFollowedMember = new QFollowedMember("ownerFollowedMember");
         return getQueryFactory()
                 .select(new QMemberDto_FollowingMemberMemberDto(

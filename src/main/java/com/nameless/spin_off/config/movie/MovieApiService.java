@@ -98,15 +98,15 @@ public class MovieApiService {
                 newMovieList.addAll(resultMovieList);
 
             } catch (HttpClientErrorException | HttpServerErrorException e) {
-                log.info("kobisMovieError");
-                log.info("statusCode : {}", e.getRawStatusCode());
-                log.info("body : {}", e.getStatusText());
+                log.error("kobisMovieError");
+                log.error("statusCode : {}", e.getRawStatusCode());
+                log.error("body : {}", e.getStatusText());
             } catch (NumberFormatException e) {
-                log.debug("kobisMovieDataError");
-                log.debug("데이터 오류 : {}", e.toString());
+                log.error("kobisMovieDataError");
+                log.error("데이터 오류 : {}", e.toString());
             } catch (Exception e) {
-                log.debug("kobisMovieError");
-                log.debug("예상하지 못한 에러 : {}", e.toString());
+                log.error("kobisMovieError");
+                log.error("예상하지 못한 에러 : {}", e.toString());
             }
         }
 
@@ -135,15 +135,15 @@ public class MovieApiService {
             movie.updateActors(getActors(actors));
 
         } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.info("kobisInfoMovieError");
-            log.info("statusCode : {}", e.getRawStatusCode());
-            log.info("body : {}", e.getStatusText());
+            log.error("kobisInfoMovieError");
+            log.error("statusCode : {}", e.getRawStatusCode());
+            log.error("body : {}", e.getStatusText());
         } catch (NumberFormatException e) {
-            log.debug("kobisInfoMovieDataError");
-            log.debug("데이터 오류 : {}", e.toString());
+            log.error("kobisInfoMovieDataError");
+            log.error("데이터 오류 : {}", e.toString());
         }  catch (Exception e) {
-            log.debug("kobisInfoMovieError");
-            log.debug("예상하지 못한 에러 : {}", e.toString());
+            log.error("kobisInfoMovieError");
+            log.error("예상하지 못한 에러 : {}", e.toString());
         }
     }
 
@@ -230,21 +230,20 @@ public class MovieApiService {
                 movie.updateNaverUrl(naverMovie.getLink());
                 movie.updateImageUrl(naverMovie.getImage());
             } else {
-                log.info("cant find naver movie");
-                log.info("movie Id : {}", movie.getId());
-                log.info("movie Title : {}", movie.getTitle());
+                log.debug("cant find naver movie");
+                log.debug("movie Id : {}", movie.getId());
+                log.debug("movie Title : {}", movie.getTitle());
             }
         } catch (CantCorrectMovieUrlException e) {
             log.info("cant find movie url");
             log.info("movie Id : {}", movie.getId());
-            log.info("movie Title : {}", movie.getTitle());
         }catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.info("naverMovieError");
-            log.info("statusCode : {}", e.getRawStatusCode());
-            log.info("body : {}", e.getStatusText());
+            log.error("naverMovieError");
+            log.error("statusCode : {}", e.getRawStatusCode());
+            log.error("body : {}", e.getStatusText());
         } catch (NumberFormatException e) {
-            log.debug("naverMovieDataError");
-            log.debug("데이터 오류 : {}", e.toString());
+            log.error("naverMovieDataError");
+            log.error("데이터 오류 : {}", e.toString());
         }  catch (Exception e) {
             log.error("naverMovieError");
             log.error("예상하지 못한 에러 : {}", e.toString());
