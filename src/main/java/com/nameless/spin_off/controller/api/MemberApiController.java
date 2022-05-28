@@ -85,7 +85,7 @@ public class MemberApiController {
             @LoginMember MemberDetails currentMember, @RequestBody MemberInfoDto memberInfoRequestDto) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("readOne");
+        log.info("updateInfo");
         log.info("currentMemberId : {}", currentMemberId);
         log.info("accountId : {}", memberInfoRequestDto.getAccountId());
         log.info("nickname : {}", memberInfoRequestDto.getNickname());
@@ -94,6 +94,27 @@ public class MemberApiController {
         log.info("website : {}", memberInfoRequestDto.getWebsite());
 
         return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
+    }
+
+    @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "password",
+                    value = "비밀번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "String")
+    })
+    @GetMapping("/check/password")
+    public SingleApiResult<Boolean> getIsCorrectPassword(
+            @LoginMember MemberDetails currentMember, @RequestParam String password) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("getIsCorrectPassword");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("password : {}", password);
+
+        return getResult(currentMember.getPassword().equals(password));
     }
 
     @ApiOperation(value = "멤버 마이페이지", notes = "")

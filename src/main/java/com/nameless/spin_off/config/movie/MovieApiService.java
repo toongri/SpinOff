@@ -66,7 +66,6 @@ public class MovieApiService {
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
                 List<Movie> newPartMovieList = new ArrayList<>();
-                log.info("movieList size : {}", movieList.size());
 
                 for (Map obj : movieList) {
                     ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
@@ -87,7 +86,6 @@ public class MovieApiService {
 
                 List<Long> alreadyMovieIds = movieRepository.findAllIdsById(movieIds);
 
-                log.info("alreadyMovieIds size : {}", alreadyMovieIds.size());
                 List<Movie> resultMovieList = newPartMovieList
                         .stream()
                         .filter(m -> m.getDirectorName() != null)
@@ -98,9 +96,7 @@ public class MovieApiService {
                     break;
                 }
 
-                log.info("resultMovieList size : {}", resultMovieList.size());
                 newMovieList.addAll(resultMovieList);
-                log.info("newMovieList size : {}", newMovieList.size());
 
             } catch (HttpClientErrorException | HttpServerErrorException e) {
                 log.error("kobisMovieError");
