@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.member.BlockedMember;
@@ -7,12 +8,14 @@ import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.enums.member.MemberScoreEnum;
 import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
+import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
 import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
 import com.nameless.spin_off.repository.member.BlockedMemberRepository;
 import com.nameless.spin_off.repository.member.FollowedMemberRepository;
@@ -21,12 +24,15 @@ import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.service.support.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.nameless.spin_off.enums.ErrorEnum.NOT_EXIST_MEMBER;
 
 @Slf4j
 @Service
@@ -39,6 +45,7 @@ public class MemberServiceJpa implements MemberService {
     private final FollowedMemberRepository followedMemberRepository;
     private final BlockedMemberRepository blockedMemberRepository;
     private final FollowedCollectionRepository followedCollectionRepository;
+    private final PasswordEncoder passwordEncoder;
     private final AwsS3Service awsS3Service;
 
     @Transactional
@@ -98,7 +105,7 @@ public class MemberServiceJpa implements MemberService {
     @Transactional
     @Override
     public Long updateMemberInfo(Long memberId, MemberInfoDto memberInfoRequestDto) {
-        Member member = memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+        Member member = getMember(memberId);
         Long cnt = 0L;
         if (!memberInfoRequestDto.getAccountId().equals(member.getAccountId())) {
             cnt++;
@@ -127,6 +134,20 @@ public class MemberServiceJpa implements MemberService {
         return cnt;
     }
 
+    @Override
+    public Boolean isMatchedPassword(MemberDetails currentMember, String password) {
+        return passwordEncoder.matches(password, currentMember.getPassword());
+    }
+
+    @Transactional
+    @Override
+    public Boolean updateMemberPassword(Long memberId, String password) {
+        isCorrectAccountPw(password);
+        Member member = getMember(memberId);
+        member.updateAccountPw(passwordEncoder.encode(password));
+        return true;
+    }
+
     @Transactional
     @Override
     public int updateAllPopularity() {
@@ -136,6 +157,18 @@ public class MemberServiceJpa implements MemberService {
             member.updatePopularity();
         }
         return members.size();
+    }
+
+
+    private Member getMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
+    }
+
+    private void isCorrectAccountPw(String accountPw) {
+//        isAccountPwCombination(accountPw);
+        if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+        }
     }
 
     private void isExistBlock(Long memberId, Long blockedMemberId) {
@@ -159,14 +192,14 @@ public class MemberServiceJpa implements MemberService {
 
     private void isExistMember(Long memberId) {
         if (!memberQueryRepository.isExist(memberId)) {
-            throw new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER);
+            throw new NotExistMemberException(NOT_EXIST_MEMBER);
         }
     }
 
     private Member getMemberWithSearch(Long memberId) throws NotExistMemberException {
         Optional<Member> optionalMember = memberRepository.findOneByIdWithSearch(memberId);
 
-        return optionalMember.orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+        return optionalMember.orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
     }
 
     private void isExistFollowedMember(Long memberId, Long followedMemberId) {

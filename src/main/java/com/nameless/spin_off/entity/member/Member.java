@@ -15,8 +15,13 @@ import com.nameless.spin_off.enums.help.ComplainStatus;
 import com.nameless.spin_off.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
+import com.nameless.spin_off.exception.sign.IncorrectAccountIdException;
+import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
+import com.nameless.spin_off.exception.sign.IncorrectEmailException;
+import com.nameless.spin_off.exception.sign.IncorrectNicknameException;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -31,6 +36,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.nameless.spin_off.enums.member.MemberCondition.EMAIL;
+import static com.nameless.spin_off.enums.member.MemberCondition.NICKNAME;
 import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 
 @Entity
@@ -230,6 +237,7 @@ public class Member extends BaseTimeEntity {
         this.id = id;
     }
     public void updateNickname(String nickname) {
+        isCorrectNickname(nickname);
         this.nickname = nickname;
     }
 
@@ -242,6 +250,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updateAccountId(String accountId) {
+        isCorrectAccountId(accountId);
         this.accountId = accountId;
     }
 
@@ -250,6 +259,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updateEmail(String email) {
+        isCorrectEmail(email);
         this.email = email;
     }
 
@@ -299,6 +309,32 @@ public class Member extends BaseTimeEntity {
     }
 
     //==비즈니스 로직==//
+
+
+    private void isCorrectEmail(String email) {
+        if (EMAIL.isNotCorrect(email)) {
+            throw new IncorrectEmailException(ErrorEnum.INCORRECT_EMAIL);
+        }
+    }
+
+    private void isCorrectAccountId(String accountId) {
+        if (MemberCondition.ACCOUNT_ID.isNotCorrect(accountId)) {
+            throw new IncorrectAccountIdException(ErrorEnum.INCORRECT_ACCOUNT_ID);
+        }
+    }
+
+    private void isCorrectAccountPw(String accountPw) {
+        if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
+            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
+        }
+    }
+
+    private void isCorrectNickname(String nickname) {
+        if (NICKNAME.isNotCorrect(nickname)) {
+            throw new IncorrectNicknameException(ErrorEnum.INCORRECT_NICKNAME);
+        }
+    }
+
     public Double executeFollowScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();

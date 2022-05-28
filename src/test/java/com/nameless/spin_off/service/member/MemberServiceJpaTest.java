@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.entity.member.Member;
@@ -7,14 +8,18 @@ import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.A;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +34,7 @@ class MemberServiceJpaTest {
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
+    @Autowired PasswordEncoder passwordEncoder;
 
     @Test
     public void 멤버_팔로우_멤버() throws Exception{
@@ -173,6 +179,48 @@ class MemberServiceJpaTest {
         assertThat(count).isEqualTo(5L);
         assertThat(count2).isEqualTo(3L);
         assertThat(count3).isEqualTo(0L);
+    }
+
+    @Test
+    public void 비밀번호_수정() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("abcd12@gmail.com")
+                .setNickname("abcdd")
+                .setAccountId("abcd232")
+                .setAccountPw(passwordEncoder.encode("abc")).build();
+        Long memberId = memberRepository.save(member).getId();
+        em.flush();
+
+        //when
+
+
+        //then
+        assertThat(memberService.isMatchedPassword(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),"abc")).isTrue();
+
+        assertThat(memberService.updateMemberPassword(memberId, "abcd1234")).isTrue();
+        assertThat(memberService.isMatchedPassword(
+                MemberDetails.builder()
+                        .id(member.getId())
+                        .accountId(member.getAccountId())
+                        .accountPw(member.getAccountPw())
+                        .authorities(member.getRoles()
+                                .stream()
+                                .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                                .collect(Collectors.toSet()))
+                        .build(),"abcd1234")).isTrue();
+
+        assertThatThrownBy(() -> memberService.updateMemberPassword(memberId, "bad"))
+                .isInstanceOf(IncorrectAccountPwException.class);
 
     }
 }

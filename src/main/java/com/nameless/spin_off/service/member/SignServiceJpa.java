@@ -64,7 +64,8 @@ public class SignServiceJpa implements SignService{
     @Override
     public MemberLoginResponseDto registerMember(MemberRegisterRequestDto requestDto)
             throws AlreadyAccountIdException, AlreadyNicknameException {
-        isCorrectRegisterRequest(requestDto);
+
+        isCorrectAccountPw(requestDto.getAccountPw());
         isExistAuthEmail(requestDto.getEmail(), requestDto.getAuthToken());
 
         Member member = Member.buildMember()
@@ -310,13 +311,6 @@ public class SignServiceJpa implements SignService{
         }
     }
 
-    private void isCorrectRegisterRequest(MemberRegisterRequestDto requestDto) {
-        isCorrectAccountId(requestDto.getAccountId());
-        isCorrectAccountPw(requestDto.getAccountPw());
-        isCorrectNickname(requestDto.getNickname());
-        isCorrectEmail(requestDto.getEmail());
-    }
-
     private void isCorrectLoginRequest(MemberLoginRequestDto requestDto) {
         isCorrectAccountId(requestDto.getAccountId());
         isCorrectAccountPw(requestDto.getAccountPw());
@@ -335,7 +329,6 @@ public class SignServiceJpa implements SignService{
     }
 
     private void isCorrectAccountPw(String accountPw) {
-//        isAccountPwCombination(accountPw);
         if (MemberCondition.ACCOUNT_PW.isNotCorrect(accountPw)) {
             throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
         }
@@ -352,15 +345,6 @@ public class SignServiceJpa implements SignService{
             throw new AlreadyEmailException(ErrorEnum.ALREADY_EMAIL);
         }
     }
-    private void isAccountPwCombination(String accountPw) {
-        if (isIncludeAllEnglish(accountPw)) {
-            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
-        } else if (isIncludeAllSign(accountPw)) {
-            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
-        } else if (isIncludeAllNumber(accountPw)) {
-            throw new IncorrectAccountPwException(ErrorEnum.INCORRECT_ACCOUNT_PW);
-        }
-    }
 
     private String getRandomPassword() {
         String randomAccountId = RandomStringUtils.randomAlphabetic(ACCOUNT_PW_MIN.getLength());
@@ -368,17 +352,6 @@ public class SignServiceJpa implements SignService{
         randomAccountId += RandomStringUtils.randomNumeric(ACCOUNT_PW_MIN.getLength());
 
         return randomAccountId;
-    }
-    private boolean isIncludeAllNumber(String accountPw) {
-        return !MemberCondition.NUMBER.isNotCorrect(accountPw);
-    }
-
-    private boolean isIncludeAllSign(String accountPw) {
-        return !MemberCondition.SIGN.isNotCorrect(accountPw);
-    }
-
-    private boolean isIncludeAllEnglish(String accountPw) {
-        return !MemberCondition.ENGLISH.isNotCorrect(accountPw);
     }
 
     private String getRandomNickname() {

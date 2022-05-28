@@ -106,7 +106,7 @@ public class MemberApiController {
                     dataType = "String")
     })
     @GetMapping("/check/password")
-    public SingleApiResult<Boolean> getIsCorrectPassword(
+    public SingleApiResult<Boolean> isMatchedPassword(
             @LoginMember MemberDetails currentMember, @RequestParam String password) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
@@ -114,7 +114,28 @@ public class MemberApiController {
         log.info("currentMemberId : {}", currentMemberId);
         log.info("password : {}", password);
 
-        return getResult(currentMember.getPassword().equals(password));
+        return getResult(memberService.isMatchedPassword(currentMember, password));
+    }
+
+    @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "password",
+                    value = "비밀번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "String")
+    })
+    @PutMapping("/password")
+    public SingleApiResult<Boolean> updatePassword(
+            @LoginMember MemberDetails currentMember, @RequestParam String password) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("getIsCorrectPassword");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("password : {}", password);
+
+        return getResult(memberService.updateMemberPassword(currentMemberId, password));
     }
 
     @ApiOperation(value = "멤버 마이페이지", notes = "")

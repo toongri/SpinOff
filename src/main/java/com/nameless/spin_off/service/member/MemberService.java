@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.member;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
@@ -16,5 +17,9 @@ public interface MemberService {
             throws NotExistMemberException;
 
     Long updateMemberInfo(Long memberId, MemberInfoDto memberInfoRequestDto);
+
+    Boolean isMatchedPassword(MemberDetails currentMember, String password);
+
+    Boolean updateMemberPassword(Long memberId, String password);
     int updateAllPopularity();
 }
