@@ -13,13 +13,13 @@ import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
 import com.nameless.spin_off.dto.PostDto.SearchPageAtHashtagPostDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
@@ -71,8 +71,20 @@ public class PostQueryServiceJpaTest {
     public void 발견_포스트_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
-        Member member2 = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         memberRepository.save(member2);
 
@@ -136,8 +148,20 @@ public class PostQueryServiceJpaTest {
     public void 팔로잉_해시태그_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
-        Member member2 = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         memberRepository.save(member2);
 
@@ -208,8 +232,20 @@ public class PostQueryServiceJpaTest {
     public void 팔로잉_무비_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
-        Member member2 = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         memberRepository.save(member2);
         List<Movie> movieList = new ArrayList<>();
@@ -279,11 +315,23 @@ public class PostQueryServiceJpaTest {
     public void 팔로잉_멤버_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build());
         }
         memberRepository.saveAll(memberList);
 
@@ -348,11 +396,23 @@ public class PostQueryServiceJpaTest {
     public void 멤버_차단_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -384,11 +444,23 @@ public class PostQueryServiceJpaTest {
     public void 전체검색_포스트_테스트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -446,7 +518,13 @@ public class PostQueryServiceJpaTest {
     public void 해시태그_검색() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -585,27 +663,33 @@ public class PostQueryServiceJpaTest {
         //given
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member);
 
         Member member2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member2);
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(""+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -801,41 +885,41 @@ public class PostQueryServiceJpaTest {
         //given
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member);
 
         Member member2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member2);
 
         Member member3 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member3);
 
         Member member4 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member4);
 
@@ -1005,27 +1089,33 @@ public class PostQueryServiceJpaTest {
         //given
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member);
 
         Member member2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member2);
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(""+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 

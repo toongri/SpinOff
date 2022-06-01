@@ -1,11 +1,11 @@
 package com.nameless.spin_off.service.help;
 
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.help.ComplainStatus;
 import com.nameless.spin_off.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
-import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.AlreadyComplainException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -22,6 +22,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.nameless.spin_off.enums.help.ContentTypeStatus.A;
@@ -48,9 +49,21 @@ class ComplainServiceJpaTest {
     @Test
     public void 컴플레인_컬렉션_삽입() throws Exception {
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Collection col = Collection.createDefaultCollection(mem2);
         collectionRepository.save(col);
@@ -78,9 +91,21 @@ class ComplainServiceJpaTest {
     @Test
     public void 컴플레인_포스트_삽입() throws Exception {
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -111,9 +136,21 @@ class ComplainServiceJpaTest {
     @Test
     public void 컴플레인_삽입_예외처리() throws Exception {
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())

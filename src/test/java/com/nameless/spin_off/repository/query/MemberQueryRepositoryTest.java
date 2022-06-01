@@ -1,8 +1,8 @@
 package com.nameless.spin_off.repository.query;
 
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.service.member.MemberService;
@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,9 +28,21 @@ class MemberQueryRepositoryTest {
     @Test
     public void 블록_체크() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
-        Member member2 = Member.buildMember().build();
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member2);
 
         memberService.insertBlockedMemberByMemberId(member.getId(), member2.getId(), BlockedMemberStatus.A);

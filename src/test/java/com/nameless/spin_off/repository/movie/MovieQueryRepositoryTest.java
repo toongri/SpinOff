@@ -3,10 +3,10 @@ package com.nameless.spin_off.repository.movie;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -23,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -50,7 +51,13 @@ public class MovieQueryRepositoryTest {
     public void 전체검색_영화_테스트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
@@ -58,7 +65,13 @@ public class MovieQueryRepositoryTest {
             Movie movie = Movie.createMovie((long) i, keyword + i, null, null, null);
             movie.updateGenres(List.of("A", "C"));
             movieList.add(movie);
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword+i).build());
         }
 
         List<Post> postList = new ArrayList<>();

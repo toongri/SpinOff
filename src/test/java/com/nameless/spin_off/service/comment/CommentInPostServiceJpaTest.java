@@ -2,10 +2,10 @@ package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInPostException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 
 import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_COMMENT;
@@ -45,7 +46,13 @@ class CommentInPostServiceJpaTest {
     @Test
     public void saveCommentInPostByCommentVO() throws Exception{
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -78,7 +85,13 @@ class CommentInPostServiceJpaTest {
     @Test
     public void 대댓글_테스트() throws Exception{
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
@@ -130,13 +143,25 @@ class CommentInPostServiceJpaTest {
     public void 댓글_저장시_파라미터_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post post2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -174,9 +199,21 @@ class CommentInPostServiceJpaTest {
     @Test
     public void 좋아요_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
@@ -205,9 +242,21 @@ class CommentInPostServiceJpaTest {
     @Test
     public void 좋아요_테스트_예외처리() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();

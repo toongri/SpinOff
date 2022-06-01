@@ -6,11 +6,11 @@ import com.nameless.spin_off.dto.MainPageDto;
 import com.nameless.spin_off.dto.MainPageDto.MainPageFollowDto;
 import com.nameless.spin_off.dto.PostDto.MainPagePostDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -29,6 +29,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,12 +59,24 @@ class MainPageQueryServiceJpaTest {
     public void 발견_메인페이지() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build());
         }
         memberRepository.saveAll(memberList);
 
@@ -218,12 +231,24 @@ class MainPageQueryServiceJpaTest {
     public void 팔로우_메인페이지_게시글() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build());
         }
         memberRepository.saveAll(memberList);
 

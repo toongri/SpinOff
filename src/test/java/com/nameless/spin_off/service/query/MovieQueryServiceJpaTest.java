@@ -35,6 +35,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,13 +67,25 @@ class MovieQueryServiceJpaTest {
     public void 영화_키워드_검색() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname(keyword+i).build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -146,7 +159,13 @@ class MovieQueryServiceJpaTest {
     public void 영화_검색() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -157,7 +176,13 @@ class MovieQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
         }
         memberRepository.saveAll(memberList);
@@ -387,7 +412,13 @@ class MovieQueryServiceJpaTest {
     public void 영화_조회() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -398,7 +429,13 @@ class MovieQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             movieList.get(i).updateGenres(List.of("" + i, "" + (i + 1), "" + (i + 2), "" + (i + 3)));
         }
@@ -629,7 +666,13 @@ class MovieQueryServiceJpaTest {
     public void 영화태그_포스트_출력() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -640,7 +683,13 @@ class MovieQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             movieList.get(i).updateGenres(List.of("" + i, "" + (i + 1), "" + (i + 2), "" + (i + 3)));
         }

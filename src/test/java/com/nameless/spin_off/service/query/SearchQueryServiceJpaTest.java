@@ -8,13 +8,13 @@ import com.nameless.spin_off.dto.MovieDto.RelatedSearchMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedSearchPostDto;
 import com.nameless.spin_off.dto.SearchDto.RelatedSearchAllDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -31,6 +31,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -59,7 +60,13 @@ class SearchQueryServiceJpaTest {
     public void 검색_삽입() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
 
         em.flush();
@@ -82,9 +89,22 @@ class SearchQueryServiceJpaTest {
 
         //given
         String keyword = "아이유";
-        Member member = Member.buildMember().setNickname(keyword+"23232").build();
+
+        Member member = Member.buildMember()
+                .setNickname(keyword+"23232")
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw").build();
         Long memberId = memberRepository.save(member).getId();
-        Member member2 = Member.buildMember().setNickname(keyword+"dfdf").build();
+        Member member2 = Member.buildMember()
+                .setNickname(keyword+"dfdf")
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw").build();
         Long memberId2 = memberRepository.save(member2).getId();
 
         memberService.insertFollowedMemberByMemberId(memberId2, memberId);

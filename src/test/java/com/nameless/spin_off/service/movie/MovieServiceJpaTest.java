@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 
 import static com.nameless.spin_off.enums.movie.MovieScoreEnum.MOVIE_FOLLOW;
 import static com.nameless.spin_off.enums.movie.MovieScoreEnum.MOVIE_VIEW;
@@ -67,7 +68,13 @@ class MovieServiceJpaTest {
     public void 멤버_팔로우_영화() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         Movie movie = Movie.createMovie(
                 0L, "abc", null, null, null);
@@ -103,7 +110,13 @@ class MovieServiceJpaTest {
     public void 멤버_팔로우_영화_예외처리() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         Movie movie = Movie.createMovie(0L, "abc", null, null, null);
         Long movieId = movieRepository.save(movie).getId();

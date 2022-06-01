@@ -3,9 +3,9 @@ package com.nameless.spin_off.service.comment;
 import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.AlreadyLikedCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
@@ -26,6 +26,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 
 import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.COLLECTION_COMMENT;
 import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.COLLECTION_VIEW;
@@ -54,7 +55,13 @@ class CommentInCollectionServiceJpaTest {
     public void saveCommentInCollectionByCommentVO() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         Collection collection = Collection.createDefaultCollection(member);
         collectionRepository.save(collection);
@@ -85,7 +92,13 @@ class CommentInCollectionServiceJpaTest {
     @Test
     public void 대댓글_테스트() throws Exception{
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -138,11 +151,23 @@ class CommentInCollectionServiceJpaTest {
     public void 댓글_저장시_파라미터_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
@@ -182,9 +207,21 @@ class CommentInCollectionServiceJpaTest {
     @Test
     public void 좋아요_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
@@ -212,9 +249,21 @@ class CommentInCollectionServiceJpaTest {
     @Test
     public void 좋아요_테스트_예외처리() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);

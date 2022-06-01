@@ -12,6 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 
 import static com.nameless.spin_off.enums.hashtag.HashtagScoreEnum.HASHTAG_FOLLOW;
 import static com.nameless.spin_off.enums.hashtag.HashtagScoreEnum.HASHTAG_VIEW;
@@ -69,7 +70,13 @@ class HashtagServiceJpaTest {
     public void 멤버_팔로우_해시태그() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         Hashtag hashtag = Hashtag.createHashtag("팔로우_해시태그");
         Long hashtagId = hashtagRepository.save(hashtag).getId();
@@ -103,7 +110,13 @@ class HashtagServiceJpaTest {
 
         //given
 
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         Hashtag hashtag = Hashtag.createHashtag("팔로우_해시태그");
         Long hashtagId = hashtagRepository.save(hashtag).getId();

@@ -41,9 +41,21 @@ class MemberServiceJpaTest {
     public void 멤버_팔로우_멤버() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
-        Member followedM = Member.buildMember().build();
+        Member followedM = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long followedMemberId = memberRepository.save(followedM).getId();
 
         em.flush();
@@ -71,9 +83,21 @@ class MemberServiceJpaTest {
     @Test
     public void 멤버_팔로우_멤버_예외처리() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
-        Member followedMember = Member.buildMember().build();
+        Member followedMember = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long followedMemberId = memberRepository.save(followedMember).getId();
 
         em.flush();
@@ -94,9 +118,21 @@ class MemberServiceJpaTest {
     public void 멤버_블락_멤버() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
-        Member blockedMember = Member.buildMember().build();
+        Member blockedMember = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
         Long aLong = collectionService
                 .insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO("", "", A), member.getId());
@@ -136,9 +172,21 @@ class MemberServiceJpaTest {
     @Test
     public void 멤버_블락_멤버_예외처리() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
-        Member blockedMember = Member.buildMember().build();
+        Member blockedMember = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
 
         em.flush();
@@ -173,13 +221,28 @@ class MemberServiceJpaTest {
         em.flush();
         
         //when
-        Long count = memberService.updateMemberInfo(memberId, new MemberInfoDto("1", "member/2", "3", "4", "5"));
+        Long count = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "mename1",
+                "member/2",
+                "memberAcc2",
+                "4",
+                "5"));
         em.flush();
 
-        Long count2 = memberService.updateMemberInfo(memberId, new MemberInfoDto("0", "member/2", "2", "3", "5"));
+        Long count2 = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "mename2",
+                "member/2",
+                "memberAcc3",
+                "3",
+                "5"));
         em.flush();
 
-        Long count3 = memberService.updateMemberInfo(memberId, new MemberInfoDto("0", "member/2", "2", "3", "5"));
+        Long count3 = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "mename2",
+                "member/2",
+                "memberAcc3",
+                "3",
+                "5"));
         em.flush();
 
 
@@ -193,9 +256,11 @@ class MemberServiceJpaTest {
     public void 비밀번호_수정() throws Exception{
         //given
         Member member = Member.buildMember()
-                .setEmail("abcd12@gmail.com")
-                .setNickname("abcdd")
-                .setAccountId("abcd232")
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setNickname("memcname")
                 .setAccountPw(passwordEncoder.encode("abc")).build();
         Long memberId = memberRepository.save(member).getId();
         em.flush();

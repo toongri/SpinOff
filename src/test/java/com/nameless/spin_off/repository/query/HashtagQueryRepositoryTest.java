@@ -3,11 +3,11 @@ package com.nameless.spin_off.repository.query;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
@@ -24,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,7 +53,13 @@ public class HashtagQueryRepositoryTest {
     public void 글에_포함된_해시태그_카운트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -179,7 +186,13 @@ public class HashtagQueryRepositoryTest {
     public void 멤버가_작성한_포스트가_포함된_해시태그_카운트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -189,7 +202,13 @@ public class HashtagQueryRepositoryTest {
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword + i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -311,7 +330,13 @@ public class HashtagQueryRepositoryTest {
     public void 컬렉션에_포함된_해시태그_카운트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -321,7 +346,13 @@ public class HashtagQueryRepositoryTest {
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword + i).build());
         }
         memberRepository.saveAll(memberList);
         List<Post> postList = new ArrayList<>();
@@ -513,7 +544,13 @@ public class HashtagQueryRepositoryTest {
     public void 영화가_태그된_포스트가_태그한_해시태그_카운트() throws Exception{
         //given
         String keyword = "가나다라";
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Hashtag> hashtagList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
@@ -524,7 +561,13 @@ public class HashtagQueryRepositoryTest {
         List<Member> memberList = new ArrayList<>();
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(keyword+i).build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword + i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
         }
         memberRepository.saveAll(memberList);

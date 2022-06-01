@@ -30,6 +30,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -59,7 +60,13 @@ class PostServiceJpaTest {
     @Test
     public void 해시태그_검열_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         CreatePostVO createPostVO = new CreatePostVO(
                 "알라리숑", "얄라리얄라", null, PublicOfPostStatus.A,
@@ -103,7 +110,13 @@ class PostServiceJpaTest {
     @Test
     public void 포스트_생성_테스트() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
 
         collectionRepository.save(Collection.createDefaultCollection(member));
@@ -168,7 +181,13 @@ class PostServiceJpaTest {
     public void 글_생성_파라미터_예외처리() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
 
         CreatePostVO createPostVO1 = new CreatePostVO(
@@ -195,7 +214,13 @@ class PostServiceJpaTest {
     public void 글_좋아요_체크() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -231,14 +256,26 @@ class PostServiceJpaTest {
     public void 글_좋아요_파라미터_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -272,7 +309,13 @@ class PostServiceJpaTest {
     public void 글_좋아요_중복삽입_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -297,7 +340,13 @@ class PostServiceJpaTest {
     public void 글_조회수_증가() throws Exception{
         //given
         LocalDateTime now;
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -329,7 +378,13 @@ class PostServiceJpaTest {
     public void 글_조회수_중복_체크() throws Exception{
         //given
         LocalDateTime now;
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
@@ -365,7 +420,13 @@ class PostServiceJpaTest {
 
         //given
         LocalDateTime now;
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())

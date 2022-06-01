@@ -5,9 +5,9 @@ import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
@@ -49,11 +49,23 @@ class CommentInCollectionQueryServiceJpaTest {
     public void 댓글조회() throws Exception{
         //given
 
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(memberRepository.save(Member.buildMember().build()));
+            memberList.add(memberRepository.save(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build()));
         }
 
         Collection defaultCollection = Collection.createDefaultCollection(member);
@@ -141,27 +153,33 @@ class CommentInCollectionQueryServiceJpaTest {
         //given
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member);
 
         Member member2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccountId")
+                .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
-                .setNickname("memberNickname").build();
+                .setNickname("memcname").build();
 
         memberRepository.save(member2);
 
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().setNickname(""+i).build());
+            memberList.add(Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 

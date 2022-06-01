@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -50,7 +51,13 @@ class CollectionServiceJpaTest {
     public void 컬렉션_생성_테스트() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
 
         em.flush();
@@ -71,7 +78,13 @@ class CollectionServiceJpaTest {
     public void 컬렉션_좋아요_업데이트() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -102,9 +115,21 @@ class CollectionServiceJpaTest {
     public void 컬렉션_좋아요_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -140,9 +165,21 @@ class CollectionServiceJpaTest {
     public void 컬렉션_팔로우_업데이트() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Collection col = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
@@ -173,9 +210,21 @@ class CollectionServiceJpaTest {
     public void 컬렉션_팔로우_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
         Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
@@ -215,7 +264,13 @@ class CollectionServiceJpaTest {
 
         //given
         LocalDateTime now;
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -241,7 +296,13 @@ class CollectionServiceJpaTest {
 
         //given
         LocalDateTime now;
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -270,7 +331,13 @@ class CollectionServiceJpaTest {
 
         //given
         LocalDateTime now;
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Collection col = Collection.createDefaultCollection(mem);
         collectionRepository.save(col);
@@ -297,14 +364,26 @@ class CollectionServiceJpaTest {
     public void 글_컬렉션_등록() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
 
         List<Collection> collectionList = new ArrayList<>();
@@ -342,14 +421,26 @@ class CollectionServiceJpaTest {
     public void 글_컬렉션_수정() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of())
                 .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
 
         List<Collection> collectionList = new ArrayList<>();
@@ -389,9 +480,21 @@ class CollectionServiceJpaTest {
     public void 글_컬렉션_수정_썸네일() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
 
         List<Collection> collectionList = new ArrayList<>();
@@ -610,12 +713,24 @@ class CollectionServiceJpaTest {
     public void 글_컬렉션_등록_예외처리() throws Exception{
 
         //given
-        Member mem = Member.buildMember().build();
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                 .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
-        Member mem2 = Member.buildMember().build();
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(mem2);
 
         List<Collection> collectionList = new ArrayList<>();

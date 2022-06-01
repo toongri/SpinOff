@@ -1,9 +1,9 @@
 package com.nameless.spin_off.repository.member;
 
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.member.FollowedMember;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.post.PostRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +30,23 @@ public class MemberRepositoryTest {
     public void findMembersByFollowingMemberId() throws Exception{
 
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcname").build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -62,11 +75,23 @@ public class MemberRepositoryTest {
     @Test
     public void findOneByIdIncludeFollowedMembers() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            memberList.add(Member.buildMember().build());
+            memberList.add(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcname").build());
         }
 
         List<Post> postList = new ArrayList<>();
