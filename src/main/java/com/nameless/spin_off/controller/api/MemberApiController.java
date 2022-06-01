@@ -51,24 +51,15 @@ public class MemberApiController {
 
     @ApiOperation(value = "멤버 정보 조회", notes = "")
     @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "memberId",
-                    value = "멤버 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
     })
     @GetMapping("/info")
-    public SingleApiResult<ReadMemberDto> readInfo(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
+    public SingleApiResult<MemberInfoDto> readInfo(@LoginMember MemberDetails currentMember) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("readOne");
+        log.info("readInfo");
         log.info("currentMemberId : {}", currentMemberId);
-        log.info("memberId : {}", memberId);
 
-        return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
+        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
     }
 
     @ApiOperation(value = "멤버 정보 수정", notes = "")
@@ -105,7 +96,7 @@ public class MemberApiController {
                     paramType = "query",
                     dataType = "String")
     })
-    @GetMapping("/check/password")
+    @GetMapping("/password/check")
     public SingleApiResult<Boolean> isMatchedPassword(
             @LoginMember MemberDetails currentMember, @RequestParam String password) {
         Long currentMemberId = getCurrentMemberId(currentMember);
@@ -117,7 +108,7 @@ public class MemberApiController {
         return getResult(memberService.isMatchedPassword(currentMember, password));
     }
 
-    @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
+    @ApiOperation(value = "멤버 비밀번호 변경", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "password",

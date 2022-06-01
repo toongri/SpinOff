@@ -143,7 +143,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public boolean confirmEmail(MemberDto.EmailAuthRequestDto requestDto) {
+    public boolean confirmEmail(EmailAuthRequestDto requestDto) {
 
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                         requestDto.getEmail(),

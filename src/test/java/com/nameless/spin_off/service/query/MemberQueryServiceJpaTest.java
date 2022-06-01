@@ -4,21 +4,18 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
-import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.SearchDto;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
@@ -1142,5 +1139,65 @@ public class MemberQueryServiceJpaTest {
                         .build(),
                 memberList.get(3).getId())).isInstanceOf(DontHaveAuthorityException.class);
         
+    }
+
+    @Test
+    public void 멤버_정보_조회() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Long memberId = memberRepository.save(member).getId();
+        em.flush();
+
+        //when
+        //then
+        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "mename",
+                "member/2",
+                "memberAcc",
+                "4",
+                "5"));
+        em.flush();
+        MemberInfoDto memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        assertThat(memberForInfo.getNickname()).isEqualTo("mename");
+        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
+        assertThat(memberForInfo.getAccountId()).isEqualTo("memberAcc");
+        assertThat(memberForInfo.getWebsite()).isEqualTo("4");
+        assertThat(memberForInfo.getBio()).isEqualTo("5");
+
+        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "mename",
+                "member/2",
+                "memberAccsds",
+                "3",
+                "5"));
+        em.flush();
+        memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        assertThat(memberForInfo.getNickname()).isEqualTo("mename");
+        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
+        assertThat(memberForInfo.getAccountId()).isEqualTo("memberAccsds");
+        assertThat(memberForInfo.getWebsite()).isEqualTo("3");
+        assertThat(memberForInfo.getBio()).isEqualTo("5");
+
+        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+                "meme",
+                "member/2",
+                "memberAccsds",
+                "3",
+                "5"));
+        em.flush();
+        memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        assertThat(memberForInfo.getNickname()).isEqualTo("meme");
+        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
+        assertThat(memberForInfo.getAccountId()).isEqualTo("memberAccsds");
+        assertThat(memberForInfo.getWebsite()).isEqualTo("3");
+        assertThat(memberForInfo.getBio()).isEqualTo("5");
+
+
     }
 }

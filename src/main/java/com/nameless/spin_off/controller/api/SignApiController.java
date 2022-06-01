@@ -119,7 +119,7 @@ public class SignApiController {
         return getResult(signService.sendEmailForAuth(email));
     }
 
-    @ApiOperation(value = "이메일 인증 수정", notes = "")
+    @ApiOperation(value = "이메일 인증 확인", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "requestDto",

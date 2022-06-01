@@ -19,6 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.A;
@@ -160,7 +161,14 @@ class MemberServiceJpaTest {
     @Test
     public void 멤버_정보_수정() throws Exception{
         //given
-        Member member = Member.buildMember().build();
+
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         em.flush();
         

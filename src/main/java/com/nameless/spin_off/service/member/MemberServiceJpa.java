@@ -159,7 +159,6 @@ public class MemberServiceJpa implements MemberService {
         return members.size();
     }
 
-
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
     }

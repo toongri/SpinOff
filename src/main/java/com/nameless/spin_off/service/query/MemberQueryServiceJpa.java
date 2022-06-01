@@ -4,13 +4,11 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
 import com.nameless.spin_off.dto.HashtagDto.RelatedMostTaggedHashtagDto;
-import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchAllMemberDto;
-import com.nameless.spin_off.dto.MemberDto.SearchMemberDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.dto.SearchDto.SearchFirstDto;
+import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -31,10 +29,13 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.enums.ErrorEnum.NOT_EXIST_MEMBER;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class MemberQueryServiceJpa implements MemberQueryService {
+
     private final MemberQueryRepository memberQueryRepository;
     private final SearchQueryRepository searchQueryRepository;
     private final MemberRepository memberRepository;
@@ -98,6 +99,17 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     }
 
     @Override
+    public MemberInfoDto getMemberForInfo(Long currentMemberId) {
+        Member member = getMember(currentMemberId);
+        return new MemberInfoDto(
+                member.getNickname(),
+                member.getProfileImg(),
+                member.getAccountId(),
+                member.getWebsite(),
+                member.getBio());
+    }
+
+    @Override
     public List<MembersByContentDto> getFollowedMembersByMemberId(Long currentMemberId, Long targetMemberId) {
         isExistMember(targetMemberId);
         blockingIds = getAllIdByBlockedMemberId(currentMemberId);
@@ -140,6 +152,10 @@ public class MemberQueryServiceJpa implements MemberQueryService {
 
         return getCollectionsByContentDtos(findAllFollowCollectionByMemberId(targetMemberId), currentMemberId,
                 getCurrentMemberAccountId(currentMember));
+    }
+
+    private Member getMember(Long memberId) {
+        return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
     }
 
     private void isBlockingMember(Long targetMemberId, Long currentMemberId) {

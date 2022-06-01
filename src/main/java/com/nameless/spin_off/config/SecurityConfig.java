@@ -47,15 +47,15 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                         .antMatchers("/api/member/search").hasRole("USER")
                         .antMatchers("/api/collection/one").hasRole("USER")
                         .antMatchers("/api/collection/all").hasRole("USER")
-                        .antMatchers("/api/member/check/**").hasRole("USER")
+                        .antMatchers("/api/member/password/**").hasRole("USER")
+                        .antMatchers("/api/member/info/**").hasRole("USER")
+                        .antMatchers(HttpMethod.POST, "/api/movie/kobis/**").permitAll()
 
                         .antMatchers(HttpMethod.GET,"/api/hashtag/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/member/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/post/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/collection/**").permitAll()
                         .antMatchers(HttpMethod.GET, "/api/movie/**").permitAll()
-
-                        .antMatchers(HttpMethod.POST, "/api/movie/kobis/**").permitAll()
 
                         .antMatchers("/api/collection/**").hasRole("USER")
                         .antMatchers("/api/comment/**").hasRole("USER")

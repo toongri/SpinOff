@@ -74,7 +74,6 @@ public class MemberDto {
         }
     }
 
-
     @Data
     public static class ReadMemberDto {
 
