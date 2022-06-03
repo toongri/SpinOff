@@ -92,12 +92,13 @@ public class MovieApiService {
                         .filter(m -> !alreadyMovieIds.contains(m.getId()))
                         .collect(Collectors.toList());
 
-                if (resultMovieList.isEmpty()) {
-                    break;
+//                if (resultMovieList.isEmpty()) {
+//                    break;
+//                }
+                if (!resultMovieList.isEmpty()) {
+                    newMovieList.addAll(resultMovieList);
                 }
-
-                newMovieList.addAll(resultMovieList);
-
+                
             } catch (HttpClientErrorException | HttpServerErrorException e) {
                 log.error("kobisMovieError");
                 log.error("statusCode : {}", e.getRawStatusCode());
