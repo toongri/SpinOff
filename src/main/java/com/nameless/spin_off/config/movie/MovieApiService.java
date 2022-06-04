@@ -98,7 +98,7 @@ public class MovieApiService {
                 if (!resultMovieList.isEmpty()) {
                     newMovieList.addAll(resultMovieList);
                 }
-                
+
             } catch (HttpClientErrorException | HttpServerErrorException e) {
                 log.error("kobisMovieError");
                 log.error("statusCode : {}", e.getRawStatusCode());
