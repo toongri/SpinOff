@@ -20,6 +20,7 @@ public class EmailServiceJpa implements EmailService{
     @Value("${spring.domain}")
     private String domain;
 
+    @Override
     @Async
     public void sendForRegister(String email, String authToken) {
 
@@ -33,6 +34,7 @@ public class EmailServiceJpa implements EmailService{
         javaMailSender.send(smm);
     }
 
+    @Override
     @Async
     public void sendForLinkageEmail(String email, String authToken, String accountId) {
 
@@ -48,7 +50,8 @@ public class EmailServiceJpa implements EmailService{
     }
 
     @Override
-    public void sendForAccountId(String email, String accountId) {
+    @Async
+    public void sendForForgetAccountId(String email, String accountId) {
         SimpleMailMessage smm = new SimpleMailMessage();
 
         smm.setFrom(userEmail);
@@ -60,13 +63,40 @@ public class EmailServiceJpa implements EmailService{
     }
 
     @Override
-    public void sendForAccountPw(String email, String accountPw) {
+    @Async
+    public void sendForForgetAccountPw(String email, String accountPw) {
         SimpleMailMessage smm = new SimpleMailMessage();
 
         smm.setFrom(userEmail);
         smm.setTo(email);
         smm.setSubject("비밀번호 재생성");
         smm.setText("accountPw : " + accountPw);
+
+        javaMailSender.send(smm);
+    }
+
+    @Override
+    @Async
+    public void sendForAuthEmail(String email, String authToken) {
+        SimpleMailMessage smm = new SimpleMailMessage();
+
+        smm.setFrom(userEmail);
+        smm.setTo(email);
+        smm.setSubject("본인 이메일 인증");
+        smm.setText("인증 코드는 " + authToken + " 입니다. 노출에 유의하십시오.");
+
+        javaMailSender.send(smm);
+    }
+
+    @Override
+    @Async
+    public void sendForUpdateEmail(String email, String authToken) {
+        SimpleMailMessage smm = new SimpleMailMessage();
+
+        smm.setFrom(userEmail);
+        smm.setTo(email);
+        smm.setSubject("이메일 업데이트 인증");
+        smm.setText("인증 코드는 " + authToken + " 입니다. 노출에 유의하십시오.");
 
         javaMailSender.send(smm);
     }

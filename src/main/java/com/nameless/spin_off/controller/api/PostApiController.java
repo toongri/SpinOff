@@ -77,15 +77,15 @@ public class PostApiController {
                     dataType = "CreatePostVO")
     })
     @PostMapping("")
-    public SingleApiResult<Long> createOne(@LoginMember MemberDetails currentMember,
-                                                     @RequestPart CreatePostVO createPostVO,
-                                                     @RequestPart("images") List<MultipartFile> multipartFiles) throws
+    public SingleApiResult<Long> createPost(@LoginMember MemberDetails currentMember,
+                                            @RequestPart CreatePostVO createPostVO,
+                                            @RequestPart("images") List<MultipartFile> multipartFiles) throws
             NotExistMemberException, NotExistMovieException, NotExistCollectionException,
             IncorrectHashtagContentException, AlreadyPostedHashtagException,
             AlreadyCollectedPostException,
             IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException {
 
-        log.info("createOne");
+        log.info("createPost");
         log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", createPostVO.getTitle());
         log.info("content : {}", createPostVO.getContent());
@@ -95,6 +95,37 @@ public class PostApiController {
         log.info("collectionIds : {}", createPostVO.getCollectionIds());
 
         return getResult(postService.insertPostByPostVO(createPostVO, currentMember.getId(), multipartFiles));
+    }
+
+    @ApiOperation(value = "글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "ip",
+                    value = "ip주소",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "192.168.0.1")
+    })
+    @GetMapping("/{postId}")
+    public SingleApiResult<ReadPostDto> readPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam String ip) {
+
+        log.info("readPost");
+        log.info("postId : {}", postId);
+        log.info("ip : {}", ip);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
+        ReadPostDto postForVisit = postQueryService.getPostForRead(currentMember, postId);
+        postService.insertViewedPostByIp(ip, postId);
+        return getResult(postForVisit);
     }
 
     @ApiOperation(value = "글 좋아요 생성", notes = "")
@@ -108,11 +139,11 @@ public class PostApiController {
                     example = "123")
     })
     @PostMapping("/{postId}/like")
-    public SingleApiResult<Long> createLikeOne(
+    public SingleApiResult<Long> createLikePost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        log.info("createLikeOne");
+        log.info("createLikePost");
         log.info("memberId : {}", currentMember.getId());
         log.info("postId : {}", postId);
 
@@ -130,61 +161,17 @@ public class PostApiController {
                     example = "123")
     })
     @GetMapping("/{postId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readLikeAll(@LoginMember MemberDetails currentMember,
-                                                                  @PathVariable Long postId)
+    public SingleApiResult<List<MembersByContentDto>> readLikePost(@LoginMember MemberDetails currentMember,
+                                                                   @PathVariable Long postId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readLikeAll");
+        log.info("readLikePost");
         log.info("postId : {}", postId);
         log.info("memberId : {}", currentMemberId);
 
         return getResult(collectionQueryService.getLikeCollectionMembers(currentMemberId, postId));
-    }
-
-    @ApiOperation(value = "글 컬렉션 리스트 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "postId",
-                    value = "글 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @GetMapping("/{postId}/collection/all")
-    public SingleApiResult<List<PostInCollectionDto>> readPostInCollections(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
-
-        log.info("readPostInCollections");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("postId : {}", postId);
-
-        return getResult(collectionQueryService.getCollectionsByMemberIdAndPostId(currentMember.getId(), postId));
-    }
-
-    @ApiOperation(value = "글 컬렉션 추천 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "postId",
-                    value = "글 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @GetMapping("/{postId}/collection/one")
-    public SingleApiResult<QuickPostInCollectionDto> readPostInCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
-            throws NotExistMemberException,
-            NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
-
-        log.info("readPostInCollection");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("postId : {}", postId);
-
-        return getResult(collectionQueryService.getCollectionNameByMemberIdAndPostId(currentMember.getId(), postId));
     }
 
     @ApiOperation(value = "글 컬렉션 리스트 수정", notes = "")
@@ -219,6 +206,27 @@ public class PostApiController {
         return getResult(postService.updateCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
 
+    @ApiOperation(value = "글 컬렉션 리스트 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/collection/all")
+    public SingleApiResult<List<PostInCollectionDto>> readPostInCollections(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+
+        log.info("readPostInCollections");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postId : {}", postId);
+
+        return getResult(collectionQueryService.getCollectionsByMemberIdAndPostId(currentMember.getId(), postId));
+    }
+
     @ApiOperation(value = "글 컬렉션 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -250,38 +258,7 @@ public class PostApiController {
         return getResult(postService.insertCollectedPost(currentMember.getId(), postId, collectionId));
     }
 
-    @ApiOperation(value = "글 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "postId",
-                    value = "글 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123"),
-            @ApiImplicitParam(
-                    name = "ip",
-                    value = "ip주소",
-                    required = true,
-                    paramType = "query",
-                    dataType = "string",
-                    example = "192.168.0.1")
-    })
-    @GetMapping("/{postId}")
-    public SingleApiResult<ReadPostDto> readPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam String ip) {
-
-        log.info("readPost");
-        log.info("postId : {}", postId);
-        log.info("ip : {}", ip);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
-
-        ReadPostDto postForVisit = postQueryService.getPostForRead(currentMember, postId);
-        postService.insertViewedPostByIp(ip, postId);
-        return getResult(postForVisit);
-    }
-
-    @ApiOperation(value = "글 댓글 조회", notes = "")
+    @ApiOperation(value = "글 컬렉션 추천 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "postId",
@@ -291,15 +268,17 @@ public class PostApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @GetMapping("/{postId}/comment")
-    public SingleApiResult<List<ContentCommentDto>> readCommentsInPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+    @GetMapping("/{postId}/collection/one")
+    public SingleApiResult<QuickPostInCollectionDto> readPostInCollection(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
+            throws NotExistMemberException,
+            NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        log.info("readCommentsInPost");
+        log.info("readPostInCollection");
+        log.info("memberId : {}", currentMember.getId());
         log.info("postId : {}", postId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
 
-        return getResult(commentInPostQueryService.getCommentsByPostId(currentMember, postId));
+        return getResult(collectionQueryService.getCollectionNameByMemberIdAndPostId(currentMember.getId(), postId));
     }
 
     @ApiOperation(value = "글 댓글 생성", notes = "")
@@ -327,6 +306,27 @@ public class PostApiController {
                 commentVO, currentMember.getId(), postId));
     }
 
+    @ApiOperation(value = "글 댓글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{postId}/comment")
+    public SingleApiResult<List<ContentCommentDto>> readCommentInPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+
+        log.info("readCommentInPost");
+        log.info("postId : {}", postId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
+        return getResult(commentInPostQueryService.getCommentsByPostId(currentMember, postId));
+    }
+
     @ApiOperation(value = "글 댓글 좋아요 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -338,11 +338,11 @@ public class PostApiController {
                     example = "123")
     })
     @PostMapping("/comment/{commentId}/like")
-    public SingleApiResult<Long> createCommentLikeOneInPost(
+    public SingleApiResult<Long> createLikeCommentInPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        log.info("createCommentLikeOneInPost");
+        log.info("createLikeCommentInPost");
         log.info("memberId : {}", currentMember.getId());
         log.info("commentId : {}", commentId);
 
@@ -360,12 +360,12 @@ public class PostApiController {
                     example = "123")
     })
     @GetMapping("/comment/{commentId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readCommentLikeMembersInPost(
+    public SingleApiResult<List<MembersByContentDto>> readLikeCommentInPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readCommentLikeMembersInPost");
+        log.info("readLikeCommentInPost");
         log.info("memberId : {}", currentMemberId);
         log.info("commentId : {}", commentId);
 
@@ -405,12 +405,12 @@ public class PostApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/{postId}/post")
-    public SingleApiResult<Slice<RelatedPostDto>> getRelatedPostsSliced(
+    public SingleApiResult<Slice<RelatedPostDto>> readRelatedPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("getPostForVisit");
+        log.info("readRelatedPost");
         log.info("postId : {}", postId);
         log.info("memberId : {}", currentMemberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
@@ -424,9 +424,9 @@ public class PostApiController {
     @ApiImplicitParams({
     })
     @GetMapping("/public-categories")
-    public List<EnumMapperValue> getPostPublicCategories() {
+    public List<EnumMapperValue> readPostPublicCategories() {
 
-        log.info("getPostPublicCategories");
+        log.info("readPostPublicCategories");
 
         return enumMapper.get("PublicOfPostStatus");
     }

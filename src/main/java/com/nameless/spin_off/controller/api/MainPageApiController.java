@@ -102,7 +102,7 @@ public class MainPageApiController {
                     example = "id,desc")
     })
     @GetMapping("/discovery")
-    public SingleApiResult<MainPageDiscoveryDto> getDiscoveryData(
+    public SingleApiResult<MainPageDiscoveryDto> readDiscoveryMainPage(
             @LoginMember MemberDetails currentMember,
             @Qualifier("popular_post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable popularPostPageable,
@@ -112,7 +112,7 @@ public class MainPageApiController {
                     Pageable collectionPageable)
             throws NotExistMemberException {
 
-        log.info("getDiscoveryData");
+        log.info("readDiscoveryMainPage");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("popularPostPageable.getPageNumber() : {}", popularPostPageable.getPageNumber());
         log.info("popularPostPageable.getPageSize() : {}", popularPostPageable.getPageSize());
@@ -224,7 +224,7 @@ public class MainPageApiController {
                     example = "id,desc")
     })
     @GetMapping("/following")
-    public SingleApiResult<MainPageFollowDto> getFollowData(
+    public SingleApiResult<MainPageFollowDto> readFollowMainPage(
             @LoginMember MemberDetails currentMember,
             @Qualifier("member_post") @PageableDefault(sort = "id", direction = Sort.Direction.DESC)
                     Pageable memberPageable,
@@ -236,7 +236,7 @@ public class MainPageApiController {
                     Pageable collectionPageable)
             throws NotExistMemberException {
 
-        log.info("getFollowData");
+        log.info("readFollowMainPage");
         log.info("memberId : {}", currentMember.getId());
         log.info("memberPageable.getPageNumber() : {}", memberPageable.getPageNumber());
         log.info("memberPageable.getPageSize() : {}", memberPageable.getPageSize());

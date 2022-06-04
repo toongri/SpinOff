@@ -165,9 +165,7 @@ public class SignServiceJpa implements SignService{
                 .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
         Member member =
-                memberRepository
-                        .findOneByAccountId(requestDto.getAccountId())
-                        .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+                getMemberByAccountId(requestDto.getAccountId());
 
         String provider = getProviderByEmail(requestDto.getEmail());
 
@@ -199,8 +197,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public boolean sendEmailForAuth(String email)
-            throws AlreadyAccountIdException, AlreadyNicknameException {
+    public boolean sendEmailForAuth(String email) throws AlreadyAccountIdException, AlreadyNicknameException {
 
         isCorrectEmail(email);
         checkDuplicateEmail(email);
@@ -219,7 +216,7 @@ public class SignServiceJpa implements SignService{
     @Override
     public boolean sendEmailForAccountId(String email) {
         isCorrectEmail(email);
-        emailService.sendForAccountId(email, memberQueryRepository.findAccountIdByEmail(email)
+        emailService.sendForForgetAccountId(email, memberQueryRepository.findAccountIdByEmail(email)
                 .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)));
         return true;
     }
@@ -228,15 +225,13 @@ public class SignServiceJpa implements SignService{
     @Override
     public boolean sendEmailForAccountPw(String accountId) {
         isCorrectAccountId(accountId);
-        Optional<Member> optionalMember = memberRepository.findOneByAccountId(accountId);
-
-        Member member = optionalMember
-                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+        Member member = getMemberByAccountId(accountId);
 
         String randomPassword = getRandomPassword();
         member.updateAccountPw(passwordEncoder.encode(randomPassword));
 
-        emailService.sendForAccountPw(member.getEmail(), randomPassword);
+        emailService.sendForForgetAccountPw(member.getEmail(), randomPassword);
+
         return true;
     }
 
@@ -250,6 +245,10 @@ public class SignServiceJpa implements SignService{
     public boolean checkDuplicateAccountId(String accountId) {
         isCorrectAccountId(accountId);
         return emailAuthQueryRepository.isNotExistAccountId(accountId);
+    }
+
+    private Member getMemberByAccountId(String accountId) {
+        return memberRepository.findOneByAccountId(accountId).orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private void validateDuplicateAtLinkage(String email, String provider) {
@@ -299,9 +298,7 @@ public class SignServiceJpa implements SignService{
     public Member findMemberByToken(MemberDto.TokenRequestDto requestDto) {
         Authentication auth = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
-        String accountId = userDetails.getUsername();
-        return memberRepository.findOneByAccountId(accountId)
-                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
+        return getMemberByAccountId(userDetails.getUsername());
     }
 
     private void isExistAuthEmail(String email, String authToken) {

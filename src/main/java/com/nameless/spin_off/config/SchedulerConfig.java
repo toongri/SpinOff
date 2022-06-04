@@ -23,7 +23,7 @@ public class SchedulerConfig {
     private final JobLauncher jobLauncher;
     private final BatchConfig batchConfig;
 
-    @Scheduled(fixedDelay = 10800000) //(1000 * 3600 * 3 -> 3h)
+    @Scheduled(fixedRate = 10800000) //(1000 * 3600 * 3 -> 3h)
     public void popularityJob() {
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
@@ -37,7 +37,7 @@ public class SchedulerConfig {
         }
     }
 
-    @Scheduled(fixedDelay = 86400000) //(1000 * 3600 * 24 -> 24h)
+    @Scheduled(fixedRate = 86400000) //(1000 * 3600 * 24 -> 24h)
     public void movieApiJob() {
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));

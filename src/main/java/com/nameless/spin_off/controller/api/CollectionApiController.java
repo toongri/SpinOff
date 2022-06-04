@@ -60,11 +60,11 @@ public class CollectionApiController {
                     dataType = "CreateCollectionVO")
     })
     @PostMapping("")
-    public SingleApiResult<Long> createOne(
+    public SingleApiResult<Long> createCollection(
             @LoginMember MemberDetails currentMember, @RequestBody CreateCollectionVO collectionVO)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
-        log.info("createOne");
+        log.info("createCollection");
         log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", collectionVO.getTitle());
         log.info("content : {}", collectionVO.getContent());
@@ -91,10 +91,10 @@ public class CollectionApiController {
                     example = "192.168.0.1")
     })
     @GetMapping("/{collectionId}")
-    public SingleApiResult<ReadCollectionDto> readOne(
+    public SingleApiResult<ReadCollectionDto> readCollection(
             @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestParam String ip) {
 
-        log.info("readOne");
+        log.info("readCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
         ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
@@ -135,11 +135,11 @@ public class CollectionApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/{collectionId}/post")
-    public SingleApiResult<Slice<CollectedPostDto>> readCollectedPostAll(
+    public SingleApiResult<Slice<CollectedPostDto>> readCollectedPosts(
             @LoginMember MemberDetails currentMember, @PathVariable Long collectionId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("readCollectedPostAll");
+        log.info("readCollectedPosts");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
@@ -160,11 +160,11 @@ public class CollectionApiController {
                     example = "123")
     })
     @PostMapping("/{collectionId}/like")
-    public SingleApiResult<Long> createLikeOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
+    public SingleApiResult<Long> createLikeCollection(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
-        log.info("createLikeOne");
+        log.info("createLikeCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMember.getId());
 
@@ -182,13 +182,13 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readLikeAll(@LoginMember MemberDetails currentMember,
-                                                                  @PathVariable Long collectionId)
+    public SingleApiResult<List<MembersByContentDto>> readLikeCollection(@LoginMember MemberDetails currentMember,
+                                                                         @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readLikeAll");
+        log.info("readLikeCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMemberId);
 
@@ -206,11 +206,11 @@ public class CollectionApiController {
                     example = "123")
     })
     @PostMapping("/{collectionId}/follow")
-    public SingleApiResult<Long> createFollowOne(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
+    public SingleApiResult<Long> createFollowCollection(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,
             NotExistCollectionException, CantFollowOwnCollectionException {
 
-        log.info("createFollowOne");
+        log.info("createFollowCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMember.getId());
 
@@ -228,40 +228,17 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowAll(@LoginMember MemberDetails currentMember,
-                                                                  @PathVariable Long collectionId)
+    public SingleApiResult<List<MembersByContentDto>> readFollowCollection(@LoginMember MemberDetails currentMember,
+                                                                           @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readLikeAll");
+        log.info("readFollowCollection");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMemberId);
 
         return getResult(collectionQueryService.getFollowCollectionMembers(currentMemberId, collectionId));
-    }
-
-    @ApiOperation(value = "컬렉션 댓글 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "collectionId",
-                    value = "컬렉션 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @GetMapping("/{collectionId}/comment")
-    public SingleApiResult<List<ContentCommentDto>> readCommentsInCollection(@LoginMember MemberDetails currentMember,
-                                                                             @PathVariable Long collectionId)
-            throws NotExistMemberException, AlreadyFollowedCollectionException,
-            NotExistCollectionException, CantFollowOwnCollectionException {
-
-        log.info("readCommentsInCollection");
-        log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
-
-        return getResult(commentInCollectionQueryService.getCommentsByCollectionId(currentMember, collectionId));
     }
 
     @ApiOperation(value = "컬렉션 댓글 생성", notes = "")
@@ -290,6 +267,29 @@ public class CollectionApiController {
         return getResult(commentId);
     }
 
+    @ApiOperation(value = "컬렉션 댓글 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{collectionId}/comment")
+    public SingleApiResult<List<ContentCommentDto>> readCommentsInCollection(@LoginMember MemberDetails currentMember,
+                                                                             @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyFollowedCollectionException,
+            NotExistCollectionException, CantFollowOwnCollectionException {
+
+        log.info("readCommentsInCollection");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
+        return getResult(commentInCollectionQueryService.getCommentsByCollectionId(currentMember, collectionId));
+    }
+
     @ApiOperation(value = "컬렉션 댓글 좋아요 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -301,12 +301,12 @@ public class CollectionApiController {
                     example = "123")
     })
     @PostMapping("/comment/{commentId}/like")
-    public SingleApiResult<Long> createCommentLikeOneInCollection(
+    public SingleApiResult<Long> createLikeCommentInCollection(
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
             NotExistCommentInCollectionException {
 
-        log.info("createCommentLikeOneInCollection");
+        log.info("createLikeCommentInCollection");
         log.info("memberId : {}", currentMember.getId());
         log.info("commentId : {}", commentId);
 
@@ -324,12 +324,13 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/comment/{commentId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readCommentLikeMembersInCollection(
+    public SingleApiResult<List<MembersByContentDto>> readLikeCommentInCollection(
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
             NotExistCommentInCollectionException {
+
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readCommentLikeMembersInCollection");
+        log.info("readLikeCommentInCollection");
         log.info("memberId : {}", currentMemberId);
         log.info("commentId : {}", commentId);
 
@@ -340,10 +341,10 @@ public class CollectionApiController {
     @ApiImplicitParams({
     })
     @GetMapping("/all")
-    public SingleApiResult<List<PostInCollectionDto>> getCollectionsById(
+    public SingleApiResult<List<PostInCollectionDto>> readCollectionsByMember(
             @LoginMember MemberDetails currentMember) {
 
-        log.info("getCollectionsById");
+        log.info("readCollectionsByMember");
         log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionQueryService.getCollectionsByMemberId(currentMember.getId()));
@@ -353,10 +354,10 @@ public class CollectionApiController {
     @ApiImplicitParams({
     })
     @GetMapping("/one")
-    public SingleApiResult<QuickPostInCollectionDto> getLatestCollectionNameById(
+    public SingleApiResult<QuickPostInCollectionDto> readLatestCollectionByMember(
             @LoginMember MemberDetails currentMember) {
 
-        log.info("getLatestCollectionNameById");
+        log.info("readLatestCollectionByMember");
         log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionQueryService.getCollectionNameByMemberId(currentMember.getId()));
@@ -366,9 +367,9 @@ public class CollectionApiController {
     @ApiImplicitParams({
     })
     @GetMapping("/public-categories")
-    public List<EnumMapperValue> getCollectionPublicCategories() {
+    public List<EnumMapperValue> readCollectionPublicCategories() {
 
-        log.info("getCollectionPublicCategories");
+        log.info("readCollectionPublicCategories");
 
         return enumMapper.get("PublicOfCollectionStatus");
     }

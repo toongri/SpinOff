@@ -1,9 +1,9 @@
 package com.nameless.spin_off.enums.member;
 
 public enum EmailAuthProviderStatus {
-    A("email"),
-    B("idFind"),
-    C("pwFind");
+    A("register"),
+    B("authEmail"),
+    C("updateEmail");
 
     private final String value;
 

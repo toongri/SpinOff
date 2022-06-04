@@ -70,11 +70,11 @@ public class MovieApiController {
                     example = "123")
     })
     @PostMapping("/{movieId}/follow")
-    public SingleApiResult<Long> createFollowOne(
+    public SingleApiResult<Long> createFollowMovie(
             @LoginMember MemberDetails currentMember, @PathVariable Long movieId)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
-        log.info("createFollowOne");
+        log.info("createFollowMovie");
         log.info("memberId : {}", currentMember.getId());
         log.info("movieId : {}", movieId);
 
@@ -92,12 +92,12 @@ public class MovieApiController {
                     example = "123")
     })
     @GetMapping("/{movieId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowMembers(@LoginMember MemberDetails currentMember,
-                                                                        @PathVariable Long movieId)
+    public SingleApiResult<List<MembersByContentDto>> readFollowMovie(@LoginMember MemberDetails currentMember,
+                                                                      @PathVariable Long movieId)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowMembers");
+        log.info("readFollowMovie");
         log.info("memberId : {}", currentMemberId);
         log.info("movieId : {}", movieId);
 
@@ -160,13 +160,13 @@ public class MovieApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/{movieId}/post")
-    public SingleApiResult<Slice<RelatedPostDto>> readPostsByMovieId(
+    public SingleApiResult<Slice<RelatedPostDto>> readMoviePost(
             @LoginMember MemberDetails currentMember, @PathVariable Long movieId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readMovie");
+        log.info("readMoviePost");
         log.info("memberId : {}", currentMemberId);
         log.info("movieId : {}", movieId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());

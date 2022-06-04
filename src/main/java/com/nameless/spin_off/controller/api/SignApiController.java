@@ -47,6 +47,7 @@ public class SignApiController {
         log.info("nickname : {}", requestDto.getNickname());
         log.info("birth : {}", requestDto.getBirth());
         log.info("email : {}", requestDto.getEmail());
+        log.info("authToken : {}", requestDto.getAuthToken());
         return getResult(signService.registerMember(requestDto));
     }
 
@@ -68,8 +69,12 @@ public class SignApiController {
                     example = "dkdklflkn333")
     })
     @PostMapping("/login/social/{provider}")
-    public SingleApiResult<SocialLoginResponseDto> registerBySocial(
+    public SingleApiResult<SocialLoginResponseDto> loginBySocial(
             @RequestParam String authCode, @PathVariable String provider) {
+
+        log.info("loginBySocial");
+        log.info("provider : {}", provider);
+        log.info("authCode : {}", authCode);
 
         return getResult(signService.loginBySocial(authCode, provider));
     }
@@ -85,8 +90,12 @@ public class SignApiController {
     })
     @PatchMapping("/login")
     public SingleApiResult<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto requestDto) {
-        MemberLoginResponseDto responseDto = signService.loginMember(requestDto);
-        return getResult(responseDto);
+
+        log.info("login");
+        log.info("accountId : {}", requestDto.getAccountId());
+        log.info("accountPw : {}", requestDto.getAccountPw());
+
+        return getResult(signService.loginMember(requestDto));
     }
 
     @ApiOperation(value = "토큰 조회 및 수정", notes = "")
@@ -100,8 +109,12 @@ public class SignApiController {
     })
     @PatchMapping("/reissue")
     public SingleApiResult<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
-        TokenResponseDto responseDto = signService.reIssue(tokenRequestDto);
-        return getResult(responseDto);
+
+        log.info("reissue");
+        log.info("refreshToken : {}", tokenRequestDto.getRefreshToken());
+        log.info("accessToken : {}", tokenRequestDto.getAccessToken());
+
+        return getResult(signService.reIssue(tokenRequestDto));
     }
 
     @ApiOperation(value = "이메일 인증 생성", notes = "")
@@ -116,6 +129,10 @@ public class SignApiController {
     })
     @PostMapping("/auth-email")
     public SingleApiResult<Boolean> authEmail(@RequestParam String email) {
+
+        log.info("authEmail");
+        log.info("email : {}", email);
+
         return getResult(signService.sendEmailForAuth(email));
     }
 
@@ -130,6 +147,11 @@ public class SignApiController {
     })
     @PatchMapping("/auth-email")
     public SingleApiResult<Boolean> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
+
+        log.info("confirmEmail");
+        log.info("authToken : {}", requestDto.getAuthToken());
+        log.info("email : {}", requestDto.getEmail());
+
         return getResult(signService.confirmEmail(requestDto));
     }
 
@@ -151,8 +173,15 @@ public class SignApiController {
                     example = "spinoff@naver.com")
     })
     @PostMapping("/linkage-email/{provider}")
-    public SingleApiResult<String> linkageEmailKakao(
-            @LoginMember MemberDetails currentMember, @RequestParam String email, @PathVariable String provider) {
+    public SingleApiResult<String> createLinkageEmail(@LoginMember MemberDetails currentMember,
+                                                @RequestParam String email,
+                                                @PathVariable String provider) {
+
+        log.info("createLinkageEmail");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("provider : {}", provider);
+        log.info("email : {}", email);
+
         try {
             if (isNotCorrectEmail(email, EmailLinkageServiceEnum.valueOf(provider))) {
                 throw new NotCorrectEmailRequest(ErrorEnum.NOT_CORRECT_EMAIL);
@@ -175,7 +204,13 @@ public class SignApiController {
                     dataType = "EmailLinkageCheckRequestDto")
     })
     @PatchMapping("/linkage-email")
-    public SingleApiResult<String> linkageEmail(@RequestBody EmailLinkageCheckRequestDto requestDto) {
+    public SingleApiResult<String> updateLinkageEmail(@RequestBody EmailLinkageCheckRequestDto requestDto) {
+
+        log.info("updateLinkageEmail");
+        log.info("email : {}", requestDto.getEmail());
+        log.info("authToken : {}", requestDto.getAuthToken());
+        log.info("accountId : {}", requestDto.getAccountId());
+
         signService.checkEmailLinkage(requestDto);
         return getResult("연동이 완료되었습니다.");
     }
@@ -192,6 +227,10 @@ public class SignApiController {
     })
     @GetMapping("/exist/nickname")
     public SingleApiResult<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
+
+        log.info("checkDuplicateNickname");
+        log.info("nickname : {}", nickname);
+
         return getResult(signService.checkDuplicateNickname(nickname));
     }
 
@@ -207,6 +246,10 @@ public class SignApiController {
     })
     @GetMapping("/exist/account-id")
     public SingleApiResult<Boolean> checkDuplicateAccountId(@RequestParam String accountId) {
+
+        log.info("checkDuplicateAccountId");
+        log.info("accountId : {}", accountId);
+
         return getResult(signService.checkDuplicateAccountId(accountId));
     }
 
@@ -221,7 +264,11 @@ public class SignApiController {
                     example = "spinoff232@gmail.com")
     })
     @GetMapping("/forget/account-id")
-    public SingleApiResult<Boolean> readMemberAccountId(@RequestParam String email) {
+    public SingleApiResult<Boolean> readForgetAccountId(@RequestParam String email) {
+
+        log.info("readForgetAccountId");
+        log.info("email : {}", email);
+
         return getResult(signService.sendEmailForAccountId(email));
     }
 
@@ -236,7 +283,11 @@ public class SignApiController {
                     example = "spinoff232")
     })
     @PatchMapping("/forget/account-pw")
-    public SingleApiResult<Boolean> readMemberAccountPw(@RequestParam String accountId) {
+    public SingleApiResult<Boolean> readForgetAccountPw(@RequestParam String accountId) {
+
+        log.info("readForgetAccountPw");
+        log.info("accountId : {}", accountId);
+
         return getResult(signService.sendEmailForAccountPw(accountId));
     }
 

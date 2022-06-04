@@ -64,6 +64,8 @@ public enum ErrorEnum {
     ALREADY_FOLLOWED_MOVIE("ERR043", "이미 해당 영화를 팔로우 했습니다."),
     NOT_EXIST_DM("ERR044", "해당 DM은 존재하지 않습니다."),
     NOT_EXIST_MEMBER("ERR045", "해당 유저는 존재하지 않습니다."),
+    NOT_MATCH_EMAIL("ERR057", "이메일이 일치하지 않습니다."),
+    ALREADY_REGISTER_EMAIL("ERR058", "이미 등록한 이메일입니다."),
 
     //MOVIE
     NOT_EXIST_MOVIE("ERR046", "해당 영화는 존재하지 않습니다."),

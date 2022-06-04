@@ -65,9 +65,13 @@ public class SearchApiController {
                     example = "123")
     })
     @GetMapping("/related/all/{keyword}")
-    public SingleApiResult<RelatedSearchAllDto> getRelatedSearchAllByKeyword(
+    public SingleApiResult<RelatedSearchAllDto> readRelatedContentByKeyword(
             @PathVariable String keyword, @RequestParam int length)
             throws IncorrectLengthRelatedKeywordException {
+
+        log.info("readRelatedContentByKeyword");
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
 
         return getResult(searchQueryService.getRelatedSearchAllByKeyword(keyword, length));
     }
@@ -90,9 +94,13 @@ public class SearchApiController {
                     example = "123")
     })
     @GetMapping("/related/hashtag/{keyword}")
-    public SingleApiResult<List<RelatedSearchHashtagDto>> getRelatedSearchHashtagByKeyword(
+    public SingleApiResult<List<RelatedSearchHashtagDto>> readRelatedHashtagByKeyword(
             @PathVariable String keyword, @RequestParam int length)
             throws IncorrectLengthRelatedKeywordException {
+
+        log.info("readRelatedHashtagByKeyword");
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
 
         return getResult(
                 searchQueryService.getRelatedSearchHashtagByKeyword(keyword, length));
@@ -116,9 +124,13 @@ public class SearchApiController {
                     example = "123")
     })
     @GetMapping("/related/member/{keyword}")
-    public SingleApiResult<List<RelatedSearchMemberDto>> getRelatedSearchMemberByKeyword
+    public SingleApiResult<List<RelatedSearchMemberDto>> readRelatedMemberByKeyword
             (@PathVariable String keyword, @RequestParam int length)
             throws IncorrectLengthRelatedKeywordException {
+
+        log.info("readRelatedMemberByKeyword");
+        log.info("keyword : {}", keyword);
+        log.info("length : {}", length);
 
         return getResult(
                 searchQueryService.getRelatedSearchMemberByKeyword(keyword, length));
@@ -230,7 +242,7 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/all/{keyword}/first")
-    public SingleApiResult<SearchFirstDto<SearchAllFirstDto>> getLastSearchesByMemberFirst(
+    public SingleApiResult<SearchFirstDto<SearchAllFirstDto>> readContentByKeywordFirst(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword, @RequestParam int length,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
@@ -241,6 +253,24 @@ public class SearchApiController {
             @Qualifier("movie") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable moviePageable)
             throws NotExistMemberException {
+
+        log.info("readContentByKeywordFirst");
+        log.info("memberId : {}", getMemberId(currentMember));
+        log.info("memberPageable.getPageNumber() : {}", memberPageable.getPageNumber());
+        log.info("memberPageable.getPageSize() : {}", memberPageable.getPageSize());
+        log.info("memberPageable.getSort() : {}", memberPageable.getSort());
+
+        log.info("postPageable.getPageNumber() : {}", postPageable.getPageNumber());
+        log.info("postPageable.getPageSize() : {}", postPageable.getPageSize());
+        log.info("postPageable.getSort() : {}", postPageable.getSort());
+
+        log.info("moviePageable.getPageNumber() : {}", moviePageable.getPageNumber());
+        log.info("moviePageable.getPageSize() : {}", moviePageable.getPageSize());
+        log.info("moviePageable.getSort() : {}", moviePageable.getSort());
+
+        log.info("collectionPageable.getPageNumber() : {}", collectionPageable.getPageNumber());
+        log.info("collectionPageable.getPageSize() : {}", collectionPageable.getPageSize());
+        log.info("collectionPageable.getSort() : {}", collectionPageable.getSort());
 
         return getResult(
                 searchQueryService.getSearchPageDataAtAllFirst(keyword, getMemberId(currentMember), length,
@@ -324,7 +354,7 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/all/{keyword}")
-    public SingleApiResult<SearchAllDto> getLastSearchesByMember(
+    public SingleApiResult<SearchAllDto> readContentByKeyword(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword,
             @Qualifier("post") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable postPageable,
@@ -333,6 +363,20 @@ public class SearchApiController {
             @Qualifier("movie") @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC)
                     Pageable moviePageable)
             throws NotExistMemberException {
+
+        log.info("readContentByKeyword");
+        log.info("memberId : {}", getMemberId(currentMember));
+        log.info("memberPageable.getPageNumber() : {}", memberPageable.getPageNumber());
+        log.info("memberPageable.getPageSize() : {}", memberPageable.getPageSize());
+        log.info("memberPageable.getSort() : {}", memberPageable.getSort());
+
+        log.info("postPageable.getPageNumber() : {}", postPageable.getPageNumber());
+        log.info("postPageable.getPageSize() : {}", postPageable.getPageSize());
+        log.info("postPageable.getSort() : {}", postPageable.getSort());
+
+        log.info("moviePageable.getPageNumber() : {}", moviePageable.getPageNumber());
+        log.info("moviePageable.getPageSize() : {}", moviePageable.getPageSize());
+        log.info("moviePageable.getSort() : {}", moviePageable.getSort());
 
         return getResult(
                 searchQueryService.getSearchPageDataAtAll(
@@ -383,17 +427,17 @@ public class SearchApiController {
                     allowMultiple = true)
     })
     @GetMapping("/all/hashtag/first")
-    public SingleApiResult<SearchFirstDto<Slice<SearchPageAtHashtagPostDto>>> getAllByHashtagFirst(
+    public SingleApiResult<SearchFirstDto<Slice<SearchPageAtHashtagPostDto>>> readContentByHashtagFirst(
             @LoginMember MemberDetails currentMember,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam List<String> hashtagContents, @RequestParam int length) {
 
-        log.info("getAllByHashtagFirst");
+        log.info("readContentByHashtagFirst");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
-        log.info("hashtagContents : {}", hashtagContents);
+        log.info("hashtagContents : {}", hashtagContents.toString());
         log.info("length : {}", length);
 
         return getResult(postQueryService
@@ -434,17 +478,17 @@ public class SearchApiController {
                     allowMultiple = true)
     })
     @GetMapping("/all/hashtag")
-    public SingleApiResult<Slice<SearchPageAtHashtagPostDto>> getAllByHashtag(
+    public SingleApiResult<Slice<SearchPageAtHashtagPostDto>> readContentByHashtag(
             @LoginMember MemberDetails currentMember,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable,
             @RequestParam List<String> hashtagContents) {
 
-        log.info("getAllByHashtag");
+        log.info("readContentByHashtag");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
-        log.info("hashtagContents : {}", hashtagContents);
+        log.info("hashtagContents : {}", hashtagContents.toString());
 
         return getResult(postQueryService
                 .getPostsByHashtagsSlicedForSearchPage(pageable, hashtagContents, getMemberId(currentMember)));
@@ -490,12 +534,12 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/movie/{keyword}/first")
-    public SingleApiResult<SearchFirstDto<SearchMovieFirstDto>> getMovieByKeyword(
+    public SingleApiResult<SearchFirstDto<SearchMovieFirstDto>> readMovieByKeywordFirst(
             @PathVariable String keyword, @RequestParam int length,
             @PageableDefault(sort = "popularity", direction  = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMovieException {
 
-        log.info("getMovieByKeyword");
+        log.info("readMovieByKeywordFirst");
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
@@ -538,11 +582,11 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/movie/{keyword}")
-    public SingleApiResult<Slice<SearchMovieDto>> getMovieByKeyword(
+    public SingleApiResult<Slice<SearchMovieDto>> readMovieByKeyword(
             @PathVariable String keyword,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("getMovieByKeyword");
+        log.info("readMovieByKeyword");
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
@@ -592,12 +636,12 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/member/{keyword}/first")
-    public SingleApiResult<SearchFirstDto<Slice<SearchMemberDto>>> getMemberByKeywordFirst(
+    public SingleApiResult<SearchFirstDto<Slice<SearchMemberDto>>> readMemberByKeywordFirst(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword, @RequestParam int length,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
-        log.info("getMemberByKeywordFirst");
+        log.info("readMemberByKeywordFirst");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
@@ -642,12 +686,12 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/member/{keyword}")
-    public SingleApiResult<Slice<SearchMemberDto>> getMemberByKeyword(
+    public SingleApiResult<Slice<SearchMemberDto>> readMemberByKeyword(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
-        log.info("getMemberByKeyword");
+        log.info("readMemberByKeyword");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
@@ -698,12 +742,12 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/collection/{keyword}/first")
-    public SingleApiResult<SearchFirstDto<Slice<SearchCollectionDto>>> getCollectionByKeywordFirst(
+    public SingleApiResult<SearchFirstDto<Slice<SearchCollectionDto>>> readCollectionByKeywordFirst(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword, @RequestParam int length,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
-        log.info("getCollectionByKeywordFirst");
+        log.info("readCollectionByKeywordFirst");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
@@ -748,12 +792,12 @@ public class SearchApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/collection/{keyword}")
-    public SingleApiResult<Slice<SearchCollectionDto>> getCollectionByKeyword(
+    public SingleApiResult<Slice<SearchCollectionDto>> readCollectionByKeyword(
             @LoginMember MemberDetails currentMember, @PathVariable String keyword,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMemberException {
 
-        log.info("getCollectionByKeyword");
+        log.info("readCollectionByKeyword");
         log.info("memberId : {}", getMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());

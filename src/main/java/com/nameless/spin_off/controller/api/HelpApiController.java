@@ -61,7 +61,7 @@ public class HelpApiController {
                     example = "A")
     })
     @PostMapping("/complain")
-    public SingleApiResult<Long> createOne(
+    public SingleApiResult<Long> createComplain(
             @LoginMember MemberDetails currentMember, @RequestParam Long contentId,
             @RequestParam ContentTypeStatus contentTypeStatus,
             @RequestParam ComplainStatus complainStatus) throws
@@ -69,7 +69,7 @@ public class HelpApiController {
             UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
             NotExistCommentInCollectionException {
 
-        log.info("createOne");
+        log.info("createComplain");
         log.info("memberId : {}", currentMember.getId());
         log.info("contentId : {}", contentId);
         log.info("contentTypeStatus : {}", contentTypeStatus);

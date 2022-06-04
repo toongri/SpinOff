@@ -45,10 +45,10 @@ public class HashtagApiController {
                     example = "123")
     })
     @PostMapping("/{hashtagId}/follow")
-    public SingleApiResult<Long> createFollowOne(@LoginMember MemberDetails currentMember, @PathVariable Long hashtagId)
+    public SingleApiResult<Long> createFollowHashtag(@LoginMember MemberDetails currentMember, @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
 
-        log.info("createFollowOne");
+        log.info("createFollowHashtag");
         log.info("hashtagId : {}", hashtagId);
         log.info("memberId : {}", currentMember.getId());
 
@@ -66,11 +66,12 @@ public class HashtagApiController {
                     example = "123")
     })
     @GetMapping("/{hashtagId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowMembers(@LoginMember MemberDetails currentMember,
+    public SingleApiResult<List<MembersByContentDto>> readFollowHashtag(@LoginMember MemberDetails currentMember,
                                                                         @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
+
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowMembers");
+        log.info("readFollowHashtag");
         log.info("hashtagId : {}", hashtagId);
         log.info("memberId : {}", currentMemberId);
 
@@ -88,9 +89,9 @@ public class HashtagApiController {
                     example = "123")
     })
     @GetMapping("/most-popular")
-    public SingleApiResult<List<MostPopularHashtag>> getMostPopularHashtag(int length) {
+    public SingleApiResult<List<MostPopularHashtag>> readMostPopularHashtag(int length) {
 
-        log.info("getMostPopularHashtag");
+        log.info("readMostPopularHashtag");
         log.info("length : {}", length);
 
         return getResult(searchQueryService.getMostPopularHashtagLimit(length));

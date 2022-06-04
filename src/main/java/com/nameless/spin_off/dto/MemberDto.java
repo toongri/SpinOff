@@ -563,7 +563,7 @@ public class MemberDto {
         private String accountId;
 
         @ApiModelProperty(
-                value = "계정 id",
+                value = "계정 pw",
                 required = true,
                 example = "dfd9232",
                 dataType = "string")

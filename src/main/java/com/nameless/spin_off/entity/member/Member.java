@@ -310,7 +310,6 @@ public class Member extends BaseTimeEntity {
 
     //==비즈니스 로직==//
 
-
     private void isCorrectEmail(String email) {
         if (EMAIL.isNotCorrect(email)) {
             throw new IncorrectEmailException(ErrorEnum.INCORRECT_EMAIL);

@@ -5,6 +5,7 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
+import com.nameless.spin_off.dto.MemberDto.EmailAuthRequestDto;
 import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
@@ -49,87 +50,7 @@ public class MemberApiController {
     private final PostQueryService postQueryService;
     private final CollectionQueryService collectionQueryService;
 
-    @ApiOperation(value = "멤버 정보 조회", notes = "")
-    @ApiImplicitParams({
-    })
-    @GetMapping("/info")
-    public SingleApiResult<MemberInfoDto> readInfo(@LoginMember MemberDetails currentMember) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-
-        log.info("readInfo");
-        log.info("currentMemberId : {}", currentMemberId);
-
-        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
-    }
-
-    @ApiOperation(value = "멤버 정보 수정", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "memberInfoRequestDto",
-                    value = "멤버 업데이트 요청",
-                    required = true,
-                    paramType = "body",
-                    dataType = "MemberInfoDto")
-    })
-    @PutMapping("/info")
-    public SingleApiResult<Long> updateInfo(
-            @LoginMember MemberDetails currentMember, @RequestBody MemberInfoDto memberInfoRequestDto) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-
-        log.info("updateInfo");
-        log.info("currentMemberId : {}", currentMemberId);
-        log.info("accountId : {}", memberInfoRequestDto.getAccountId());
-        log.info("nickname : {}", memberInfoRequestDto.getNickname());
-        log.info("profileUrl : {}", memberInfoRequestDto.getProfileUrl());
-        log.info("bio : {}", memberInfoRequestDto.getBio());
-        log.info("website : {}", memberInfoRequestDto.getWebsite());
-
-        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
-    }
-
-    @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "password",
-                    value = "비밀번호",
-                    required = true,
-                    paramType = "query",
-                    dataType = "String")
-    })
-    @GetMapping("/password/check")
-    public SingleApiResult<Boolean> isMatchedPassword(
-            @LoginMember MemberDetails currentMember, @RequestParam String password) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-
-        log.info("getIsCorrectPassword");
-        log.info("currentMemberId : {}", currentMemberId);
-        log.info("password : {}", password);
-
-        return getResult(memberService.isMatchedPassword(currentMember, password));
-    }
-
-    @ApiOperation(value = "멤버 비밀번호 변경", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "password",
-                    value = "비밀번호",
-                    required = true,
-                    paramType = "query",
-                    dataType = "String")
-    })
-    @PutMapping("/password")
-    public SingleApiResult<Boolean> updatePassword(
-            @LoginMember MemberDetails currentMember, @RequestParam String password) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-
-        log.info("getIsCorrectPassword");
-        log.info("currentMemberId : {}", currentMemberId);
-        log.info("password : {}", password);
-
-        return getResult(memberService.updateMemberPassword(currentMemberId, password));
-    }
-
-    @ApiOperation(value = "멤버 마이페이지", notes = "")
+    @ApiOperation(value = "멤버 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "memberId",
@@ -140,15 +61,83 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}")
-    public SingleApiResult<ReadMemberDto> readOne(
+    public SingleApiResult<ReadMemberDto> readMember(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("readOne");
+        log.info("readMember");
         log.info("currentMemberId : {}", currentMemberId);
         log.info("memberId : {}", memberId);
 
         return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
+    }
+
+
+    @ApiOperation(value = "멤버 팔로우 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "followedMemberId",
+                    value = "팔로우할 멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @PostMapping("/{followedMemberId}/follow")
+    public SingleApiResult<Long> createFollowMember(
+            @LoginMember MemberDetails currentMember, @PathVariable Long followedMemberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+
+        log.info("createFollowMember");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("followedMemberId : {}", followedMemberId);
+
+        return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), followedMemberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로워 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/follower")
+    public SingleApiResult<List<MembersByContentDto>> readFollowerMember(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowerMember");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowingMembersByMemberId(currentMemberId, memberId));
+    }
+
+    @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberId",
+                    value = "멤버 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @GetMapping("/{memberId}/following")
+    public SingleApiResult<List<MembersByContentDto>> readFollowingMember(
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            throws AlreadyFollowedMemberException, NotExistMemberException {
+
+        Long currentMemberId = getCurrentMemberId(currentMember);
+        log.info("readFollowingMember");
+        log.info("memberId : {}", currentMemberId);
+        log.info("targetMemberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowedMembersByMemberId(currentMemberId, memberId));
     }
 
     @ApiOperation(value = "멤버 마이페이지 글", notes = "")
@@ -245,72 +234,6 @@ public class MemberApiController {
         return getResult(collectionQueryService.getCollectionsByMemberIdSliced(currentMember, memberId, pageable));
     }
 
-    @ApiOperation(value = "멤버 팔로우 생성", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "followedMemberId",
-                    value = "팔로우할 멤버 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @PostMapping("/{followedMemberId}/follow")
-    public SingleApiResult<Long> createFollowOne(
-            @LoginMember MemberDetails currentMember, @PathVariable Long followedMemberId)
-            throws AlreadyFollowedMemberException, NotExistMemberException {
-
-        log.info("createFollowOne");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("followedMemberId : {}", followedMemberId);
-
-        return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), followedMemberId));
-    }
-
-    @ApiOperation(value = "멤버 팔로워 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "memberId",
-                    value = "멤버 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @GetMapping("/{memberId}/follower")
-    public SingleApiResult<List<MembersByContentDto>> readFollowersByMemberId(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
-            throws AlreadyFollowedMemberException, NotExistMemberException {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowersByMemberId");
-        log.info("memberId : {}", currentMemberId);
-        log.info("targetMemberId : {}", memberId);
-
-        return getResult(memberQueryService.getFollowingMembersByMemberId(currentMemberId, memberId));
-    }
-
-    @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
-    @ApiImplicitParams({
-            @ApiImplicitParam(
-                    name = "memberId",
-                    value = "멤버 id",
-                    required = true,
-                    paramType = "path",
-                    dataType = "Long",
-                    example = "123")
-    })
-    @GetMapping("/{memberId}/following")
-    public SingleApiResult<List<MembersByContentDto>> readFollowingsByMemberId(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
-            throws AlreadyFollowedMemberException, NotExistMemberException {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowingsByMemberId");
-        log.info("memberId : {}", currentMemberId);
-        log.info("targetMemberId : {}", memberId);
-
-        return getResult(memberQueryService.getFollowedMembersByMemberId(currentMemberId, memberId));
-    }
-
     @ApiOperation(value = "멤버 팔로우 영화 조회", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -322,11 +245,12 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/follow/movie")
-    public SingleApiResult<List<FollowMovieDto>> readFollowMoviesByMemberId(
+    public SingleApiResult<List<FollowMovieDto>> readFollowMovie(
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
+
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowersByMemberId");
+        log.info("readFollowMovie");
         log.info("memberId : {}", currentMemberId);
         log.info("targetMemberId : {}", memberId);
 
@@ -344,11 +268,12 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/follow/hashtag")
-    public SingleApiResult<List<FollowHashtagDto>> readFollowHashtagsByMemberId(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+    public SingleApiResult<List<FollowHashtagDto>> readFollowHashtag(@LoginMember MemberDetails currentMember,
+                                                                     @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
+
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowingsByMemberId");
+        log.info("readFollowHashtag");
         log.info("memberId : {}", currentMemberId);
         log.info("targetMemberId : {}", memberId);
 
@@ -366,15 +291,96 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/follow/collection")
-    public SingleApiResult<List<FollowCollectionDto>> readFollowCollectionsByMemberId(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+    public SingleApiResult<List<FollowCollectionDto>> readFollowCollection(@LoginMember MemberDetails currentMember,
+                                                                           @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
+
         Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowCollectionsByMemberId");
+        log.info("readFollowCollection");
         log.info("memberId : {}", currentMemberId);
         log.info("targetMemberId : {}", memberId);
 
         return getResult(memberQueryService.getFollowCollectionsByMemberId(currentMember, memberId));
+    }
+
+    @ApiOperation(value = "멤버 정보 조회", notes = "")
+    @ApiImplicitParams({
+    })
+    @GetMapping("/info")
+    public SingleApiResult<MemberInfoDto> readMemberInfo(@LoginMember MemberDetails currentMember) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readMemberInfo");
+        log.info("currentMemberId : {}", currentMemberId);
+
+        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
+    }
+
+    @ApiOperation(value = "멤버 정보 수정", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberInfoRequestDto",
+                    value = "멤버 업데이트 요청",
+                    required = true,
+                    paramType = "body",
+                    dataType = "MemberInfoDto")
+    })
+    @PatchMapping("/info")
+    public SingleApiResult<Long> updateMemberInfo(
+            @LoginMember MemberDetails currentMember, @RequestBody MemberInfoDto memberInfoRequestDto) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("updateMemberInfo");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("accountId : {}", memberInfoRequestDto.getAccountId());
+        log.info("nickname : {}", memberInfoRequestDto.getNickname());
+        log.info("profileUrl : {}", memberInfoRequestDto.getProfileUrl());
+        log.info("bio : {}", memberInfoRequestDto.getBio());
+        log.info("website : {}", memberInfoRequestDto.getWebsite());
+
+        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
+    }
+
+    @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "password",
+                    value = "비밀번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "String")
+    })
+    @GetMapping("/password/check")
+    public SingleApiResult<Boolean> readIsMatchedPassword(
+            @LoginMember MemberDetails currentMember, @RequestParam String password) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readIsMatchedPassword");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("password : {}", password);
+
+        return getResult(memberService.isMatchedPassword(currentMember, password));
+    }
+
+    @ApiOperation(value = "멤버 비밀번호 변경", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "password",
+                    value = "비밀번호",
+                    required = true,
+                    paramType = "query",
+                    dataType = "String")
+    })
+    @PatchMapping("/password")
+    public SingleApiResult<Boolean> updatePassword(
+            @LoginMember MemberDetails currentMember, @RequestParam String password) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("updatePassword");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("password : {}", password);
+
+        return getResult(memberService.updateMemberPassword(currentMemberId, password));
     }
 
     @ApiOperation(value = "멤버 차단 생성", notes = "")
@@ -388,12 +394,12 @@ public class MemberApiController {
                     example = "123")
     })
     @PostMapping("/{blockedMemberId}/block")
-    public SingleApiResult<Long> createBlockOne(
-            @LoginMember MemberDetails currentMember, @PathVariable Long blockedMemberId,
-            @RequestParam BlockedMemberStatus blockedMemberStatus)
+    public SingleApiResult<Long> createBlockMember(@LoginMember MemberDetails currentMember,
+                                                   @PathVariable Long blockedMemberId,
+                                                   @RequestParam BlockedMemberStatus blockedMemberStatus)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
-        log.info("createBlockOne");
+        log.info("createBlockMember");
         log.info("memberId : {}", currentMember.getId());
         log.info("blockedMemberId : {}", blockedMemberId);
         log.info("blockedMemberStatus : {}", blockedMemberStatus);
@@ -420,12 +426,12 @@ public class MemberApiController {
                     example = "A")
     })
     @PostMapping("/search")
-    public SingleApiResult<Long> createSearchByKeyword(
+    public SingleApiResult<Long> createSearch(
             @LoginMember MemberDetails currentMember, @RequestParam String keyword,
             @RequestParam SearchedByMemberStatus searchedByMemberStatus)
             throws NotExistMemberException {
 
-        log.info("createBlockOne");
+        log.info("createSearch");
         log.info("memberId : {}", currentMember.getId());
         log.info("keyword : {}", keyword);
         log.info("searchedByMemberStatus : {}", searchedByMemberStatus);
@@ -444,11 +450,92 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/search")
-    public SingleApiResult<List<LastSearchDto>> getLastSearchesByMemberLimit(
+    public SingleApiResult<List<LastSearchDto>> readLastSearch(
             @LoginMember MemberDetails currentMember, @RequestParam int length)
             throws NotExistMemberException {
 
+        log.info("readLastSearch");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("length : {}", length);
+
         return getResult(memberQueryService.getLastSearchesByMemberLimit(currentMember.getId(), length));
+    }
+
+    @ApiOperation(value = "이메일 인증 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "email",
+                    value = "이메일 정보",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "spinoff232@gmail.com")
+    })
+    @PostMapping("/auth-email")
+    public SingleApiResult<Boolean> createAuthEmail(@LoginMember MemberDetails currentMember,
+                                                    @RequestParam String email) {
+        log.info("createAuthEmail");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("email : {}", email);
+        return getResult(memberService.sendEmailForAuth(currentMember.getId(), email));
+    }
+
+    @ApiOperation(value = "이메일 인증 확인", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "requestDto",
+                    value = "이메일 인증 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "EmailAuthRequestDto")
+    })
+    @PatchMapping("/auth-email")
+    public SingleApiResult<Boolean> confirmAuthEmail(@RequestBody EmailAuthRequestDto requestDto) {
+
+        log.info("confirmAuthEmail");
+        log.info("email : {}", requestDto.getEmail());
+        log.info("authToken : {}", requestDto.getAuthToken());
+
+        return getResult(memberService.confirmEmailForAuth(requestDto));
+    }
+
+
+    @ApiOperation(value = "이메일 변경 인증 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "email",
+                    value = "이메일 정보",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "spinoff232@gmail.com")
+    })
+    @PostMapping("/update-email")
+    public SingleApiResult<Boolean> createUpdateEmail(@LoginMember MemberDetails currentMember,
+                                                    @RequestParam String email) {
+        log.info("createUpdateEmail");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("email : {}", email);
+        return getResult(memberService.sendEmailForUpdateEmail(currentMember.getId(), email));
+    }
+
+    @ApiOperation(value = "이메일 변경 인증 확인", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "requestDto",
+                    value = "이메일 인증 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "EmailAuthRequestDto")
+    })
+    @PatchMapping("/update-email")
+    public SingleApiResult<Boolean> confirmUpdateEmail(@RequestBody EmailAuthRequestDto requestDto) {
+
+        log.info("confirmUpdateEmail");
+        log.info("email : {}", requestDto.getEmail());
+        log.info("authToken : {}", requestDto.getAuthToken());
+
+        return getResult(memberService.confirmEmailForUpdateEMail(requestDto));
     }
 
     private Long getCurrentMemberId(MemberDetails currentMember) {

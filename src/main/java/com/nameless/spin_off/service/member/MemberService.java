@@ -1,6 +1,7 @@
 package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.MemberDto.EmailAuthRequestDto;
 import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
@@ -21,5 +22,9 @@ public interface MemberService {
     Boolean isMatchedPassword(MemberDetails currentMember, String password);
 
     Boolean updateMemberPassword(Long memberId, String password);
+    boolean sendEmailForAuth(Long memberId, String email);
+    boolean confirmEmailForAuth(EmailAuthRequestDto requestDto);
+    boolean sendEmailForUpdateEmail(Long memberId, String email);
+    boolean confirmEmailForUpdateEMail(EmailAuthRequestDto requestDto);
     int updateAllPopularity();
 }
