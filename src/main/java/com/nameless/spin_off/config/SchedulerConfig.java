@@ -23,7 +23,7 @@ public class SchedulerConfig {
     private final JobLauncher jobLauncher;
     private final BatchConfig batchConfig;
 
-    @Scheduled(fixedRate = 10800000) //(1000 * 3600 * 3 -> 3h)
+    @Scheduled(cron = "0 0 2/3 * * *") //(3시간마다 정해진 시간에 실행)
     public void popularityJob() {
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
@@ -37,7 +37,7 @@ public class SchedulerConfig {
         }
     }
 
-    @Scheduled(fixedRate = 86400000) //(1000 * 3600 * 24 -> 24h)
+    @Scheduled(cron = "0 0 7 * * *") //(매일 7시에 실행)
     public void movieApiJob() {
         Map<String, JobParameter> confMap = new HashMap<>();
         confMap.put("time", new JobParameter(System.currentTimeMillis()));
