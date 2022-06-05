@@ -25,6 +25,7 @@ public enum ErrorEnum {
     INCORRECT_ACCOUNT_PW("ERR015", "비밀번호의 형식이 맞지 않습니다."),
     INCORRECT_EMAIL("ERR016", "이메일의 형식이 맞지 않습니다."),
     INCORRECT_NICKNAME("ERR017", "닉네임의 형식이 맞지 않습니다."),
+    INCORRECT_PHONE_NUMBER("ERR059", "전화번호의 형식이 맞지 않습니다."),
     NOT_CORRECT_EMAIL("ERR018", "요청한 이메일이 일치하지 않습니다."),
     NOT_EXIST_ACCOUNT_ID("ERR019", "해당 아이디는 존재하지 않습니다."),
     NOT_EXIST_EMAIL_AUTH_TOKEN("ERR020", "해당 이메일 인증이 존재하지 않습니다."),

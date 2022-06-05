@@ -1,7 +1,6 @@
 package com.nameless.spin_off.entity.member;
 
 import com.nameless.spin_off.dto.MemberDto.MemberBuilder;
-import com.nameless.spin_off.dto.MemberDto.MemberRegisterRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
@@ -18,10 +17,7 @@ import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.member.MemberCondition;
 import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.*;
-import com.nameless.spin_off.exception.sign.IncorrectAccountIdException;
-import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
-import com.nameless.spin_off.exception.sign.IncorrectEmailException;
-import com.nameless.spin_off.exception.sign.IncorrectNicknameException;
+import com.nameless.spin_off.exception.sign.*;
 import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -36,8 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static com.nameless.spin_off.enums.member.MemberCondition.EMAIL;
-import static com.nameless.spin_off.enums.member.MemberCondition.NICKNAME;
+import static com.nameless.spin_off.enums.member.MemberCondition.*;
 import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 
 @Entity
@@ -206,18 +201,6 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    public static Member createMemberByCreateVO(MemberRegisterRequestDto memberRegisterRequestDto) {
-
-        return Member.buildMember()
-                .setNickname(memberRegisterRequestDto.getNickname())
-                .setEmail(memberRegisterRequestDto.getEmail())
-                .setAccountId(memberRegisterRequestDto.getAccountId())
-                .setAccountPw(memberRegisterRequestDto.getAccountPw())
-                .setBirth(memberRegisterRequestDto.getBirth())
-                .setName(memberRegisterRequestDto.getName())
-                .build();
-    }
-
     public static Member createMember(Long id) {
         Member member = new Member();
         member.updateId(id);
@@ -264,6 +247,7 @@ public class Member extends BaseTimeEntity {
     }
 
     public void updatePhoneNumber(String phoneNumber) {
+        isCorrectPhoneNumber(phoneNumber);
         this.phoneNumber = phoneNumber;
     }
 
@@ -331,6 +315,12 @@ public class Member extends BaseTimeEntity {
     private void isCorrectNickname(String nickname) {
         if (NICKNAME.isNotCorrect(nickname)) {
             throw new IncorrectNicknameException(ErrorEnum.INCORRECT_NICKNAME);
+        }
+    }
+
+    private void isCorrectPhoneNumber(String phoneNumber) {
+        if (CELL_PHONE.isNotCorrect(phoneNumber)) {
+            throw new IncorrectPhoneNumberException(ErrorEnum.INCORRECT_PHONE_NUMBER);
         }
     }
 

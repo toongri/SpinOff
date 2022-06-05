@@ -598,6 +598,13 @@ public class MemberDto {
         private String email;
 
         @ApiModelProperty(
+                value = "전화번호",
+                required = true,
+                example = "01011111111",
+                dataType = "string")
+        private String cellphone;
+
+        @ApiModelProperty(
                 value = "이메일 인증코드",
                 required = true,
                 example = "dfdfd0922",
