@@ -46,7 +46,6 @@ public class MovieApiController {
         return movieService.updateMovieByNaver();
     }
 
-
     @ApiOperation(value = "kobis api 영화 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -126,19 +125,27 @@ public class MovieApiController {
                     required = true,
                     paramType = "path",
                     dataType = "Long",
-                    example = "123")
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "ip",
+                    value = "ip주소",
+                    required = true,
+                    paramType = "query",
+                    dataType = "string",
+                    example = "192.168.0.1")
     })
     @GetMapping("/{movieId}")
     public SingleApiResult<ReadMovieDto> readMovie(@LoginMember MemberDetails currentMember,
-                                                   @PathVariable Long movieId)
+                                                   @PathVariable Long movieId, @RequestParam String ip)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
         log.info("readMovie");
         log.info("memberId : {}", currentMemberId);
         log.info("movieId : {}", movieId);
-
-        return getResult(movieQueryService.getMovieForRead(currentMemberId, movieId));
+        ReadMovieDto movieForRead = movieQueryService.getMovieForRead(currentMemberId, movieId);
+        movieService.insertViewedMovieByIp(ip, movieId);
+        return getResult(movieForRead);
     }
 
     @ApiOperation(value = "영화 관련 글 조회", notes = "")
