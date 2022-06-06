@@ -31,6 +31,15 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
         super(Movie.class);
     }
 
+    public List<Movie> findAllWithoutNaverInfoOrderByCreateDesc() {
+        return getQueryFactory()
+                .select(movie)
+                .from(movie)
+                .where(movie.naverUrl.isEmpty().or(movie.thumbnail.isEmpty()))
+                .orderBy(movie.createdDate.desc())
+                .fetch();
+    }
+
     public List<MovieMemberDto> findMembersByMovieId(Long movieId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MovieMemberDto(

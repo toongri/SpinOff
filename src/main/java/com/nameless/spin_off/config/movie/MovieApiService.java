@@ -3,7 +3,7 @@ package com.nameless.spin_off.config.movie;
 import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto;
 import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto.NaverMovie;
 import com.nameless.spin_off.entity.movie.Movie;
-import com.nameless.spin_off.exception.movie.CantCorrectMovieUrlException;
+import com.nameless.spin_off.exception.movie.CantFindMovieUrlException;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -85,8 +85,8 @@ public class MovieApiService {
                         newPartMovieList.add(movie);
 
                     } catch (NumberFormatException e) {
-                        log.error("kobisMovieDataError");
-                        log.error("데이터 오류 : {}", e.toString());
+                        log.debug("kobisMovieDataError");
+                        log.debug("데이터 오류 : {}", e.toString());
                     } catch (Exception e) {
                         log.error("kobisMovieError");
                         log.error("예상하지 못한 에러 : {}", e.toString());
@@ -151,15 +151,15 @@ public class MovieApiService {
             log.error("statusCode : {}", e.getRawStatusCode());
             log.error("body : {}", e.getStatusText());
         } catch (NumberFormatException e) {
-            log.error("kobisInfoMovieDataError");
-            log.error("데이터 오류 : {}", e.toString());
+            log.debug("kobisInfoMovieDataError");
+            log.debug("데이터 오류 : {}", e.toString());
         }  catch (Exception e) {
             log.error("kobisInfoMovieError");
             log.error("예상하지 못한 에러 : {}", e.toString());
         }
     }
 
-    public void updateThumbnailAndUrlByMovie(Movie movie) {
+    public boolean updateThumbnailAndUrlByMovie(Movie movie) {
         try {
             HttpHeaders headers = new HttpHeaders(); // 헤더에 key들을 담아준다.
             headers.set("X-Naver-Client-Id", naverClientId);
@@ -170,8 +170,8 @@ public class MovieApiService {
                     .fromHttpUrl(
                             naverUrl + "?" +
                                     "query=" + movie.getTitle() + "&" +
-                                    "yearfrom=" + movie.getYear() + "&" +
-                                    "yearto=" + movie.getYear())
+                                    "yearfrom=" + (movie.getYear() - 1) + "&" +
+                                    "yearto=" + (movie.getYear() + 1))
                     .build();
 
             NaverMoviesResponseDto response =
@@ -179,7 +179,7 @@ public class MovieApiService {
                             NaverMoviesResponseDto.class, movie.getTitle()).getBody();
 
             assert response != null;
-            TimeUnit.MILLISECONDS.sleep(500);
+            TimeUnit.MILLISECONDS.sleep(700);
 
             if (response.getDisplay() == 1) {
                 log.debug("one naver movie");
@@ -198,7 +198,7 @@ public class MovieApiService {
                         movie.updateNaverUrl(naverMovie.getLink());
                         movie.updateImageUrl(naverMovie.getImage());
                     } else {
-                        throw new CantCorrectMovieUrlException();
+                        throw new CantFindMovieUrlException();
                     }
                 } else {
                     if (movie.getTitle().replace(" ", "").equals(naverMovie.getTitle()
@@ -211,9 +211,8 @@ public class MovieApiService {
                     movie.updateNaverUrl(naverMovie.getLink());
                     movie.updateImageUrl(naverMovie.getImage());
                     } else {
-                        throw new CantCorrectMovieUrlException();
+                        throw new CantFindMovieUrlException();
                     }
-
                 }
 
             } else if (response.getDisplay() > 1) {
@@ -228,12 +227,12 @@ public class MovieApiService {
                             .stream()
                             .filter(i -> movie.getTitle().replace(" ", "").equals(i.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")))
                             .filter(i -> isContains(movie, i))
-                            .findFirst().orElseThrow(CantCorrectMovieUrlException::new);
+                            .findFirst().orElseThrow(CantFindMovieUrlException::new);
                 } else {
                     naverMovie = response.getItems()
                             .stream()
                             .filter(i -> movie.getTitle().replace(" ", "").equals(i.getTitle().replace("<b>", "").replace("</b>", "").replace(" ", "")))
-                            .findFirst().orElseThrow(CantCorrectMovieUrlException::new);
+                            .findFirst().orElseThrow(CantFindMovieUrlException::new);
                 }
 
                 log.debug("movie link : {}", naverMovie.getLink());
@@ -242,24 +241,27 @@ public class MovieApiService {
                 movie.updateNaverUrl(naverMovie.getLink());
                 movie.updateImageUrl(naverMovie.getImage());
             } else {
-                log.debug("cant find naver movie");
-                log.debug("movie Id : {}", movie.getId());
-                log.debug("movie Title : {}", movie.getTitle());
+                throw new CantFindMovieUrlException();
             }
-        } catch (CantCorrectMovieUrlException e) {
-            log.info("cant find movie url");
-            log.info("movie Id : {}", movie.getId());
+        } catch (CantFindMovieUrlException e) {
+            log.debug("cant find movie url");
+            log.debug("movie Id : {}", movie.getId());
+            return false;
         }catch (HttpClientErrorException | HttpServerErrorException e) {
             log.error("naverMovieError");
             log.error("statusCode : {}", e.getRawStatusCode());
             log.error("body : {}", e.getStatusText());
+            return false;
         } catch (NumberFormatException e) {
             log.error("naverMovieDataError");
             log.error("데이터 오류 : {}", e.toString());
+            return false;
         }  catch (Exception e) {
             log.error("naverMovieError");
             log.error("예상하지 못한 에러 : {}", e.toString());
+            return false;
         }
+        return true;
     }
 
     private boolean isContains(Movie movie, NaverMovie i) {

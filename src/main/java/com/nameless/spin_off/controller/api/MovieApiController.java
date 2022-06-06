@@ -37,6 +37,16 @@ public class MovieApiController {
     private final MovieService movieService;
     private final MovieQueryService movieQueryService;
 
+    @ApiOperation(value = "naver api 영화 수정", notes = "")
+    @ApiImplicitParams({
+    })
+    @PostMapping("/naver")
+    public int updateMovieByNaver() {
+        log.info("naver");
+        return movieService.updateMovieByNaver();
+    }
+
+
     @ApiOperation(value = "kobis api 영화 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -55,8 +65,12 @@ public class MovieApiController {
                     example = "123")
     })
     @PostMapping("/kobis/{startPage}")
-    public int test(@PathVariable int startPage, int size) {
-        return movieService.updateMovieApi(startPage, size);
+    public int createMovieByKobis(@PathVariable int startPage, int size) {
+
+        log.info("createMovieByKobis");
+        log.info("startPage : {}", startPage);
+        log.info("size : {}", size);
+        return movieService.createMoviesByKobis(startPage, size);
     }
 
     @ApiOperation(value = "영화 팔로우 생성", notes = "")

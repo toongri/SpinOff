@@ -1,12 +1,12 @@
 package com.nameless.spin_off.service.movie;
 
 import com.nameless.spin_off.config.movie.MovieApiService;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.movie.ViewedMovieByIp;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.movie.MovieScoreEnum;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMovieException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.movie.NotExistMovieException;
@@ -73,13 +73,26 @@ public class MovieServiceJpa implements MovieService{
 
     @Transactional
     @Override
-    public int updateMovieApi(int startPage, int size) {
+    public int createMoviesByKobis(int startPage, int size) {
         List<Movie> allNew = movieApiService.findAllNew(startPage, size);
         for (Movie movie : allNew) {
             movieApiService.updateThumbnailAndUrlByMovie(movie);
             movieApiService.updateActorsMovie(movie);
         }
         return movieRepository.saveAll(allNew).size();
+    }
+
+    @Transactional
+    @Override
+    public int updateMovieByNaver() {
+        List<Movie> movies = movieQueryRepository.findAllWithoutNaverInfoOrderByCreateDesc();
+        int cnt = 0;
+        for (Movie movie : movies) {
+            if (movieApiService.updateThumbnailAndUrlByMovie(movie)) {
+                cnt++;
+            }
+        }
+        return cnt;
     }
 
 
