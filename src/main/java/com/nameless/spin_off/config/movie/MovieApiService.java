@@ -61,36 +61,49 @@ public class MovieApiService {
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-                log.info("resultMap : {}", resultMap.toString());
+                log.debug("resultMap : {}", resultMap.toString());
 
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
                 List<Movie> newPartMovieList = new ArrayList<>();
 
                 for (Map obj : movieList) {
-                    ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
-                    String director = getDirector(directors);
+                    try {
+                        ArrayList<Map> directors = (ArrayList<Map>) (obj.get("directors"));
+                        String director = getDirector(directors);
 
-                    Movie movie = Movie.createMovie(Long.parseLong(String.valueOf(obj.get("movieCd"))),
-                            String.valueOf(obj.get("movieNm")),
-                            Integer.parseInt(String.valueOf(obj.get("prdtYear"))),
-                            director, String.valueOf(obj.get("repNationNm")));
+                        Movie movie = Movie.createMovie(Long.parseLong(String.valueOf(obj.get("movieCd"))),
+                                String.valueOf(obj.get("movieNm")),
+                                Integer.parseInt(String.valueOf(obj.get("prdtYear"))),
+                                director, String.valueOf(obj.get("repNationNm")));
 
-                    List<String> genres = Arrays.asList(String.valueOf(obj.get("genreAlt")).split(","));
+                        log.debug("movie id : {}", movie.getId());
+                        log.debug("movie title : {}", movie.getTitle());
+                        List<String> genres = Arrays.asList(String.valueOf(obj.get("genreAlt")).split(","));
 
-                    movie.updateGenres(genres);
-                    newPartMovieList.add(movie);
+                        movie.updateGenres(genres);
+                        newPartMovieList.add(movie);
+
+                    } catch (NumberFormatException e) {
+                        log.error("kobisMovieDataError");
+                        log.error("데이터 오류 : {}", e.toString());
+                    } catch (Exception e) {
+                        log.error("kobisMovieError");
+                        log.error("예상하지 못한 에러 : {}", e.toString());
+                    }
                 }
 
                 List<Long> movieIds = newPartMovieList.stream().map(Movie::getId).collect(Collectors.toList());
+                log.debug("movieIds : {}", movieIds.toString());
 
                 List<Long> alreadyMovieIds = movieRepository.findAllIdsById(movieIds);
+                log.debug("alreadyMovieIds : {}", alreadyMovieIds.toString());
 
                 List<Movie> resultMovieList = newPartMovieList
                         .stream()
-                        .filter(m -> m.getDirectorName() != null)
-                        .filter(m -> !alreadyMovieIds.contains(m.getId()))
+                        .filter(m -> m.getDirectorName() != null && !alreadyMovieIds.contains(m.getId()))
                         .collect(Collectors.toList());
+                log.debug("resultMovieList : {}", resultMovieList.toString());
 
 //                if (resultMovieList.isEmpty()) {
 //                    break;
@@ -103,9 +116,6 @@ public class MovieApiService {
                 log.error("kobisMovieError");
                 log.error("statusCode : {}", e.getRawStatusCode());
                 log.error("body : {}", e.getStatusText());
-            } catch (NumberFormatException e) {
-                log.error("kobisMovieDataError");
-                log.error("데이터 오류 : {}", e.toString());
             } catch (Exception e) {
                 log.error("kobisMovieError");
                 log.error("예상하지 못한 에러 : {}", e.toString());
