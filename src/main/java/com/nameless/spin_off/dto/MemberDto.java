@@ -64,6 +64,7 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
+    @NoArgsConstructor
     public static class MemberProfileRequestDto {
 
         @ApiModelProperty(

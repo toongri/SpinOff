@@ -139,6 +139,7 @@ public class MemberServiceJpa implements MemberService {
             cnt++;
             awsS3Service.deleteFile(member.getProfileImg());
             member.updateProfileImg(null);
+
         } else if (multipartFile != null) {
             cnt++;
             if (member.getProfileImg() != null) {

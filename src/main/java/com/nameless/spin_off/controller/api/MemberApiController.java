@@ -321,10 +321,9 @@ public class MemberApiController {
                     name = "memberProfileRequestDto",
                     value = "{" +
                             "\"nickname\":\"스프링부트\"," +
-                            " \"profileUrl\":\"www.naver.profile.com\"," +
-                            " \"accountId\":spinoff033," +
+                            " \"accountId\":\"spinoff033\"," +
                             " \"website\": \"www.naver.com\"," +
-                            " \"bio\" : \"스프링부트와 aws로 혼자 구현하는 웹 서비스\"," +
+                            " \"bio\" : \"스프링부트와 aws로 혼자 구현하는 웹 서비스\"" +
                             "}",
                     required = true,
                     paramType = "formData",
@@ -333,7 +332,7 @@ public class MemberApiController {
     @PatchMapping("/profile")
     public SingleApiResult<Long> updateMemberProfile(@LoginMember MemberDetails currentMember,
                                                      @RequestPart MemberProfileRequestDto memberProfileRequestDto,
-                                                     @RequestPart("image") MultipartFile multipartFile) throws IOException {
+                                                     @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("updateMemberInfo");
@@ -344,6 +343,43 @@ public class MemberApiController {
         log.info("website : {}", memberProfileRequestDto.getWebsite());
 
         return getResult(memberService.updateMemberProfile(currentMemberId, memberProfileRequestDto, multipartFile));
+    }
+
+    @ApiOperation(value = "멤버 개인정보 조회", notes = "")
+    @ApiImplicitParams({
+    })
+    @GetMapping("/info")
+    public SingleApiResult<MemberInfoResponseDto> readMemberInfo(@LoginMember MemberDetails currentMember) {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("readMemberInfo");
+        log.info("currentMemberId : {}", currentMemberId);
+
+        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
+    }
+
+    @ApiOperation(value = "멤버 개인정보 수정", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "memberInfoRequestDto",
+                    required = true,
+                    paramType = "body",
+                    dataType = "MemberInfoRequestDto")
+    })
+    @PatchMapping("/info")
+    public SingleApiResult<Long> updateMemberInfo(@LoginMember MemberDetails currentMember,
+                                                     @RequestBody MemberInfoRequestDto memberInfoRequestDto)
+            throws IOException {
+        Long currentMemberId = getCurrentMemberId(currentMember);
+
+        log.info("updateMemberInfo");
+        log.info("currentMemberId : {}", currentMemberId);
+        log.info("authToken : {}", memberInfoRequestDto.getAuthToken());
+        log.info("email : {}", memberInfoRequestDto.getEmail());
+        log.info("birth : {}", memberInfoRequestDto.getBirth());
+        log.info("phoneNumber : {}", memberInfoRequestDto.getPhoneNumber());
+
+        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
     }
 
     @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
