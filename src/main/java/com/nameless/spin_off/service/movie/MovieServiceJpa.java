@@ -78,8 +78,10 @@ public class MovieServiceJpa implements MovieService{
         for (Movie movie : allNew) {
             movieApiService.updateThumbnailAndUrlByMovie(movie);
             movieApiService.updateActorsMovie(movie);
+            movie.updateLastModifiedDate();
+            movieRepository.save(movie);
         }
-        return movieRepository.saveAll(allNew).size();
+        return allNew.size();
     }
 
     @Transactional
@@ -90,6 +92,7 @@ public class MovieServiceJpa implements MovieService{
         for (Movie movie : movies) {
             if (movieApiService.updateThumbnailAndUrlByMovie(movie)) {
                 cnt++;
+                movie.updateLastModifiedDate();
             }
         }
         return cnt;

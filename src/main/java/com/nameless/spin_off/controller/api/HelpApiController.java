@@ -77,4 +77,20 @@ public class HelpApiController {
 
         return getResult(complainService.insertComplain(currentMember.getId(), contentId, contentTypeStatus, complainStatus));
     }
+
+//    @ApiOperation(value = "신고 생성", notes = "")
+//    @ApiImplicitParams({
+//    })
+//    @GetMapping("/complain")
+//    public SingleApiResult<Long> createComplain(
+//            @LoginMember MemberDetails currentMember) throws
+//            NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
+//            UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
+//            NotExistCommentInCollectionException {
+//
+//        log.info("createComplain");
+//        log.info("memberId : {}", currentMember.getId());
+//
+//        return getResult(complainService.insertComplain(currentMember.getId(), contentId, contentTypeStatus, complainStatus));
+//    }
 }

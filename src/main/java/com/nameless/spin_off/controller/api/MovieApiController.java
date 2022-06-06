@@ -42,7 +42,7 @@ public class MovieApiController {
     })
     @PostMapping("/naver")
     public int updateMovieByNaver() {
-        log.info("naver");
+        log.info("updateMovieByNaver");
         return movieService.updateMovieByNaver();
     }
 

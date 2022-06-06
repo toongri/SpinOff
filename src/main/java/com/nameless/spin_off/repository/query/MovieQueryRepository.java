@@ -23,6 +23,7 @@ import static com.nameless.spin_off.entity.movie.QFollowedMovie.followedMovie;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.movie.QViewedMovieByIp.viewedMovieByIp;
 import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.enums.movie.MovieApiEnum.NAVER_API_REQUEST_NUMBER_MAX;
 
 @Repository
 public class MovieQueryRepository extends Querydsl4RepositorySupport {
@@ -37,6 +38,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
                 .from(movie)
                 .where(movie.naverUrl.isEmpty().or(movie.thumbnail.isEmpty()))
                 .orderBy(movie.createdDate.desc())
+                .limit(NAVER_API_REQUEST_NUMBER_MAX.getValue())
                 .fetch();
     }
 

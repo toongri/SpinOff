@@ -1,8 +1,10 @@
 package com.nameless.spin_off.enums.movie;
 
 public enum MovieApiEnum {
-    API_REQUEST_NUMBER_MAX(15),
-    API_REQUEST_LENGTH_MAX(100);
+    KOBIS_API_REQUEST_NUMBER_MAX(15),
+    KOBIS_API_REQUEST_SIZE_MAX(100),
+    NAVER_API_REQUEST_NUMBER_MAX(20000);
+
 
     private final int value;
 

@@ -23,7 +23,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.nameless.spin_off.enums.movie.MovieApiEnum.API_REQUEST_LENGTH_MAX;
+import static com.nameless.spin_off.enums.movie.MovieApiEnum.KOBIS_API_REQUEST_SIZE_MAX;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -55,7 +55,7 @@ public class MovieApiService {
                         .fromHttpUrl(
                                 kobisUrl + "?" +
                                         "key=" + key + "&" +
-                                        "itemPerPage=" + API_REQUEST_LENGTH_MAX.getValue() + "&" +
+                                        "itemPerPage=" + KOBIS_API_REQUEST_SIZE_MAX.getValue() + "&" +
                                         "curPage=" + (startPage + curPage))
                         .build();
 
@@ -196,7 +196,7 @@ public class MovieApiService {
                         log.debug("movie image : {}", naverMovie.getImage());
 
                         movie.updateNaverUrl(naverMovie.getLink());
-                        movie.updateImageUrl(naverMovie.getImage());
+                        movie.updateThumbnail(naverMovie.getImage());
                     } else {
                         throw new CantFindMovieUrlException();
                     }
@@ -205,11 +205,16 @@ public class MovieApiService {
                         .replace("<b>", "").replace("</b>", "")
                         .replace(" ", "")) && isContains(movie, naverMovie)) {
 
-                    log.debug("movie link : {}", naverMovie.getLink());
-                    log.debug("movie image : {}", naverMovie.getImage());
+                        if (movie.getNaverUrl() == naverMovie.getLink() && movie.getThumbnail() == naverMovie.getImage()) {
+                            return false;
+                        }
 
-                    movie.updateNaverUrl(naverMovie.getLink());
-                    movie.updateImageUrl(naverMovie.getImage());
+                        log.debug("movie link : {}", naverMovie.getLink());
+                        log.debug("movie image : {}", naverMovie.getImage());
+
+                        movie.updateNaverUrl(naverMovie.getLink());
+                        movie.updateThumbnail(naverMovie.getImage());
+
                     } else {
                         throw new CantFindMovieUrlException();
                     }
@@ -235,11 +240,15 @@ public class MovieApiService {
                             .findFirst().orElseThrow(CantFindMovieUrlException::new);
                 }
 
+                if (movie.getNaverUrl() == naverMovie.getLink() && movie.getThumbnail() == naverMovie.getImage()) {
+                    return false;
+                }
+
                 log.debug("movie link : {}", naverMovie.getLink());
                 log.debug("movie image : {}", naverMovie.getImage());
 
                 movie.updateNaverUrl(naverMovie.getLink());
-                movie.updateImageUrl(naverMovie.getImage());
+                movie.updateThumbnail(naverMovie.getImage());
             } else {
                 throw new CantFindMovieUrlException();
             }

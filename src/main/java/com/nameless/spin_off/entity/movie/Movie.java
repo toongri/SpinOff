@@ -1,11 +1,11 @@
 package com.nameless.spin_off.entity.movie;
 
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.ContentsTimeEnum;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -19,7 +19,7 @@ import static com.nameless.spin_off.enums.movie.MovieScoreEnum.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Movie extends BaseTimeEntity {
+public class Movie {
 
     @Id
     @Column(name="movie_id")
@@ -33,6 +33,12 @@ public class Movie extends BaseTimeEntity {
     private String nation;
     private Double popularity;
     private String actors;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
 
     @OneToMany(mappedBy = "movie", fetch = FetchType.LAZY)
     private List<FollowedMovie> followingMembers = new ArrayList<>();
@@ -90,6 +96,9 @@ public class Movie extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
+    }
     public void updateActors(String actors) {
         this.actors = actors;
     }
@@ -112,8 +121,8 @@ public class Movie extends BaseTimeEntity {
     public void updatePopularity() {
         popularity = executeViewScore() + executeFollowScore() + executePostScore();
     }
-    public void updateImageUrl(String imageUrl) {
-        this.thumbnail = imageUrl;
+    public void updateThumbnail(String thumbnail) {
+        this.thumbnail = thumbnail;
     }
     private void updateTitle(String title) {
         this.title = title;
