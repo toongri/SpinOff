@@ -5,7 +5,6 @@ import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.help.Complain;
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.entity.movie.FollowedMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.Post;
@@ -22,6 +21,7 @@ import com.sun.istack.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -38,7 +38,7 @@ import static com.nameless.spin_off.enums.member.MemberScoreEnum.MEMBER_FOLLOW;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseTimeEntity {
+public class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -60,6 +60,12 @@ public class Member extends BaseTimeEntity {
     private String kakaoEmail;
     private String refreshToken;
     private Double popularity;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -197,6 +203,7 @@ public class Member extends BaseTimeEntity {
         member.updateNaverEmail(naverEmail);
         member.updateKakaoEmail(kakaoEmail);
         member.updatePopularityZero();
+        member.updateLastModifiedDate();
 
         return member;
     }
@@ -213,6 +220,9 @@ public class Member extends BaseTimeEntity {
     }
 
     //==수정 메소드==//
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
+    }
     public void updateBio(String bio) {
         this.bio = bio;
     }

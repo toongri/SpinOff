@@ -1,10 +1,10 @@
 package com.nameless.spin_off.entity.hashtag;
 
-import com.nameless.spin_off.entity.listener.BaseTimeEntity;
 import com.nameless.spin_off.enums.ContentsTimeEnum;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import static com.nameless.spin_off.enums.hashtag.HashtagScoreEnum.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Hashtag extends BaseTimeEntity {
+public class Hashtag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,6 +28,12 @@ public class Hashtag extends BaseTimeEntity {
     private String content;
 
     private Double popularity;
+
+    @CreatedDate
+    @Column(updatable = false)
+    private LocalDateTime createdDate;
+
+    private LocalDateTime lastModifiedDate;
 
     @OneToMany(mappedBy = "hashtag", fetch = FetchType.LAZY)
     private List<FollowedHashtag> followingMembers = new ArrayList<>();
@@ -62,6 +68,7 @@ public class Hashtag extends BaseTimeEntity {
         Hashtag hashtag = new Hashtag();
         hashtag.updateContent(content);
         hashtag.updatePopularityZero();
+        hashtag.updateLastModifiedDate();
 
         return hashtag;
     }
@@ -87,6 +94,9 @@ public class Hashtag extends BaseTimeEntity {
 
     public void updatePopularityZero() {
         popularity = 0.0;
+    }
+    public void updateLastModifiedDate() {
+        this.lastModifiedDate = LocalDateTime.now();
     }
 
     //==비즈니스 로직==//

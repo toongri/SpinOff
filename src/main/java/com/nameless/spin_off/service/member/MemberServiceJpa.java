@@ -147,7 +147,7 @@ public class MemberServiceJpa implements MemberService {
             }
             member.updateProfileImg(getUrlByMultipartFile(multipartFile));
         }
-
+        member.updateLastModifiedDate();
         return cnt;
     }
 
@@ -170,6 +170,7 @@ public class MemberServiceJpa implements MemberService {
             cnt++;
             member.updateBirth(memberInfoRequestDto.getBirth());
         }
+        member.updateLastModifiedDate();
 
         return cnt;
     }
@@ -185,6 +186,7 @@ public class MemberServiceJpa implements MemberService {
         isCorrectAccountPw(password);
         Member member = getMember(memberId);
         member.updateAccountPw(passwordEncoder.encode(password));
+        member.updateLastModifiedDate();
         return true;
     }
 

@@ -30,4 +30,5 @@ public interface MemberQueryService {
     List<FollowMovieDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowCollectionDto> getFollowCollectionsByMemberId(MemberDetails currentMember, Long targetMemberId);
 
+
 }
