@@ -56,6 +56,7 @@ public class MovieQueryRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -71,6 +72,7 @@ public class MovieQueryRepositoryTest {
                     .setName("memberName")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
                     .setNickname(keyword+i).build());
         }
 

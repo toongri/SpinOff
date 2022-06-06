@@ -19,7 +19,77 @@ public class MemberDto {
 
     @Data
     @AllArgsConstructor
-    public static class MemberInfoDto {
+    public static class MemberInfoRequestDto {
+
+        @ApiModelProperty(
+                value = "인증 토큰",
+                example = "abdfwe2")
+        private String authToken;
+
+        @ApiModelProperty(
+                value = "멤버 email",
+                example = "spinoff@naver.com")
+        private String email;
+
+        @ApiModelProperty(
+                value = "멤버 전화번호",
+                example = "01011111111")
+        private String phoneNumber;
+
+        @ApiModelProperty(
+                value = "멤버 생일",
+                example = "2019-05-05")
+        private LocalDate birth;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MemberInfoResponseDto {
+
+        @ApiModelProperty(
+                value = "멤버 email",
+                example = "spinoff@naver.com")
+        private String email;
+
+        @ApiModelProperty(
+                value = "멤버 전화번호",
+                example = "01011111111")
+        private String phoneNumber;
+
+        @ApiModelProperty(
+                value = "멤버 생일",
+                example = "2019-05-05")
+        private LocalDate birth;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MemberProfileRequestDto {
+
+        @ApiModelProperty(
+                value = "멤버 닉네임",
+                example = "toongri")
+        private String nickname;
+
+        @ApiModelProperty(
+                value = "프로필 id",
+                example = "fhjdklebneke")
+        private String accountId;
+
+        @ApiModelProperty(
+                value = "프로필 웹사이트url",
+                example = "www.nvaer.com")
+        private String website;
+
+        @ApiModelProperty(
+                value = "프로필 소개",
+                example = "fhjdklebneke")
+        private String bio;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static class MemberProfileResponseDto {
 
         @ApiModelProperty(
                 value = "멤버 닉네임",
@@ -46,7 +116,6 @@ public class MemberDto {
                 example = "fhjdklebneke")
         private String bio;
     }
-
 
     @Data
     public static class MovieMemberDto {
@@ -549,7 +618,6 @@ public class MemberDto {
         }
     }
 
-
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
@@ -586,8 +654,7 @@ public class MemberDto {
         @ApiModelProperty(
                 value = "생일",
                 required = true,
-                example = "2019-05-05",
-                dataType = "string")
+                example = "2019-05-05")
         private LocalDate birth;
 
         @ApiModelProperty(
@@ -602,7 +669,7 @@ public class MemberDto {
                 required = true,
                 example = "01011111111",
                 dataType = "string")
-        private String cellphone;
+        private String phoneNumber;
 
         @ApiModelProperty(
                 value = "이메일 인증코드",

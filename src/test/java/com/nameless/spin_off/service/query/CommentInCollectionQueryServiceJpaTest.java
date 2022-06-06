@@ -54,6 +54,7 @@ class CommentInCollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -64,6 +65,7 @@ class CommentInCollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build()));
         }
@@ -156,6 +158,7 @@ class CommentInCollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -166,6 +169,7 @@ class CommentInCollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -174,12 +178,13 @@ class CommentInCollectionQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 

@@ -60,6 +60,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -97,6 +98,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
@@ -156,6 +158,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
@@ -166,6 +169,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
@@ -212,6 +216,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -220,6 +225,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
@@ -254,6 +260,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -262,6 +269,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);

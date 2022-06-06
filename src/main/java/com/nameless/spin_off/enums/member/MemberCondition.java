@@ -10,7 +10,7 @@ public enum MemberCondition {
             ACCOUNT_PW_MIN.getLength() + "," + ACCOUNT_PW_MAX.getLength() + "}$"),
     NICKNAME("^[a-z0-9A-Z가-힣_,.]{" + NICKNAME_MIN.getLength() + "," + NICKNAME_MAX.getLength() + "}$"),
 //    CELL_PHONE("^01(?:0|1|[6-9])-\\d{3,4}-\\d{4}"),
-    CELL_PHONE("^01(?:0|1|[6-9])\\d{7,8}"),
+    PHONE_NUMBER("^01(?:0|1|[6-9])\\d{7,8}"),
     EMAIL("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"),
     ENGLISH("^[a-zA-Z]*$"),
     NUMBER("^[0-9]*$"),

@@ -123,15 +123,15 @@ class SignServiceJpaTest {
 
         memberRegisterRequestDto.setNickname("퉁그리_");
 
-        memberRegisterRequestDto.setCellphone("absd232");
+        memberRegisterRequestDto.setPhoneNumber("absd232");
         assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
                 .isInstanceOf(IncorrectPhoneNumberException.class);
 
-        memberRegisterRequestDto.setCellphone("01523232323");
+        memberRegisterRequestDto.setPhoneNumber("01523232323");
         assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
                 .isInstanceOf(IncorrectPhoneNumberException.class);
 
-        memberRegisterRequestDto.setCellphone("010232323");
+        memberRegisterRequestDto.setPhoneNumber("010232323");
         assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
                 .isInstanceOf(IncorrectPhoneNumberException.class);
 
@@ -142,7 +142,7 @@ class SignServiceJpaTest {
                 .provider(EmailAuthProviderStatus.A)
                 .build());
 
-        memberRegisterRequestDto.setCellphone("01023232323");
+        memberRegisterRequestDto.setPhoneNumber("01023232323");
         memberRegisterRequestDto.setEmail("@naver.com");
         assertThatThrownBy(() -> signService.registerMember(memberRegisterRequestDto))
                 .isInstanceOf(IncorrectEmailException.class);

@@ -76,6 +76,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Member member2 = Member.buildMember()
@@ -83,6 +84,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -153,6 +155,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Member member2 = Member.buildMember()
@@ -160,6 +163,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -237,6 +241,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Member member2 = Member.buildMember()
@@ -244,6 +249,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -320,6 +326,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -330,6 +337,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -401,6 +409,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -411,6 +420,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -449,18 +459,20 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -523,6 +535,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -666,6 +679,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -676,6 +690,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -684,12 +699,13 @@ public class PostQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -888,6 +904,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -898,6 +915,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -908,6 +926,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -918,6 +937,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1092,6 +1112,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1102,6 +1123,7 @@ public class PostQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1110,12 +1132,13 @@ public class PostQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 

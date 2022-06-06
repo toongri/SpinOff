@@ -2,13 +2,19 @@ package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto;
-import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
+import com.nameless.spin_off.dto.MemberDto.MemberInfoRequestDto;
+import com.nameless.spin_off.dto.MemberDto.MemberProfileRequestDto;
+import com.nameless.spin_off.entity.member.EmailAuth;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.EmailAuthProviderStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.sign.IncorrectAccountIdException;
 import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
+import com.nameless.spin_off.exception.sign.IncorrectNicknameException;
+import com.nameless.spin_off.repository.member.EmailAuthRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import org.junit.jupiter.api.Test;
@@ -36,6 +42,7 @@ class MemberServiceJpaTest {
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
     @Autowired PasswordEncoder passwordEncoder;
+    @Autowired EmailAuthRepository emailAuthRepository;
 
     @Test
     public void 멤버_팔로우_멤버() throws Exception{
@@ -46,6 +53,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -54,6 +62,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long followedMemberId = memberRepository.save(followedM).getId();
@@ -88,6 +97,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -96,6 +106,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long followedMemberId = memberRepository.save(followedMember).getId();
@@ -123,6 +134,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -131,6 +143,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
@@ -177,6 +190,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -185,6 +199,7 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
@@ -207,7 +222,7 @@ class MemberServiceJpaTest {
     }
     
     @Test
-    public void 멤버_정보_수정() throws Exception{
+    public void 멤버_프로필_수정() throws Exception{
         //given
 
         Member member = Member.buildMember()
@@ -215,40 +230,109 @@ class MemberServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01000000000")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
         em.flush();
         
         //when
-        Long count = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        Long count = memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "mename1",
-                "member/2",
                 "memberAcc2",
                 "4",
-                "5"));
+                "5"), null);
         em.flush();
 
-        Long count2 = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        Long count2 = memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "mename2",
-                "member/2",
                 "memberAcc3",
                 "3",
-                "5"));
+                "5"), null);
         em.flush();
 
-        Long count3 = memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        Long count3 = memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "mename2",
-                "member/2",
                 "memberAcc3",
                 "3",
-                "5"));
+                "5"), null);
+        em.flush();
+
+        //then
+        assertThat(count).isEqualTo(4L);
+        assertThat(count2).isEqualTo(3L);
+        assertThat(count3).isEqualTo(0L);
+
+        assertThatThrownBy(() -> memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
+                "a",
+                "memberAcc3",
+                "3",
+                "5"), null)).isInstanceOf(IncorrectNicknameException.class);
+
+        assertThatThrownBy(() -> memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
+                "mename2",
+                "and",
+                "3",
+                "5"), null)).isInstanceOf(IncorrectAccountIdException.class);
+    }
+
+    @Test
+    public void 멤버_정보_수정() throws Exception{
+        //given
+
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setPhoneNumber("01011111111")
+                .setBirth(LocalDate.now())
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Long memberId = memberRepository.save(member).getId();
+
+
+        emailAuthRepository.save(EmailAuth.builder()
+                .authToken("abc")
+                .email("jhkimkkk@naver.com")
+                .expired(true)
+                .provider(EmailAuthProviderStatus.C)
+                .build());
+        em.flush();
+
+        //when
+        Long count = memberService.updateMemberInfo(memberId, new MemberInfoRequestDto(
+                "abc",
+                "jhkimkkk@naver.com",
+                "0101111111",
+                LocalDate.now().minusDays(1)));
+        em.flush();
+
+        emailAuthRepository.save(EmailAuth.builder()
+                .authToken("abc")
+                .email("jhkimkkk2323@naver.com")
+                .expired(true)
+                .provider(EmailAuthProviderStatus.C)
+                .build());
+        em.flush();
+
+        Long count2 = memberService.updateMemberInfo(memberId, new MemberInfoRequestDto(
+                "abc",
+                "jhkimkkk2323@naver.com",
+                "01011111112",
+                LocalDate.now().minusDays(1)));
+        em.flush();
+
+        Long count3 = memberService.updateMemberInfo(memberId, new MemberInfoRequestDto(
+                "abc",
+                "jhkimkkk2323@naver.com",
+                "01011111112",
+                LocalDate.now().minusDays(1)));
         em.flush();
 
 
         //then
-        assertThat(count).isEqualTo(5L);
-        assertThat(count2).isEqualTo(3L);
+        assertThat(count).isEqualTo(3L);
+        assertThat(count2).isEqualTo(2L);
         assertThat(count3).isEqualTo(0L);
     }
 
@@ -261,6 +345,7 @@ class MemberServiceJpaTest {
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setNickname("memcname")
+                .setPhoneNumber("01011111111")
                 .setAccountPw(passwordEncoder.encode("abc")).build();
         Long memberId = memberRepository.save(member).getId();
         em.flush();

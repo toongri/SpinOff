@@ -72,6 +72,7 @@ class MovieQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -80,12 +81,13 @@ class MovieQueryServiceJpaTest {
         for (int i = 0; i < 10; i++) {
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname(keyword+i).build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -164,6 +166,7 @@ class MovieQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -177,12 +180,13 @@ class MovieQueryServiceJpaTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
         }
         memberRepository.saveAll(memberList);
@@ -417,6 +421,7 @@ class MovieQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -430,12 +435,13 @@ class MovieQueryServiceJpaTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             movieList.get(i).updateGenres(List.of("" + i, "" + (i + 1), "" + (i + 2), "" + (i + 3)));
         }
@@ -671,6 +677,7 @@ class MovieQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -684,12 +691,13 @@ class MovieQueryServiceJpaTest {
         List<Movie> movieList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname(keyword+i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             movieList.get(i).updateGenres(List.of("" + i, "" + (i + 1), "" + (i + 2), "" + (i + 3)));
         }

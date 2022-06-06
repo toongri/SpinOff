@@ -58,6 +58,7 @@ public class HashtagQueryRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -191,6 +192,7 @@ public class HashtagQueryRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -208,6 +210,7 @@ public class HashtagQueryRepositoryTest {
                     .setName("memberName")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
                     .setNickname(keyword + i).build());
         }
         memberRepository.saveAll(memberList);
@@ -335,6 +338,7 @@ public class HashtagQueryRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -352,6 +356,7 @@ public class HashtagQueryRepositoryTest {
                     .setName("memberName")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
                     .setNickname(keyword + i).build());
         }
         memberRepository.saveAll(memberList);
@@ -549,6 +554,7 @@ public class HashtagQueryRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -567,6 +573,7 @@ public class HashtagQueryRepositoryTest {
                     .setName("memberName")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
                     .setNickname(keyword + i).build());
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
         }

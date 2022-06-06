@@ -319,7 +319,7 @@ public class Member extends BaseTimeEntity {
     }
 
     private void isCorrectPhoneNumber(String phoneNumber) {
-        if (CELL_PHONE.isNotCorrect(phoneNumber)) {
+        if (PHONE_NUMBER.isNotCorrect(phoneNumber)) {
             throw new IncorrectPhoneNumberException(ErrorEnum.INCORRECT_PHONE_NUMBER);
         }
     }

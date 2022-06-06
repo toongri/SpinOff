@@ -35,6 +35,7 @@ public class MemberRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -44,6 +45,7 @@ public class MemberRepositoryTest {
                     .setEmail("jhkimkkk0923@naver.com")
                     .setAccountId("memberAccId2")
                     .setName("memberName")
+                    .setPhoneNumber("01011111111")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
                     .setNickname("memcname").build());
@@ -80,6 +82,7 @@ public class MemberRepositoryTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -89,6 +92,7 @@ public class MemberRepositoryTest {
                     .setEmail("jhkimkkk0923@naver.com")
                     .setAccountId("memberAccId2")
                     .setName("memberName")
+                    .setPhoneNumber("01011111111")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
                     .setNickname("memcname").build());

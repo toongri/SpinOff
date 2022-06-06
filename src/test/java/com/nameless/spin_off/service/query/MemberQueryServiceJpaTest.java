@@ -73,18 +73,20 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname(keyword+i).build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -233,18 +235,20 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname(keyword+i).build());
         }
 
         List<Post> postList = new ArrayList<>();
@@ -319,6 +323,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -349,6 +354,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -379,6 +385,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -407,6 +414,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -417,6 +425,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -425,12 +434,13 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -566,6 +576,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -576,6 +587,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -584,12 +596,13 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -663,6 +676,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -673,6 +687,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -681,12 +696,13 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -760,6 +776,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -770,6 +787,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -780,12 +798,13 @@ public class MemberQueryServiceJpaTest {
         for (int i = 0; i < 10; i++) {
             movieList.add(Movie.createMovie((long) i, keyword + i, null, null, null));
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);
         movieRepository.saveAll(movieList);
@@ -855,6 +874,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -865,6 +885,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -875,12 +896,13 @@ public class MemberQueryServiceJpaTest {
         for (int i = 0; i < 10; i++) {
             hashtagList.add(Hashtag.createHashtag(keyword + i));
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname(keyword+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname(keyword+i).build());
         }
         memberRepository.saveAll(memberList);
         hashtagRepository.saveAll(hashtagList);
@@ -951,6 +973,7 @@ public class MemberQueryServiceJpaTest {
                 .setName("memberName")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw")
+                .setPhoneNumber("01011111111")
                 .setNickname("memcname").build();
 
         memberRepository.save(member);
@@ -960,6 +983,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -968,12 +992,13 @@ public class MemberQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId(keyword+i)
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcname").build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId(keyword+i)
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcname").build());
         }
         memberRepository.saveAll(memberList);
         List<String> urls = List.of("a", "b", "c", "d", "e");
@@ -1227,6 +1252,7 @@ public class MemberQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -1234,48 +1260,41 @@ public class MemberQueryServiceJpaTest {
 
         //when
         //then
-        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "mename",
-                "member/2",
                 "memberAcc",
                 "4",
-                "5"));
+                "5"), null);
         em.flush();
-        MemberInfoDto memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        MemberProfileResponseDto memberForInfo = memberQueryService.getMemberForProfile(memberId);
         assertThat(memberForInfo.getNickname()).isEqualTo("mename");
-        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
         assertThat(memberForInfo.getAccountId()).isEqualTo("memberAcc");
         assertThat(memberForInfo.getWebsite()).isEqualTo("4");
         assertThat(memberForInfo.getBio()).isEqualTo("5");
 
-        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "mename",
-                "member/2",
                 "memberAccsds",
                 "3",
-                "5"));
+                "5"), null);
         em.flush();
-        memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        memberForInfo = memberQueryService.getMemberForProfile(memberId);
         assertThat(memberForInfo.getNickname()).isEqualTo("mename");
-        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
         assertThat(memberForInfo.getAccountId()).isEqualTo("memberAccsds");
         assertThat(memberForInfo.getWebsite()).isEqualTo("3");
         assertThat(memberForInfo.getBio()).isEqualTo("5");
 
-        memberService.updateMemberInfo(memberId, new MemberInfoDto(
+        memberService.updateMemberProfile(memberId, new MemberProfileRequestDto(
                 "meme",
-                "member/2",
                 "memberAccsds",
                 "3",
-                "5"));
+                "5"), null);
         em.flush();
-        memberForInfo = memberQueryService.getMemberForInfo(memberId);
+        memberForInfo = memberQueryService.getMemberForProfile(memberId);
         assertThat(memberForInfo.getNickname()).isEqualTo("meme");
-        assertThat(memberForInfo.getProfileUrl()).isEqualTo("member/2");
         assertThat(memberForInfo.getAccountId()).isEqualTo("memberAccsds");
         assertThat(memberForInfo.getWebsite()).isEqualTo("3");
         assertThat(memberForInfo.getBio()).isEqualTo("5");
-
 
     }
 }

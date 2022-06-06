@@ -65,6 +65,7 @@ class SearchQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         Long memberId = memberRepository.save(member).getId();
@@ -96,6 +97,7 @@ class SearchQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw").build();
         Long memberId = memberRepository.save(member).getId();
         Member member2 = Member.buildMember()
@@ -103,6 +105,7 @@ class SearchQueryServiceJpaTest {
                 .setEmail("jhkimkkk0923@naver.com")
                 .setAccountId("memberAccId2")
                 .setName("memberName")
+                .setPhoneNumber("01011111111")
                 .setBirth(LocalDate.now())
                 .setAccountPw("memberAccountPw").build();
         Long memberId2 = memberRepository.save(member2).getId();

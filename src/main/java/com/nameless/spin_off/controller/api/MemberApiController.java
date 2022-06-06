@@ -5,10 +5,7 @@ import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.FollowCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.MyPageCollectionDto;
 import com.nameless.spin_off.dto.HashtagDto.FollowHashtagDto;
-import com.nameless.spin_off.dto.MemberDto.EmailAuthRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
-import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.MemberDto.ReadMemberDto;
+import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
@@ -33,7 +30,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
@@ -303,42 +302,48 @@ public class MemberApiController {
         return getResult(memberQueryService.getFollowCollectionsByMemberId(currentMember, memberId));
     }
 
-    @ApiOperation(value = "멤버 정보 조회", notes = "")
+    @ApiOperation(value = "멤버 프로필 조회", notes = "")
     @ApiImplicitParams({
     })
-    @GetMapping("/info")
-    public SingleApiResult<MemberInfoDto> readMemberInfo(@LoginMember MemberDetails currentMember) {
+    @GetMapping("/profile")
+    public SingleApiResult<MemberProfileResponseDto> readMemberProfile(@LoginMember MemberDetails currentMember) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("readMemberInfo");
         log.info("currentMemberId : {}", currentMemberId);
 
-        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
+        return getResult(memberQueryService.getMemberForProfile(currentMemberId));
     }
 
-    @ApiOperation(value = "멤버 정보 수정", notes = "")
+    @ApiOperation(value = "멤버 프로필 수정", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "memberInfoRequestDto",
-                    value = "멤버 업데이트 요청",
+                    name = "memberProfileRequestDto",
+                    value = "{" +
+                            "\"nickname\":\"스프링부트\"," +
+                            " \"profileUrl\":\"www.naver.profile.com\"," +
+                            " \"accountId\":spinoff033," +
+                            " \"website\": \"www.naver.com\"," +
+                            " \"bio\" : \"스프링부트와 aws로 혼자 구현하는 웹 서비스\"," +
+                            "}",
                     required = true,
-                    paramType = "body",
-                    dataType = "MemberInfoDto")
+                    paramType = "formData",
+                    dataType = "MemberProfileRequestDto")
     })
-    @PatchMapping("/info")
-    public SingleApiResult<Long> updateMemberInfo(
-            @LoginMember MemberDetails currentMember, @RequestBody MemberInfoDto memberInfoRequestDto) {
+    @PatchMapping("/profile")
+    public SingleApiResult<Long> updateMemberProfile(@LoginMember MemberDetails currentMember,
+                                                     @RequestPart MemberProfileRequestDto memberProfileRequestDto,
+                                                     @RequestPart("image") MultipartFile multipartFile) throws IOException {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("updateMemberInfo");
         log.info("currentMemberId : {}", currentMemberId);
-        log.info("accountId : {}", memberInfoRequestDto.getAccountId());
-        log.info("nickname : {}", memberInfoRequestDto.getNickname());
-        log.info("profileUrl : {}", memberInfoRequestDto.getProfileUrl());
-        log.info("bio : {}", memberInfoRequestDto.getBio());
-        log.info("website : {}", memberInfoRequestDto.getWebsite());
+        log.info("accountId : {}", memberProfileRequestDto.getAccountId());
+        log.info("nickname : {}", memberProfileRequestDto.getNickname());
+        log.info("bio : {}", memberProfileRequestDto.getBio());
+        log.info("website : {}", memberProfileRequestDto.getWebsite());
 
-        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
+        return getResult(memberService.updateMemberProfile(currentMemberId, memberProfileRequestDto, multipartFile));
     }
 
     @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")

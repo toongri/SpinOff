@@ -2,7 +2,8 @@ package com.nameless.spin_off.service.member;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.EmailAuthRequestDto;
-import com.nameless.spin_off.dto.MemberDto.MemberInfoDto;
+import com.nameless.spin_off.dto.MemberDto.MemberInfoRequestDto;
+import com.nameless.spin_off.dto.MemberDto.MemberProfileRequestDto;
 import com.nameless.spin_off.entity.collection.FollowedCollection;
 import com.nameless.spin_off.entity.member.BlockedMember;
 import com.nameless.spin_off.entity.member.EmailAuth;
@@ -12,6 +13,7 @@ import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.member.*;
 import com.nameless.spin_off.exception.member.*;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
+import com.nameless.spin_off.exception.sign.EmailNotAuthenticatedException;
 import com.nameless.spin_off.exception.sign.IncorrectAccountPwException;
 import com.nameless.spin_off.exception.sign.IncorrectEmailException;
 import com.nameless.spin_off.exception.sign.NotExistEmailAuthTokenException;
@@ -29,13 +31,16 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.ContentsLengthEnum.EMAIL_TOKEN;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.EMAIL_AUTH_MINUTE;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.REGISTER_EMAIL_AUTH_MINUTE;
 import static com.nameless.spin_off.enums.ErrorEnum.*;
 
 @Slf4j
@@ -111,31 +116,58 @@ public class MemberServiceJpa implements MemberService {
 
     @Transactional
     @Override
-    public Long updateMemberInfo(Long memberId, MemberInfoDto memberInfoRequestDto) {
+    public Long updateMemberProfile(Long memberId, MemberProfileRequestDto memberProfileRequestDto, MultipartFile multipartFile) throws IOException {
         Member member = getMember(memberId);
         Long cnt = 0L;
-        if (!memberInfoRequestDto.getAccountId().equals(member.getAccountId())) {
+        if (!memberProfileRequestDto.getAccountId().equals(member.getAccountId())) {
             cnt++;
-            member.updateAccountId(memberInfoRequestDto.getAccountId());
+            member.updateAccountId(memberProfileRequestDto.getAccountId());
         }
-        if (!memberInfoRequestDto.getNickname().equals(member.getNickname())) {
+        if (!memberProfileRequestDto.getNickname().equals(member.getNickname())) {
             cnt++;
-            member.updateNickname(memberInfoRequestDto.getNickname());
+            member.updateNickname(memberProfileRequestDto.getNickname());
         }
-        if (!memberInfoRequestDto.getBio().equals(member.getBio())) {
+        if (!memberProfileRequestDto.getBio().equals(member.getBio())) {
             cnt++;
-            member.updateBio(memberInfoRequestDto.getBio());
+            member.updateBio(memberProfileRequestDto.getBio());
         }
-        if (!memberInfoRequestDto.getWebsite().equals(member.getWebsite())) {
+        if (!memberProfileRequestDto.getWebsite().equals(member.getWebsite())) {
             cnt++;
-            member.updateWebsite(memberInfoRequestDto.getWebsite());
+            member.updateWebsite(memberProfileRequestDto.getWebsite());
         }
-        if (!memberInfoRequestDto.getProfileUrl().equals(member.getProfileImg())) {
+        if (member.getProfileImg() != null && multipartFile == null) {
+            cnt++;
+            awsS3Service.deleteFile(member.getProfileImg());
+            member.updateProfileImg(null);
+        } else if (multipartFile != null) {
             cnt++;
             if (member.getProfileImg() != null) {
                 awsS3Service.deleteFile(member.getProfileImg());
             }
-            member.updateProfileImg(memberInfoRequestDto.getProfileUrl());
+            member.updateProfileImg(getUrlByMultipartFile(multipartFile));
+        }
+
+        return cnt;
+    }
+
+    @Transactional
+    @Override
+    public Long updateMemberInfo(Long memberId, MemberInfoRequestDto memberInfoRequestDto) {
+
+        Member member = getMember(memberId);
+        Long cnt = 0L;
+        if (!memberInfoRequestDto.getEmail().equals(member.getEmail())) {
+            isExistAuthEmail(memberInfoRequestDto.getEmail(), memberInfoRequestDto.getAuthToken());
+            cnt++;
+            member.updateEmail(memberInfoRequestDto.getEmail());
+        }
+        if (!memberInfoRequestDto.getPhoneNumber().equals(member.getPhoneNumber())) {
+            cnt++;
+            member.updatePhoneNumber(memberInfoRequestDto.getPhoneNumber());
+        }
+        if (!memberInfoRequestDto.getBirth().equals(member.getBirth())) {
+            cnt++;
+            member.updateBirth(memberInfoRequestDto.getBirth());
         }
 
         return cnt;
@@ -257,6 +289,13 @@ public class MemberServiceJpa implements MemberService {
         }
     }
 
+    private void isExistAuthEmail(String email, String authToken) {
+        if (!emailAuthQueryRepository.isExistAuthEmail(email, authToken,
+                REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.C)) {
+            throw new EmailNotAuthenticatedException(ErrorEnum.EMAIL_NOT_AUTHENTICATED);
+        }
+    }
+
     private void isExistBlock(Long memberId, Long blockedMemberId) {
         if (memberQueryRepository.isExistBlockedMember(memberId, blockedMemberId)) {
             throw new AlreadyBlockedMemberException(ErrorEnum.ALREADY_BLOCKED_MEMBER);
@@ -315,5 +354,9 @@ public class MemberServiceJpa implements MemberService {
                 .stream()
                 .map(FollowedMember::createFollowedMember)
                 .collect(Collectors.toList());
+    }
+
+    private String getUrlByMultipartFile(MultipartFile multipartFile) throws IOException {
+        return awsS3Service.upload(multipartFile, "member");
     }
 }

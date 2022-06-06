@@ -69,6 +69,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -78,6 +79,7 @@ public class CollectionQueryServiceJpaTest {
                     .setEmail("jhkimkkk0923@naver.com")
                     .setAccountId("memberAccId2")
                     .setName("memberName")
+                    .setPhoneNumber("01011111111")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
                     .setNickname("memcname").build());
@@ -191,6 +193,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -200,6 +203,7 @@ public class CollectionQueryServiceJpaTest {
                     .setEmail("jhkimkkk0923@naver.com")
                     .setAccountId("memberAccId2")
                     .setName("memberName")
+                    .setPhoneNumber("01011111111")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
                     .setNickname("memcname").build());
@@ -317,6 +321,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -326,6 +331,7 @@ public class CollectionQueryServiceJpaTest {
                     .setEmail("jhkimkkk0923@naver.com")
                     .setAccountId("memberAccId2")
                     .setName("memberName")
+                    .setPhoneNumber("01011111111")
                     .setBirth(LocalDate.now())
                     .setAccountPw("memberAccountPw")
                     .setNickname("memcname").build());
@@ -442,6 +448,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -452,6 +459,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -569,6 +577,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -579,6 +588,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -685,6 +695,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -695,6 +706,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -780,6 +792,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(member);
@@ -790,6 +803,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build());
         }
@@ -895,6 +909,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -905,6 +920,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -915,6 +931,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -925,6 +942,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1099,6 +1117,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1109,6 +1128,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1117,12 +1137,13 @@ public class CollectionQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
         Movie movie = Movie.createMovie(0L, "movietitle", null, null, null);
@@ -1367,6 +1388,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1377,6 +1399,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1385,12 +1408,13 @@ public class CollectionQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 
@@ -1456,6 +1480,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1466,6 +1491,7 @@ public class CollectionQueryServiceJpaTest {
                 .setAccountId("memberAccId2")
                 .setName("memberName")
                 .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
 
@@ -1474,12 +1500,13 @@ public class CollectionQueryServiceJpaTest {
         List<Member> memberList = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
             memberList.add(Member.buildMember()
-                .setEmail("jhkimkkk0923@naver.com")
-                .setAccountId("memberAccId2")
-                .setName("memberName")
-                .setBirth(LocalDate.now())
-                .setAccountPw("memberAccountPw")
-                .setNickname("memcnam"+i).build());
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setAccountPw("memberAccountPw")
+                    .setPhoneNumber("01011111111")
+                    .setNickname("memcnam"+i).build());
         }
         memberRepository.saveAll(memberList);
 

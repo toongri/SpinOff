@@ -75,7 +75,7 @@ public class SignServiceJpa implements SignService{
                 .setAccountPw(passwordEncoder.encode(requestDto.getAccountPw()))
                 .setBirth(requestDto.getBirth())
                 .setName(requestDto.getName())
-                .setPhoneNumber(requestDto.getCellphone())
+                .setPhoneNumber(requestDto.getPhoneNumber())
                 .build();
 
         member.updateRefreshToken(jwtTokenProvider.createRefreshToken());

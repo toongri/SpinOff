@@ -22,7 +22,8 @@ public interface MemberQueryService {
             String keyword, Pageable pageable, Long memberId, int length) throws NotExistMemberException;
     List<LastSearchDto> getLastSearchesByMemberLimit(Long memberId, int length) throws NotExistMemberException;
     ReadMemberDto getMemberForRead(MemberDetails currentMember, Long targetMemberId);
-    MemberInfoDto getMemberForInfo(Long currentMemberId);
+    MemberProfileResponseDto getMemberForProfile(Long currentMemberId);
+    MemberInfoResponseDto getMemberForInfo(Long currentMemberId);
     List<MembersByContentDto> getFollowedMembersByMemberId(Long currentMemberId, Long targetMemberId);
     List<MembersByContentDto> getFollowingMembersByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowHashtagDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);

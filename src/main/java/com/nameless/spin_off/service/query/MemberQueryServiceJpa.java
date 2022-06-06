@@ -99,14 +99,23 @@ public class MemberQueryServiceJpa implements MemberQueryService {
     }
 
     @Override
-    public MemberInfoDto getMemberForInfo(Long currentMemberId) {
+    public MemberProfileResponseDto getMemberForProfile(Long currentMemberId) {
         Member member = getMember(currentMemberId);
-        return new MemberInfoDto(
+        return new MemberProfileResponseDto(
                 member.getNickname(),
                 member.getProfileImg(),
                 member.getAccountId(),
                 member.getWebsite(),
                 member.getBio());
+    }
+
+    @Override
+    public MemberInfoResponseDto getMemberForInfo(Long currentMemberId) {
+        Member member = getMember(currentMemberId);
+        return new MemberInfoResponseDto(
+                member.getEmail(),
+                member.getPhoneNumber(),
+                member.getBirth());
     }
 
     @Override
