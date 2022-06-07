@@ -11,7 +11,6 @@ import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
-import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -368,7 +367,7 @@ public class MemberApiController {
     })
     @PatchMapping("/info")
     public SingleApiResult<Long> updateMemberInfo(@LoginMember MemberDetails currentMember,
-                                                     @RequestBody MemberInfoRequestDto memberInfoRequestDto)
+                                                  @RequestBody MemberInfoRequestDto memberInfoRequestDto)
             throws IOException {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
@@ -409,12 +408,12 @@ public class MemberApiController {
                     name = "password",
                     value = "비밀번호",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "String")
     })
     @PatchMapping("/password")
     public SingleApiResult<Boolean> updatePassword(
-            @LoginMember MemberDetails currentMember, @RequestParam String password) {
+            @LoginMember MemberDetails currentMember, @RequestBody String password) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("updatePassword");
@@ -430,14 +429,14 @@ public class MemberApiController {
                     name = "memberId",
                     value = "차단할 멤버 id",
                     required = true,
-                    paramType = "path",
+                    paramType = "body",
                     dataType = "Long",
                     example = "123")
     })
     @PostMapping("/{memberId}/block")
     public SingleApiResult<Long> createBlockMember(@LoginMember MemberDetails currentMember,
                                                    @PathVariable Long memberId,
-                                                   @RequestParam BlockedMemberStatus blockedMemberStatus)
+                                                   @RequestBody BlockedMemberStatus blockedMemberStatus)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
         log.info("createBlockMember");
@@ -480,16 +479,18 @@ public class MemberApiController {
     })
     @PostMapping("/search")
     public SingleApiResult<Long> createSearch(
-            @LoginMember MemberDetails currentMember, @RequestParam String keyword,
-            @RequestParam SearchedByMemberStatus searchedByMemberStatus)
+            @LoginMember MemberDetails currentMember, @RequestBody SearchMemberRequestDto searchMemberRequestDto)
             throws NotExistMemberException {
 
         log.info("createSearch");
         log.info("memberId : {}", currentMember.getId());
-        log.info("keyword : {}", keyword);
-        log.info("searchedByMemberStatus : {}", searchedByMemberStatus);
+        log.info("keyword : {}", searchMemberRequestDto.getKeyword());
+        log.info("searchedByMemberStatus : {}", searchMemberRequestDto.getSearchedByMemberStatus());
 
-        return getResult(memberService.insertSearch(currentMember.getId(), keyword, searchedByMemberStatus));
+        return getResult(memberService.insertSearch(
+                currentMember.getId(),
+                searchMemberRequestDto.getKeyword(),
+                searchMemberRequestDto.getSearchedByMemberStatus()));
     }
 
     @ApiOperation(value = "검색 기록 조회", notes = "")
@@ -558,13 +559,13 @@ public class MemberApiController {
                     name = "email",
                     value = "이메일 정보",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "spinoff232@gmail.com")
     })
     @PostMapping("/update-email")
     public SingleApiResult<Boolean> createUpdateEmail(@LoginMember MemberDetails currentMember,
-                                                    @RequestParam String email) {
+                                                    @RequestBody String email) {
         log.info("createUpdateEmail");
         log.info("memberId : {}", currentMember.getId());
         log.info("email : {}", email);

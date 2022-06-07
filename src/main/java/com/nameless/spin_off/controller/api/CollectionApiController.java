@@ -86,13 +86,13 @@ public class CollectionApiController {
                     name = "ip",
                     value = "ip주소",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "192.168.0.1")
     })
     @GetMapping("/{collectionId}")
     public SingleApiResult<ReadCollectionDto> readCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestParam String ip) {
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestBody String ip) {
 
         log.info("readCollection");
         log.info("collectionId : {}", collectionId);
@@ -100,6 +100,36 @@ public class CollectionApiController {
         ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
         collectionService.insertViewedCollectionByIp(ip, collectionId);
         return getResult(collection);
+    }
+
+    @ApiOperation(value = "컬렉션 글 생성", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "postIds",
+                    value = "글 id 리스트",
+                    required = true,
+                    paramType = "body",
+                    dataType = "Long",
+                    allowMultiple = true)
+    })
+    @PostMapping("/{collectionId}/post")
+    public SingleApiResult<Integer> createCollectedPost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestBody List<Long> postIds) {
+
+        log.info("createCollectedPost");
+        log.info("collectionId : {}", collectionId);
+        log.info("memberId : {}", currentMember.getId());
+        log.info("postIds : {}", postIds.toString());
+
+
+        return getResult(collectionService.insertCollectedPost(currentMember.getId(), collectionId, postIds));
     }
 
     @ApiOperation(value = "컬렉션 글 조회", notes = "")
@@ -135,7 +165,7 @@ public class CollectionApiController {
                     example = "popularity,desc")
     })
     @GetMapping("/{collectionId}/post")
-    public SingleApiResult<Slice<CollectedPostDto>> readCollectedPosts(
+    public SingleApiResult<Slice<CollectedPostDto>> readCollectedPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long collectionId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 

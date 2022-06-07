@@ -2,9 +2,8 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.HelpDto.ComplainRequestDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
-import com.nameless.spin_off.enums.help.ComplainStatus;
-import com.nameless.spin_off.enums.help.ContentTypeStatus;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInCollectionException;
 import com.nameless.spin_off.exception.comment.NotExistCommentInPostException;
@@ -21,8 +20,8 @@ import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
@@ -39,43 +38,29 @@ public class HelpApiController {
     @ApiOperation(value = "신고 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "contentId",
-                    value = "컨텐츠 id",
+                    name = "complainRequestDto",
+                    value = "신고",
                     required = true,
-                    paramType = "query",
-                    dataType = "Long",
-                    example = "123"),
-            @ApiImplicitParam(
-                    name = "contentTypeStatus",
-                    value = "컨텐츠 타입",
-                    required = true,
-                    paramType = "query",
-                    dataType = "ContentTypeStatus",
-                    example = "A"),
-            @ApiImplicitParam(
-                    name = "complainStatus",
-                    value = "신고 타입",
-                    required = true,
-                    paramType = "query",
-                    dataType = "ComplainStatus",
-                    example = "A")
+                    paramType = "body",
+                    dataType = "ComplainRequestDto")
     })
     @PostMapping("/complain")
     public SingleApiResult<Long> createComplain(
-            @LoginMember MemberDetails currentMember, @RequestParam Long contentId,
-            @RequestParam ContentTypeStatus contentTypeStatus,
-            @RequestParam ComplainStatus complainStatus) throws
+            @LoginMember MemberDetails currentMember, @RequestBody ComplainRequestDto complainRequestDto) throws
             NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
             UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
             NotExistCommentInCollectionException {
 
         log.info("createComplain");
         log.info("memberId : {}", currentMember.getId());
-        log.info("contentId : {}", contentId);
-        log.info("contentTypeStatus : {}", contentTypeStatus);
-        log.info("complainStatus : {}", complainStatus);
+        log.info("contentId : {}", complainRequestDto.getContentId());
+        log.info("contentTypeStatus : {}", complainRequestDto.getContentTypeStatus());
+        log.info("complainStatus : {}", complainRequestDto.getComplainStatus());
 
-        return getResult(complainService.insertComplain(currentMember.getId(), contentId, contentTypeStatus, complainStatus));
+        return getResult(complainService.insertComplain(currentMember.getId(),
+                complainRequestDto.getContentId(),
+                complainRequestDto.getContentTypeStatus(),
+                complainRequestDto.getComplainStatus()));
     }
 
 //    @ApiOperation(value = "신고 생성", notes = "")

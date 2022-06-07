@@ -187,21 +187,20 @@ public class PostApiController {
                     name = "collectionIds",
                     value = "컬렉션 id 리스트",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "long",
-                    example = "123",
                     allowMultiple = true)
     })
     @PutMapping("/{postId}/collection/all")
     public SingleApiResult<List<Long>> updatePostInCollections(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam List<Long> collectionIds)
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestBody List<Long> collectionIds)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
         log.info("updatePostInCollections");
         log.info("memberId : {}", currentMember.getId());
         log.info("postId : {}", postId);
-        log.info("collectionIds : {}", collectionIds);
+        log.info("collectionIds : {}", collectionIds.toString());
 
         return getResult(postService.updateCollectedPosts(currentMember.getId(), postId, collectionIds));
     }
@@ -240,13 +239,13 @@ public class PostApiController {
                     name = "collectionId",
                     value = "컬렉션 id",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "long",
                     example = "123")
     })
     @PostMapping("/{postId}/collection/one")
     public SingleApiResult<Long> createPostInCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam Long collectionId)
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestBody Long collectionId)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 

@@ -59,12 +59,12 @@ public class MovieApiController {
                     name = "size",
                     value = "api size",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "int",
                     example = "123")
     })
     @PostMapping("/kobis/{startPage}")
-    public int createMovieByKobis(@PathVariable int startPage, int size) {
+    public int createMovieByKobis(@PathVariable int startPage, @RequestBody int size) {
 
         log.info("createMovieByKobis");
         log.info("startPage : {}", startPage);

@@ -124,8 +124,8 @@ public class SearchApiController {
                     example = "123")
     })
     @GetMapping("/related/member/{keyword}")
-    public SingleApiResult<List<RelatedSearchMemberDto>> readRelatedMemberByKeyword
-            (@PathVariable String keyword, @RequestParam int length)
+    public SingleApiResult<List<RelatedSearchMemberDto>> readRelatedMemberByKeyword(
+            @PathVariable String keyword, @RequestParam int length)
             throws IncorrectLengthRelatedKeywordException {
 
         log.info("readRelatedMemberByKeyword");

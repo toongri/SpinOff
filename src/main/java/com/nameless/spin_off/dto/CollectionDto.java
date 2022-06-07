@@ -393,6 +393,7 @@ public class CollectionDto {
     }
 
     @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class ReadCollectionDto {
         @ApiModelProperty(

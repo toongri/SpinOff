@@ -64,13 +64,13 @@ public class SignApiController {
                     name = "authCode",
                     value = "인증 코드",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "dkdklflkn333")
     })
     @PostMapping("/login/social/{provider}")
     public SingleApiResult<SocialLoginResponseDto> loginBySocial(
-            @RequestParam String authCode, @PathVariable String provider) {
+            @RequestBody String authCode, @PathVariable String provider) {
 
         log.info("loginBySocial");
         log.info("provider : {}", provider);
@@ -123,12 +123,12 @@ public class SignApiController {
                     name = "email",
                     value = "이메일 정보",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "spinoff232@gmail.com")
     })
     @PostMapping("/auth-email")
-    public SingleApiResult<Boolean> authEmail(@RequestParam String email) {
+    public SingleApiResult<Boolean> authEmail(@RequestBody String email) {
 
         log.info("authEmail");
         log.info("email : {}", email);
@@ -168,13 +168,13 @@ public class SignApiController {
                     name = "email",
                     value = "이메일",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "spinoff@naver.com")
     })
     @PostMapping("/linkage-email/{provider}")
     public SingleApiResult<String> createLinkageEmail(@LoginMember MemberDetails currentMember,
-                                                @RequestParam String email,
+                                                @RequestBody String email,
                                                 @PathVariable String provider) {
 
         log.info("createLinkageEmail");
@@ -278,12 +278,12 @@ public class SignApiController {
                     name = "accountId",
                     value = "아이디",
                     required = true,
-                    paramType = "query",
+                    paramType = "body",
                     dataType = "string",
                     example = "spinoff232")
     })
     @PatchMapping("/forget/account-pw")
-    public SingleApiResult<Boolean> readForgetAccountPw(@RequestParam String accountId) {
+    public SingleApiResult<Boolean> readForgetAccountPw(@RequestBody String accountId) {
 
         log.info("readForgetAccountPw");
         log.info("accountId : {}", accountId);

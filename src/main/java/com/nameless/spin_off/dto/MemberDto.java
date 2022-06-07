@@ -4,6 +4,7 @@ package com.nameless.spin_off.dto;
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.member.SearchedByMemberStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,22 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MemberDto {
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class SearchMemberRequestDto {
+
+        @ApiModelProperty(
+                value = "키워드",
+                example = "123")
+        private String keyword;
+
+        @ApiModelProperty(
+                value = "검색 종류",
+                example = "A")
+        SearchedByMemberStatus searchedByMemberStatus;
+    }
 
     @Data
     public static class BlockedMemberDto {
@@ -386,6 +403,7 @@ public class MemberDto {
     }
 
     @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class EmailAuthRequestDto {
 
@@ -403,10 +421,6 @@ public class MemberDto {
                 dataType = "string")
         private String authToken;
 
-        public EmailAuthRequestDto(String email, String authToken) {
-            this.email = email;
-            this.authToken = authToken;
-        }
     }
 
     @Data
@@ -422,6 +436,7 @@ public class MemberDto {
     }
 
     @Data
+    @AllArgsConstructor
     @NoArgsConstructor
     public static class EmailLinkageCheckRequestDto {
 
@@ -446,11 +461,6 @@ public class MemberDto {
                 dataType = "string")
         private String authToken;
 
-        public EmailLinkageCheckRequestDto(String email, String accountId, String authToken) {
-            this.email = email;
-            this.accountId = accountId;
-            this.authToken = authToken;
-        }
     }
 
     @Data
