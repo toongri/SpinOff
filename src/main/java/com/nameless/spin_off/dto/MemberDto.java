@@ -3,6 +3,7 @@ package com.nameless.spin_off.dto;
 
 import com.nameless.spin_off.dto.PostDto.ThumbnailMemberDto;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.querydsl.core.annotations.QueryProjection;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,45 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MemberDto {
+
+    @Data
+    public static class BlockedMemberDto {
+
+        @ApiModelProperty(
+                value = "차단 id",
+                example = "123")
+        private Long blockId;
+
+        @ApiModelProperty(
+                value = "차단 종류",
+                example = "A")
+        private BlockedMemberStatus blockedMemberStatus;
+
+        @ApiModelProperty(
+                value = "멤버 id",
+                example = "123")
+        private Long memberId;
+
+        @ApiModelProperty(
+                value = "계정 id",
+                example = "123")
+        private String accountId;
+
+        @ApiModelProperty(
+                value = "계정 닉네임",
+                example = "123")
+        private String nickname;
+
+        @QueryProjection
+        public BlockedMemberDto(Long blockId, BlockedMemberStatus blockedMemberStatus, Long memberId, String accountId, String nickname) {
+            this.blockId = blockId;
+            this.blockedMemberStatus = blockedMemberStatus;
+            this.memberId = memberId;
+            this.accountId = accountId;
+            this.nickname = nickname;
+        }
+    }
+
 
     @Data
     @AllArgsConstructor

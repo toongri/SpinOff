@@ -427,26 +427,38 @@ public class MemberApiController {
     @ApiOperation(value = "멤버 차단 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "blockedMemberId",
+                    name = "memberId",
                     value = "차단할 멤버 id",
                     required = true,
                     paramType = "path",
                     dataType = "Long",
                     example = "123")
     })
-    @PostMapping("/{blockedMemberId}/block")
+    @PostMapping("/{memberId}/block")
     public SingleApiResult<Long> createBlockMember(@LoginMember MemberDetails currentMember,
-                                                   @PathVariable Long blockedMemberId,
+                                                   @PathVariable Long memberId,
                                                    @RequestParam BlockedMemberStatus blockedMemberStatus)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
         log.info("createBlockMember");
         log.info("memberId : {}", currentMember.getId());
-        log.info("blockedMemberId : {}", blockedMemberId);
+        log.info("blockedMemberId : {}", memberId);
         log.info("blockedMemberStatus : {}", blockedMemberStatus);
 
         return getResult(memberService
-                .insertBlockedMemberByMemberId(currentMember.getId(), blockedMemberId, blockedMemberStatus));
+                .insertBlockedMemberByMemberId(currentMember.getId(), memberId, blockedMemberStatus));
+    }
+    @ApiOperation(value = "멤버 차단 목록 조회", notes = "")
+    @ApiImplicitParams({
+    })
+    @GetMapping("/block")
+    public SingleApiResult<List<BlockedMemberDto>> readBlockMember(@LoginMember MemberDetails currentMember)
+            throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
+
+        log.info("readBlockMember");
+        log.info("memberId : {}", currentMember.getId());
+
+        return getResult(memberQueryService.getBlockedMembersByMemberId(currentMember.getId()));
     }
 
     @ApiOperation(value = "검색 기록 생성", notes = "")
@@ -539,7 +551,6 @@ public class MemberApiController {
 
         return getResult(memberService.confirmEmailForAuth(requestDto));
     }
-
 
     @ApiOperation(value = "이메일 변경 인증 생성", notes = "")
     @ApiImplicitParams({

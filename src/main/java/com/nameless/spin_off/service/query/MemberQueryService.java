@@ -29,6 +29,6 @@ public interface MemberQueryService {
     List<FollowHashtagDto> getFollowHashtagsByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowMovieDto> getFollowMoviesByMemberId(Long currentMemberId, Long targetMemberId);
     List<FollowCollectionDto> getFollowCollectionsByMemberId(MemberDetails currentMember, Long targetMemberId);
-
+    List<BlockedMemberDto> getBlockedMembersByMemberId(Long currentMemberId);
 
 }

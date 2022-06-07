@@ -163,6 +163,11 @@ public class MemberQueryServiceJpa implements MemberQueryService {
                 getCurrentMemberAccountId(currentMember));
     }
 
+    @Override
+    public List<BlockedMemberDto> getBlockedMembersByMemberId(Long currentMemberId) {
+        return memberQueryRepository.findAllBlockedMemberByMemberId(currentMemberId);
+    }
+
     private Member getMember(Long memberId) {
         return memberRepository.findById(memberId).orElseThrow(() -> new NotExistMemberException(NOT_EXIST_MEMBER));
     }

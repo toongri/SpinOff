@@ -32,6 +32,17 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
+    public List<BlockedMemberDto> findAllBlockedMemberByMemberId(Long memberId) {
+        return getQueryFactory()
+                .select(new QMemberDto_BlockedMemberDto(
+                        blockedMember.id, blockedMember.blockedMemberStatus, member.id, member.accountId, member.nickname))
+                .from(blockedMember)
+                .join(blockedMember.member, member)
+                .where(blockedMember.blockingMember.id.eq(memberId))
+                .orderBy(blockedMember.id.desc())
+                .fetch();
+    }
+
     public List<MembersByContentDto> findAllFollowedMemberByMemberId(Long memberId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MembersByContentDto(

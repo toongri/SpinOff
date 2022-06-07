@@ -1295,6 +1295,77 @@ public class MemberQueryServiceJpaTest {
         assertThat(memberForInfo.getAccountId()).isEqualTo("memberAccsds");
         assertThat(memberForInfo.getWebsite()).isEqualTo("3");
         assertThat(memberForInfo.getBio()).isEqualTo("5");
+    }
+    
+    @Test
+    public void 본인_차단_목록_조회() throws Exception{
+        //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        Long memberId = memberRepository.save(member).getId();
 
+
+        List<Long> memberIds = new ArrayList<>();
+
+        for (int i = 0; i < 10; i++) {
+            memberIds.add(memberRepository.save(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcname").build()).getId());
+        }
+
+        em.flush();
+
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(0), BlockedMemberStatus.B);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(1), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(2), BlockedMemberStatus.B);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(3), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(4), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(5), BlockedMemberStatus.A);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(6), BlockedMemberStatus.B);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(7), BlockedMemberStatus.B);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(8), BlockedMemberStatus.B);
+        memberService.insertBlockedMemberByMemberId(member.getId(), memberIds.get(9), BlockedMemberStatus.A);
+
+        em.flush();
+        em.clear();
+
+        //when
+        System.out.println("서비스함수");
+        List<BlockedMemberDto> blockedMembers = memberQueryService.getBlockedMembersByMemberId(memberId);
+        em.flush();
+        System.out.println("서비스함수끝끝");
+       //then
+
+        assertThat(blockedMembers.stream().map(BlockedMemberDto::getMemberId).collect(Collectors.toList()))
+                .containsExactly(memberIds.get(9), memberIds.get(8), memberIds.get(7), memberIds.get(6),
+                        memberIds.get(5), memberIds.get(4), memberIds.get(3), memberIds.get(2), memberIds.get(1),
+                        memberIds.get(0));
+
+        assertThat(blockedMembers.stream().map(BlockedMemberDto::getBlockedMemberStatus).collect(Collectors.toList()))
+                .containsExactly(BlockedMemberStatus.A, BlockedMemberStatus.B, BlockedMemberStatus.B,
+                        BlockedMemberStatus.B, BlockedMemberStatus.A, BlockedMemberStatus.A, BlockedMemberStatus.A,
+                        BlockedMemberStatus.B, BlockedMemberStatus.A, BlockedMemberStatus.B);
+
+        assertThat(blockedMembers.stream().map(BlockedMemberDto::getAccountId).collect(Collectors.toList()))
+                .containsExactly("memberAccId2", "memberAccId2", "memberAccId2", "memberAccId2", "memberAccId2",
+                        "memberAccId2", "memberAccId2", "memberAccId2", "memberAccId2", "memberAccId2");
+
+        assertThat(blockedMembers.stream().map(BlockedMemberDto::getNickname).collect(Collectors.toList()))
+                .containsExactly("memcname", "memcname", "memcname", "memcname", "memcname",
+                        "memcname", "memcname", "memcname", "memcname", "memcname");
+
+
+        assertThat(memberQueryService.getBlockedMembersByMemberId(memberIds.get(0)).size()).isEqualTo(0);
     }
 }
