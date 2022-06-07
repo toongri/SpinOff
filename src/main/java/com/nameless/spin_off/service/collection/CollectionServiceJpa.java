@@ -2,27 +2,25 @@ package com.nameless.spin_off.service.collection;
 
 import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
 import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
-import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.entity.collection.FollowedCollection;
-import com.nameless.spin_off.entity.collection.LikedCollection;
-import com.nameless.spin_off.entity.collection.ViewedCollectionByIp;
+import com.nameless.spin_off.entity.collection.*;
+import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.collection.CollectionScoreEnum;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
-import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
+import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.collection.FollowedCollectionRepository;
-import com.nameless.spin_off.repository.collection.LikedCollectionRepository;
-import com.nameless.spin_off.repository.collection.ViewedCollectionByIpRepository;
+import com.nameless.spin_off.repository.collection.*;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
+import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
@@ -30,11 +28,13 @@ import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CollectionServiceJpa implements CollectionService {
+    private final PostQueryRepository postQueryRepository;
     private final CollectionRepository collectionRepository;
     private final CollectionQueryRepository collectionQueryRepository;
     private final LikedCollectionRepository likedCollectionRepository;
     private final ViewedCollectionByIpRepository viewedCollectionByIpRepository;
     private final FollowedCollectionRepository followedCollectionRepository;
+    private final CollectedPostRepository collectedPostRepository;
 
     @Transactional
     @Override
@@ -89,6 +89,21 @@ public class CollectionServiceJpa implements CollectionService {
 
     @Transactional
     @Override
+    public int insertCollectedPost(Long currentMemberId, Long collectionId, List<Long> postIds) {
+        isExistPosts(currentMemberId, postIds);
+        isExistCollection(currentMemberId, collectionId);
+        isAlreadyCollectedPost(collectionId);
+
+        List<CollectedPost> collectedPosts = postIds.stream()
+                .map(p ->
+                        CollectedPost.createCollectedPost(Collection.createCollection(collectionId), Post.createPost(p)))
+                .collect(Collectors.toList());
+
+        return collectedPostRepository.saveAll(collectedPosts).size();
+    }
+
+    @Transactional
+    @Override
     public int updateAllPopularity() {
         List<Collection> collections = collectionQueryRepository
                 .findAllByViewAfterTime(CollectionScoreEnum.COLLECTION_VIEW.getOldestDate());
@@ -97,6 +112,28 @@ public class CollectionServiceJpa implements CollectionService {
             collection.updatePopularity();
         }
         return collections.size();
+    }
+
+    private void isAlreadyCollectedPost(Long collectionId) {
+        if (collectionQueryRepository.countCollectedPostsByCollectionId(collectionId) != 0L) {
+            throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
+        }
+    }
+
+    private void isExistCollection(Long currentMemberId, Long collectionId) {
+        if (!collectionQueryRepository.isExistCollectionByIdAndMemberId(collectionId, currentMemberId)) {
+            throw new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION);
+        }
+    }
+
+    private void isExistPosts(Long currentMemberId, List<Long> postIds) {
+        if (postIds.size() != getCountExistPost(currentMemberId, postIds)) {
+            throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
+        }
+    }
+
+    private Long getCountExistPost(Long currentMemberId, List<Long> postIds) {
+        return postQueryRepository.countExistPostByPostIdAndMemberId(currentMemberId, postIds);
     }
 
     private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {

@@ -44,6 +44,15 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
         super(Post.class);
     }
 
+    public Long countExistPostByPostIdAndMemberId(Long memberId, List<Long> postIds) {
+        return getQueryFactory()
+                .select(post)
+                .from(post)
+                .where(post.member.id.eq(memberId),
+                        post.id.in(postIds))
+                .fetchCount();
+    }
+
     public List<MembersByContentDto> findAllLikeMemberByPostId(Long postId, List<Long> blockedMemberIds) {
         return getQueryFactory()
                 .select(new QMemberDto_MembersByContentDto(

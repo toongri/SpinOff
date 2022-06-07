@@ -41,6 +41,25 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         super(Collection.class);
     }
 
+    public Boolean isExistCollectionByIdAndMemberId(Long collectionId, Long memberId) {
+        Integer fetchOne = getQueryFactory()
+                .selectOne()
+                .from(collection)
+                .where(
+                        collection.member.id.eq(memberId),
+                        collection.id.eq(collectionId))
+                .fetchFirst();
+
+        return fetchOne != null;
+    }
+
+    public Long countCollectedPostsByCollectionId(Long collectionId) {
+        return getQueryFactory()
+                .selectFrom(collectedPost)
+                .where(collectedPost.collection.id.eq(collectionId))
+                .fetchCount();
+    }
+
     public List<Long> findAllFollowedCollectionIdByMemberId(Long memberId) {
         return getQueryFactory()
                 .select(followedCollection.collection.id)

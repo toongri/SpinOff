@@ -778,4 +778,91 @@ class CollectionServiceJpaTest {
         assertThatThrownBy(() -> postService.updateCollectedPosts(mem2.getId(), po.getId(), ids))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
+
+    @Test
+    public void 컬렉션_글_삽입() throws Exception{
+        //given
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(mem);
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(mem2);
+        Collection memberCollection = collectionRepository.save(Collection.createDefaultCollection(mem));
+
+        List<Collection> collectionList = new ArrayList<>();
+        for (int i = 0; i < 10; i++)
+            collectionList.add(collectionRepository.save(Collection.createDefaultCollection(mem2)));
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("0")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("1")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("2")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("3")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("4")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("5")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("6")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("7")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("8")
+                .setHashTags(List.of()).build()));
+        postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("").setContent("").setUrls(List.of())
+                .setThumbnailUrl("9")
+                .setHashTags(List.of()).build()));
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수 시작");
+        int i = collectionService.insertCollectedPost(mem.getId(), memberCollection.getId(), postList.stream()
+                .map(Post::getId).collect(Collectors.toList()));
+        System.out.println("서비스함수 끝");
+
+        assertThat(postList.size()).isEqualTo(i);
+
+        assertThatThrownBy(() -> collectionService.insertCollectedPost(mem.getId(), memberCollection.getId(), postList.stream()
+                .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(AlreadyCollectedPostException.class);
+        assertThatThrownBy(() -> collectionService.insertCollectedPost(mem2.getId(), collectionList.get(0).getId(), postList.stream()
+                .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistPostException.class);
+        assertThatThrownBy(() -> collectionService.insertCollectedPost(mem.getId(), collectionList.get(0).getId(), postList.stream()
+                .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistCollectionException.class);
+    }
 }
