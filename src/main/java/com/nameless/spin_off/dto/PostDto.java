@@ -26,6 +26,28 @@ public class PostDto {
 
     @Data
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostOnCollectionRequestDto {
+
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                example = "123")
+        Long collectionId;
+    }
+
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PostOnCollectionsRequestDto {
+
+        @ApiModelProperty(
+                value = "컬렉션 id",
+                example = "[1,2,3,4]")
+        List<Long> collectionIds;
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class MyPagePostDto {
 
         @ApiModelProperty(

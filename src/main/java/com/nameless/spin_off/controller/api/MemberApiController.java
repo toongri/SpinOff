@@ -405,47 +405,46 @@ public class MemberApiController {
     @ApiOperation(value = "멤버 비밀번호 변경", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "password",
+                    name = "requestDto",
                     value = "비밀번호",
                     required = true,
                     paramType = "body",
-                    dataType = "String")
+                    dataType = "PasswordRequestDto")
     })
     @PatchMapping("/password")
-    public SingleApiResult<Boolean> updatePassword(
-            @LoginMember MemberDetails currentMember, @RequestBody String password) {
+    public SingleApiResult<Boolean> updatePassword(@LoginMember MemberDetails currentMember,
+                                                   @RequestBody PasswordRequestDto requestDto) {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
         log.info("updatePassword");
         log.info("currentMemberId : {}", currentMemberId);
-        log.info("password : {}", password);
+        log.info("password : {}", requestDto.getPassword());
 
-        return getResult(memberService.updateMemberPassword(currentMemberId, password));
+        return getResult(memberService.updateMemberPassword(currentMemberId, requestDto.getPassword()));
     }
 
     @ApiOperation(value = "멤버 차단 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "memberId",
+                    name = "requestDto",
                     value = "차단할 멤버 id",
                     required = true,
                     paramType = "body",
-                    dataType = "Long",
-                    example = "123")
+                    dataType = "BlockRequestDto")
     })
     @PostMapping("/{memberId}/block")
     public SingleApiResult<Long> createBlockMember(@LoginMember MemberDetails currentMember,
                                                    @PathVariable Long memberId,
-                                                   @RequestBody BlockedMemberStatus blockedMemberStatus)
+                                                   @RequestBody BlockRequestDto requestDto)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
         log.info("createBlockMember");
         log.info("memberId : {}", currentMember.getId());
         log.info("blockedMemberId : {}", memberId);
-        log.info("blockedMemberStatus : {}", blockedMemberStatus);
+        log.info("blockedMemberStatus : {}", requestDto.getBlockedMemberStatus());
 
         return getResult(memberService
-                .insertBlockedMemberByMemberId(currentMember.getId(), memberId, blockedMemberStatus));
+                .insertBlockedMemberByMemberId(currentMember.getId(), memberId, requestDto.getBlockedMemberStatus()));
     }
     @ApiOperation(value = "멤버 차단 목록 조회", notes = "")
     @ApiImplicitParams({
@@ -463,19 +462,11 @@ public class MemberApiController {
     @ApiOperation(value = "검색 기록 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "keyword",
-                    value = "검색 키워드",
+                    name = "searchMemberRequestDto",
+                    value = "검색 dto",
                     required = true,
-                    paramType = "query",
-                    dataType = "string",
-                    example = "첼시"),
-            @ApiImplicitParam(
-                    name = "searchedByMemberStatus",
-                    value = "검색 속성",
-                    required = true,
-                    paramType = "query",
-                    dataType = "SearchedByMemberStatus",
-                    example = "A")
+                    paramType = "body",
+                    dataType = "SearchMemberRequestDto")
     })
     @PostMapping("/search")
     public SingleApiResult<Long> createSearch(
@@ -556,20 +547,19 @@ public class MemberApiController {
     @ApiOperation(value = "이메일 변경 인증 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "email",
+                    name = "requestDto",
                     value = "이메일 정보",
                     required = true,
                     paramType = "body",
-                    dataType = "string",
-                    example = "spinoff232@gmail.com")
+                    dataType = "EmailRequestDto")
     })
     @PostMapping("/update-email")
     public SingleApiResult<Boolean> createUpdateEmail(@LoginMember MemberDetails currentMember,
-                                                    @RequestBody String email) {
+                                                    @RequestBody EmailRequestDto requestDto) {
         log.info("createUpdateEmail");
         log.info("memberId : {}", currentMember.getId());
-        log.info("email : {}", email);
-        return getResult(memberService.sendEmailForUpdateEmail(currentMember.getId(), email));
+        log.info("email : {}", requestDto.getEmail());
+        return getResult(memberService.sendEmailForUpdateEmail(currentMember.getId(), requestDto.getEmail()));
     }
 
     @ApiOperation(value = "이메일 변경 인증 확인", notes = "")

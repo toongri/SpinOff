@@ -1,7 +1,6 @@
 package com.nameless.spin_off.service.query;
 
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
@@ -90,8 +89,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);//.
             Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -214,8 +213,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -342,8 +341,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -469,8 +468,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -598,8 +597,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -716,8 +715,8 @@ public class CollectionQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -812,8 +811,8 @@ public class CollectionQueryServiceJpaTest {
         List<Collection> collectionList = new ArrayList<>();
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO("", "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionRequestDto("", "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionService.insertFollowedCollectionByMemberId(member.getId(), aLong);
             collectionList.add(byId);
@@ -1248,20 +1247,15 @@ public class CollectionQueryServiceJpaTest {
         collectionList.add(collectionRepository
                 .save(Collection.createCollection(member, 0 + "", 0 + "", PublicOfCollectionStatus.A)));
 
-        Long dfdd = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
-                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(3).getId(),
+        Long dfdd = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(null, "dfdd"), memberList.get(3).getId(),
                 collectionList.get(0).getId());
-        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
-                .CreateCommentInCollectionVO(dfdd, "dfdd"), memberList.get(3).getId(),
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(dfdd, "dfdd"), memberList.get(3).getId(),
                 collectionList.get(0).getId());
-        Long dfdd1 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
-                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(5).getId(),
+        Long dfdd1 = commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(null, "dfdd"), memberList.get(5).getId(),
                 collectionList.get(0).getId());
-        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
-                .CreateCommentInCollectionVO(dfdd1, "dfdd"), memberList.get(0).getId(),
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(dfdd1, "dfdd"), memberList.get(0).getId(),
                 collectionList.get(0).getId());
-        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto
-                .CreateCommentInCollectionVO(null, "dfdd"), memberList.get(8).getId(),
+        commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(null, "dfdd"), memberList.get(8).getId(),
                 collectionList.get(0).getId());
 
         memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());

@@ -80,29 +80,29 @@ class CommentInPostQueryServiceJpaTest {
                 .setHashTags(List.of()).build());
         List<Long> commentIds = new ArrayList<>();
 
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), member.getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), memberList.get(0).getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), memberList.get(1).getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), memberList.get(2).getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), memberList.get(3).getId(), post.getId()));
 
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(0), "ddd"), member.getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(0), "ddd"), memberList.get(0).getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(0), "ddd"), memberList.get(1).getId(), post.getId()));
 
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(2), "ddd"), member.getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(2), "ddd"), memberList.get(0).getId(), post.getId()));
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 commentIds.get(2), "ddd"), memberList.get(1).getId(), post.getId()));
 
         commentInPostService.insertLikedCommentByMemberId(memberList.get(1).getId(), commentIds.get(1));
@@ -216,7 +216,7 @@ class CommentInPostQueryServiceJpaTest {
 
         List<Long> commentIds = new ArrayList<>();
 
-        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CreateCommentInPostVO(
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
                 null, "ddd"), member.getId(), postList.get(0).getId()));
 
         memberService.insertFollowedMemberByMemberId(member2.getId(), member.getId());

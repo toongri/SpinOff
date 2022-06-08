@@ -1,7 +1,7 @@
 package com.nameless.spin_off.service.comment;
 
 import com.nameless.spin_off.dto.CollectionDto.CollectionIdAndPublicCollectionDto;
-import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
+import com.nameless.spin_off.dto.CommentDto.CommentInCollectionRequestDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.comment.LikedCommentInCollection;
@@ -32,7 +32,7 @@ public class CommentInCollectionServiceJpa implements CommentInCollectionService
 
     @Transactional
     @Override
-    public Long insertCommentInCollectionByCommentVO(CreateCommentInCollectionVO commentVO, Long memberId, Long collectionId)
+    public Long insertCommentInCollectionByCommentVO(CommentInCollectionRequestDto commentVO, Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
         hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
         isExistCommentInCollection(commentVO.getParentId(), collectionId);

@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.collection;
 
-import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
+import com.nameless.spin_off.dto.CollectionDto.CollectionRequestDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.*;
 import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.A;
+import static com.nameless.spin_off.enums.collection.PublicOfCollectionStatus.B;
 import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_COLLECT;
 import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_VIEW;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -67,7 +68,7 @@ class CollectionServiceJpaTest {
         //when
         System.out.println("서비스 함수");
         Long aLong = collectionService
-                .insertCollectionByCollectionVO(new CreateCollectionVO("", "", A), member.getId());
+                .insertCollection(new CollectionRequestDto("", "", A), member.getId());
         System.out.println("컬렉션 조회 함수");
         Collection collection = collectionRepository.getById(aLong);
 
@@ -864,5 +865,61 @@ class CollectionServiceJpaTest {
                 .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistPostException.class);
         assertThatThrownBy(() -> collectionService.insertCollectedPost(mem.getId(), collectionList.get(0).getId(), postList.stream()
                 .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistCollectionException.class);
+    }
+
+    @Test
+    public void 컬렉션_수정() throws Exception{
+        //given
+        Member mem = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(mem);
+        Member mem2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(mem2);
+        Collection memberCollection1 = collectionRepository.save(Collection.createDefaultCollection(mem));
+
+        Collection memberCollection2 = collectionRepository.save(
+                Collection.createCollection(mem, "abc", "abcdd", A));
+
+        em.flush();
+        em.clear();
+        //when
+        System.out.println("서비스함수 시작");
+        Long aLong = collectionService.updateCollection(new CollectionRequestDto("abc", "abcdd", A),
+                memberCollection2.getId(), mem.getId());
+        System.out.println("서비스함수 끝");
+
+        LocalDateTime lastModifiedDate = collectionRepository.findById(memberCollection2.getId()).get().getLastModifiedDate();
+
+        Long aLong2 = collectionService.updateCollection(new CollectionRequestDto("abccd", "abcddaa", B),
+                memberCollection2.getId(), mem.getId());
+        Collection collection = collectionRepository.findById(memberCollection2.getId()).get();
+
+        em.flush();
+        //then
+        assertThat(memberCollection2.getLastModifiedDate()).isEqualTo(lastModifiedDate);
+        assertThat(aLong).isEqualTo(0L);
+
+        assertThat(collection.getTitle()).isEqualTo("abccd");
+        assertThat(collection.getContent()).isEqualTo("abcddaa");
+        assertThat(collection.getPublicOfCollectionStatus()).isEqualTo(B);
+        assertThat(aLong2).isEqualTo(3L);
+
+        assertThatThrownBy(() -> collectionService.updateCollection(new CollectionRequestDto("abccd", "abcddaa", B),
+                memberCollection2.getId(), mem2.getId())).isInstanceOf(DontHaveAuthorityException.class);
+        assertThatThrownBy(() -> collectionService.updateCollection(new CollectionRequestDto("abccd", "abcddaa", B),
+                memberCollection1.getId(), mem.getId())).isInstanceOf(DontHaveAuthorityException.class);
     }
 }

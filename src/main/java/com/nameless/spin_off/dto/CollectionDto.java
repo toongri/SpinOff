@@ -17,6 +17,17 @@ public class CollectionDto {
 
     @Data
     @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CollectedPostsRequestDto {
+
+        @ApiModelProperty(
+                value = "글 id",
+                example = "[1,2,3,4]")
+        List<Long> postIds;
+    }
+
+    @Data
+    @NoArgsConstructor
     public static class FollowCollectionDto {
 
         @ApiModelProperty(
@@ -488,7 +499,7 @@ public class CollectionDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateCollectionVO {
+    public static class CollectionRequestDto {
 
         @ApiModelProperty(
                 value = "컬렉션 제목",

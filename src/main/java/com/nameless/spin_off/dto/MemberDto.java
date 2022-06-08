@@ -11,6 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.cglib.core.Block;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -18,6 +19,39 @@ import java.util.Comparator;
 import java.util.List;
 
 public class MemberDto {
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class PasswordRequestDto {
+
+        @ApiModelProperty(
+                value = "비밀번호",
+                example = "abcd232")
+        private String password;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class EmailRequestDto {
+
+        @ApiModelProperty(
+                value = "이메일",
+                example = "spinoff@naver.com")
+        private String email;
+    }
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class BlockRequestDto {
+
+        @ApiModelProperty(
+                value = "블록유형",
+                example = "A")
+        private BlockedMemberStatus blockedMemberStatus;
+    }
 
     @Data
     @AllArgsConstructor

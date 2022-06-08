@@ -94,8 +94,8 @@ public class MemberQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -256,8 +256,8 @@ public class MemberQueryServiceJpaTest {
         memberRepository.saveAll(memberList);
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)

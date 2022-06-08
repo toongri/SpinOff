@@ -82,8 +82,8 @@ public class MovieQueryRepositoryTest {
 
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())

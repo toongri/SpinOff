@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.collection;
 
-import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
+import com.nameless.spin_off.dto.CollectionDto.CollectionRequestDto;
 import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
 import com.nameless.spin_off.entity.collection.*;
 import com.nameless.spin_off.entity.member.Member;
@@ -38,12 +38,41 @@ public class CollectionServiceJpa implements CollectionService {
 
     @Transactional
     @Override
-    public Long insertCollectionByCollectionVO(CreateCollectionVO collectionVO, Long memberId)
+    public Long insertCollection(CollectionRequestDto collectionVO, Long memberId)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         return collectionRepository.save(Collection.createCollection(
                 Member.createMember(memberId), collectionVO.getTitle(),
                 collectionVO.getContent(), collectionVO.getPublicOfCollectionStatus())).getId();
+    }
+
+    @Transactional
+    @Override
+    public Long updateCollection(CollectionRequestDto collectionRequestDto, Long collectionId, Long memberId) {
+        Collection collection = getCollection(collectionId);
+        if (!collection.getMember().getId().equals(memberId)) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+        Long cnt = 0L;
+        if (!collectionRequestDto.getTitle().equals(collection.getTitle())) {
+            if (collection.getIsDefault()) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+            cnt++;
+            collection.updateTitle(collectionRequestDto.getTitle());
+        }
+        if (!collectionRequestDto.getContent().equals(collection.getContent())) {
+            cnt++;
+            collection.updateContent(collectionRequestDto.getContent());
+        }
+        if (!collectionRequestDto.getPublicOfCollectionStatus().equals(collection.getPublicOfCollectionStatus())) {
+            cnt++;
+            collection.updatePublicOfCollectionStatus(collectionRequestDto.getPublicOfCollectionStatus());
+        }
+        if (cnt > 0) {
+            collection.updateLastModifiedDate();
+        }
+        return cnt;
     }
 
     @Transactional
@@ -112,6 +141,10 @@ public class CollectionServiceJpa implements CollectionService {
             collection.updatePopularity();
         }
         return collections.size();
+    }
+
+    private Collection getCollection(Long collectionId) {
+        return collectionRepository.findById(collectionId).orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
     private void isAlreadyCollectedPost(Long collectionId) {

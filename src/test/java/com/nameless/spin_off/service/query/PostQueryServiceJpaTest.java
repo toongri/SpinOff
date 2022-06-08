@@ -480,8 +480,8 @@ public class PostQueryServiceJpaTest {
 
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword + mem.getId(), "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword + mem.getId(), "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
                     .setTitle(keyword + mem.getId() + "0").setContent("").setUrls(List.of())
@@ -733,16 +733,11 @@ public class PostQueryServiceJpaTest {
                 .build();
         postRepository.save(post);
 
-        Long dfdd = commentInPostService.insertCommentInPostByCommentVO(new CommentDto
-                .CreateCommentInPostVO(null, "dfdd"), memberList.get(3).getId(), post.getId());
-        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
-                .CreateCommentInPostVO(dfdd, "dfdd"), memberList.get(3).getId(), post.getId());
-        Long dfdd1 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto
-                .CreateCommentInPostVO(null, "dfdd"), memberList.get(5).getId(), post.getId());
-        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
-                .CreateCommentInPostVO(dfdd1, "dfdd"), memberList.get(0).getId(), post.getId());
-        commentInPostService.insertCommentInPostByCommentVO(new CommentDto
-                .CreateCommentInPostVO(null, "dfdd"), memberList.get(8).getId(), post.getId());
+        Long dfdd = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(null, "dfdd"), memberList.get(3).getId(), post.getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(dfdd, "dfdd"), memberList.get(3).getId(), post.getId());
+        Long dfdd1 = commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(null, "dfdd"), memberList.get(5).getId(), post.getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(dfdd1, "dfdd"), memberList.get(0).getId(), post.getId());
+        commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(null, "dfdd"), memberList.get(8).getId(), post.getId());
 
         postService.insertLikedPostByMemberId(memberList.get(4).getId(), post.getId());
         postService.insertLikedPostByMemberId(memberList.get(8).getId(), post.getId());

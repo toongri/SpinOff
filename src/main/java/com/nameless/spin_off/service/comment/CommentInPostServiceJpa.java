@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.dto.CommentDto.CreateCommentInPostVO;
+import com.nameless.spin_off.dto.CommentDto.CommentInPostRequestDto;
 import com.nameless.spin_off.dto.PostDto.PostIdAndPublicPostDto;
 import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.comment.LikedCommentInPost;
@@ -33,7 +33,7 @@ public class CommentInPostServiceJpa implements CommentInPostService {
 
     @Transactional
     @Override
-    public Long insertCommentInPostByCommentVO(CreateCommentInPostVO commentVO, Long memberId, Long postId)
+    public Long insertCommentInPostByCommentVO(CommentInPostRequestDto commentVO, Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
         hasAuthPost(memberId, postId, getPublicOfPost(postId));
         isExistCommentInPost(commentVO.getParentId(), postId);

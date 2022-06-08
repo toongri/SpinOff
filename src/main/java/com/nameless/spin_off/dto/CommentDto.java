@@ -56,7 +56,7 @@ public class CommentDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateCommentInPostVO {
+    public static class CommentInPostRequestDto {
 
         @ApiModelProperty(
                 value = "댓글 id",
@@ -75,7 +75,7 @@ public class CommentDto {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class CreateCommentInCollectionVO {
+    public static class CommentInCollectionRequestDto {
 
         @ApiModelProperty(
                 value = "댓글 id",

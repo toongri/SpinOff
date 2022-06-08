@@ -4,6 +4,11 @@ import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.*;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
+import com.nameless.spin_off.dto.SignDto;
+import com.nameless.spin_off.dto.SignDto.AccountIdRequestDto;
+import com.nameless.spin_off.dto.SignDto.AuthCodeRequestDto;
+import com.nameless.spin_off.dto.SignDto.CreateEmailRequestDto;
+import com.nameless.spin_off.dto.SignDto.LinkageEmailRequestDto;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.member.EmailLinkageServiceEnum;
 import com.nameless.spin_off.enums.member.MemberCondition;
@@ -61,22 +66,21 @@ public class SignApiController {
                     dataType = "string",
                     example = "naver"),
             @ApiImplicitParam(
-                    name = "authCode",
+                    name = "requestDto",
                     value = "인증 코드",
                     required = true,
                     paramType = "body",
-                    dataType = "string",
-                    example = "dkdklflkn333")
+                    dataType = "AuthCodeRequestDto")
     })
     @PostMapping("/login/social/{provider}")
     public SingleApiResult<SocialLoginResponseDto> loginBySocial(
-            @RequestBody String authCode, @PathVariable String provider) {
+            @RequestBody AuthCodeRequestDto requestDto, @PathVariable String provider) {
 
         log.info("loginBySocial");
         log.info("provider : {}", provider);
-        log.info("authCode : {}", authCode);
+        log.info("authCode : {}", requestDto.getAuthCode());
 
-        return getResult(signService.loginBySocial(authCode, provider));
+        return getResult(signService.loginBySocial(requestDto.getAuthCode(), provider));
     }
 
     @ApiOperation(value = "로그인", notes = "")
@@ -120,20 +124,19 @@ public class SignApiController {
     @ApiOperation(value = "이메일 인증 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "email",
+                    name = "requestDto",
                     value = "이메일 정보",
                     required = true,
                     paramType = "body",
-                    dataType = "string",
-                    example = "spinoff232@gmail.com")
+                    dataType = "CreateEmailRequestDto")
     })
     @PostMapping("/auth-email")
-    public SingleApiResult<Boolean> authEmail(@RequestBody String email) {
+    public SingleApiResult<Boolean> authEmail(@RequestBody CreateEmailRequestDto requestDto) {
 
         log.info("authEmail");
-        log.info("email : {}", email);
+        log.info("email : {}", requestDto.getEmail());
 
-        return getResult(signService.sendEmailForAuth(email));
+        return getResult(signService.sendEmailForAuth(requestDto.getEmail()));
     }
 
     @ApiOperation(value = "이메일 인증 확인", notes = "")
@@ -165,32 +168,31 @@ public class SignApiController {
                     dataType = "String",
                     example = "naver"),
             @ApiImplicitParam(
-                    name = "email",
+                    name = "requestDto",
                     value = "이메일",
                     required = true,
                     paramType = "body",
-                    dataType = "string",
-                    example = "spinoff@naver.com")
+                    dataType = "LinkageEmailRequestDto")
     })
     @PostMapping("/linkage-email/{provider}")
     public SingleApiResult<String> createLinkageEmail(@LoginMember MemberDetails currentMember,
-                                                @RequestBody String email,
+                                                @RequestBody LinkageEmailRequestDto requestDto,
                                                 @PathVariable String provider) {
 
         log.info("createLinkageEmail");
         log.info("memberId : {}", currentMember.getId());
         log.info("provider : {}", provider);
-        log.info("email : {}", email);
+        log.info("email : {}", requestDto.getEmail());
 
         try {
-            if (isNotCorrectEmail(email, EmailLinkageServiceEnum.valueOf(provider))) {
+            if (isNotCorrectEmail(requestDto.getEmail(), EmailLinkageServiceEnum.valueOf(provider))) {
                 throw new NotCorrectEmailRequest(ErrorEnum.NOT_CORRECT_EMAIL);
             }
         } catch (IllegalArgumentException e) {
             throw new IncorrectProviderException(ErrorEnum.INCORRECT_PROVIDER);
         }
 
-        signService.updateEmailLinkage(email, currentMember.getUsername(), provider);
+        signService.updateEmailLinkage(requestDto.getEmail(), currentMember.getUsername(), provider);
         return getResult("메일을 확인하여 주시기 바랍니다.");
     }
 
@@ -275,20 +277,19 @@ public class SignApiController {
     @ApiOperation(value = "비밀번호 정보 조회 및 수정, 메일 발송", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "accountId",
+                    name = "requestDto",
                     value = "아이디",
                     required = true,
                     paramType = "body",
-                    dataType = "string",
-                    example = "spinoff232")
+                    dataType = "AccountIdRequestDto")
     })
     @PatchMapping("/forget/account-pw")
-    public SingleApiResult<Boolean> readForgetAccountPw(@RequestBody String accountId) {
+    public SingleApiResult<Boolean> readForgetAccountPw(@RequestBody AccountIdRequestDto requestDto) {
 
         log.info("readForgetAccountPw");
-        log.info("accountId : {}", accountId);
+        log.info("accountId : {}", requestDto.getAccountId());
 
-        return getResult(signService.sendEmailForAccountPw(accountId));
+        return getResult(signService.sendEmailForAccountPw(requestDto.getAccountId()));
     }
 
     private Boolean isNotCorrectEmail(String email, EmailLinkageServiceEnum provider) {

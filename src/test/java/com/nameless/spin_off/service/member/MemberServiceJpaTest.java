@@ -148,10 +148,10 @@ class MemberServiceJpaTest {
                 .setNickname("memcname").build();
         Long blockedMemberId = memberRepository.save(blockedMember).getId();
         Long aLong = collectionService
-                .insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO("", "", A), member.getId());
+                .insertCollection(new CollectionDto.CollectionRequestDto("", "", A), member.getId());
 
         Long aLong1 = collectionService
-                .insertCollectionByCollectionVO(new CollectionDto.CreateCollectionVO("", "", A), blockedMember.getId());
+                .insertCollection(new CollectionDto.CollectionRequestDto("", "", A), blockedMember.getId());
 
         memberService.insertFollowedMemberByMemberId(memberId, blockedMemberId);
         collectionService.insertFollowedCollectionByMemberId(memberId, aLong1);

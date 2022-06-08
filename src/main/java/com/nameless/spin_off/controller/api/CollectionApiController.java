@@ -2,12 +2,9 @@ package com.nameless.spin_off.controller.api;
 
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
-import com.nameless.spin_off.dto.CollectionDto.CreateCollectionVO;
-import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
-import com.nameless.spin_off.dto.CollectionDto.ReadCollectionDto;
+import com.nameless.spin_off.dto.CollectionDto.*;
 import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
-import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
+import com.nameless.spin_off.dto.CommentDto.CommentInCollectionRequestDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
@@ -53,24 +50,24 @@ public class CollectionApiController {
     @ApiOperation(value = "컬렉션 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "collectionVO",
+                    name = "collectionRequestDto",
                     value = "컬렉션 정보",
                     required = true,
                     paramType = "body",
-                    dataType = "CreateCollectionVO")
+                    dataType = "CollectionRequestDto")
     })
     @PostMapping("")
     public SingleApiResult<Long> createCollection(
-            @LoginMember MemberDetails currentMember, @RequestBody CreateCollectionVO collectionVO)
+            @LoginMember MemberDetails currentMember, @RequestBody CollectionRequestDto collectionRequestDto)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         log.info("createCollection");
         log.info("memberId : {}", currentMember.getId());
-        log.info("title : {}", collectionVO.getTitle());
-        log.info("content : {}", collectionVO.getContent());
-        log.info("publicOfCollectionStatus : {}", collectionVO.getPublicOfCollectionStatus());
+        log.info("title : {}", collectionRequestDto.getTitle());
+        log.info("content : {}", collectionRequestDto.getContent());
+        log.info("publicOfCollectionStatus : {}", collectionRequestDto.getPublicOfCollectionStatus());
 
-        return getResult(collectionService.insertCollectionByCollectionVO(collectionVO, currentMember.getId()));
+        return getResult(collectionService.insertCollection(collectionRequestDto, currentMember.getId()));
     }
 
     @ApiOperation(value = "컬렉션 조회", notes = "")
@@ -86,13 +83,13 @@ public class CollectionApiController {
                     name = "ip",
                     value = "ip주소",
                     required = true,
-                    paramType = "body",
+                    paramType = "query",
                     dataType = "string",
                     example = "192.168.0.1")
     })
     @GetMapping("/{collectionId}")
     public SingleApiResult<ReadCollectionDto> readCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestBody String ip) {
+            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestParam String ip) {
 
         log.info("readCollection");
         log.info("collectionId : {}", collectionId);
@@ -100,6 +97,37 @@ public class CollectionApiController {
         ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
         collectionService.insertViewedCollectionByIp(ip, collectionId);
         return getResult(collection);
+    }
+
+    @ApiOperation(value = "컬렉션 수정", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "collectionId",
+                    value = "컬렉션 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123"),
+            @ApiImplicitParam(
+                    name = "collectionRequestDto",
+                    value = "컬렉션 정보",
+                    required = true,
+                    paramType = "body",
+                    dataType = "CollectionRequestDto")
+    })
+    @PutMapping("/{collectionId}")
+    public SingleApiResult<Long> updateCollection(@LoginMember MemberDetails currentMember,
+                                                  @PathVariable Long collectionId,
+                                                  @RequestBody CollectionRequestDto collectionRequestDto)
+            throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
+
+        log.info("createCollection");
+        log.info("memberId : {}", currentMember.getId());
+        log.info("title : {}", collectionRequestDto.getTitle());
+        log.info("content : {}", collectionRequestDto.getContent());
+        log.info("publicOfCollectionStatus : {}", collectionRequestDto.getPublicOfCollectionStatus());
+
+        return getResult(collectionService.updateCollection(collectionRequestDto, collectionId, currentMember.getId()));
     }
 
     @ApiOperation(value = "컬렉션 글 생성", notes = "")
@@ -112,24 +140,24 @@ public class CollectionApiController {
                     dataType = "Long",
                     example = "123"),
             @ApiImplicitParam(
-                    name = "postIds",
+                    name = "requestDto",
                     value = "글 id 리스트",
                     required = true,
                     paramType = "body",
-                    dataType = "Long",
-                    allowMultiple = true)
+                    dataType = "CollectionRequestDto")
     })
     @PostMapping("/{collectionId}/post")
-    public SingleApiResult<Integer> createCollectedPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestBody List<Long> postIds) {
+    public SingleApiResult<Integer> createCollectedPost(@LoginMember MemberDetails currentMember,
+                                                        @PathVariable Long collectionId,
+                                                        @RequestBody CollectedPostsRequestDto requestDto) {
 
         log.info("createCollectedPost");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMember.getId());
-        log.info("postIds : {}", postIds.toString());
+        log.info("postIds : {}", requestDto.getPostIds().toString());
 
 
-        return getResult(collectionService.insertCollectedPost(currentMember.getId(), collectionId, postIds));
+        return getResult(collectionService.insertCollectedPost(currentMember.getId(), collectionId, requestDto.getPostIds()));
     }
 
     @ApiOperation(value = "컬렉션 글 조회", notes = "")
@@ -274,26 +302,26 @@ public class CollectionApiController {
     @ApiOperation(value = "컬렉션 댓글 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "commentVO",
+                    name = "commentRequestDto",
                     value = "댓글 정보",
                     required = true,
                     paramType = "body",
-                    dataType = "CreateCommentInCollectionVO")
+                    dataType = "CommentInCollectionRequestDto")
     })
     @PostMapping("/{collectionId}/comment")
     public SingleApiResult<Long> createCommentInCollection(
-            @LoginMember MemberDetails currentMember, @RequestBody CreateCommentInCollectionVO commentVO,
+            @LoginMember MemberDetails currentMember, @RequestBody CommentInCollectionRequestDto commentRequestDto,
             @PathVariable Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
         log.info("createCommentInCollection");
         log.info("memberId : {}", currentMember.getId());
         log.info("collectionId : {}", collectionId);
-        log.info("parentId : {}", commentVO.getParentId());
-        log.info("content : {}", commentVO.getContent());
+        log.info("parentId : {}", commentRequestDto.getParentId());
+        log.info("content : {}", commentRequestDto.getContent());
 
         Long commentId = commentInCollectionService.insertCommentInCollectionByCommentVO(
-                commentVO, currentMember.getId(), collectionId);
+                commentRequestDto, currentMember.getId(), collectionId);
         return getResult(commentId);
     }
 

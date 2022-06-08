@@ -365,8 +365,8 @@ public class HashtagQueryRepositoryTest {
 
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword, "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword, "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
@@ -587,8 +587,8 @@ public class HashtagQueryRepositoryTest {
 
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
-            Long aLong = collectionService.insertCollectionByCollectionVO(
-                    new CollectionDto.CreateCollectionVO(keyword, "", A), mem.getId());
+            Long aLong = collectionService.insertCollection(
+                    new CollectionDto.CollectionRequestDto(keyword, "", A), mem.getId());
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)

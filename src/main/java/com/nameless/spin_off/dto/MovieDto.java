@@ -19,6 +19,22 @@ import static com.nameless.spin_off.enums.search.SearchEnum.MOVIE_SEARCH_THUMBNA
 public class MovieDto {
 
     @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class KobisRequestDto {
+
+        @ApiModelProperty(
+                value = "시작페이지",
+                example = "123")
+        private int startPage;
+
+        @ApiModelProperty(
+                value = "크기",
+                example = "123")
+        private int size;
+    }
+
+    @Data
     @NoArgsConstructor
     public static class ReadMovieDto {
 

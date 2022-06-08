@@ -1,6 +1,6 @@
 package com.nameless.spin_off.service.comment;
 
-import com.nameless.spin_off.dto.CommentDto.CreateCommentInCollectionVO;
+import com.nameless.spin_off.dto.CommentDto.CommentInCollectionRequestDto;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
@@ -75,7 +75,7 @@ class CommentInCollectionServiceJpaTest {
         CommentInCollection comment = commentInCollectionRepository
                 .getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
-                                new CreateCommentInCollectionVO(
+                                new CommentInCollectionRequestDto(
                                         null, "야스히로 라할살"), member.getId(), collection.getId()));
         System.out.println("컬렉션업로드");
         collectionService.insertViewedCollectionByIp("22", collection.getId());
@@ -115,14 +115,14 @@ class CommentInCollectionServiceJpaTest {
         CommentInCollection childComment1 =
                 commentInCollectionRepository.getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
-                                new CreateCommentInCollectionVO(
+                                new CommentInCollectionRequestDto(
                                         parent.getId(), "요지스타 라할살"), mem.getId(), col.getId()));
 
         System.out.println("서비스함수2");
         CommentInCollection childComment2 =
                 commentInCollectionRepository.getById(
                         commentInCollectionService.insertCommentInCollectionByCommentVO(
-                                new CreateCommentInCollectionVO(
+                                new CommentInCollectionRequestDto(
                                         parent.getId(), "슈퍼스타검흰 라할살"), mem.getId(), col.getId()));
 
         em.flush();
@@ -176,14 +176,14 @@ class CommentInCollectionServiceJpaTest {
         Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
 
-        CreateCommentInCollectionVO commentInCollectionVO1 =
-                new CreateCommentInCollectionVO(-1L, "");
+        CommentInCollectionRequestDto commentInCollectionVO1 =
+                new CommentInCollectionRequestDto(-1L, "");
 
-        CreateCommentInCollectionVO commentInCollectionVO2 =
-                new CreateCommentInCollectionVO(0L, "");
+        CommentInCollectionRequestDto commentInCollectionVO2 =
+                new CommentInCollectionRequestDto(0L, "");
 
-        CreateCommentInCollectionVO commentInCollectionVO3 =
-                new CreateCommentInCollectionVO(-1L, "");
+        CommentInCollectionRequestDto commentInCollectionVO3 =
+                new CommentInCollectionRequestDto(-1L, "");
 
         //when
 
@@ -196,15 +196,15 @@ class CommentInCollectionServiceJpaTest {
                 .isInstanceOf(NotExistCommentInCollectionException.class);//.hasMessageContaining("")
 
         Long aLong = commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(null, ""), mem2.getId(), col.getId());
+                new CommentInCollectionRequestDto(null, ""), mem2.getId(), col.getId());
         memberService.insertBlockedMemberByMemberId(mem.getId(), mem2.getId(), BlockedMemberStatus.A);
         em.flush();
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(null, ""), mem.getId(), col2.getId()))
+                new CommentInCollectionRequestDto(null, ""), mem.getId(), col2.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
 
         assertThatThrownBy(() -> commentInCollectionService.insertCommentInCollectionByCommentVO(
-                new CreateCommentInCollectionVO(aLong, ""), mem.getId(), col.getId()))
+                new CommentInCollectionRequestDto(aLong, ""), mem.getId(), col.getId()))
                 .isInstanceOf(DontHaveAuthorityException.class);//.hasMessageContaining("")
     }
 
