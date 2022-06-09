@@ -62,7 +62,8 @@ logging:
     org.hibernate.SQL: debug
 
 kobis:
-  key: key
+  batchKey: key
+  apiKey: key
 org:
   gradle:
     daemon: false

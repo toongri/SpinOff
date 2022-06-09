@@ -184,7 +184,7 @@ public class BatchConfig {
     @StepScope  // 1
     public ListItemReader<Movie> movieApiReader() {
         log.info("********** This is movieApiReader");
-        List<Movie> activeMovies = movieApiService.findAllNew(1, KOBIS_API_REQUEST_NUMBER_MAX.getValue());
+        List<Movie> activeMovies = movieApiService.findAllNew(1, KOBIS_API_REQUEST_NUMBER_MAX.getValue(), true);
         log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
         return new ListItemReader<>(activeMovies);  // 3
     }
@@ -249,8 +249,8 @@ public class BatchConfig {
             @Override
             public Movie process(Movie movie) throws Exception {
                 log.info("********** This is movieApiProcessor");
+                movieApiService.updateActorsMovie(movie, true);
                 movieApiService.updateThumbnailAndUrlByMovie(movie);
-                movieApiService.updateActorsMovie(movie);
                 movie.updateLastModifiedDate();
                 return movie;  // 2
             }

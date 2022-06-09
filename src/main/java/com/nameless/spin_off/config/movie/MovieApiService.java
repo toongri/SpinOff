@@ -4,6 +4,7 @@ import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto;
 import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto.NaverMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.movie.CantFindMovieUrlException;
+import com.nameless.spin_off.exception.movie.OverKobisMovieApiLimitException;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +38,18 @@ public class MovieApiService {
     private String naverClientId;
     @Value("${spring.social.naver.client_secret}")
     private String naverClientSecret;
-    @Value("${kobis.key}")
+    @Value("${kobis.batchKey}")
+    private String batchKey;
+    @Value("${kobis.apiKey}")
+    private String apiKey;
     private String key;
     private String kobisUrl = "http://kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieList.json";
     private String kobisInfoUrl = "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json";
     private String naverUrl = "https://openapi.naver.com/v1/search/movie.json";
 
-    public List<Movie> findAllNew(int startPage, int size) {
+    public List<Movie> findAllNew(int startPage, int size, boolean isBatch) {
+
+        key = isBatch ? batchKey : apiKey;
 
         List<Movie> newMovieList = new ArrayList<>();
         for (int curPage = 0; curPage < size; curPage++) {
@@ -62,6 +68,9 @@ public class MovieApiService {
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
                 log.debug("resultMap : {}", resultMap.toString());
+                if (resultMap.getBody().containsKey("faultInfo")) {
+                    throw new OverKobisMovieApiLimitException();
+                }
 
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
                 ArrayList<Map> movieList = (ArrayList<Map>) lm.get("movieList");
@@ -116,6 +125,10 @@ public class MovieApiService {
                 log.error("kobisMovieError");
                 log.error("statusCode : {}", e.getRawStatusCode());
                 log.error("body : {}", e.getStatusText());
+            } catch (OverKobisMovieApiLimitException e) {
+                log.error("OverKobisMovieApiLimitError");
+                log.error("code : {}", e.getErrorEnum().getCode());
+                log.error("message : {}", e.getMessage());
             } catch (Exception e) {
                 log.error("kobisMovieError");
                 log.error("예상하지 못한 에러 : {}", e.toString());
@@ -125,7 +138,8 @@ public class MovieApiService {
         return newMovieList;
     }
 
-    public void updateActorsMovie(Movie movie) {
+    public boolean updateActorsMovie(Movie movie, boolean isBatch) {
+        key = isBatch ? batchKey : apiKey;
         try {
             HttpHeaders header = new HttpHeaders();
             HttpEntity<?> entity = new HttpEntity<>(header);
@@ -139,7 +153,9 @@ public class MovieApiService {
 
             //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
             ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-
+            if (resultMap.getBody().containsKey("faultInfo")) {
+                throw new OverKobisMovieApiLimitException();
+            }
             LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieInfoResult");
             Map movieInfo = (Map)lm.get("movieInfo");
 
@@ -150,13 +166,23 @@ public class MovieApiService {
             log.error("kobisInfoMovieError");
             log.error("statusCode : {}", e.getRawStatusCode());
             log.error("body : {}", e.getStatusText());
+            return false;
+        } catch (OverKobisMovieApiLimitException e) {
+            log.error("OverKobisMovieApiLimitError");
+            log.error("code : {}", e.getErrorEnum().getCode());
+            log.error("message : {}", e.getMessage());
+            return false;
         } catch (NumberFormatException e) {
             log.debug("kobisInfoMovieDataError");
             log.debug("데이터 오류 : {}", e.toString());
+            return false;
         }  catch (Exception e) {
             log.error("kobisInfoMovieError");
             log.error("예상하지 못한 에러 : {}", e.toString());
+            return false;
         }
+
+        return true;
     }
 
     public boolean updateThumbnailAndUrlByMovie(Movie movie) {
@@ -273,15 +299,6 @@ public class MovieApiService {
         return true;
     }
 
-    private boolean isContains(Movie movie, NaverMovie i) {
-        for (String str : List.of(i.getDirector().split("\\|"))) {
-            if (movie.getDirectorName().replace(" ", "").contains(str.replace(" ", ""))) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     private String getActors(ArrayList<Map> actors) {
         if (!actors.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -304,6 +321,15 @@ public class MovieApiService {
         } else {
             return null;
         }
+    }
+
+    private boolean isContains(Movie movie, NaverMovie i) {
+        for (String str : List.of(i.getDirector().split("\\|"))) {
+            if (movie.getDirectorName().replace(" ", "").contains(str.replace(" ", ""))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private String getDirector(ArrayList<Map> directors) {

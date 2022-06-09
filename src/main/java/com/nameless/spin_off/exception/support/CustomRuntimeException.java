@@ -6,13 +6,17 @@ public class CustomRuntimeException extends RuntimeException{
 
     private final ErrorEnum errorEnum;
 
-    public CustomRuntimeException(String message, ErrorEnum errorEnum) {
-        super(message);
-        this.errorEnum = errorEnum;
+    public CustomRuntimeException() {
+        this.errorEnum = null;
     }
 
     public CustomRuntimeException(ErrorEnum errorEnum) {
         super(errorEnum.getMessage());
+        this.errorEnum = errorEnum;
+    }
+
+    public CustomRuntimeException(String message, ErrorEnum errorEnum) {
+        super(message);
         this.errorEnum = errorEnum;
     }
 

@@ -74,14 +74,17 @@ public class MovieServiceJpa implements MovieService{
     @Transactional
     @Override
     public int createMoviesByKobis(int startPage, int size) {
-        List<Movie> allNew = movieApiService.findAllNew(startPage, size);
+        List<Movie> allNew = movieApiService.findAllNew(startPage, size, false);
+        int cnt = 0;
         for (Movie movie : allNew) {
-            movieApiService.updateThumbnailAndUrlByMovie(movie);
-            movieApiService.updateActorsMovie(movie);
-            movie.updateLastModifiedDate();
-            movieRepository.save(movie);
+            if (movieApiService.updateActorsMovie(movie, false)) {
+                movieApiService.updateThumbnailAndUrlByMovie(movie);
+                movie.updateLastModifiedDate();
+                movieRepository.save(movie);
+                cnt++;
+            }
         }
-        return allNew.size();
+        return cnt;
     }
 
     @Transactional
