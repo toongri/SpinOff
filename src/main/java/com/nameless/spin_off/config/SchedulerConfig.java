@@ -37,17 +37,17 @@ public class SchedulerConfig {
         }
     }
 
-//    @Scheduled(cron = "0 0 7 * * *") //(매일 7시에 실행)
-//    public void movieApiJob() {
-//        Map<String, JobParameter> confMap = new HashMap<>();
-//        confMap.put("time", new JobParameter(System.currentTimeMillis()));
-//        JobParameters jobParameters = new JobParameters(confMap);
-//
-//        try {
-//            jobLauncher.run(batchConfig.movieApiJob(), jobParameters);
-//        } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException |
-//                JobParametersInvalidException | JobRestartException e) {
-//            log.error(e.getMessage());
-//        }
-//    }
+    @Scheduled(cron = "0 0 7 * * *") //(매일 7시에 실행)
+    public void movieApiJob() {
+        Map<String, JobParameter> confMap = new HashMap<>();
+        confMap.put("time", new JobParameter(System.currentTimeMillis()));
+        JobParameters jobParameters = new JobParameters(confMap);
+
+        try {
+            jobLauncher.run(batchConfig.movieApiJob(), jobParameters);
+        } catch (JobExecutionAlreadyRunningException | JobInstanceAlreadyCompleteException |
+                JobParametersInvalidException | JobRestartException e) {
+            log.error(e.getMessage());
+        }
+    }
 }
