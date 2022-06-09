@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.domain.Persistable;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
@@ -21,7 +22,7 @@ import static com.nameless.spin_off.enums.movie.MovieScoreEnum.*;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Movie {
+public class Movie implements Persistable<Long> {
 
     @Id
     @Column(name="movie_id")
@@ -282,4 +283,8 @@ public class Movie {
                         .between(post.getCreatedDate(), currentTime) < MOVIE_POST.getDays().get(j + 1);
     }
 
+    @Override
+    public boolean isNew() {
+        return getCreatedDate() == null;
+    }
 }
