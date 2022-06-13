@@ -68,6 +68,7 @@ public class Member {
     private LocalDateTime createdDate;
 
     private LocalDateTime lastModifiedDate;
+    private LocalDate deleteDate;
 
     @ElementCollection(fetch = FetchType.LAZY)
     @Enumerated(EnumType.STRING)
@@ -287,21 +288,22 @@ public class Member {
         this.refreshToken = refreshToken;
     }
 
-    public Member updateGoogleEmail(String googleEmail) {
+    public void updateGoogleEmail(String googleEmail) {
         this.googleEmail = googleEmail;
-        return this;
     }
-    public Member updateNaverEmail(String naverEmail) {
+    public void updateNaverEmail(String naverEmail) {
         this.naverEmail = naverEmail;
-        return this;
     }
-    public Member updateKakaoEmail(String kakaoEmail) {
+    public void updateKakaoEmail(String kakaoEmail) {
         this.kakaoEmail = kakaoEmail;
-        return this;
     }
 
     public void addRolesToUser() {
         this.roles.add(AuthorityOfMemberStatus.C);
+    }
+
+    public void updateDeleteDate(LocalDate deleteDate) {
+        this.deleteDate = deleteDate;
     }
 
     //==비즈니스 로직==//

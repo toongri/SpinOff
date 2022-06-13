@@ -215,6 +215,6 @@ public class CollectionServiceJpa implements CollectionService {
     }
 
     private boolean isExistCollectionIp(Long collectionId, String ip) {
-        return collectionQueryRepository.isExistIp(collectionId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+        return collectionQueryRepository.isExistIp(collectionId, ip, VIEWED_BY_IP_MINUTE.getDateTimeMinusMinutes());
     }
 }

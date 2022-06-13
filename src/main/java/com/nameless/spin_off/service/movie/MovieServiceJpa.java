@@ -121,6 +121,6 @@ public class MovieServiceJpa implements MovieService{
     }
 
     private boolean isExistMovieIp(Long movieId, String ip) {
-        return movieQueryRepository.isExistIp(movieId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+        return movieQueryRepository.isExistIp(movieId, ip, VIEWED_BY_IP_MINUTE.getDateTimeMinusMinutes());
     }
 }

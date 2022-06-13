@@ -12,6 +12,7 @@ import com.nameless.spin_off.exception.member.NotExistMemberException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 public interface MemberService {
     Long insertFollowedMemberByMemberId(Long memberId, Long followedMemberId)
@@ -28,5 +29,7 @@ public interface MemberService {
     boolean confirmEmailForAuth(EmailAuthRequestDto requestDto);
     boolean sendEmailForUpdateEmail(Long memberId, String email);
     boolean confirmEmailForUpdateEMail(EmailAuthRequestDto requestDto);
+    boolean updateMemberDeleteDate(Long memberId, LocalDate localDate);
+    boolean updateMemberDeleteDateToNull(Long memberId);
     int updateAllPopularity();
 }

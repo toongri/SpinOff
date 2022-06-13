@@ -34,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -220,7 +221,7 @@ public class MemberServiceJpa implements MemberService {
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                         requestDto.getEmail(),
                         requestDto.getAuthToken(),
-                        EMAIL_AUTH_MINUTE.getDateTime(),
+                        EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes(),
                         EmailAuthProviderStatus.B)
                 .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
@@ -257,11 +258,27 @@ public class MemberServiceJpa implements MemberService {
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                         requestDto.getEmail(),
                         requestDto.getAuthToken(),
-                        EMAIL_AUTH_MINUTE.getDateTime(),
+                        EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes(),
                         EmailAuthProviderStatus.C)
                 .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
         emailAuth.useToken();
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public boolean updateMemberDeleteDate(Long memberId, LocalDate localDate) {
+        Member member = getMember(memberId);
+        member.updateDeleteDate(localDate);
+        return true;
+    }
+
+    @Transactional
+    @Override
+    public boolean updateMemberDeleteDateToNull(Long memberId) {
+        Member member = getMemberByIdAndDeleteDateNotNull(memberId);
+        member.updateDeleteDate(null);
         return true;
     }
 
@@ -274,6 +291,11 @@ public class MemberServiceJpa implements MemberService {
             member.updatePopularity();
         }
         return members.size();
+    }
+
+    private Member getMemberByIdAndDeleteDateNotNull(Long memberId) {
+        return memberQueryRepository
+                .findOneByIdAndDeleteDateNotNull(memberId).orElseThrow(() -> new DontHaveAuthorityException(DONT_HAVE_AUTHORITY));
     }
 
     private void isCorrectEmail(String email) {
@@ -295,7 +317,7 @@ public class MemberServiceJpa implements MemberService {
 
     private void isExistAuthEmail(String email, String authToken) {
         if (!emailAuthQueryRepository.isExistAuthEmail(email, authToken,
-                REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.C)) {
+                REGISTER_EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes(), EmailAuthProviderStatus.C)) {
             throw new EmailNotAuthenticatedException(ErrorEnum.EMAIL_NOT_AUTHENTICATED);
         }
     }

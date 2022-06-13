@@ -11,7 +11,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.cglib.core.Block;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -73,16 +72,6 @@ public class MemberDto {
     public static class BlockedMemberDto {
 
         @ApiModelProperty(
-                value = "차단 id",
-                example = "123")
-        private Long blockId;
-
-        @ApiModelProperty(
-                value = "차단 종류",
-                example = "A")
-        private BlockedMemberStatus blockedMemberStatus;
-
-        @ApiModelProperty(
                 value = "멤버 id",
                 example = "123")
         private Long memberId;
@@ -97,9 +86,13 @@ public class MemberDto {
                 example = "123")
         private String nickname;
 
+        @ApiModelProperty(
+                value = "차단 종류",
+                example = "A")
+        private BlockedMemberStatus blockedMemberStatus;
+
         @QueryProjection
-        public BlockedMemberDto(Long blockId, BlockedMemberStatus blockedMemberStatus, Long memberId, String accountId, String nickname) {
-            this.blockId = blockId;
+        public BlockedMemberDto(Long memberId, String accountId, String nickname, BlockedMemberStatus blockedMemberStatus) {
             this.blockedMemberStatus = blockedMemberStatus;
             this.memberId = memberId;
             this.accountId = accountId;

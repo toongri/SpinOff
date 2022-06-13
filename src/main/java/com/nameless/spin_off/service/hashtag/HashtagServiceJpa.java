@@ -1,11 +1,11 @@
 package com.nameless.spin_off.service.hashtag;
 
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.hashtag.HashtagScoreEnum;
 import com.nameless.spin_off.entity.hashtag.FollowedHashtag;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.ViewedHashtagByIp;
 import com.nameless.spin_off.entity.member.Member;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.hashtag.HashtagScoreEnum;
 import com.nameless.spin_off.exception.hashtag.NotExistHashtagException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedHashtagException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -76,6 +76,6 @@ public class HashtagServiceJpa implements HashtagService{
     }
 
     private boolean isExistHashtagIp(Long hashtagId, String ip) {
-        return hashtagQueryRepository.isExistIp(hashtagId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+        return hashtagQueryRepository.isExistIp(hashtagId, ip, VIEWED_BY_IP_MINUTE.getDateTimeMinusMinutes());
     }
 }

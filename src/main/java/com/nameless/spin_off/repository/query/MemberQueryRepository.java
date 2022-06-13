@@ -32,10 +32,20 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         super(Member.class);
     }
 
+    public Optional<Member> findOneByIdAndDeleteDateNotNull(Long memberId) {
+        return Optional.ofNullable(getQueryFactory()
+                .select(member)
+                .from(member)
+                .where(
+                        member.id.eq(memberId),
+                        member.deleteDate.isNotNull())
+                .fetchFirst());
+    }
+
     public List<BlockedMemberDto> findAllBlockedMemberByMemberId(Long memberId) {
         return getQueryFactory()
                 .select(new QMemberDto_BlockedMemberDto(
-                        blockedMember.id, blockedMember.blockedMemberStatus, member.id, member.accountId, member.nickname))
+                        member.id, member.accountId, member.nickname, blockedMember.blockedMemberStatus))
                 .from(blockedMember)
                 .join(blockedMember.member, member)
                 .where(blockedMember.blockingMember.id.eq(memberId))

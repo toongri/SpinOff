@@ -10,7 +10,6 @@ import com.nameless.spin_off.dto.MovieDto.FollowMovieDto;
 import com.nameless.spin_off.dto.PostDto.MyPagePostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.dto.SearchDto.LastSearchDto;
-import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.exception.member.AlreadyBlockedMemberException;
 import com.nameless.spin_off.exception.member.AlreadyFollowedMemberException;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
@@ -35,6 +34,7 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.nameless.spin_off.dto.ResultDto.SingleApiResult.getResult;
+import static com.nameless.spin_off.enums.ContentsTimeEnum.MEMBER_DELETE_MONTH;
 
 @Slf4j
 @Api(tags = {"멤버 api"})
@@ -70,27 +70,26 @@ public class MemberApiController {
         return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
     }
 
-
     @ApiOperation(value = "멤버 팔로우 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
-                    name = "followedMemberId",
+                    name = "memberId",
                     value = "팔로우할 멤버 id",
                     required = true,
                     paramType = "path",
                     dataType = "Long",
                     example = "123")
     })
-    @PostMapping("/{followedMemberId}/follow")
+    @PostMapping("/{memberId}/follow")
     public SingleApiResult<Long> createFollowMember(
-            @LoginMember MemberDetails currentMember, @PathVariable Long followedMemberId)
+            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
         log.info("createFollowMember");
         log.info("memberId : {}", currentMember.getId());
-        log.info("followedMemberId : {}", followedMemberId);
+        log.info("followedMemberId : {}", memberId);
 
-        return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), followedMemberId));
+        return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), memberId));
     }
 
     @ApiOperation(value = "멤버 팔로워 조회", notes = "")
@@ -301,6 +300,30 @@ public class MemberApiController {
         return getResult(memberQueryService.getFollowCollectionsByMemberId(currentMember, memberId));
     }
 
+    @ApiOperation(value = "멤버 삭제시간 업데이트", notes = "")
+    @ApiImplicitParams({
+    })
+    @PatchMapping("/delete")
+    public SingleApiResult<Boolean> updateDeleteDate(@LoginMember MemberDetails currentMember) {
+
+        log.info("updateDeleteDate");
+        log.info("currentMemberId : {}", currentMember.getId());
+
+        return getResult(memberService.updateMemberDeleteDate(currentMember.getId(), MEMBER_DELETE_MONTH.getDatePlusMonths()));
+    }
+
+    @ApiOperation(value = "멤버 삭제 취소", notes = "")
+    @ApiImplicitParams({
+    })
+    @PatchMapping("/delete/cancel")
+    public SingleApiResult<Boolean> updateDeleteDateCancel(@LoginMember MemberDetails currentMember) {
+
+        log.info("updateDeleteDateCancel");
+        log.info("currentMemberId : {}", currentMember.getId());
+
+        return getResult(memberService.updateMemberDeleteDateToNull(currentMember.getId()));
+    }
+
     @ApiOperation(value = "멤버 프로필 조회", notes = "")
     @ApiImplicitParams({
     })
@@ -446,6 +469,7 @@ public class MemberApiController {
         return getResult(memberService
                 .insertBlockedMemberByMemberId(currentMember.getId(), memberId, requestDto.getBlockedMemberStatus()));
     }
+
     @ApiOperation(value = "멤버 차단 목록 조회", notes = "")
     @ApiImplicitParams({
     })
@@ -468,6 +492,7 @@ public class MemberApiController {
                     paramType = "body",
                     dataType = "SearchMemberRequestDto")
     })
+
     @PostMapping("/search")
     public SingleApiResult<Long> createSearch(
             @LoginMember MemberDetails currentMember, @RequestBody SearchMemberRequestDto searchMemberRequestDto)

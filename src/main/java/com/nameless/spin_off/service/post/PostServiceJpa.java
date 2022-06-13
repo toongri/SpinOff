@@ -5,14 +5,14 @@ import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ThumbnailAndPublicPostDto;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
-import com.nameless.spin_off.enums.ErrorEnum;
-import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.ViewedPostByIp;
+import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
 import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
@@ -265,7 +265,7 @@ public class PostServiceJpa implements PostService{
     }
 
     private boolean isExistPostIp(Long postId, String ip) {
-        return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTime());
+        return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTimeMinusMinutes());
     }
 
     private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {

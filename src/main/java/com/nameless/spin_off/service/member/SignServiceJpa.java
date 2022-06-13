@@ -149,7 +149,7 @@ public class SignServiceJpa implements SignService{
         EmailAuth emailAuth = emailAuthQueryRepository.findValidAuthByEmail(
                         requestDto.getEmail(),
                         requestDto.getAuthToken(),
-                        EMAIL_AUTH_MINUTE.getDateTime(),
+                        EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes(),
                         EmailAuthProviderStatus.A)
                 .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
@@ -162,7 +162,7 @@ public class SignServiceJpa implements SignService{
     public void checkEmailLinkage(MemberDto.EmailLinkageCheckRequestDto requestDto) {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
                         requestDto.getAccountId(), requestDto.getEmail(),
-                        requestDto.getAuthToken(), EMAIL_AUTH_MINUTE.getDateTime())
+                        requestDto.getAuthToken(), EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes())
                 .orElseThrow(() -> new NotExistEmailAuthTokenException(ErrorEnum.NOT_EXIST_EMAIL_AUTH_TOKEN));
 
         Member member =
@@ -304,7 +304,7 @@ public class SignServiceJpa implements SignService{
 
     private void isExistAuthEmail(String email, String authToken) {
         if (!emailAuthQueryRepository.isExistAuthEmail(email, authToken,
-                REGISTER_EMAIL_AUTH_MINUTE.getDateTime(), EmailAuthProviderStatus.A)) {
+                REGISTER_EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes(), EmailAuthProviderStatus.A)) {
             throw new EmailNotAuthenticatedException(ErrorEnum.EMAIL_NOT_AUTHENTICATED);
         }
     }
