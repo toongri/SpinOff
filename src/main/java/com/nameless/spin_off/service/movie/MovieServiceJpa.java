@@ -73,8 +73,8 @@ public class MovieServiceJpa implements MovieService{
 
     @Transactional
     @Override
-    public int createMoviesByKobis(int startPage, int size) {
-        List<Movie> allNew = movieApiService.findAllNew(startPage, size, false);
+    public int createMoviesByKobis(int startPage, int size, boolean isBatch) {
+        List<Movie> allNew = movieApiService.findAllNew(startPage, size, isBatch);
         int cnt = 0;
         for (Movie movie : allNew) {
             if (movieApiService.updateActorsMovie(movie, false)) {

@@ -5,6 +5,7 @@ import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto.NaverMovie;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.exception.movie.CantFindMovieUrlException;
 import com.nameless.spin_off.exception.movie.OverKobisMovieApiLimitException;
+import com.nameless.spin_off.exception.movie.UnKnownKobisException;
 import com.nameless.spin_off.repository.movie.MovieRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -50,7 +51,7 @@ public class MovieApiService {
     public List<Movie> findAllNew(int startPage, int size, boolean isBatch) {
 
         key = isBatch ? batchKey : apiKey;
-
+        int errCnt = 0;
         List<Movie> newMovieList = new ArrayList<>();
         for (int curPage = 0; curPage < size; curPage++) {
             try {
@@ -69,7 +70,12 @@ public class MovieApiService {
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
                 log.debug("resultMap : {}", resultMap.toString());
                 if (resultMap.getBody().containsKey("faultInfo")) {
-                    throw new OverKobisMovieApiLimitException();
+                    LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("faultInfo");
+                    if (String.valueOf(lm.get("errorCode")).equals("320099")) {
+                        throw new UnKnownKobisException();
+                    } else {
+                        throw new OverKobisMovieApiLimitException();
+                    }
                 }
 
                 LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("movieListResult");
@@ -120,18 +126,29 @@ public class MovieApiService {
                 if (!resultMovieList.isEmpty()) {
                     newMovieList.addAll(resultMovieList);
                 }
-
+                errCnt = 0;
             } catch (HttpClientErrorException | HttpServerErrorException e) {
                 log.error("kobisMovieError");
                 log.error("statusCode : {}", e.getRawStatusCode());
                 log.error("body : {}", e.getStatusText());
+                errCnt = 0;
             } catch (OverKobisMovieApiLimitException e) {
                 log.error("OverKobisMovieApiLimitError");
                 log.error("code : {}", e.getErrorEnum().getCode());
                 log.error("message : {}", e.getMessage());
+                errCnt = 0;
+            } catch (UnKnownKobisException e) {
+                log.error("UnKnownKobisException");
+                if (errCnt < 10) {
+                    errCnt++;
+                    curPage--;
+                } else {
+                    errCnt = 0;
+                }
             } catch (Exception e) {
                 log.error("kobisMovieError");
                 log.error("예상하지 못한 에러 : {}", e.toString());
+                errCnt = 0;
             }
         }
         log.info("newMovieList size : {}", newMovieList.size());
@@ -140,49 +157,60 @@ public class MovieApiService {
 
     public boolean updateActorsMovie(Movie movie, boolean isBatch) {
         key = isBatch ? batchKey : apiKey;
-        try {
-            HttpHeaders header = new HttpHeaders();
-            HttpEntity<?> entity = new HttpEntity<>(header);
+        for (int i = 0; i < 10; i++) {
+            try {
+                HttpHeaders header = new HttpHeaders();
+                HttpEntity<?> entity = new HttpEntity<>(header);
 
-            UriComponents uri = UriComponentsBuilder
-                    .fromHttpUrl(
-                            kobisInfoUrl + "?" +
-                                    "key=" + key + "&" +
-                                    "movieCd=" + movie.getId())
-                    .build();
+                UriComponents uri = UriComponentsBuilder
+                        .fromHttpUrl(
+                                kobisInfoUrl + "?" +
+                                        "key=" + key + "&" +
+                                        "movieCd=" + movie.getId())
+                        .build();
 
-            //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
-            ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-            if (resultMap.getBody().containsKey("faultInfo")) {
-                throw new OverKobisMovieApiLimitException();
+                //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
+                ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
+                log.debug("resultMap {}", resultMap.toString());
+                if (resultMap.getBody().containsKey("faultInfo")) {
+
+                    LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("faultInfo");
+                    if (String.valueOf(lm.get("errorCode")).equals("320099")) {
+                        throw new UnKnownKobisException();
+                    } else {
+                        throw new OverKobisMovieApiLimitException();
+                    }
+                }
+                LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieInfoResult");
+                Map movieInfo = (Map)lm.get("movieInfo");
+
+                ArrayList<Map> actors = (ArrayList<Map>) (movieInfo.get("actors"));
+                movie.updateActors(getActors(actors));
+
+                return true;
+            } catch (HttpClientErrorException | HttpServerErrorException e) {
+                log.error("kobisInfoMovieError");
+                log.error("statusCode : {}", e.getRawStatusCode());
+                log.error("body : {}", e.getStatusText());
+                return false;
+            } catch (OverKobisMovieApiLimitException e) {
+                log.error("OverKobisMovieApiLimitError");
+                log.error("code : {}", e.getErrorEnum().getCode());
+                log.error("message : {}", e.getMessage());
+                return false;
+            } catch (UnKnownKobisException e) {
+                log.error("UnKnownKobisException");
+            } catch (NumberFormatException e) {
+                log.debug("kobisInfoMovieDataError");
+                log.debug("데이터 오류 : {}", e.toString());
+                return false;
+            }  catch (Exception e) {
+                log.error("kobisInfoMovieError");
+                log.error("예상하지 못한 에러 : {}", e.toString());
+                return false;
             }
-            LinkedHashMap lm = (LinkedHashMap)resultMap.getBody().get("movieInfoResult");
-            Map movieInfo = (Map)lm.get("movieInfo");
-
-            ArrayList<Map> actors = (ArrayList<Map>) (movieInfo.get("actors"));
-            movie.updateActors(getActors(actors));
-
-        } catch (HttpClientErrorException | HttpServerErrorException e) {
-            log.error("kobisInfoMovieError");
-            log.error("statusCode : {}", e.getRawStatusCode());
-            log.error("body : {}", e.getStatusText());
-            return false;
-        } catch (OverKobisMovieApiLimitException e) {
-            log.error("OverKobisMovieApiLimitError");
-            log.error("code : {}", e.getErrorEnum().getCode());
-            log.error("message : {}", e.getMessage());
-            return false;
-        } catch (NumberFormatException e) {
-            log.debug("kobisInfoMovieDataError");
-            log.debug("데이터 오류 : {}", e.toString());
-            return false;
-        }  catch (Exception e) {
-            log.error("kobisInfoMovieError");
-            log.error("예상하지 못한 에러 : {}", e.toString());
-            return false;
         }
-
-        return true;
+        return false;
     }
 
     public boolean updateThumbnailAndUrlByMovie(Movie movie) {

@@ -10,6 +10,6 @@ public interface MovieService {
     Long insertFollowedMovieByMovieId(Long memberId, Long movieId)
             throws NotExistMemberException, NotExistMovieException, AlreadyFollowedMovieException;
     int updateAllPopularity();
-    int createMoviesByKobis(int startPage, int size);
+    int createMoviesByKobis(int startPage, int size, boolean isBatch);
     int updateMovieByNaver();
 }

@@ -3,7 +3,6 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.MovieDto;
 import com.nameless.spin_off.dto.MovieDto.KobisRequestDto;
 import com.nameless.spin_off.dto.MovieDto.ReadMovieDto;
 import com.nameless.spin_off.dto.PostDto.RelatedPostDto;
@@ -48,6 +47,24 @@ public class MovieApiController {
         return movieService.updateMovieByNaver();
     }
 
+    @ApiOperation(value = "kobis api 영화 생성2", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "requestDto",
+                    value = "api 요청",
+                    required = true,
+                    paramType = "body",
+                    dataType = "KobisRequestDto")
+    })
+    @PostMapping("/kobis/test")
+    public int test(@RequestBody KobisRequestDto requestDto) {
+
+        log.info("createMovieByKobis");
+        log.info("startPage : {}", requestDto.getStartPage());
+        log.info("size : {}", requestDto.getSize());
+        return movieService.createMoviesByKobis(requestDto.getStartPage(), requestDto.getSize(), true);
+    }
+
     @ApiOperation(value = "kobis api 영화 생성", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
@@ -63,7 +80,7 @@ public class MovieApiController {
         log.info("createMovieByKobis");
         log.info("startPage : {}", requestDto.getStartPage());
         log.info("size : {}", requestDto.getSize());
-        return movieService.createMoviesByKobis(requestDto.getStartPage(), requestDto.getSize());
+        return movieService.createMoviesByKobis(requestDto.getStartPage(), requestDto.getSize(), false);
     }
 
     @ApiOperation(value = "영화 팔로우 생성", notes = "")
