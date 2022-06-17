@@ -138,7 +138,7 @@ public class BatchConfig {
     @Bean
     @StepScope  // 1
     public ListItemReader<Member> popularityMemberReader() {
-        log.info("********** This is popularityMemberReader");
+//        log.info("********** This is popularityMemberReader");
         List<Member> activeMembers = memberRepository.findAllByViewAfterTime(MEMBER_FOLLOW.getOldestDate());
         log.info("          - activeMember SIZE : " + activeMembers.size());  // 2
         return new ListItemReader<>(activeMembers);  // 3
@@ -147,45 +147,45 @@ public class BatchConfig {
     @Bean
     @StepScope  // 1
     public ListItemReader<Post> popularityPostReader() {
-        log.info("********** This is popularityPostReader");
+//        log.info("********** This is popularityPostReader");
         List<Post> activePosts = postRepository.findAllByViewAfterTime(POST_VIEW.getOldestDate());
-        log.info("          - activeMember SIZE : " + activePosts.size());  // 2
+        log.info("          - activePost SIZE : " + activePosts.size());  // 2
         return new ListItemReader<>(activePosts);  // 3
     }
 
     @Bean
     @StepScope  // 1
     public ListItemReader<Collection> popularityCollectionReader() {
-        log.info("********** This is popularityCollectionReader");
+//        log.info("********** This is popularityCollectionReader");
         List<Collection> activeCollections = collectionRepository.findAllByViewAfterTime(COLLECTION_VIEW.getOldestDate());
-        log.info("          - activeMember SIZE : " + activeCollections.size());  // 2
+        log.info("          - activeCollection SIZE : " + activeCollections.size());  // 2
         return new ListItemReader<>(activeCollections);  // 3
     }
 
     @Bean
     @StepScope  // 1
     public ListItemReader<Hashtag> popularityHashtagReader() {
-        log.info("********** This is popularityHashtagReader");
+//        log.info("********** This is popularityHashtagReader");
         List<Hashtag> activeHashtags = hashtagRepository.findAllByViewAfterTime(HASHTAG_VIEW.getOldestDate());
-        log.info("          - activeMember SIZE : " + activeHashtags.size());  // 2
+        log.info("          - activeHashtag SIZE : " + activeHashtags.size());  // 2
         return new ListItemReader<>(activeHashtags);  // 3
     }
 
     @Bean
     @StepScope  // 1
     public ListItemReader<Movie> popularityMovieReader() {
-        log.info("********** This is popularityMovieReader");
+//        log.info("********** This is popularityMovieReader");
         List<Movie> activeMovies = movieRepository.findAllByViewAfterTime(MOVIE_VIEW.getOldestDate());
-        log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
+        log.info("          - activeMovie SIZE : " + activeMovies.size());  // 2
         return new ListItemReader<>(activeMovies);  // 3
     }
 
     @Bean
     @StepScope  // 1
     public ListItemReader<Movie> movieApiReader() {
-        log.info("********** This is movieApiReader");
+//        log.info("********** This is movieApiReader");
         List<Movie> activeMovies = movieApiService.findAllNew(1, KOBIS_API_REQUEST_NUMBER_MAX.getValue(), true);
-        log.info("          - activeMember SIZE : " + activeMovies.size());  // 2
+        log.info("          - activeMovie SIZE : " + activeMovies.size());  // 2
         return new ListItemReader<>(activeMovies);  // 3
     }
 
@@ -193,7 +193,7 @@ public class BatchConfig {
         return new ItemProcessor<Member, Member>() {  // 1
             @Override
             public Member process(Member member) throws Exception {
-                log.info("********** This is popularityMemberProcessor");
+//                log.info("********** This is popularityMemberProcessor");
                 member.updatePopularity();
                 return member;  // 2
             }
@@ -204,7 +204,7 @@ public class BatchConfig {
         return new ItemProcessor<Post, Post>() {  // 1
             @Override
             public Post process(Post post) throws Exception {
-                log.info("********** This is popularityPostProcessor");
+//                log.info("********** This is popularityPostProcessor");
                 post.updatePopularity();
                 return post;  // 2
             }
@@ -215,7 +215,7 @@ public class BatchConfig {
         return new ItemProcessor<Collection, Collection>() {  // 1
             @Override
             public Collection process(Collection collection) throws Exception {
-                log.info("********** This is popularityCollectionProcessor");
+//                log.info("********** This is popularityCollectionProcessor");
                 collection.updatePopularity();
                 return collection;  // 2
             }
@@ -226,7 +226,7 @@ public class BatchConfig {
         return new ItemProcessor<Hashtag, Hashtag>() {  // 1
             @Override
             public Hashtag process(Hashtag hashtag) throws Exception {
-                log.info("********** This is popularityHashtagProcessor");
+//                log.info("********** This is popularityHashtagProcessor");
                 hashtag.updatePopularity();
                 return hashtag;  // 2
             }
@@ -237,7 +237,7 @@ public class BatchConfig {
         return new ItemProcessor<Movie, Movie>() {  // 1
             @Override
             public Movie process(Movie movie) throws Exception {
-                log.info("********** This is popularityMovieProcessor");
+//                log.info("********** This is popularityMovieProcessor");
                 movie.updatePopularity();
                 return movie;  // 2
             }
@@ -248,42 +248,43 @@ public class BatchConfig {
         return new ItemProcessor<Movie, Movie>() {  // 1
             @Override
             public Movie process(Movie movie) throws Exception {
-                log.info("********** This is movieApiProcessor");
-                movieApiService.updateActorsMovie(movie, true);
-                movieApiService.updateThumbnailAndUrlByMovie(movie);
-                movie.updateLastModifiedDate();
+//                log.info("********** This is movieApiProcessor");
+                if (movieApiService.updateActorsMovie(movie, true)) {
+                    movieApiService.updateThumbnailAndUrlByMovie(movie);
+                    movie.updateLastModifiedDate();
+                }
                 return movie;  // 2
             }
         };
     }
 
     public ItemWriter<Member> popularityMemberWriter() {
-        log.info("********** This is popularityMemberWriter");
+//        log.info("********** This is popularityMemberWriter");
         return (memberRepository::saveAll);
     }
 
     public ItemWriter<Post> popularityPostWriter() {
-        log.info("********** This is popularityPostWriter");
+//        log.info("********** This is popularityPostWriter");
         return (postRepository::saveAll);
     }
 
     public ItemWriter<Collection> popularityCollectionWriter() {
-        log.info("********** This is popularityCollectionWriter");
+//        log.info("********** This is popularityCollectionWriter");
         return (collectionRepository::saveAll);
     }
 
     public ItemWriter<Hashtag> popularityHashtagWriter() {
-        log.info("********** This is popularityHashtagWriter");
+//        log.info("********** This is popularityHashtagWriter");
         return (hashtagRepository::saveAll);
     }
 
     public ItemWriter<Movie> popularityMovieWriter() {
-        log.info("********** This is popularityMovieWriter");
+//        log.info("********** This is popularityMovieWriter");
         return (movieRepository::saveAll);
     }
 
     public ItemWriter<Movie> movieApiWriter() {
-        log.info("********** This is movieApiWriter");
+//        log.info("********** This is movieApiWriter");
         return (movieRepository::saveAll);
     }
 }
