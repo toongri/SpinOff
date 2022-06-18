@@ -34,6 +34,8 @@ class MovieServiceJpaTest {
 
         //given
         Movie mov = movieRepository.save(Movie.createMovie(0L, "", null, null, null));
+
+        em.flush();
         Movie mov2 = movieRepository.save(Movie.createMovie(1L, "", null, null, null));
         Movie mov3 = movieRepository.save(Movie.createMovie(2L, "", null, null, null));
 

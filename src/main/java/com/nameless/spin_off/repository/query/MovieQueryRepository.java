@@ -23,6 +23,7 @@ import static com.nameless.spin_off.entity.movie.QFollowedMovie.followedMovie;
 import static com.nameless.spin_off.entity.movie.QMovie.movie;
 import static com.nameless.spin_off.entity.movie.QViewedMovieByIp.viewedMovieByIp;
 import static com.nameless.spin_off.entity.post.QPost.post;
+import static com.nameless.spin_off.enums.movie.MovieApiEnum.KOBIS_API_REQUEST_SIZE_MAX;
 import static com.nameless.spin_off.enums.movie.MovieApiEnum.NAVER_API_REQUEST_NUMBER_MAX;
 
 @Repository
@@ -32,11 +33,22 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
         super(Movie.class);
     }
 
+    public List<Movie> findAllWithoutActorOrderByCreateDesc(int page, int size) {
+        return getQueryFactory()
+                .select(movie)
+                .from(movie)
+                .where(movie.actors.isEmpty())
+                .orderBy(movie.createdDate.desc())
+                .offset((long) page * size * KOBIS_API_REQUEST_SIZE_MAX.getValue())
+                .limit((long) size * KOBIS_API_REQUEST_SIZE_MAX.getValue())
+                .fetch();
+    }
+
     public List<Movie> findAllWithoutNaverInfoOrderByCreateDesc() {
         return getQueryFactory()
                 .select(movie)
                 .from(movie)
-                .where(movie.naverUrl.isEmpty().or(movie.thumbnail.isEmpty()))
+                .where(movie.naverUrl.isEmpty().or(movie.thumbnail.eq("")))
                 .orderBy(movie.createdDate.desc())
                 .limit(NAVER_API_REQUEST_NUMBER_MAX.getValue())
                 .fetch();

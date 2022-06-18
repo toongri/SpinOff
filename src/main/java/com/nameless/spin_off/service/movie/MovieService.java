@@ -12,4 +12,5 @@ public interface MovieService {
     int updateAllPopularity();
     int createMoviesByKobis(int startPage, int size, boolean isBatch);
     int updateMovieByNaver();
+    int updateMovieActorByKobis(int page, int size);
 }

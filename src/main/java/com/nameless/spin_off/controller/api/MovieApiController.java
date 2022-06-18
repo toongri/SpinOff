@@ -41,13 +41,13 @@ public class MovieApiController {
     @ApiOperation(value = "naver api 영화 수정", notes = "")
     @ApiImplicitParams({
     })
-    @PostMapping("/naver")
+    @PutMapping("/naver")
     public int updateMovieByNaver() {
         log.info("updateMovieByNaver");
         return movieService.updateMovieByNaver();
     }
 
-    @ApiOperation(value = "kobis api 영화 생성2", notes = "")
+    @ApiOperation(value = "kobis api 영화배우 업데이트", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(
                     name = "requestDto",
@@ -56,13 +56,13 @@ public class MovieApiController {
                     paramType = "body",
                     dataType = "KobisRequestDto")
     })
-    @PostMapping("/kobis/test")
-    public int test(@RequestBody KobisRequestDto requestDto) {
+    @PutMapping("/kobis/actor")
+    public int updateMovieActorByKobis(@RequestBody KobisRequestDto requestDto) {
 
-        log.info("createMovieByKobis");
+        log.info("updateMovieActorByKobis");
         log.info("startPage : {}", requestDto.getStartPage());
         log.info("size : {}", requestDto.getSize());
-        return movieService.createMoviesByKobis(requestDto.getStartPage(), requestDto.getSize(), true);
+        return movieService.updateMovieActorByKobis(requestDto.getStartPage(), requestDto.getSize());
     }
 
     @ApiOperation(value = "kobis api 영화 생성", notes = "")

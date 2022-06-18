@@ -101,6 +101,19 @@ public class MovieServiceJpa implements MovieService{
         return cnt;
     }
 
+    @Override
+    public int updateMovieActorByKobis(int page, int size) {
+        List<Movie> movies = movieQueryRepository.findAllWithoutActorOrderByCreateDesc(page, size);
+        int cnt = 0;
+        for (Movie movie : movies) {
+            if (movieApiService.updateActorsMovie(movie, false)) {
+                cnt++;
+                movie.updateLastModifiedDate();
+            }
+        }
+        return cnt;
+    }
+
 
     private Movie getMovieById(Long movieId) throws NotExistMovieException {
         Optional<Movie> optionalMovie = movieRepository.findById(movieId);
