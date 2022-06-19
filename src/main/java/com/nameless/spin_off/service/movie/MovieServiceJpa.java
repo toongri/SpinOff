@@ -101,6 +101,7 @@ public class MovieServiceJpa implements MovieService{
         return cnt;
     }
 
+    @Transactional
     @Override
     public int updateMovieActorByKobis(int page, int size) {
         List<Movie> movies = movieQueryRepository.findAllWithoutActorOrderByCreateDesc(page, size);

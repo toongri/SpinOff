@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .cors()
+                .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .httpBasic().disable()
                 .csrf().disable()
@@ -84,8 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.addAllowedOrigin("*"); //허용 출처
-//        configuration.addAllowedOrigin("http://localhost:3000"); //허용 출처
-//        configuration.addAllowedOrigin("http://www.spin-off.p-e.kr"); //허용 출처
+        configuration.addAllowedOrigin("http://localhost:3000"); //허용 출처
+        configuration.addAllowedOrigin("http://www.spin-off.p-e.kr"); //허용 출처
         configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
