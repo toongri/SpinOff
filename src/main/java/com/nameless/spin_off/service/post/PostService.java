@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.post;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotExistCollectionException;
@@ -28,5 +29,7 @@ public interface PostService {
             throws NotExistMemberException, NotMatchCollectionException,
             NotExistPostException, AlreadyCollectedPostException;
     Long insertCollectedPost(Long memberId, Long postId, Long collectionId);
+
+    Long deletePost(MemberDetails currentMember, Long postId);
     int updateAllPopularity();
 }

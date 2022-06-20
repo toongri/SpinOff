@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.post;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostThumbnailsCollectionDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.dto.PostDto.ThumbnailAndPublicPostDto;
@@ -165,6 +166,11 @@ public class PostServiceJpa implements PostService{
         return collectedPostRepository.save(CollectedPost.createCollectedPost(
                 Collection.createCollection(collectionId),
                 Post.createPost(postId))).getId();
+    }
+
+    @Override
+    public Long deletePost(MemberDetails currentMember, Long postId) {
+        return null;
     }
 
     @Transactional
