@@ -65,9 +65,6 @@ class CommentInPostQueryServiceJpaTest {
                 .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build());
 
-        Post post2 = postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
-                .setTitle("aaa").setContent("").setUrls(List.of())
-                .setHashTags(List.of()).build());
         List<Long> commentIds = new ArrayList<>();
 
         commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(

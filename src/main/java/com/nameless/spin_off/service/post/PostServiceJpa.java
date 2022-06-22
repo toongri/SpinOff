@@ -168,9 +168,16 @@ public class PostServiceJpa implements PostService{
                 Post.createPost(postId))).getId();
     }
 
+    @Transactional
     @Override
     public Long deletePost(MemberDetails currentMember, Long postId) {
-        return null;
+        Post post = getPostWithPostedMedia(postId);
+        hasAuthPost(currentMember, post.getMember().getId());
+        for (PostedMedia media : post.getPostedMedias()) {
+            awsS3Service.deleteFile(media.getUrl());
+        }
+        postRepository.delete(post);
+        return 1L;
     }
 
     @Transactional

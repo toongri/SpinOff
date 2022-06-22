@@ -1,5 +1,7 @@
 package com.nameless.spin_off.service.post;
 
+import com.nameless.spin_off.config.member.MemberDetails;
+import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
@@ -7,7 +9,9 @@ import com.nameless.spin_off.entity.hashtag.Hashtag;
 import com.nameless.spin_off.entity.hashtag.PostedHashtag;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
@@ -17,18 +21,23 @@ import com.nameless.spin_off.exception.post.AlreadyLikedPostException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.comment.CommentInPostRepository;
+import com.nameless.spin_off.repository.comment.LikedCommentInPostRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -50,6 +59,9 @@ class PostServiceJpaTest {
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired MemberService memberService;
+    @Autowired CommentInPostService commentInPostService;
+    @Autowired CommentInPostRepository commentInPostRepository;
+    @Autowired LikedCommentInPostRepository likedCommentInPostRepository;
 
     @Test
     public void 해시태그_검열_테스트() throws Exception{
@@ -452,10 +464,108 @@ class PostServiceJpaTest {
     @Test
     public void 글_삭제_테스트() throws Exception{
         //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(member);
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        member2.addRole(AuthorityOfMemberStatus.A);
+        memberRepository.save(member2);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(memberRepository.save(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcname").build()));
+        }
+        Post post = postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setHashTags(List.of()).build());
+
+        List<Long> commentIds = new ArrayList<>();
+
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                null, "ddd"), member.getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                null, "ddd"), memberList.get(0).getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                null, "ddd"), memberList.get(1).getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                null, "ddd"), memberList.get(2).getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                null, "ddd"), memberList.get(3).getId(), post.getId()));
+
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(0), "ddd"), member.getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(0), "ddd"), memberList.get(0).getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(0), "ddd"), memberList.get(1).getId(), post.getId()));
+
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(2), "ddd"), member.getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(2), "ddd"), memberList.get(0).getId(), post.getId()));
+        commentIds.add(commentInPostService.insertCommentInPostByCommentVO(new CommentDto.CommentInPostRequestDto(
+                commentIds.get(2), "ddd"), memberList.get(1).getId(), post.getId()));
+
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(1).getId(), commentIds.get(1));
+        commentInPostService.insertLikedCommentByMemberId(member.getId(), commentIds.get(0));
+        commentInPostService.insertLikedCommentByMemberId(memberList.get(2).getId(), commentIds.get(0));
+        commentInPostService.insertLikedCommentByMemberId(member.getId(), commentIds.get(7));
+
+        em.flush();
+        em.clear();
 
         //when
+        System.out.println("서비스함수");
+        postService.deletePost(MemberDetails.builder()
+                .id(member.getId())
+                .accountId(member.getAccountId())
+                .accountPw(member.getAccountPw())
+                .authorities(member.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), post.getId());
+        em.flush();
+        System.out.println("서비스함수끝");
 
         //then
+        assertThatThrownBy(() -> postRepository.findById(post.getId())
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST)))
+                .isInstanceOf(NotExistPostException.class);
+        assertThat(commentInPostRepository.findAll().size()).isEqualTo(0);
+        assertThat(likedCommentInPostRepository.findAll().size()).isEqualTo(0);
 
+        Post post2 = postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setHashTags(List.of()).build());
+
+        postService.deletePost(MemberDetails.builder()
+                .id(member2.getId())
+                .accountId(member2.getAccountId())
+                .accountPw(member2.getAccountPw())
+                .authorities(member2.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), post2.getId());
     }
 }
