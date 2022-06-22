@@ -68,7 +68,7 @@ class CollectionServiceJpaTest {
         //when
         System.out.println("서비스 함수");
         Long aLong = collectionService
-                .insertCollection(new CollectionRequestDto("", "", A), member.getId());
+                .insertCollection(new CollectionRequestDto("aaa", "", A), member.getId());
         System.out.println("컬렉션 조회 함수");
         Collection collection = collectionRepository.getById(aLong);
 
@@ -188,7 +188,7 @@ class CollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
-        Collection col = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
+        Collection col = Collection.createCollection(mem2, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
 
         em.flush();
@@ -235,9 +235,9 @@ class CollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
-        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
+        Collection col = Collection.createCollection(mem, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
-        Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
+        Collection col2 = Collection.createCollection(mem2, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
 
         em.flush();
@@ -386,7 +386,7 @@ class CollectionServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
@@ -445,7 +445,7 @@ class CollectionServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("dfdfdfd")
                 .setHashTags(List.of()).build();
         postRepository.save(po);
@@ -522,43 +522,43 @@ class CollectionServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("0")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("1")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("2")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("3")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("4")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("5")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("6")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("7")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("8")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("9")
                 .setHashTags(List.of()).build()));
 
@@ -741,7 +741,7 @@ class CollectionServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
+                .setTitle("aaa").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
         Member mem2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
@@ -810,43 +810,43 @@ class CollectionServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("0")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("1")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("2")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("3")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("4")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("5")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("6")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("7")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("8")
                 .setHashTags(List.of()).build()));
         postList.add(postRepository.save(Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl("9")
                 .setHashTags(List.of()).build()));
         em.flush();
@@ -901,7 +901,11 @@ class CollectionServiceJpaTest {
                 memberCollection2.getId(), mem.getId());
         System.out.println("서비스함수 끝");
 
+        em.flush();
         LocalDateTime lastModifiedDate = collectionRepository.findById(memberCollection2.getId()).get().getLastModifiedDate();
+
+        assertThat(memberCollection2.getLastModifiedDate()).isEqualTo(lastModifiedDate);
+        assertThat(aLong).isEqualTo(0L);
 
         Long aLong2 = collectionService.updateCollection(new CollectionRequestDto("abccd", "abcddaa", B),
                 memberCollection2.getId(), mem.getId());
@@ -909,8 +913,6 @@ class CollectionServiceJpaTest {
 
         em.flush();
         //then
-        assertThat(memberCollection2.getLastModifiedDate()).isEqualTo(lastModifiedDate);
-        assertThat(aLong).isEqualTo(0L);
 
         assertThat(collection.getTitle()).isEqualTo("abccd");
         assertThat(collection.getContent()).isEqualTo("abcddaa");

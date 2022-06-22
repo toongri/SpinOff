@@ -4,12 +4,8 @@ import com.nameless.spin_off.entity.comment.CommentInPost;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
-import com.nameless.spin_off.repository.collection.CollectedPostRepository;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,10 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CommentInPostRepositoryTest {
     @Autowired PostRepository postRepository;
     @Autowired MemberRepository memberRepository;
-    @Autowired CollectionRepository collectionRepository;
-    @Autowired CollectedPostRepository collectedPostRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired PostService postService;
     @Autowired CommentInPostRepository commentInPostRepository;
     @Autowired EntityManager em;
 
@@ -46,7 +38,7 @@ class CommentInPostRepositoryTest {
                 .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
+                .setTitle("aaa").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(post);
         CommentInPost parentComment = CommentInPost.createCommentInPost(member, "야스히로 라할살", null, post);
         CommentInPost childComment1 = CommentInPost.createCommentInPost(member, "요지스타 라할살", parentComment, post);

@@ -11,6 +11,7 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.movie.Movie;
 import com.nameless.spin_off.entity.post.LikedPost;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.enums.ContentsLengthEnum.HASHTAG_LIST_MAX;
 import static com.nameless.spin_off.enums.ContentsLengthEnum.POST_IMAGE_MAX;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
-import static com.nameless.spin_off.enums.hashtag.HashtagCondition.CONTENT;
 import static com.nameless.spin_off.enums.post.PostScoreEnum.POST_VIEW;
 
 @Service
@@ -197,14 +197,17 @@ public class PostServiceJpa implements PostService{
         return posts.size();
     }
 
+    private Post getPostWithPostedMedia(Long postId) {
+        return postRepository.findOneByIdWithPostedMedia(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
+    }
+
     private List<Hashtag> saveHashtagsByString(List<String> hashtagContents) throws IncorrectHashtagContentException {
 
         List<String> hashtagStrings = hashtagContents.stream()
                 .distinct()
                 .limit(HASHTAG_LIST_MAX.getLength())
                 .collect(Collectors.toList());
-
-        isNotContainCantChar(hashtagStrings);
 
         List<Hashtag> alreadySavedHashtags = hashtagRepository.findAllByContentIn(hashtagStrings);
 
@@ -234,14 +237,6 @@ public class PostServiceJpa implements PostService{
     private void isExistCollectedPost(Long postId, Long collectionId) {
         if (postQueryRepository.isExistCollectedPost(postId, collectionId)) {
             throw new AlreadyCollectedPostException(ErrorEnum.ALREADY_COLLECTED_POST);
-        }
-    }
-
-    private void isNotContainCantChar(List<String> hashtagContents) {
-        for (String hashtagContent : hashtagContents) {
-            if (CONTENT.isNotCorrect(hashtagContent)) {
-                throw new IncorrectHashtagContentException(ErrorEnum.INCORRECT_HASHTAG_CONTENT);
-            }
         }
     }
 
@@ -287,6 +282,12 @@ public class PostServiceJpa implements PostService{
             if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
+        }
+    }
+
+    private void hasAuthPost(MemberDetails currentMember, Long memberId) {
+        if (!(currentMember.isAdmin() || currentMember.getId().equals(memberId))) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
     }
 

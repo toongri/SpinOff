@@ -48,8 +48,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class MovieQueryServiceJpaTest {
 
-    @Autowired MemberQueryService memberQueryService;
-    @Autowired SearchQueryService searchQueryService;
     @Autowired MovieService movieService;
     @Autowired MemberRepository memberRepository;
     @Autowired HashtagRepository hashtagRepository;
@@ -200,7 +198,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(3))
                 .setHashTags(List.of(hashtagList.get(0))).build();
@@ -210,7 +208,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(4))
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build();
@@ -219,7 +217,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build();
         postRepository.save(build2);
@@ -227,7 +225,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setMovie(movieList.get(7))
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
@@ -239,7 +237,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -251,7 +249,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -264,7 +262,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -276,7 +274,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -289,7 +287,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build8 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -301,7 +299,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -453,7 +451,7 @@ class MovieQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(3))
                 .setHashTags(List.of(hashtagList.get(0))).build();
@@ -463,7 +461,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(4))
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build();
@@ -472,7 +470,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build();
         postRepository.save(build2);
@@ -480,7 +478,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setMovie(movieList.get(7))
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
@@ -492,7 +490,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -504,7 +502,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -517,7 +515,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -529,7 +527,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -542,7 +540,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build8 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -555,7 +553,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -709,7 +707,7 @@ class MovieQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(3))
                 .setHashTags(List.of(hashtagList.get(0))).build();
@@ -719,7 +717,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(4))
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build();
@@ -728,7 +726,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build();
         postRepository.save(build2);
@@ -736,7 +734,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setMovie(movieList.get(7))
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
@@ -748,7 +746,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -760,7 +758,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -773,7 +771,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -785,7 +783,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -798,7 +796,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build8 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(
@@ -811,7 +809,7 @@ class MovieQueryServiceJpaTest {
         em.flush();
 
         Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(7))
                 .setHashTags(List.of(

@@ -10,10 +10,8 @@ import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.MovieQueryRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
-import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.movie.MovieService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +40,7 @@ public class MovieQueryRepositoryTest {
     @Autowired MovieRepository movieRepository;
     @Autowired MovieService movieService;
     @Autowired MovieQueryRepository movieQueryRepository;
-    @Autowired MemberService memberService;
-    @Autowired MemberQueryRepository memberQueryRepository;
     @Autowired EntityManager em;
-
 
     @Test
     public void 전체검색_영화_테스트() throws Exception{

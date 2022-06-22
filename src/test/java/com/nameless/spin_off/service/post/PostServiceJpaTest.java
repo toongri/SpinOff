@@ -19,10 +19,7 @@ import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.repository.post.PostedMediaRepository;
-import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.member.MemberService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +44,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class PostServiceJpaTest {
 
     @Autowired PostService postService;
-    @Autowired CommentInPostService commentInPostService;
     @Autowired PostRepository postRepository;
     @Autowired HashtagRepository hashtagRepository;
-    @Autowired PostedMediaRepository postedMediaRepository;
     @Autowired CollectionRepository collectionRepository;
-    @Autowired LikedPostRepository likedPostRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired MemberService memberService;
@@ -122,8 +116,8 @@ class PostServiceJpaTest {
         memberRepository.save(member);
 
         collectionRepository.save(Collection.createDefaultCollection(member));
-        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.A));
-        collectionRepository.save(Collection.createCollection(member, "", "", PublicOfCollectionStatus.A));
+        collectionRepository.save(Collection.createCollection(member, "aaa", "", PublicOfCollectionStatus.A));
+        collectionRepository.save(Collection.createCollection(member, "aaa", "", PublicOfCollectionStatus.A));
 
         List<Collection> collectionsByMember = collectionRepository.findAllByMember(member);
 
@@ -227,7 +221,7 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -270,7 +264,7 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -284,7 +278,7 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po2);
 
@@ -325,7 +319,7 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -357,7 +351,7 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
 
@@ -385,7 +379,6 @@ class PostServiceJpaTest {
     @Test
     public void 글_조회수_중복_체크() throws Exception{
         //given
-        LocalDateTime now;
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
                 .setAccountId("memberAccId2")
@@ -396,10 +389,9 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
-        now = LocalDateTime.now();
         postService.insertViewedPostByIp("00", post.getId());
 
         em.flush();
@@ -428,7 +420,6 @@ class PostServiceJpaTest {
     public void 글_조회수_시간후_증가() throws Exception{
 
         //given
-        LocalDateTime now;
         Member member = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
                 .setAccountId("memberAccId2")
@@ -439,17 +430,15 @@ class PostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(member);
         Post post = Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
-        now = LocalDateTime.now();
         postService.insertViewedPostByIp("00", post.getId());
 
         em.flush();
         em.clear();
 
         //when
-        now = LocalDateTime.now().plusHours(2);
         System.out.println("서비스함수");
         postService.insertViewedPostByIp("00", post.getId());
         System.out.println("포스트");
@@ -458,5 +447,15 @@ class PostServiceJpaTest {
         //then
         assertThat(post2.getPopularity()).isEqualTo(post2.getViewedPostByIps().size());
         assertThat(post2.getPopularity()).isEqualTo(2);
+    }
+
+    @Test
+    public void 글_삭제_테스트() throws Exception{
+        //given
+
+        //when
+
+        //then
+
     }
 }

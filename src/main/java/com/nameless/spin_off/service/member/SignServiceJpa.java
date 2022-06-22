@@ -104,7 +104,6 @@ public class SignServiceJpa implements SignService{
         }
     }
 
-
     @Transactional
     @Override
     public SocialLoginResponseDto loginBySocial(String authCode, String provider) {
@@ -271,20 +270,15 @@ public class SignServiceJpa implements SignService{
     }
 
     private Member saveMember(ProfileDto profile, String provider) {
-        MemberDto.MemberBuilder memberBuilder = Member.buildMember()
-                .setEmail(profile.getEmail())
-                .setAccountId(getRandomAccountId())
-                .setNickname(getRandomNickname())
-                .setName(profile.getName())
-                .setAccountPw(null);
-        Member member;
+
+        Member member = Member.createMember(getRandomAccountId(), getRandomNickname(), profile.getName(), profile.getEmail());
 
         if (naver.getName().equals(provider)) {
-            member = memberBuilder.setNaverEmail(profile.getEmail()).build();
+            member.updateNaverEmail(profile.getEmail());
         } else if (kakao.getName().equals(provider)) {
-            member = memberBuilder.setKakaoEmail(profile.getEmail()).build();
+            member.updateKakaoEmail(profile.getEmail());
         } else {
-            member = memberBuilder.setGoogleEmail(profile.getEmail()).build();
+            member.updateGoogleEmail(profile.getEmail());
         }
         memberRepository.save(member);
         collectionRepository.save(Collection.createDefaultCollection(member));

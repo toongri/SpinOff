@@ -10,12 +10,9 @@ import com.nameless.spin_off.exception.collection.NotExistCollectionException;
 import com.nameless.spin_off.exception.member.AlreadyComplainException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.member.MemberService;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,12 +36,9 @@ class ComplainServiceJpaTest {
     @Autowired MemberService memberService;
     @Autowired ComplainService complainService;
     @Autowired MemberRepository memberRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired MovieRepository movieRepository;
     @Autowired PostRepository postRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired EntityManager em;
-    @Autowired PostService postService;
 
     @Test
     public void 컴플레인_컬렉션_삽입() throws Exception {
@@ -112,7 +106,7 @@ class ComplainServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
 
@@ -159,7 +153,7 @@ class ComplainServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         complainService.insertComplain(mem.getId(), po.getId(), A, ComplainStatus.A);

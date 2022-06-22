@@ -10,11 +10,8 @@ import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.member.MemberService;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -35,13 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CommentInCollectionQueryServiceJpaTest {
 
     @Autowired CommentInCollectionService commentInCollectionService;
-    @Autowired PostService postService;
-    @Autowired PostRepository postRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
-    @Autowired CollectionService collectionService;
-    @Autowired CollectionQueryService collectionQueryService;
     @Autowired MemberService memberService;
     @Autowired CommentInCollectionQueryService commentInCollectionQueryService;
 

@@ -1,6 +1,6 @@
 package com.nameless.spin_off.enums;
 
-import com.nameless.spin_off.enums.collection.CollectionContentLimitEnum;
+import static com.nameless.spin_off.enums.ContentsLengthEnum.*;
 
 public enum ErrorEnum {
 
@@ -31,14 +31,15 @@ public enum ErrorEnum {
     NOT_EXIST_EMAIL_LINKAGE_TOKEN("ERR113", "현재 이메일 연동 토큰을 찾을 수 없습니다."),
     NOT_MATCH_ACCOUNT_PW("ERR114", "비밀번호가 일치하지 않습니다."),
     INCORRECT_PROVIDER("ERR115", "요청한 provider가 존재하지 않습니다."),
+    INCORRECT_BIO("ERR116", "소개글의 형식이 맞지 않습니다."),
 
     //COLLECTION
     ALREADY_COLLECTED_POST("ERR200", "이미 컬렉션에 포스트가 포함되있습니다."),
     ALREADY_FOLLOWED_COLLECTION("ERR201", "이미 해당 컬렉션을 팔로우 했습니다."),
     ALREADY_LIKED_COLLECTION("ERR202", "이미 해당 컬렉션을 좋아요 했습니다."),
     CANT_FOLLOW_OWN_COLLECTION("ERR203", "본인의 컬렉션은 팔로우 할 수 없습니다."),
-    INCORRECT_CONTENT_OF_COLLECTION("ERR204", "글의 본문은 "+ CollectionContentLimitEnum.CONTENT_LENGTH_MAX.getValue() +"자를 넘겨서는 안됩니다."),
-    INCORRECT_TITLE_OF_COLLECTION("ERR205", "글의 제목은 "+ CollectionContentLimitEnum.TITLE_LENGTH_MAX.getValue() +"자를 넘겨서는 안됩니다."),
+    INCORRECT_CONTENT_OF_COLLECTION("ERR204", "글의 본문은 "+ COLLECTION_CONTENT_MAX.getLength() +"자를 넘겨서는 안됩니다."),
+    INCORRECT_TITLE_OF_COLLECTION("ERR205", "글의 제목은 "+ COLLECTION_TITLE_MAX.getLength() +"자를 넘겨서는 안됩니다."),
     NOT_EXIST_COLLECTION("ERR206", "컬렉션이 존재하지 않습니다."),
     NOT_MATCH_COLLECTION("ERR207", "컬렉션 ID가 옳바르지 않습니다."),
     ALREADY_LIKED_COMMENT_IN_COLLECTION("ERR208", "이미 해당 댓글을 좋아요 했습니다."),
@@ -47,9 +48,9 @@ public enum ErrorEnum {
     //POST
     ALREADY_LIKED_POST("ERR400", "이미 해당 유저를 팔로우 했습니다."),
     ALREADY_POSTED_HASHTAG("ERR401", "이미 해당 해시태그를 태그 했습니다."),
-    INCORRECT_CONTENT_OF_POST("ERR402", "글의 본문은 "+ CollectionContentLimitEnum.CONTENT_LENGTH_MAX.getValue() +"자를 넘겨서는 안됩니다."),
-    INCORRECT_POST_IMAGE_LENGTH("ERR403", "글에 허용되는 이미지의 갯수는 " + ContentsLengthEnum.POST_IMAGE_MAX.getLength() + "개가 최대입니다."),
-    INCORRECT_TITLE_OF_POST("ERR404", "글의 제목은 " + CollectionContentLimitEnum.TITLE_LENGTH_MAX.getValue() + "자를 넘겨서는 안됩니다."),
+    INCORRECT_CONTENT_OF_POST("ERR402", "글의 본문은 "+ POST_CONTENT_MAX.getLength() +"자를 넘겨서는 안됩니다."),
+    INCORRECT_POST_IMAGE_LENGTH("ERR403", "글에 허용되는 이미지의 갯수는 " + POST_IMAGE_MAX.getLength() + "개가 최대입니다."),
+    INCORRECT_TITLE_OF_POST("ERR404", "글의 제목은 " + POST_TITLE_MAX.getLength() + "자를 넘겨서는 안됩니다."),
     NOT_EXIST_POST("ERR405", "해당 포스트가 존재하지 않습니다."),
     ALREADY_LIKED_COMMENT_IN_POST("ERR406", "이미 해당 댓글을 좋아요 했습니다."),
     NOT_EXIST_COMMENT_IN_POST("ERR407", "댓글이 존재하지 않습니다."),

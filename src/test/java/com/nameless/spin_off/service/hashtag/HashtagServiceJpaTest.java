@@ -33,9 +33,9 @@ class HashtagServiceJpaTest {
     public void 해시태그_조회수_증가() throws Exception{
 
         //given
-        Hashtag hashtag = hashtagRepository.save(Hashtag.createHashtag(""));
-        Hashtag hashtag2 = hashtagRepository.save(Hashtag.createHashtag(""));
-        Hashtag hashtag3 = hashtagRepository.save(Hashtag.createHashtag(""));
+        Hashtag hashtag = hashtagRepository.save(Hashtag.createHashtag("a"));
+        Hashtag hashtag2 = hashtagRepository.save(Hashtag.createHashtag("a"));
+        Hashtag hashtag3 = hashtagRepository.save(Hashtag.createHashtag("a"));
 
         em.flush();
         em.clear();

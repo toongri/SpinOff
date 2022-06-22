@@ -15,9 +15,7 @@ import com.nameless.spin_off.repository.movie.MovieRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.service.collection.CollectionService;
 import com.nameless.spin_off.service.hashtag.HashtagService;
-import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
-import com.nameless.spin_off.service.query.CollectionQueryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -42,8 +40,6 @@ public class HashtagQueryRepositoryTest {
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
-    @Autowired CollectionQueryService collectionQueryService;
-    @Autowired MemberService memberService;
     @Autowired HashtagRepository hashtagRepository;
     @Autowired HashtagQueryRepository hashtagQueryRepository;
     @Autowired MovieRepository movieRepository;
@@ -71,32 +67,32 @@ public class HashtagQueryRepositoryTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -104,7 +100,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -112,7 +108,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -120,7 +116,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -128,7 +124,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -137,7 +133,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -218,32 +214,32 @@ public class HashtagQueryRepositoryTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -251,7 +247,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -259,7 +255,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -267,7 +263,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -275,7 +271,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -284,7 +280,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         postList.add(Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -370,7 +366,7 @@ public class HashtagQueryRepositoryTest {
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setThumbnailUrl(mem.getId() + "0")
                     .setHashTags(List.of()).build();
             build.addAllCollectedPost(List.of(byId));
@@ -378,7 +374,7 @@ public class HashtagQueryRepositoryTest {
         }
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0))).build();
         build.addAllCollectedPost(List.of(collectionList.get(0)));
@@ -386,7 +382,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1)))
                 .build();
@@ -395,7 +391,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build2 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2)))
                 .build();
@@ -404,7 +400,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build3 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3)))
@@ -415,7 +411,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build4 = Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -428,7 +424,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build5 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -441,7 +437,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build6 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -455,7 +451,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build7 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -468,7 +464,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build8 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -483,7 +479,7 @@ public class HashtagQueryRepositoryTest {
 
         em.flush();
         Post build9 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -592,7 +588,7 @@ public class HashtagQueryRepositoryTest {
             Collection byId = collectionRepository.getById(aLong);
             collectionList.add(byId);
             Post build = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setThumbnailUrl(mem.getId() + "0")
                     .setHashTags(List.of()).build();
             build.addAllCollectedPost(List.of(byId));
@@ -605,7 +601,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         Post build = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(3))
                 .setHashTags(List.of(hashtagList.get(0)))
@@ -617,7 +613,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         Post build1 = Post.buildPost().setMember(memberList.get(4)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(4))
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1)))
@@ -628,7 +624,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2)))
                 .build();
@@ -638,7 +634,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3)))
@@ -651,7 +647,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 =Post.buildPost().setMember(memberList.get(1)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -666,7 +662,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(7)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(1))
                 .setHashTags(List.of(
@@ -682,7 +678,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(8)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -697,7 +693,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 =Post.buildPost().setMember(memberList.get(3)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(8))
                 .setHashTags(List.of(
@@ -713,7 +709,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(2)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -729,7 +725,7 @@ public class HashtagQueryRepositoryTest {
         em.flush();
 
         build1 = Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setMovie(movieList.get(9))
                 .setHashTags(List.of(

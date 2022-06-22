@@ -14,6 +14,7 @@ public enum MemberCondition {
     EMAIL("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$"),
     ENGLISH("^[a-zA-Z]*$"),
     NUMBER("^[0-9]*$"),
+    BIO("^.{" + BIO_MIN.getLength() + "," + BIO_MAX.getLength() + "}$"),
     SIGN("^[:!\"#$%&'()*+,-./:=?@[＼;]^_`{|}~]*$");
 
     private final String possibleWord;

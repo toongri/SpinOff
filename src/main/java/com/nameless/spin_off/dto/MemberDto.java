@@ -766,9 +766,6 @@ public class MemberDto {
         private LocalDate birth;
         private String phoneNumber;
         private String email;
-        private String googleEmail;
-        private String kakaoEmail;
-        private String naverEmail;
 
         public MemberBuilder setAccountId(String accountId) {
             this.accountId = accountId;
@@ -805,24 +802,8 @@ public class MemberDto {
             return this;
         }
 
-        public MemberBuilder setGoogleEmail(String googleEmail) {
-            this.googleEmail = googleEmail;
-            return this;
-        }
-
-        public MemberBuilder setNaverEmail(String naverEmail) {
-            this.naverEmail = naverEmail;
-            return this;
-        }
-
-        public MemberBuilder setKakaoEmail(String kakaoEmail) {
-            this.kakaoEmail = kakaoEmail;
-            return this;
-        }
-
         public Member build() {
-            return Member.createMember(accountId, accountPw, nickname,name, birth, phoneNumber, email,
-                    googleEmail, naverEmail, kakaoEmail);
+            return Member.createMember(accountId, accountPw, nickname,name, birth, phoneNumber, email);
         }
     }
 }

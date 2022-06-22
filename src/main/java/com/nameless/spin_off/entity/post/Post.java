@@ -35,8 +35,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
-import static com.nameless.spin_off.enums.post.PostContentLimitEnum.CONTENT_LENGTH_MAX;
-import static com.nameless.spin_off.enums.post.PostContentLimitEnum.TITLE_LENGTH_MAX;
+import static com.nameless.spin_off.enums.post.PostCondition.CONTENT;
+import static com.nameless.spin_off.enums.post.PostCondition.TITLE;
 import static com.nameless.spin_off.enums.post.PostScoreEnum.*;
 
 @Entity
@@ -176,14 +176,7 @@ public class Post {
             throws AlreadyPostedHashtagException, IncorrectTitleOfPostException, IncorrectContentOfPostException {
         Post post = new Post();
         member.addPost(post);
-
-        if (title.length() > TITLE_LENGTH_MAX.getValue()) {
-            throw new IncorrectTitleOfPostException(ErrorEnum.INCORRECT_TITLE_OF_POST);
-        }
         post.updateTitle(title);
-        if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
-            throw new IncorrectContentOfPostException(ErrorEnum.INCORRECT_CONTENT_OF_POST);
-        }
         post.updateContent(content);
         post.updateThumbnailUrl(thumbnailUrl);
         post.addAllPostedHashtagsByHashtags(hashtags);
@@ -239,9 +232,11 @@ public class Post {
     }
 
     public void updateContent(String content) {
+        isCorrectContent(content);
         this.content = content;
     }
     public void updateTitle(String title) {
+        isCorrectTitle(title);
         this.title = title;
     }
 
@@ -279,6 +274,18 @@ public class Post {
             return addViewedPostByIp(ip);
         } else {
             return -1L;
+        }
+    }
+
+    private void isCorrectTitle(String title) {
+        if (TITLE.isNotCorrect(title)) {
+            throw new IncorrectTitleOfPostException(ErrorEnum.INCORRECT_TITLE_OF_POST);
+        }
+    }
+
+    private void isCorrectContent(String content) {
+        if (CONTENT.isNotCorrect(content)) {
+            throw new IncorrectContentOfPostException(ErrorEnum.INCORRECT_CONTENT_OF_POST);
         }
     }
 

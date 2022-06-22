@@ -162,7 +162,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
-        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
+        Collection col = Collection.createCollection(mem, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         Member mem2 = Member.buildMember()
                 .setEmail("jhkimkkk0923@naver.com")
@@ -173,7 +173,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
-        Collection col2 = Collection.createCollection(mem2, "", "", PublicOfCollectionStatus.A);
+        Collection col2 = Collection.createCollection(mem2, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col2);
 
         CommentInCollectionRequestDto commentInCollectionVO1 =
@@ -229,7 +229,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
-        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
+        Collection col = Collection.createCollection(mem, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         CommentInCollection commentInCollection =
                 CommentInCollection.createCommentInCollection(mem, " ", null, col);
@@ -273,7 +273,7 @@ class CommentInCollectionServiceJpaTest {
                 .setAccountPw("memberAccountPw")
                 .setNickname("memcname").build();
         memberRepository.save(mem);
-        Collection col = Collection.createCollection(mem, "", "", PublicOfCollectionStatus.A);
+        Collection col = Collection.createCollection(mem, "aaa", "", PublicOfCollectionStatus.A);
         collectionRepository.save(col);
         CommentInCollection commentInCollection =
                 CommentInCollection.createCommentInCollection(mem, " ", null, col);

@@ -22,8 +22,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
-import static com.nameless.spin_off.enums.collection.CollectionContentLimitEnum.CONTENT_LENGTH_MAX;
-import static com.nameless.spin_off.enums.collection.CollectionContentLimitEnum.TITLE_LENGTH_MAX;
+import static com.nameless.spin_off.enums.collection.CollectionCondition.CONTENT;
+import static com.nameless.spin_off.enums.collection.CollectionCondition.TITLE;
 import static com.nameless.spin_off.enums.collection.CollectionScoreEnum.*;
 
 @Entity
@@ -133,14 +133,7 @@ public class Collection {
 
         Collection collection = new Collection();
         collection.updateMember(member);
-
-        if (title.length() > TITLE_LENGTH_MAX.getValue()) {
-            throw new IncorrectTitleOfCollectionException(ErrorEnum.INCORRECT_TITLE_OF_COLLECTION);
-        }
         collection.updateTitle(title);
-        if (content.length() > CONTENT_LENGTH_MAX.getValue()) {
-            throw new IncorrectContentOfCollectionException(ErrorEnum.INCORRECT_CONTENT_OF_COLLECTION);
-        }
         collection.updateContent(content);
         collection.updatePublicOfCollectionStatus(publicOfCollectionStatus);
         collection.updatePopularityZero();
@@ -221,10 +214,12 @@ public class Collection {
     }
 
     public void updateContent(String content) {
+        isCorrectContent(content);
         this.content = content;
     }
 
     public void updateTitle(String title) {
+        isCorrectTitle(title);
         this.title = title;
     }
 
@@ -255,6 +250,18 @@ public class Collection {
     }
 
     //==비즈니스 로직==//
+
+    private void isCorrectTitle(String title) {
+        if (TITLE.isNotCorrect(title)) {
+            throw new IncorrectTitleOfCollectionException(ErrorEnum.INCORRECT_TITLE_OF_COLLECTION);
+        }
+    }
+
+    private void isCorrectContent(String content) {
+        if (CONTENT.isNotCorrect(content)) {
+            throw new IncorrectContentOfCollectionException(ErrorEnum.INCORRECT_CONTENT_OF_COLLECTION);
+        }
+    }
     public double executeViewScore() {
 
         LocalDateTime currentTime = LocalDateTime.now();

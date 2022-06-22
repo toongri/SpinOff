@@ -5,9 +5,6 @@ import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
-import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,11 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class PostRepositoryTest {
 
     @Autowired PostRepository postRepository;
-    @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
     @Autowired CollectedPostRepository collectedPostRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired PostService postService;
 
     @Test
     public void 컬렉션추가_조회확인() throws Exception{

@@ -1,6 +1,7 @@
 package com.nameless.spin_off.entity.hashtag;
 
 import com.nameless.spin_off.enums.ContentsTimeEnum;
+import com.nameless.spin_off.exception.hashtag.IncorrectHashtagContentException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.nameless.spin_off.enums.ErrorEnum.INCORRECT_HASHTAG_CONTENT;
+import static com.nameless.spin_off.enums.hashtag.HashtagCondition.CONTENT;
 import static com.nameless.spin_off.enums.hashtag.HashtagScoreEnum.*;
 
 @Entity
@@ -87,6 +90,7 @@ public class Hashtag {
         this.id = id;
     }
     public void updateContent(String content) {
+        isCorrectContent(content);
         this.content = content;
     }
 
@@ -102,6 +106,13 @@ public class Hashtag {
     }
 
     //==비즈니스 로직==//
+
+    private void isCorrectContent(String content) {
+        if (CONTENT.isNotCorrect(content)) {
+            throw new IncorrectHashtagContentException(INCORRECT_HASHTAG_CONTENT);
+        }
+    }
+
     public Long insertViewedHashtagByIp(String ip) {
 
         if (isNotAlreadyIpView(ip)) {

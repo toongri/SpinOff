@@ -42,7 +42,6 @@ class CommentInPostServiceJpaTest {
     @Autowired EntityManager em;
     @Autowired MemberService memberService;
 
-
     @Test
     public void saveCommentInPostByCommentVO() throws Exception{
         //given
@@ -56,7 +55,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(po);
         postService.insertViewedPostByIp("22", po.getId());
@@ -96,7 +95,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
+                .setTitle("aaa").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
         CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 
@@ -155,7 +154,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post post = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post);
         Member mem2 = Member.buildMember()
@@ -168,7 +167,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem2);
         Post post2 = Post.buildPost().setMember(mem2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build();
         postRepository.save(post2);
 
@@ -222,7 +221,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
+                .setTitle("aaa").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
         CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 
@@ -267,7 +266,7 @@ class CommentInPostServiceJpaTest {
                 .setNickname("memcname").build();
         memberRepository.save(mem);
         Post po = Post.buildPost().setMember(mem).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
+                .setTitle("aaa").setContent("").setUrls(List.of()).setHashTags(List.of()).build();
         postRepository.save(po);
         CommentInPost parent = CommentInPost.createCommentInPost(mem, "야스히로 라할살", null, po);
 

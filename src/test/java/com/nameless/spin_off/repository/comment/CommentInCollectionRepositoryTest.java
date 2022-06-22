@@ -3,13 +3,8 @@ package com.nameless.spin_off.repository.comment;
 import com.nameless.spin_off.entity.collection.Collection;
 import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
-import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
-import com.nameless.spin_off.repository.hashtag.HashtagRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
-import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.service.comment.CommentInCollectionService;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,16 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @Transactional
 class CommentInCollectionRepositoryTest {
-    @Autowired PostRepository postRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired CollectionRepository collectionRepository;
-    @Autowired CollectedPostRepository collectedPostRepository;
-    @Autowired HashtagRepository hashtagRepository;
-    @Autowired PostService postService;
     @Autowired CommentInCollectionRepository commentInCollectionRepository;
     @Autowired EntityManager em;
-    @Autowired CommentInCollectionService commentInCollectionService;
-
 
     @Test
     public void 부모댓글_찾기() throws Exception{

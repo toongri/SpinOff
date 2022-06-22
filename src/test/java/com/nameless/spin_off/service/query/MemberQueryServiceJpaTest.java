@@ -109,7 +109,7 @@ public class MemberQueryServiceJpaTest {
 
         for (Collection collection : collectionList) {
             Post build = Post.buildPost().setMember(collection.getMember()).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collection.getMember().getId() + "1")
                     .setHashTags(List.of()).build();
             build.addAllCollectedPost(List.of(collection));
@@ -123,7 +123,7 @@ public class MemberQueryServiceJpaTest {
         for (Integer integer : integers) {
             Post build = Post.buildPost().setMember(collectionList.get(integer).getMember())
                     .setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setThumbnailUrl(collectionList.get(integer).getMember().getId() + "2")
                     .setHashTags(List.of()).build();
             build.addAllCollectedPost(List.of(collectionList.get(integer)));
@@ -134,7 +134,7 @@ public class MemberQueryServiceJpaTest {
 
         Post build = Post.buildPost().setMember(collectionList.get(6).getMember())
                 .setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(collectionList.get(6).getMember().getId() + "3")
                 .setHashTags(List.of()).build();
         build.addAllCollectedPost(List.of(collectionList.get(6)));
@@ -1023,56 +1023,56 @@ public class MemberQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(hashtagList.get(0), hashtagList.get(1), hashtagList.get(2))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
                         hashtagList.get(4), hashtagList.get(5), hashtagList.get(6), hashtagList.get(7))).build());
 
         postList.add(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),
@@ -1080,7 +1080,7 @@ public class MemberQueryServiceJpaTest {
                         hashtagList.get(8))).build());
 
         postList.add(Post.buildPost().setMember(memberList.get(5)).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of(
                         hashtagList.get(0), hashtagList.get(1), hashtagList.get(2), hashtagList.get(3),

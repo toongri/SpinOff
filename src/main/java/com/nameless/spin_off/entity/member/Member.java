@@ -189,9 +189,22 @@ public class Member {
     }
 
     //==생성 메소드==//
+    public static Member createMember(String accountId, String nickname, String name, String email) {
+
+        Member member = new Member();
+        member.updateAccountId(accountId);
+        member.updateName(name);
+        member.updateEmail(email);
+        member.updateNickname(nickname);
+        member.addRolesToUser();
+        member.updatePopularityZero();
+        member.updateLastModifiedDate();
+
+        return member;
+    }
+
     public static Member createMember(String accountId, String accountPw, String nickname,
-                                      String name, LocalDate birth, String phoneNumber, String email,
-                                      String googleEmail, String naverEmail, String kakaoEmail) {
+                                      String name, LocalDate birth, String phoneNumber, String email) {
 
         Member member = new Member();
         member.updateAccountId(accountId);
@@ -202,9 +215,6 @@ public class Member {
         member.updateEmail(email);
         member.updateNickname(nickname);
         member.addRolesToUser();
-        member.updateGoogleEmail(googleEmail);
-        member.updateNaverEmail(naverEmail);
-        member.updateKakaoEmail(kakaoEmail);
         member.updatePopularityZero();
         member.updateLastModifiedDate();
 
@@ -227,6 +237,7 @@ public class Member {
         this.lastModifiedDate = LocalDateTime.now();
     }
     public void updateBio(String bio) {
+        isCorrectBio(bio);
         this.bio = bio;
     }
     private void updateId(Long id) {
@@ -291,9 +302,11 @@ public class Member {
     public void updateGoogleEmail(String googleEmail) {
         this.googleEmail = googleEmail;
     }
+
     public void updateNaverEmail(String naverEmail) {
         this.naverEmail = naverEmail;
     }
+
     public void updateKakaoEmail(String kakaoEmail) {
         this.kakaoEmail = kakaoEmail;
     }
@@ -315,8 +328,14 @@ public class Member {
     }
 
     private void isCorrectAccountId(String accountId) {
-        if (MemberCondition.ACCOUNT_ID.isNotCorrect(accountId)) {
+        if (ACCOUNT_ID.isNotCorrect(accountId)) {
             throw new IncorrectAccountIdException(ErrorEnum.INCORRECT_ACCOUNT_ID);
+        }
+    }
+
+    private void isCorrectBio(String bio) {
+        if (BIO.isNotCorrect(bio)) {
+            throw new IncorrectBioException(ErrorEnum.INCORRECT_BIO);
         }
     }
 

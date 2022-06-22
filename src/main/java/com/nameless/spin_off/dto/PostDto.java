@@ -575,38 +575,28 @@ public class PostDto {
         private String title;
 
         @ApiModelProperty(
-                value = "글 제목",
+                value = "글 본문",
                 required = true,
                 example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
                 dataType = "String")
         private String content;
 
         @ApiModelProperty(
-                value = "글 제목",
+                value = "영화 id",
                 required = true,
-                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
-                dataType = "String")
+                example = "123",
+                dataType = "Long")
         private Long movieId;
 
         @ApiModelProperty(
-                value = "글 제목",
+                value = "글 공개 범위",
                 required = true,
-                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
-                dataType = "String")
+                example = "A",
+                dataType = "PublicOfPostStatus")
         private PublicOfPostStatus publicOfPostStatus;
 
-        @ApiModelProperty(
-                value = "글 제목",
-                required = true,
-                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
-                dataType = "String")
         private List<String> hashtagContents;
 
-        @ApiModelProperty(
-                value = "글 제목",
-                required = true,
-                example = "스프링부트와 aws로 혼자 구현하는 웹 서비스",
-                dataType = "List<Long>")
         private List<Long> collectionIds;
     }
 

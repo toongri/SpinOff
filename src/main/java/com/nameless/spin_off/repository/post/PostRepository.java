@@ -16,6 +16,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE post.id = :id")
     Optional<Post> findOneByIdWithCollectedPost(@Param("id") Long id);
 
+    @Query("SELECT DISTINCT post FROM Post post " +
+            "LEFT JOIN FETCH post.postedMedias postedMedia " +
+            "WHERE post.id = :id")
+    Optional<Post> findOneByIdWithPostedMedia(@Param("id") Long id);
+
     @Query("SELECT p FROM Post p " +
             "JOIN FETCH p.viewedPostByIps view " +
             "WHERE (view.createdDate > :time)")

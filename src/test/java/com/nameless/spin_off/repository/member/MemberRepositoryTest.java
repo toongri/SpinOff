@@ -23,7 +23,6 @@ public class MemberRepositoryTest {
 
     @Autowired PostRepository postRepository;
     @Autowired MemberRepository memberRepository;
-    @Autowired FollowedMemberRepository followedMemberRepository;
     @Autowired EntityManager em;
 
     @Test
@@ -56,7 +55,7 @@ public class MemberRepositoryTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);
@@ -103,7 +102,7 @@ public class MemberRepositoryTest {
         for (Member mem : memberList) {
             member.addFollowedMember(mem);
             postList.add(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                    .setTitle("").setContent("").setUrls(List.of())
+                    .setTitle("aaa").setContent("").setUrls(List.of())
                     .setHashTags(List.of()).build());
         }
         postRepository.saveAll(postList);

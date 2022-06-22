@@ -7,14 +7,10 @@ import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
-import com.nameless.spin_off.repository.collection.CollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
-import com.nameless.spin_off.service.collection.CollectionService;
-import com.nameless.spin_off.service.comment.CommentInCollectionService;
 import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.member.MemberService;
-import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,17 +30,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 class CommentInPostQueryServiceJpaTest {
 
-    @Autowired CommentInCollectionService commentInCollectionService;
     @Autowired CommentInPostService commentInPostService;
-    @Autowired PostService postService;
     @Autowired PostRepository postRepository;
-    @Autowired CollectionRepository collectionRepository;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
-    @Autowired CollectionService collectionService;
-    @Autowired CollectionQueryService collectionQueryService;
     @Autowired MemberService memberService;
-    @Autowired CommentInCollectionQueryService commentInCollectionQueryService;
     @Autowired CommentInPostQueryService commentInPostQueryService;
 
     @Test
@@ -72,11 +62,11 @@ class CommentInPostQueryServiceJpaTest {
                 .setNickname("memcname").build()));
         }
         Post post = postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build());
 
         Post post2 = postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setHashTags(List.of()).build());
         List<Long> commentIds = new ArrayList<>();
 
@@ -195,22 +185,22 @@ class CommentInPostQueryServiceJpaTest {
         List<Post> postList = new ArrayList<>();
 
         postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
 
         postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
 
         postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
 
         postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
-                .setTitle("").setContent("").setUrls(List.of())
+                .setTitle("aaa").setContent("").setUrls(List.of())
                 .setThumbnailUrl(member.getId() + "1")
                 .setHashTags(List.of()).build()));
 
