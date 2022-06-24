@@ -21,6 +21,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
@@ -83,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); //허용 출처
+        configuration.setAllowedOriginPatterns(List.of("*")); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:80"); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:443"); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:3000"); //허용 출처
