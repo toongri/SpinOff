@@ -16,6 +16,11 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
@@ -36,8 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-//                .cors().configurationSource(corsConfigurationSource())
-                .cors()
+                .cors().configurationSource(corsConfigurationSource())
                 .and()
                     .httpBasic().disable()
                 .csrf().disable()
@@ -76,21 +80,21 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(exceptionHandlerFilter, JwtAuthenticationFilter.class);
     }
 
-//    @Bean
-//    CorsConfigurationSource corsConfigurationSource() {
-//        CorsConfiguration configuration = new CorsConfiguration();
-////        configuration.addAllowedOrigin("*"); //허용 출처
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.addAllowedOrigin("*"); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:80"); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:443"); //허용 출처
 //        configuration.addAllowedOrigin("http://localhost:3000"); //허용 출처
 //        configuration.addAllowedOrigin("http://www.spin-off.p-e.kr"); //허용 출처
-//        configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type"));
-//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
-//        configuration.setAllowCredentials(true);
-//
-//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-//        source.registerCorsConfiguration("/**", configuration);
-//
-//        return source;
-//    }
+        configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PATCH", "PUT", "DELETE"));
+        configuration.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+
+        return source;
+    }
 }
