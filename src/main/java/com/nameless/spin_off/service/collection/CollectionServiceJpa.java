@@ -1,5 +1,6 @@
 package com.nameless.spin_off.service.collection;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CollectionRequestDto;
 import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
 import com.nameless.spin_off.entity.collection.*;
@@ -49,7 +50,7 @@ public class CollectionServiceJpa implements CollectionService {
     @Transactional
     @Override
     public Long updateCollection(CollectionRequestDto collectionRequestDto, Long collectionId, Long memberId) {
-        Collection collection = getCollection(collectionId);
+        Collection collection = getCollectionById(collectionId);
         if (!collection.getMember().getId().equals(memberId)) {
             throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
         }
@@ -133,6 +134,16 @@ public class CollectionServiceJpa implements CollectionService {
 
     @Transactional
     @Override
+    public Long deleteCollection(MemberDetails currentMember, Long collectionId) {
+        Collection collection = getCollectionById(collectionId);
+        hasAuthCollection(currentMember, collection.getMember().getId(), collection.getIsDefault());
+        collectionRepository.delete(collection);
+
+        return 1L;
+    }
+
+    @Transactional
+    @Override
     public int updateAllPopularity() {
         List<Collection> collections = collectionQueryRepository
                 .findAllByViewAfterTime(CollectionScoreEnum.COLLECTION_VIEW.getOldestDate());
@@ -142,8 +153,14 @@ public class CollectionServiceJpa implements CollectionService {
         }
         return collections.size();
     }
+    
+    private void hasAuthCollection(MemberDetails currentMember, Long memberId, boolean isDefault) {
+        if (!(currentMember.isAdmin() || currentMember.getId().equals(memberId)) || isDefault) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+    }
 
-    private Collection getCollection(Long collectionId) {
+    private Collection getCollectionById(Long collectionId) {
         return collectionRepository.findById(collectionId).orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
