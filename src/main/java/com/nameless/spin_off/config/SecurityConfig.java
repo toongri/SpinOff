@@ -84,6 +84,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 //        configuration.addAllowedOrigin("*"); //허용 출처
+        configuration.addAllowedOrigin("http://localhost:80"); //허용 출처
+        configuration.addAllowedOrigin("http://localhost:443"); //허용 출처
         configuration.addAllowedOrigin("http://localhost:3000"); //허용 출처
         configuration.addAllowedOrigin("http://www.spin-off.p-e.kr"); //허용 출처
         configuration.setAllowedHeaders(Arrays.asList("X-AUTH-TOKEN", "Content-Type"));

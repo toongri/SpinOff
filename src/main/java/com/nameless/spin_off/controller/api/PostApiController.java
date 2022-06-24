@@ -4,10 +4,9 @@ import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostInCollectionDto;
 import com.nameless.spin_off.dto.CollectionDto.QuickPostInCollectionDto;
-import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.CommentDto.CommentInPostRequestDto;
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
-import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.PostDto.*;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
 import com.nameless.spin_off.enums.EnumMapper;
@@ -125,6 +124,27 @@ public class PostApiController {
         ReadPostDto postForVisit = postQueryService.getPostForRead(currentMember, postId);
         postService.insertViewedPostByIp(ip, postId);
         return getResult(postForVisit);
+    }
+
+    @ApiOperation(value = "글 삭제", notes = "")
+    @ApiImplicitParams({
+            @ApiImplicitParam(
+                    name = "postId",
+                    value = "글 id",
+                    required = true,
+                    paramType = "path",
+                    dataType = "Long",
+                    example = "123")
+    })
+    @DeleteMapping("/{postId}")
+    public SingleApiResult<Long> deletePost(
+            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+
+        log.info("deletePost");
+        log.info("postId : {}", postId);
+        log.info("memberId : {}", currentMember.getId());
+
+        return getResult(postService.deletePost(currentMember, postId));
     }
 
     @ApiOperation(value = "글 좋아요 생성", notes = "")
