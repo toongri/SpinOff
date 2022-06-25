@@ -153,7 +153,7 @@ public class CollectionServiceJpa implements CollectionService {
         }
         return collections.size();
     }
-    
+
     private void hasAuthCollection(MemberDetails currentMember, Long memberId, boolean isDefault) {
         if (!(currentMember.isAdmin() || currentMember.getId().equals(memberId)) || isDefault) {
             throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
