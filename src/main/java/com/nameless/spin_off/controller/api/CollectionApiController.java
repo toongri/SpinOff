@@ -3,8 +3,8 @@ package com.nameless.spin_off.controller.api;
 import com.nameless.spin_off.config.auth.LoginMember;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.*;
-import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.CommentDto.CommentInCollectionRequestDto;
+import com.nameless.spin_off.dto.CommentDto.ContentCommentDto;
 import com.nameless.spin_off.dto.MemberDto.MembersByContentDto;
 import com.nameless.spin_off.dto.PostDto.CollectedPostDto;
 import com.nameless.spin_off.dto.ResultDto.SingleApiResult;
@@ -61,7 +61,7 @@ public class CollectionApiController {
             @LoginMember MemberDetails currentMember, @RequestBody CollectionRequestDto collectionRequestDto)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
-        log.info("createCollection");
+        log.info("api : {}", "POST :: /collection");
         log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", collectionRequestDto.getTitle());
         log.info("content : {}", collectionRequestDto.getContent());
@@ -91,7 +91,7 @@ public class CollectionApiController {
     public SingleApiResult<ReadCollectionDto> readCollection(
             @LoginMember MemberDetails currentMember, @PathVariable Long collectionId, @RequestParam String ip) {
 
-        log.info("readCollection");
+        log.info("api : {}", "GET :: /collection/{id}");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", getCurrentMemberId(currentMember));
         ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
@@ -121,7 +121,7 @@ public class CollectionApiController {
                                                   @RequestBody CollectionRequestDto collectionRequestDto)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
-        log.info("createCollection");
+        log.info("api : {}", "PUT :: /collection/{id}");
         log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", collectionRequestDto.getTitle());
         log.info("content : {}", collectionRequestDto.getContent());
@@ -151,7 +151,7 @@ public class CollectionApiController {
                                                         @PathVariable Long collectionId,
                                                         @RequestBody CollectedPostsRequestDto requestDto) {
 
-        log.info("createCollectedPost");
+        log.info("api : {}", "POST :: /collection/{id}/post");
         log.info("collectionId : {}", collectionId);
         log.info("memberId : {}", currentMember.getId());
         log.info("postIds : {}", requestDto.getPostIds().toString());

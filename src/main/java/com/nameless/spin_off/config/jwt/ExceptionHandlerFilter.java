@@ -34,25 +34,27 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
             errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
             httpStatus = HttpStatus.UNAUTHORIZED;
-            log.info("entrypoint exception handler filter");
+            log.info("exception code : {}", errorMessage);
+            log.info("exception message : {}", errorCode);
             writeTokenResponse(response);
         } catch (UsernameNotFoundException ex) {
             errorMessage = ErrorEnum.USERNAME_NOT_FOUND.getMessage();
             errorCode = ErrorEnum.USERNAME_NOT_FOUND.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;
+            log.info("exception code : {}", errorMessage);
+            log.info("exception message : {}", errorCode);
+            writeTokenResponse(response);
         } catch (RuntimeException ex) {
             errorMessage = ErrorEnum.RUNTIME.getMessage();
             errorCode = ErrorEnum.RUNTIME.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;
-            log.error("runtime exception exception handler filter");
+            log.error("exception code : {}", errorMessage);
+            log.error("exception message : {}", errorCode);
             writeTokenResponse(response);
         }
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
-
-        errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
-        errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
 
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());

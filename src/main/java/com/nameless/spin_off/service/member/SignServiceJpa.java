@@ -125,7 +125,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public TokenResponseDto reIssue(MemberDto.TokenRequestDto requestDto) {
+    public TokenResponseDto reIssue(TokenRequestDto requestDto) {
         if (!jwtTokenProvider.validateTokenExpiration(requestDto.getRefreshToken())) {
             throw new InvalidRefreshTokenException(ErrorEnum.INVALID_REFRESH_TOKEN);
         }
@@ -290,7 +290,7 @@ public class SignServiceJpa implements SignService{
         return email.substring(email.indexOf("@") + 1, email.indexOf("."));
     }
 
-    public Member findMemberByToken(MemberDto.TokenRequestDto requestDto) {
+    public Member findMemberByToken(TokenRequestDto requestDto) {
         Authentication auth = jwtTokenProvider.getAuthentication(requestDto.getAccessToken());
         UserDetails userDetails = (UserDetails) auth.getPrincipal();
         return getMemberByAccountId(userDetails.getUsername());

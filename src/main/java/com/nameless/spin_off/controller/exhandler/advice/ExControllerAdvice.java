@@ -21,14 +21,16 @@ public class ExControllerAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResult> userExHandler(CustomRuntimeException e) {
-        log.info("[exceptionHandler] ex", e);
+        log.info("exception code : {}", e.getErrorEnum().getCode());
+        log.info("exception message : {}", e.getErrorEnum().getMessage());
         ErrorResult errorResult = new ErrorResult(e.getErrorEnum().getCode(), e.getErrorEnum().getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResult> userExHandler(CustomRuntimeForbiddenException e) {
-        log.info("[exceptionHandler] ex", e);
+        log.info("exception code : {}", e.getErrorEnum().getCode());
+        log.info("exception message : {}", e.getErrorEnum().getMessage());
         ErrorResult errorResult = new ErrorResult(e.getErrorEnum().getCode(), e.getErrorEnum().getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.FORBIDDEN);
     }
@@ -36,6 +38,7 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResult> userExHandler(RuntimeException e) {
         log.error("[exceptionHandler] ex", e);
+        log.error("exception message : {}", e.getMessage());
         ErrorResult errorResult = new ErrorResult(RUNTIME.getCode(), RUNTIME.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
@@ -43,6 +46,7 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResult> requestHandler(MissingRequestValueException e) {
         log.error("[exceptionHandler] ex", e);
+        log.error("exception message : {}", e.getMessage());
         ErrorResult errorResult = new ErrorResult(MISSING_REQUEST_VALUE.getCode(), MISSING_REQUEST_VALUE.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
@@ -50,6 +54,7 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResult> userExHandler(FileSizeLimitExceededException e) {
         log.error("[exceptionHandler] ex", e);
+        log.error("exception message : {}", e.getMessage());
         ErrorResult errorResult = new ErrorResult(FILE_SIZE_LIMIT_EXCEEDED.getCode(), FILE_SIZE_LIMIT_EXCEEDED.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
@@ -58,6 +63,7 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ErrorResult exHandler(Exception e) {
         log.error("[exceptionHandler] ex", e);
+        log.error("exception message : {}", e.getMessage());
         return new ErrorResult(UNKNOWN.getCode(), UNKNOWN.getMessage());
     }
 }

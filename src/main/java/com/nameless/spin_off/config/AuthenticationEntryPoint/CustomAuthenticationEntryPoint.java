@@ -28,14 +28,17 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
             throws IOException, ServletException {
-        log.info("[exceptionHandler] ex", authException);
+
+        errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
+        errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
+        log.info("exception code : {}", errorMessage);
+        log.info("exception message : {}", errorCode);
+
         writeTokenResponse(response);
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
 
-        errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
-        errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
 
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());

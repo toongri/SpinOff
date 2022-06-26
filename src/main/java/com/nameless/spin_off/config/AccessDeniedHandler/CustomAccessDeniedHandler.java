@@ -27,13 +27,16 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
     //권한초과
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException, ServletException {
-        log.info("[exceptionHandler] ex", accessDeniedException);
+
+        errorMessage = ErrorEnum.ACCESS_DENIED.getMessage();
+        errorCode = ErrorEnum.ACCESS_DENIED.getCode();
+
+        log.info("exception code : {}", errorMessage);
+        log.info("exception message : {}", errorCode);
         writeTokenResponse(response);
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
-        errorMessage = ErrorEnum.ACCESS_DENIED.getMessage();
-        errorCode = ErrorEnum.ACCESS_DENIED.getCode();
 
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
