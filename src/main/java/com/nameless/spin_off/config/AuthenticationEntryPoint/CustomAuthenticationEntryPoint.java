@@ -39,7 +39,6 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {
 
-
         response.setContentType("text/html;charset=UTF-8");
         response.setStatus(httpStatus.value());
         response.addHeader("code", errorCode);

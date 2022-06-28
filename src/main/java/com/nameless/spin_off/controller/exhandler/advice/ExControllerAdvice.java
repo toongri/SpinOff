@@ -36,25 +36,22 @@ public class ExControllerAdvice {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResult> userExHandler(RuntimeException e) {
+    public ResponseEntity<ErrorResult> exHandler(RuntimeException e) {
         log.error("[exceptionHandler] ex", e);
-        log.error("exception message : {}", e.getMessage());
         ErrorResult errorResult = new ErrorResult(RUNTIME.getCode(), RUNTIME.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResult> requestHandler(MissingRequestValueException e) {
+    public ResponseEntity<ErrorResult> exHandler(MissingRequestValueException e) {
         log.error("[exceptionHandler] ex", e);
-        log.error("exception message : {}", e.getMessage());
         ErrorResult errorResult = new ErrorResult(MISSING_REQUEST_VALUE.getCode(), MISSING_REQUEST_VALUE.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorResult> userExHandler(FileSizeLimitExceededException e) {
-        log.error("[exceptionHandler] ex", e);
-        log.error("exception message : {}", e.getMessage());
+    public ResponseEntity<ErrorResult> exHandler(FileSizeLimitExceededException e) {
+        log.error("exception : {}", e.toString());
         ErrorResult errorResult = new ErrorResult(FILE_SIZE_LIMIT_EXCEEDED.getCode(), FILE_SIZE_LIMIT_EXCEEDED.getMessage());
         return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
     }
@@ -63,7 +60,6 @@ public class ExControllerAdvice {
     @ExceptionHandler
     public ErrorResult exHandler(Exception e) {
         log.error("[exceptionHandler] ex", e);
-        log.error("exception message : {}", e.getMessage());
         return new ErrorResult(UNKNOWN.getCode(), UNKNOWN.getMessage());
     }
 }

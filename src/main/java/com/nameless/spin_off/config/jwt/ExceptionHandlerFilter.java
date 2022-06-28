@@ -30,26 +30,25 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (AuthenticationEntryException ex) {
+        } catch (AuthenticationEntryException e) {
             errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
             errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
             httpStatus = HttpStatus.UNAUTHORIZED;
             log.info("exception code : {}", errorMessage);
             log.info("exception message : {}", errorCode);
             writeTokenResponse(response);
-        } catch (UsernameNotFoundException ex) {
+        } catch (UsernameNotFoundException e) {
             errorMessage = ErrorEnum.USERNAME_NOT_FOUND.getMessage();
             errorCode = ErrorEnum.USERNAME_NOT_FOUND.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;
             log.info("exception code : {}", errorMessage);
             log.info("exception message : {}", errorCode);
             writeTokenResponse(response);
-        } catch (RuntimeException ex) {
+        } catch (RuntimeException e) {
             errorMessage = ErrorEnum.RUNTIME.getMessage();
             errorCode = ErrorEnum.RUNTIME.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;
-            log.error("exception code : {}", errorMessage);
-            log.error("exception message : {}", errorCode);
+            log.error("[exceptionHandler] ex", e);
             writeTokenResponse(response);
         }
     }
