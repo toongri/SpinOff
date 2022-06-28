@@ -334,8 +334,7 @@ public class MemberQueryServiceJpa implements MemberQueryService {
         blockIds.addAll(blockedIds);
         return memberQueryRepository
                 .findByIdForRead(targetMemberId, blockIds.stream().distinct().collect(Collectors.toList()))
-                .orElseGet(() -> memberQueryRepository.findByIdForRead(targetMemberId)
-                        .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER)));
+                .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
     }
 
     private List<RelatedMostTaggedHashtagDto> getHashtagsByPostIds(int length, List<SearchMemberDto> data) {

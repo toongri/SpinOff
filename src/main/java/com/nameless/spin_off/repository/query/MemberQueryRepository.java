@@ -97,18 +97,6 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<ReadMemberDto> findByIdForRead(Long memberId) {
-
-        return Optional.ofNullable(getQueryFactory()
-                .select(new QMemberDto_ReadMemberDto(
-                        member.id, member.nickname, member.accountId, member.profileImg, member.bio, post.count()))
-                .from(member)
-                .leftJoin(member.posts, post)
-                .where(
-                        member.id.eq(memberId))
-                .fetchFirst());
-    }
-
     public Optional<String> findAccountIdByEmail(String email) {
         return Optional.ofNullable(getQueryFactory()
                 .select(member.accountId)
