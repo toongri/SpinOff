@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -30,6 +31,13 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
+        } catch (RequestRejectedException e) {
+            errorMessage = ErrorEnum.REQUEST_REJECTED.getMessage();
+            errorCode = ErrorEnum.REQUEST_REJECTED.getCode();
+            httpStatus = HttpStatus.BAD_REQUEST;
+            log.error("exception code : {}", errorMessage);
+            log.error("exception message : {}", errorCode);
+            writeTokenResponse(response);
         } catch (AuthenticationEntryException e) {
             errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
             errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
@@ -41,8 +49,8 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             errorMessage = ErrorEnum.USERNAME_NOT_FOUND.getMessage();
             errorCode = ErrorEnum.USERNAME_NOT_FOUND.getCode();
             httpStatus = HttpStatus.BAD_REQUEST;
-            log.info("exception code : {}", errorMessage);
-            log.info("exception message : {}", errorCode);
+            log.error("exception code : {}", errorMessage);
+            log.error("exception message : {}", errorCode);
             writeTokenResponse(response);
         } catch (RuntimeException e) {
             errorMessage = ErrorEnum.RUNTIME.getMessage();

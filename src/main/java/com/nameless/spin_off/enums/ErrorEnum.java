@@ -80,7 +80,8 @@ public enum ErrorEnum {
     INCORRECT_LENGTH_RELATED_KEYWORD("ERR901", "키워드 길이 제한을 확인 해주시기 바랍니다."),
     UNKNOWN_CONTENT_TYPE("ERR902", "해당 컨텐츠 속성은 존재하지 않습니다."),
     RUNTIME("ERR0903", "예상하지 못한 예외입니다."),
-    MISSING_REQUEST_VALUE("ERR904", "요청 파라미터가 부족합니다.");
+    MISSING_REQUEST_VALUE("ERR904", "요청 파라미터가 부족합니다."),
+    REQUEST_REJECTED("ERR905", "url 요청에 금지된 단어가 포함되있습니다.");
 
 
     private final String code;
