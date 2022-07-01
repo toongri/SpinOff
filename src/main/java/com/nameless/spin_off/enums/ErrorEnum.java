@@ -25,7 +25,7 @@ public enum ErrorEnum {
     INCORRECT_EMAIL("ERR107", "이메일의 형식이 맞지 않습니다."),
     INCORRECT_NICKNAME("ERR108", "닉네임의 형식이 맞지 않습니다."),
     INCORRECT_PHONE_NUMBER("ERR109", "전화번호의 형식이 맞지 않습니다."),
-    NOT_CORRECT_EMAIL("ERR110", "요청한 이메일이 일치하지 않습니다."),
+    NOT_CORRECT_EMAIL("ERR110", "추가 소셜 연동은 이메일 기능이 가능한 아이디만 가능합니다."),
     NOT_EXIST_ACCOUNT_ID("ERR111", "해당 아이디는 존재하지 않습니다."),
     NOT_EXIST_EMAIL_AUTH_TOKEN("ERR112", "해당 이메일 인증이 존재하지 않습니다."),
     NOT_EXIST_EMAIL_LINKAGE_TOKEN("ERR113", "현재 이메일 연동 토큰을 찾을 수 없습니다."),

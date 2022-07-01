@@ -23,10 +23,12 @@ public class MemberDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String accountId) throws UsernameNotFoundException {
-        log.info("accountId : {}", accountId);
+        log.debug("accountId : {}", accountId);
         Member member = memberRepository.findByAccountIdWithRoles(accountId)
                 .orElseThrow(() -> new NotExistMemberException(ErrorEnum.NOT_EXIST_MEMBER));
-        log.info("member.getRoles() : {}", member.getRoles().toString());
+
+        log.info("currentMemberId : {}", member.getId());
+        log.debug("currentMember.getRoles() : {}", member.getRoles().toString());
 
         return new MemberAdapter(member);
     }

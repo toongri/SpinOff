@@ -158,7 +158,7 @@ public class SignServiceJpa implements SignService{
 
     @Transactional
     @Override
-    public void checkEmailLinkage(MemberDto.EmailLinkageCheckRequestDto requestDto) {
+    public void checkEmailLinkage(EmailLinkageCheckRequestDto requestDto) {
         EmailLinkage emailLinkage = emailLinkageQueryRepository.findValidLinkageByEmail(
                         requestDto.getAccountId(), requestDto.getEmail(),
                         requestDto.getAuthToken(), EMAIL_AUTH_MINUTE.getDateTimeMinusMinutes())
