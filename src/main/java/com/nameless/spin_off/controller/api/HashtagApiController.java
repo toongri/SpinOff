@@ -45,12 +45,13 @@ public class HashtagApiController {
                     example = "123")
     })
     @PostMapping("/{hashtagId}/follow")
-    public SingleApiResult<Long> createFollowHashtag(@LoginMember MemberDetails currentMember, @PathVariable Long hashtagId)
+    public SingleApiResult<Long> createFollowHashtag(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
 
-        log.info("createFollowHashtag");
+        log.info("**** POST :: /hashtag/{hashtagId}/follow");
         log.info("hashtagId : {}", hashtagId);
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(hashtagService.insertFollowedHashtagByHashtagId(currentMember.getId(), hashtagId));
     }
@@ -66,16 +67,15 @@ public class HashtagApiController {
                     example = "123")
     })
     @GetMapping("/{hashtagId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowHashtag(@LoginMember MemberDetails currentMember,
-                                                                        @PathVariable Long hashtagId)
+    public SingleApiResult<List<MembersByContentDto>> readFollowHashtag(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long hashtagId)
             throws AlreadyFollowedHashtagException, NotExistMemberException, NotExistHashtagException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowHashtag");
+        log.info("**** GET :: /hashtag/{hashtagId}/follow");
         log.info("hashtagId : {}", hashtagId);
-        log.info("memberId : {}", currentMemberId);
 
-        return getResult(hashtagQueryService.getFollowHashtagMembers(currentMemberId, hashtagId));
+        return getResult(hashtagQueryService.getFollowHashtagMembers(getCurrentMemberId(currentMember), hashtagId));
     }
 
     @ApiOperation(value = "가장 인기있는 해시태그 조회", notes = "")
@@ -91,7 +91,7 @@ public class HashtagApiController {
     @GetMapping("/most-popular")
     public SingleApiResult<List<MostPopularHashtag>> readMostPopularHashtag(int length) {
 
-        log.info("readMostPopularHashtag");
+        log.info("**** GET :: /hashtag/most-popular");
         log.info("length : {}", length);
 
         return getResult(searchQueryService.getMostPopularHashtagLimit(length));

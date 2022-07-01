@@ -41,9 +41,10 @@ public class MovieApiController {
     @ApiOperation(value = "naver api 영화 수정", notes = "")
     @ApiImplicitParams({
     })
-    @PutMapping("/naver")
+    @PatchMapping("/naver")
     public int updateMovieByNaver() {
-        log.info("updateMovieByNaver");
+        log.info("**** PATCH :: /movie/naver");
+
         return movieService.updateMovieByNaver();
     }
 
@@ -56,10 +57,10 @@ public class MovieApiController {
                     paramType = "body",
                     dataType = "KobisRequestDto")
     })
-    @PutMapping("/kobis/actor")
+    @PatchMapping("/kobis/actor")
     public int updateMovieActorByKobis(@RequestBody KobisRequestDto requestDto) {
 
-        log.info("updateMovieActorByKobis");
+        log.info("**** PATCH :: /movie/kobis/actor");
         log.info("startPage : {}", requestDto.getStartPage());
         log.info("size : {}", requestDto.getSize());
         return movieService.updateMovieActorByKobis(requestDto.getStartPage(), requestDto.getSize());
@@ -77,7 +78,7 @@ public class MovieApiController {
     @PostMapping("/kobis")
     public int createMovieByKobis(@RequestBody KobisRequestDto requestDto) {
 
-        log.info("createMovieByKobis");
+        log.info("**** POST :: /movie/kobis");
         log.info("startPage : {}", requestDto.getStartPage());
         log.info("size : {}", requestDto.getSize());
         return movieService.createMoviesByKobis(requestDto.getStartPage(), requestDto.getSize(), false);
@@ -95,11 +96,11 @@ public class MovieApiController {
     })
     @PostMapping("/{movieId}/follow")
     public SingleApiResult<Long> createFollowMovie(
-            @LoginMember MemberDetails currentMember, @PathVariable Long movieId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long movieId)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
-        log.info("createFollowMovie");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /movie/{movieId}/follow");
         log.info("movieId : {}", movieId);
 
         return getResult(movieService.insertFollowedMovieByMovieId(currentMember.getId(), movieId));
@@ -116,16 +117,15 @@ public class MovieApiController {
                     example = "123")
     })
     @GetMapping("/{movieId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowMovie(@LoginMember MemberDetails currentMember,
-                                                                      @PathVariable Long movieId)
+    public SingleApiResult<List<MembersByContentDto>> readFollowMovie(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long movieId)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowMovie");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /movie/{movieId}/follow");
         log.info("movieId : {}", movieId);
 
-        return getResult(movieQueryService.getFollowMovieMembers(currentMemberId, movieId));
+        return getResult(movieQueryService.getFollowMovieMembers(getCurrentMemberId(currentMember), movieId));
     }
 
     @ApiOperation(value = "영화 조회", notes = "")
@@ -146,15 +146,15 @@ public class MovieApiController {
                     example = "192.168.0.1")
     })
     @GetMapping("/{movieId}")
-    public SingleApiResult<ReadMovieDto> readMovie(@LoginMember MemberDetails currentMember,
-                                                   @PathVariable Long movieId, @RequestParam String ip)
+    public SingleApiResult<ReadMovieDto> readMovie(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long movieId,
+            @RequestParam String ip)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readMovie");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /movie/{movieId}");
         log.info("movieId : {}", movieId);
-        ReadMovieDto movieForRead = movieQueryService.getMovieForRead(currentMemberId, movieId);
+        ReadMovieDto movieForRead = movieQueryService.getMovieForRead(getCurrentMemberId(currentMember), movieId);
         movieService.insertViewedMovieByIp(ip, movieId);
         return getResult(movieForRead);
     }
@@ -193,19 +193,18 @@ public class MovieApiController {
     })
     @GetMapping("/{movieId}/post")
     public SingleApiResult<Slice<RelatedPostDto>> readMoviePost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long movieId,
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long movieId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable)
             throws NotExistMovieException, AlreadyFollowedMovieException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readMoviePost");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /movie/{movieId}/post");
         log.info("movieId : {}", movieId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        return getResult(movieQueryService.getRelatedPostsByMovieIdSliced(currentMemberId, movieId, pageable));
+        return getResult(movieQueryService.getRelatedPostsByMovieIdSliced(getCurrentMemberId(currentMember), movieId, pageable));
     }
 
     private Long getCurrentMemberId(MemberDetails currentMember) {

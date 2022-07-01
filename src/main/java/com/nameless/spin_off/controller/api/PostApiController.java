@@ -83,8 +83,7 @@ public class PostApiController {
             AlreadyCollectedPostException,
             IncorrectTitleOfPostException, IncorrectContentOfPostException, NotMatchCollectionException, IOException {
 
-        log.info("createPost");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /post");
         log.info("title : {}", createPostVO.getTitle());
         log.info("content : {}", createPostVO.getContent());
         log.info("movieId : {}", createPostVO.getMovieId());
@@ -116,10 +115,9 @@ public class PostApiController {
     public SingleApiResult<ReadPostDto> readPost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId, @RequestParam String ip) {
 
-        log.info("readPost");
+        log.info("**** GET :: /post/{postId}");
         log.info("postId : {}", postId);
         log.info("ip : {}", ip);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
 
         ReadPostDto postForVisit = postQueryService.getPostForRead(currentMember, postId);
         postService.insertViewedPostByIp(ip, postId);
@@ -140,9 +138,8 @@ public class PostApiController {
     public SingleApiResult<Long> deletePost(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
 
-        log.info("deletePost");
+        log.info("**** DELETE :: /post/{postId}");
         log.info("postId : {}", postId);
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(postService.deletePost(currentMember, postId));
     }
@@ -159,11 +156,11 @@ public class PostApiController {
     })
     @PostMapping("/{postId}/like")
     public SingleApiResult<Long> createLikePost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        log.info("createLikePost");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /post/{postId}/like");
         log.info("postId : {}", postId);
 
         return getResult(postService.insertLikedPostByMemberId(currentMember.getId(), postId));
@@ -180,17 +177,16 @@ public class PostApiController {
                     example = "123")
     })
     @GetMapping("/{postId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readLikePost(@LoginMember MemberDetails currentMember,
-                                                                   @PathVariable Long postId)
+    public SingleApiResult<List<MembersByContentDto>> readLikePost(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readLikePost");
+        log.info("**** GET :: /post/{postId}/like");
         log.info("postId : {}", postId);
-        log.info("memberId : {}", currentMemberId);
 
-        return getResult(collectionQueryService.getLikeCollectionMembers(currentMemberId, postId));
+        return getResult(collectionQueryService.getLikeCollectionMembers(getCurrentMemberId(currentMember), postId));
     }
 
     @ApiOperation(value = "글 컬렉션 리스트 수정", notes = "")
@@ -210,14 +206,14 @@ public class PostApiController {
                     dataType = "PostOnCollectionsRequestDto")
     })
     @PutMapping("/{postId}/collection/all")
-    public SingleApiResult<List<Long>> updatePostInCollections(@LoginMember MemberDetails currentMember,
-                                                               @PathVariable Long postId,
-                                                               @RequestBody PostOnCollectionsRequestDto requestDto)
+    public SingleApiResult<List<Long>> updatePostInCollections(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId,
+            @RequestBody PostOnCollectionsRequestDto requestDto)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        log.info("updatePostInCollections");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** PUT :: /post/{postId}/collection/all");
         log.info("postId : {}", postId);
         log.info("collectionIds : {}", requestDto.getCollectionIds().toString());
 
@@ -238,8 +234,7 @@ public class PostApiController {
     public SingleApiResult<List<PostInCollectionDto>> readPostInCollections(
             @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
 
-        log.info("readPostInCollections");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** GET :: /post/{postId}/collection/all");
         log.info("postId : {}", postId);
 
         return getResult(collectionQueryService.getCollectionsByMemberIdAndPostId(currentMember.getId(), postId));
@@ -262,14 +257,14 @@ public class PostApiController {
                     dataType = "PostOnCollectionRequestDto")
     })
     @PostMapping("/{postId}/collection/one")
-    public SingleApiResult<Long> createPostInCollection(@LoginMember MemberDetails currentMember,
-                                                        @PathVariable Long postId,
-                                                        @RequestBody PostOnCollectionRequestDto requestDto)
+    public SingleApiResult<Long> createPostInCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId,
+            @RequestBody PostOnCollectionRequestDto requestDto)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        log.info("createPostInCollection");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /post/{postId}/collection/one");
         log.info("postId : {}", postId);
         log.info("collectionId : {}", requestDto.getCollectionId());
 
@@ -288,12 +283,12 @@ public class PostApiController {
     })
     @GetMapping("/{postId}/collection/one")
     public SingleApiResult<QuickPostInCollectionDto> readPostInCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId)
             throws NotExistMemberException,
             NotExistPostException, AlreadyCollectedPostException, NotMatchCollectionException {
 
-        log.info("readPostInCollection");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** GET :: /post/{postId}/collection/one");
         log.info("postId : {}", postId);
 
         return getResult(collectionQueryService.getCollectionNameByMemberIdAndPostId(currentMember.getId(), postId));
@@ -314,8 +309,7 @@ public class PostApiController {
             @PathVariable Long postId)
             throws NotExistMemberException, NotExistPostException, NotExistCommentInPostException {
 
-        log.info("createCommentInPost");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /post/{postId}/comment");
         log.info("postId : {}", postId);
         log.info("parentId : {}", requestDto.getParentId());
         log.info("content : {}", requestDto.getContent());
@@ -336,11 +330,11 @@ public class PostApiController {
     })
     @GetMapping("/{postId}/comment")
     public SingleApiResult<List<ContentCommentDto>> readCommentInPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId) {
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId) {
 
-        log.info("readCommentInPost");
+        log.info("**** GET :: /post/{postId}/comment");
         log.info("postId : {}", postId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
 
         return getResult(commentInPostQueryService.getCommentsByPostId(currentMember, postId));
     }
@@ -357,11 +351,11 @@ public class PostApiController {
     })
     @PostMapping("/comment/{commentId}/like")
     public SingleApiResult<Long> createLikeCommentInPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        log.info("createLikeCommentInPost");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /post/comment/{commentId}/like");
         log.info("commentId : {}", commentId);
 
         return getResult(commentInPostService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
@@ -382,12 +376,10 @@ public class PostApiController {
             @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
             throws NotExistMemberException, NotExistCommentInPostException, AlreadyLikedCommentInPostException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readLikeCommentInPost");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /post/comment/{commentId}/like");
         log.info("commentId : {}", commentId);
 
-        return getResult(commentInPostQueryService.getLikeCommentMembers(currentMemberId, commentId));
+        return getResult(commentInPostQueryService.getLikeCommentMembers(getCurrentMemberId(currentMember), commentId));
     }
 
     @ApiOperation(value = "연관 글 조회", notes = "")
@@ -424,18 +416,17 @@ public class PostApiController {
     })
     @GetMapping("/{postId}/post")
     public SingleApiResult<Slice<RelatedPostDto>> readRelatedPost(
-            @LoginMember MemberDetails currentMember, @PathVariable Long postId,
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long postId,
             @PageableDefault(sort = "popularity", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readRelatedPost");
+        log.info("**** GET :: /post/{postId}/post");
         log.info("postId : {}", postId);
-        log.info("memberId : {}", currentMemberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
 
-        return getResult(postQueryService.getRelatedPostsSliced(currentMemberId, postId, pageable));
+        return getResult(postQueryService.getRelatedPostsSliced(getCurrentMemberId(currentMember), postId, pageable));
     }
 
     @ApiOperation(value = "글 공개 설정 리스트 조회", notes = "")

@@ -60,11 +60,10 @@ public class MemberApiController {
     })
     @GetMapping("/{memberId}")
     public SingleApiResult<ReadMemberDto> readMember(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId) {
 
-        log.info("readMember");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** GET :: /member/{memberId}");
         log.info("memberId : {}", memberId);
 
         return getResult(memberQueryService.getMemberForRead(currentMember, memberId));
@@ -82,12 +81,12 @@ public class MemberApiController {
     })
     @PostMapping("/{memberId}/follow")
     public SingleApiResult<Long> createFollowMember(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
-        log.info("createFollowMember");
-        log.info("memberId : {}", currentMember.getId());
-        log.info("followedMemberId : {}", memberId);
+        log.info("**** POST :: /member/{memberId}/follow");
+        log.info("memberId : {}", memberId);
 
         return getResult(memberService.insertFollowedMemberByMemberId(currentMember.getId(), memberId));
     }
@@ -102,16 +101,16 @@ public class MemberApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @GetMapping("/{memberId}/follower")
+    @GetMapping("/{memberId}/follow/follower")
     public SingleApiResult<List<MembersByContentDto>> readFollowerMember(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowerMember");
-        log.info("memberId : {}", currentMemberId);
-        log.info("targetMemberId : {}", memberId);
 
-        return getResult(memberQueryService.getFollowingMembersByMemberId(currentMemberId, memberId));
+        log.info("**** GET :: /member/{memberId}/follow/follower");
+        log.info("memberId : {}", memberId);
+
+        return getResult(memberQueryService.getFollowingMembersByMemberId(getCurrentMemberId(currentMember), memberId));
     }
 
     @ApiOperation(value = "멤버 팔로잉 조회", notes = "")
@@ -124,17 +123,16 @@ public class MemberApiController {
                     dataType = "Long",
                     example = "123")
     })
-    @GetMapping("/{memberId}/following")
+    @GetMapping("/{memberId}/follow/following")
     public SingleApiResult<List<MembersByContentDto>> readFollowingMember(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowingMember");
-        log.info("memberId : {}", currentMemberId);
-        log.info("targetMemberId : {}", memberId);
+        log.info("**** GET :: /member/{memberId}/follow/following");
+        log.info("memberId : {}", memberId);
 
-        return getResult(memberQueryService.getFollowedMembersByMemberId(currentMemberId, memberId));
+        return getResult(memberQueryService.getFollowedMembersByMemberId(getCurrentMemberId(currentMember), memberId));
     }
 
     @ApiOperation(value = "멤버 마이페이지 글", notes = "")
@@ -171,11 +169,12 @@ public class MemberApiController {
     })
     @GetMapping("/{memberId}/post")
     public SingleApiResult<Slice<MyPagePostDto>> readMemberPosts(
-            @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("readMemberPosts");
-        log.info("currentMemberId : {}", getCurrentMemberId(currentMember));
+
+        log.info("**** GET :: /member/{memberId}/post");
         log.info("memberId : {}", memberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
@@ -221,8 +220,7 @@ public class MemberApiController {
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId,
             @PageableDefault(sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
 
-        log.info("readMemberCollections");
-        log.info("currentMemberId : {}", getCurrentMemberId(currentMember));
+        log.info("**** GET :: /member/{memberId}/collection");
         log.info("memberId : {}", memberId);
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
@@ -246,12 +244,10 @@ public class MemberApiController {
             @LoginMember MemberDetails currentMember, @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowMovie");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /member/{memberId}/follow/movie");
         log.info("targetMemberId : {}", memberId);
 
-        return getResult(memberQueryService.getFollowMoviesByMemberId(currentMemberId, memberId));
+        return getResult(memberQueryService.getFollowMoviesByMemberId(getCurrentMemberId(currentMember), memberId));
     }
 
     @ApiOperation(value = "멤버 팔로우 해시태그 조회", notes = "")
@@ -265,16 +261,15 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/follow/hashtag")
-    public SingleApiResult<List<FollowHashtagDto>> readFollowHashtag(@LoginMember MemberDetails currentMember,
-                                                                     @PathVariable Long memberId)
+    public SingleApiResult<List<FollowHashtagDto>> readFollowHashtag(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowHashtag");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /member/{memberId}/follow/hashtag");
         log.info("targetMemberId : {}", memberId);
 
-        return getResult(memberQueryService.getFollowHashtagsByMemberId(currentMemberId, memberId));
+        return getResult(memberQueryService.getFollowHashtagsByMemberId(getCurrentMemberId(currentMember), memberId));
     }
 
     @ApiOperation(value = "멤버 팔로우 컬렉션 조회", notes = "")
@@ -288,13 +283,12 @@ public class MemberApiController {
                     example = "123")
     })
     @GetMapping("/{memberId}/follow/collection")
-    public SingleApiResult<List<FollowCollectionDto>> readFollowCollection(@LoginMember MemberDetails currentMember,
-                                                                           @PathVariable Long memberId)
+    public SingleApiResult<List<FollowCollectionDto>> readFollowCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId)
             throws AlreadyFollowedMemberException, NotExistMemberException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
-        log.info("readFollowCollection");
-        log.info("memberId : {}", currentMemberId);
+        log.info("**** GET :: /member/{memberId}/follow/collection");
         log.info("targetMemberId : {}", memberId);
 
         return getResult(memberQueryService.getFollowCollectionsByMemberId(currentMember, memberId));
@@ -306,8 +300,7 @@ public class MemberApiController {
     @PatchMapping("/delete")
     public SingleApiResult<Boolean> updateDeleteDate(@LoginMember MemberDetails currentMember) {
 
-        log.info("updateDeleteDate");
-        log.info("currentMemberId : {}", currentMember.getId());
+        log.info("**** PATCH :: /member/delete");
 
         return getResult(memberService.updateMemberDeleteDate(currentMember.getId(), MEMBER_DELETE_MONTH.getDatePlusMonths()));
     }
@@ -318,8 +311,7 @@ public class MemberApiController {
     @PatchMapping("/delete/cancel")
     public SingleApiResult<Boolean> updateDeleteDateCancel(@LoginMember MemberDetails currentMember) {
 
-        log.info("updateDeleteDateCancel");
-        log.info("currentMemberId : {}", currentMember.getId());
+        log.info("**** DELETE :: /member/delete/cancel");
 
         return getResult(memberService.updateMemberDeleteDateToNull(currentMember.getId()));
     }
@@ -329,12 +321,10 @@ public class MemberApiController {
     })
     @GetMapping("/profile")
     public SingleApiResult<MemberProfileResponseDto> readMemberProfile(@LoginMember MemberDetails currentMember) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("readMemberInfo");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** GET :: /member/profile");
 
-        return getResult(memberQueryService.getMemberForProfile(currentMemberId));
+        return getResult(memberQueryService.getMemberForProfile(getCurrentMemberId(currentMember)));
     }
 
     @ApiOperation(value = "멤버 프로필 수정", notes = "")
@@ -352,13 +342,13 @@ public class MemberApiController {
                     dataType = "MemberProfileRequestDto")
     })
     @PatchMapping("/profile")
-    public SingleApiResult<Long> updateMemberProfile(@LoginMember MemberDetails currentMember,
-                                                     @RequestPart MemberProfileRequestDto memberProfileRequestDto,
-                                                     @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
+    public SingleApiResult<Long> updateMemberProfile(
+            @LoginMember MemberDetails currentMember,
+            @RequestPart MemberProfileRequestDto memberProfileRequestDto,
+            @RequestPart(value = "image", required = false) MultipartFile multipartFile) throws IOException {
         Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("updateMemberInfo");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** PATCH :: /member/profile");
         log.info("accountId : {}", memberProfileRequestDto.getAccountId());
         log.info("nickname : {}", memberProfileRequestDto.getNickname());
         log.info("bio : {}", memberProfileRequestDto.getBio());
@@ -372,12 +362,10 @@ public class MemberApiController {
     })
     @GetMapping("/info")
     public SingleApiResult<MemberInfoResponseDto> readMemberInfo(@LoginMember MemberDetails currentMember) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("readMemberInfo");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** GET :: /member/info");
 
-        return getResult(memberQueryService.getMemberForInfo(currentMemberId));
+        return getResult(memberQueryService.getMemberForInfo(getCurrentMemberId(currentMember)));
     }
 
     @ApiOperation(value = "멤버 개인정보 수정", notes = "")
@@ -389,19 +377,18 @@ public class MemberApiController {
                     dataType = "MemberInfoRequestDto")
     })
     @PatchMapping("/info")
-    public SingleApiResult<Long> updateMemberInfo(@LoginMember MemberDetails currentMember,
-                                                  @RequestBody MemberInfoRequestDto memberInfoRequestDto)
+    public SingleApiResult<Long> updateMemberInfo(
+            @LoginMember MemberDetails currentMember,
+            @RequestBody MemberInfoRequestDto memberInfoRequestDto)
             throws IOException {
-        Long currentMemberId = getCurrentMemberId(currentMember);
 
-        log.info("updateMemberInfo");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** PATCH :: /member/info");
         log.info("authToken : {}", memberInfoRequestDto.getAuthToken());
         log.info("email : {}", memberInfoRequestDto.getEmail());
         log.info("birth : {}", memberInfoRequestDto.getBirth());
         log.info("phoneNumber : {}", memberInfoRequestDto.getPhoneNumber());
 
-        return getResult(memberService.updateMemberInfo(currentMemberId, memberInfoRequestDto));
+        return getResult(memberService.updateMemberInfo(getCurrentMemberId(currentMember), memberInfoRequestDto));
     }
 
     @ApiOperation(value = "멤버 비밀번호 여부 확인", notes = "")
@@ -415,11 +402,10 @@ public class MemberApiController {
     })
     @GetMapping("/password/check")
     public SingleApiResult<Boolean> readIsMatchedPassword(
-            @LoginMember MemberDetails currentMember, @RequestParam String password) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
+            @LoginMember MemberDetails currentMember,
+            @RequestParam String password) {
 
-        log.info("readIsMatchedPassword");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** GET :: /member/password/check");
         log.info("password : {}", password);
 
         return getResult(memberService.isMatchedPassword(currentMember, password));
@@ -435,15 +421,14 @@ public class MemberApiController {
                     dataType = "PasswordRequestDto")
     })
     @PatchMapping("/password")
-    public SingleApiResult<Boolean> updatePassword(@LoginMember MemberDetails currentMember,
-                                                   @RequestBody PasswordRequestDto requestDto) {
-        Long currentMemberId = getCurrentMemberId(currentMember);
+    public SingleApiResult<Boolean> updatePassword(
+            @LoginMember MemberDetails currentMember,
+            @RequestBody PasswordRequestDto requestDto) {
 
-        log.info("updatePassword");
-        log.info("currentMemberId : {}", currentMemberId);
+        log.info("**** PATCH :: /member/password");
         log.info("password : {}", requestDto.getPassword());
 
-        return getResult(memberService.updateMemberPassword(currentMemberId, requestDto.getPassword()));
+        return getResult(memberService.updateMemberPassword(getCurrentMemberId(currentMember), requestDto.getPassword()));
     }
 
     @ApiOperation(value = "멤버 차단 생성", notes = "")
@@ -456,13 +441,13 @@ public class MemberApiController {
                     dataType = "BlockRequestDto")
     })
     @PostMapping("/{memberId}/block")
-    public SingleApiResult<Long> createBlockMember(@LoginMember MemberDetails currentMember,
-                                                   @PathVariable Long memberId,
-                                                   @RequestBody BlockRequestDto requestDto)
+    public SingleApiResult<Long> createBlockMember(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long memberId,
+            @RequestBody BlockRequestDto requestDto)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
-        log.info("createBlockMember");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /member/{memberId}/block");
         log.info("blockedMemberId : {}", memberId);
         log.info("blockedMemberStatus : {}", requestDto.getBlockedMemberStatus());
 
@@ -477,8 +462,7 @@ public class MemberApiController {
     public SingleApiResult<List<BlockedMemberDto>> readBlockMember(@LoginMember MemberDetails currentMember)
             throws AlreadyFollowedMemberException, NotExistMemberException, AlreadyBlockedMemberException {
 
-        log.info("readBlockMember");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** GET :: /member/block");
 
         return getResult(memberQueryService.getBlockedMembersByMemberId(currentMember.getId()));
     }
@@ -498,8 +482,7 @@ public class MemberApiController {
             @LoginMember MemberDetails currentMember, @RequestBody SearchMemberRequestDto searchMemberRequestDto)
             throws NotExistMemberException {
 
-        log.info("createSearch");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /member/search");
         log.info("keyword : {}", searchMemberRequestDto.getKeyword());
         log.info("searchedByMemberStatus : {}", searchMemberRequestDto.getSearchedByMemberStatus());
 
@@ -521,11 +504,11 @@ public class MemberApiController {
     })
     @GetMapping("/search")
     public SingleApiResult<List<LastSearchDto>> readLastSearch(
-            @LoginMember MemberDetails currentMember, @RequestParam int length)
+            @LoginMember MemberDetails currentMember,
+            @RequestParam int length)
             throws NotExistMemberException {
 
-        log.info("readLastSearch");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** GET :: /member/search");
         log.info("length : {}", length);
 
         return getResult(memberQueryService.getLastSearchesByMemberLimit(currentMember.getId(), length));
@@ -542,10 +525,10 @@ public class MemberApiController {
                     example = "spinoff232@gmail.com")
     })
     @PostMapping("/auth-email")
-    public SingleApiResult<Boolean> createAuthEmail(@LoginMember MemberDetails currentMember,
-                                                    @RequestParam String email) {
-        log.info("createAuthEmail");
-        log.info("memberId : {}", currentMember.getId());
+    public SingleApiResult<Boolean> createAuthEmail(
+            @LoginMember MemberDetails currentMember,
+            @RequestParam String email) {
+        log.info("**** POST :: /member/auth-email");
         log.info("email : {}", email);
         return getResult(memberService.sendEmailForAuth(currentMember.getId(), email));
     }
@@ -562,7 +545,7 @@ public class MemberApiController {
     @PatchMapping("/auth-email")
     public SingleApiResult<Boolean> confirmAuthEmail(@RequestBody EmailAuthRequestDto requestDto) {
 
-        log.info("confirmAuthEmail");
+        log.info("**** PATCH :: /member/auth-email");
         log.info("email : {}", requestDto.getEmail());
         log.info("authToken : {}", requestDto.getAuthToken());
 
@@ -579,10 +562,11 @@ public class MemberApiController {
                     dataType = "EmailRequestDto")
     })
     @PostMapping("/update-email")
-    public SingleApiResult<Boolean> createUpdateEmail(@LoginMember MemberDetails currentMember,
-                                                    @RequestBody EmailRequestDto requestDto) {
-        log.info("createUpdateEmail");
-        log.info("memberId : {}", currentMember.getId());
+    public SingleApiResult<Boolean> createUpdateEmail(
+            @LoginMember MemberDetails currentMember,
+            @RequestBody EmailRequestDto requestDto) {
+
+        log.info("**** POST :: /member/update-email");
         log.info("email : {}", requestDto.getEmail());
         return getResult(memberService.sendEmailForUpdateEmail(currentMember.getId(), requestDto.getEmail()));
     }
@@ -599,7 +583,7 @@ public class MemberApiController {
     @PatchMapping("/update-email")
     public SingleApiResult<Boolean> confirmUpdateEmail(@RequestBody EmailAuthRequestDto requestDto) {
 
-        log.info("confirmUpdateEmail");
+        log.info("**** PATCH :: /member/update-email");
         log.info("email : {}", requestDto.getEmail());
         log.info("authToken : {}", requestDto.getAuthToken());
 

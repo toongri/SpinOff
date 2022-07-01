@@ -112,8 +112,7 @@ public class MainPageApiController {
                     Pageable collectionPageable)
             throws NotExistMemberException {
 
-        log.info("readDiscoveryMainPage");
-        log.info("memberId : {}", getMemberId(currentMember));
+        log.info("**** GET :: /main-page/discovery");
         log.info("popularPostPageable.getPageNumber() : {}", popularPostPageable.getPageNumber());
         log.info("popularPostPageable.getPageSize() : {}", popularPostPageable.getPageSize());
         log.info("popularPostPageable.getSort() : {}", popularPostPageable.getSort());
@@ -236,8 +235,7 @@ public class MainPageApiController {
                     Pageable collectionPageable)
             throws NotExistMemberException {
 
-        log.info("readFollowMainPage");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** GET :: /main-page/following");
         log.info("memberPageable.getPageNumber() : {}", memberPageable.getPageNumber());
         log.info("memberPageable.getPageSize() : {}", memberPageable.getPageSize());
         log.info("memberPageable.getSort() : {}", memberPageable.getSort());

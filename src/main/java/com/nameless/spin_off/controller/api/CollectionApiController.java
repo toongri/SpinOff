@@ -62,7 +62,6 @@ public class CollectionApiController {
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         log.info("**** POST :: /collection");
-        log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", collectionRequestDto.getTitle());
         log.info("content : {}", collectionRequestDto.getContent());
         log.info("publicOfCollectionStatus : {}", collectionRequestDto.getPublicOfCollectionStatus());
@@ -93,7 +92,7 @@ public class CollectionApiController {
 
         log.info("**** GET :: /collection/{id}");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
+
         ReadCollectionDto collection = collectionQueryService.getCollectionForRead(currentMember, collectionId);
         collectionService.insertViewedCollectionByIp(ip, collectionId);
         return getResult(collection);
@@ -116,13 +115,13 @@ public class CollectionApiController {
                     dataType = "CollectionRequestDto")
     })
     @PutMapping("/{collectionId}")
-    public SingleApiResult<Long> updateCollection(@LoginMember MemberDetails currentMember,
-                                                  @PathVariable Long collectionId,
-                                                  @RequestBody CollectionRequestDto collectionRequestDto)
+    public SingleApiResult<Long> updateCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long collectionId,
+            @RequestBody CollectionRequestDto collectionRequestDto)
             throws NotExistMemberException, IncorrectTitleOfCollectionException, IncorrectContentOfCollectionException {
 
         log.info("**** PUT :: /collection/{id}");
-        log.info("memberId : {}", currentMember.getId());
         log.info("title : {}", collectionRequestDto.getTitle());
         log.info("content : {}", collectionRequestDto.getContent());
         log.info("publicOfCollectionStatus : {}", collectionRequestDto.getPublicOfCollectionStatus());
@@ -153,7 +152,6 @@ public class CollectionApiController {
 
         log.info("**** POST :: /collection/{id}/post");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", currentMember.getId());
         log.info("postIds : {}", requestDto.getPostIds().toString());
 
         return getResult(collectionService.insertCollectedPost(currentMember.getId(), collectionId, requestDto.getPostIds()));
@@ -198,7 +196,6 @@ public class CollectionApiController {
 
         log.info("**** GET :: /collection/{collectionId}/post");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
         log.info("pageable.getPageNumber() : {}", pageable.getPageNumber());
         log.info("pageable.getPageSize() : {}", pageable.getPageSize());
         log.info("pageable.getSort() : {}", pageable.getSort());
@@ -223,7 +220,6 @@ public class CollectionApiController {
 
         log.info("**** POST :: /collection/{collectionId}/like");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionService.insertLikedCollectionByMemberId(currentMember.getId(), collectionId));
     }
@@ -239,17 +235,15 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/like")
-    public SingleApiResult<List<MembersByContentDto>> readLikeCollection(@LoginMember MemberDetails currentMember,
-                                                                         @PathVariable Long collectionId)
-            throws NotExistMemberException, AlreadyLikedCollectionException,
-            NotExistCollectionException {
+    public SingleApiResult<List<MembersByContentDto>> readLikeCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyLikedCollectionException, NotExistCollectionException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
         log.info("**** GET :: /collection/{collectionId}/like");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", currentMemberId);
 
-        return getResult(collectionQueryService.getLikeCollectionMembers(currentMemberId, collectionId));
+        return getResult(collectionQueryService.getLikeCollectionMembers(getCurrentMemberId(currentMember), collectionId));
     }
 
     @ApiOperation(value = "컬렉션 팔로우 생성", notes = "")
@@ -263,13 +257,14 @@ public class CollectionApiController {
                     example = "123")
     })
     @PostMapping("/{collectionId}/follow")
-    public SingleApiResult<Long> createFollowCollection(@LoginMember MemberDetails currentMember, @PathVariable Long collectionId)
-            throws NotExistMemberException, AlreadyFollowedCollectionException,
-            NotExistCollectionException, CantFollowOwnCollectionException {
+    public SingleApiResult<Long> createFollowCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long collectionId)
+            throws NotExistMemberException, AlreadyFollowedCollectionException, NotExistCollectionException,
+            CantFollowOwnCollectionException {
 
         log.info("**** POST :: /collection/{collectionId}/follow");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionService.insertFollowedCollectionByMemberId(currentMember.getId(), collectionId));
     }
@@ -285,17 +280,16 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/follow")
-    public SingleApiResult<List<MembersByContentDto>> readFollowCollection(@LoginMember MemberDetails currentMember,
-                                                                           @PathVariable Long collectionId)
+    public SingleApiResult<List<MembersByContentDto>> readFollowCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyLikedCollectionException,
             NotExistCollectionException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
         log.info("**** GET :: /collection/{collectionId}/follow");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", currentMemberId);
 
-        return getResult(collectionQueryService.getFollowCollectionMembers(currentMemberId, collectionId));
+        return getResult(collectionQueryService.getFollowCollectionMembers(getCurrentMemberId(currentMember), collectionId));
     }
 
     @ApiOperation(value = "컬렉션 댓글 생성", notes = "")
@@ -309,12 +303,12 @@ public class CollectionApiController {
     })
     @PostMapping("/{collectionId}/comment")
     public SingleApiResult<Long> createCommentInCollection(
-            @LoginMember MemberDetails currentMember, @RequestBody CommentInCollectionRequestDto commentRequestDto,
+            @LoginMember MemberDetails currentMember,
+            @RequestBody CommentInCollectionRequestDto commentRequestDto,
             @PathVariable Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, NotExistCommentInCollectionException {
 
         log.info("**** POST :: /collection/{collectionId}/comment");
-        log.info("memberId : {}", currentMember.getId());
         log.info("collectionId : {}", collectionId);
         log.info("parentId : {}", commentRequestDto.getParentId());
         log.info("content : {}", commentRequestDto.getContent());
@@ -335,14 +329,14 @@ public class CollectionApiController {
                     example = "123")
     })
     @GetMapping("/{collectionId}/comment")
-    public SingleApiResult<List<ContentCommentDto>> readCommentsInCollection(@LoginMember MemberDetails currentMember,
-                                                                             @PathVariable Long collectionId)
+    public SingleApiResult<List<ContentCommentDto>> readCommentsInCollection(
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long collectionId)
             throws NotExistMemberException, AlreadyFollowedCollectionException,
             NotExistCollectionException, CantFollowOwnCollectionException {
 
         log.info("**** GET :: /collection/{collectionId}/comment");
         log.info("collectionId : {}", collectionId);
-        log.info("memberId : {}", getCurrentMemberId(currentMember));
 
         return getResult(commentInCollectionQueryService.getCommentsByCollectionId(currentMember, collectionId));
     }
@@ -359,12 +353,12 @@ public class CollectionApiController {
     })
     @PostMapping("/comment/{commentId}/like")
     public SingleApiResult<Long> createLikeCommentInCollection(
-            @LoginMember MemberDetails currentMember, @PathVariable Long commentId)
+            @LoginMember MemberDetails currentMember,
+            @PathVariable Long commentId)
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
             NotExistCommentInCollectionException {
 
         log.info("**** POST :: /collection/comment/{commentId}/like");
-        log.info("memberId : {}", currentMember.getId());
         log.info("commentId : {}", commentId);
 
         return getResult(commentInCollectionService.insertLikedCommentByMemberId(currentMember.getId(), commentId));
@@ -386,12 +380,10 @@ public class CollectionApiController {
             throws NotExistMemberException, AlreadyLikedCommentInCollectionException,
             NotExistCommentInCollectionException {
 
-        Long currentMemberId = getCurrentMemberId(currentMember);
         log.info("**** GET :: /collection/comment/{commentId}/like");
-        log.info("memberId : {}", currentMemberId);
         log.info("commentId : {}", commentId);
 
-        return getResult(commentInCollectionQueryService.getLikeCommentMembers(currentMemberId, commentId));
+        return getResult(commentInCollectionQueryService.getLikeCommentMembers(getCurrentMemberId(currentMember), commentId));
     }
 
     @ApiOperation(value = "컬렉션 리스트 조회", notes = "로그인 된 멤버의 컬렉션 리스트 조회")
@@ -402,7 +394,6 @@ public class CollectionApiController {
             @LoginMember MemberDetails currentMember) {
 
         log.info("**** GET :: /collection/all");
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionQueryService.getCollectionsByMemberId(currentMember.getId()));
     }
@@ -415,7 +406,6 @@ public class CollectionApiController {
             @LoginMember MemberDetails currentMember) {
 
         log.info("**** GET :: /collection/one");
-        log.info("memberId : {}", currentMember.getId());
 
         return getResult(collectionQueryService.getCollectionNameByMemberId(currentMember.getId()));
     }

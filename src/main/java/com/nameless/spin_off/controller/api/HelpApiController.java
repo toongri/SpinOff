@@ -46,36 +46,22 @@ public class HelpApiController {
     })
     @PostMapping("/complain")
     public SingleApiResult<Long> createComplain(
-            @LoginMember MemberDetails currentMember, @RequestBody ComplainRequestDto complainRequestDto) throws
+            @LoginMember MemberDetails currentMember,
+            @RequestBody ComplainRequestDto complainRequestDto)
+            throws
             NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
             UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
             NotExistCommentInCollectionException {
 
-        log.info("createComplain");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /help/complain");
         log.info("contentId : {}", complainRequestDto.getContentId());
         log.info("contentTypeStatus : {}", complainRequestDto.getContentTypeStatus());
         log.info("complainStatus : {}", complainRequestDto.getComplainStatus());
 
-        return getResult(complainService.insertComplain(currentMember.getId(),
+        return getResult(
+                complainService.insertComplain(currentMember.getId(),
                 complainRequestDto.getContentId(),
                 complainRequestDto.getContentTypeStatus(),
                 complainRequestDto.getComplainStatus()));
     }
-
-//    @ApiOperation(value = "신고 생성", notes = "")
-//    @ApiImplicitParams({
-//    })
-//    @GetMapping("/complain")
-//    public SingleApiResult<Long> createComplain(
-//            @LoginMember MemberDetails currentMember) throws
-//            NotExistPostException, NotExistCollectionException, AlreadyComplainException, NotExistMemberException,
-//            UnknownContentTypeException, NotExistDMException, NotExistCommentInPostException,
-//            NotExistCommentInCollectionException {
-//
-//        log.info("createComplain");
-//        log.info("memberId : {}", currentMember.getId());
-//
-//        return getResult(complainService.insertComplain(currentMember.getId(), contentId, contentTypeStatus, complainStatus));
-//    }
 }

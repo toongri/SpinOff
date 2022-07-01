@@ -45,7 +45,7 @@ public class SignApiController {
     @PostMapping("/register")
     public SingleApiResult<MemberLoginResponseDto> register(@RequestBody MemberRegisterRequestDto requestDto) {
 
-        log.info("register");
+        log.info("**** POST :: /sign/register");
         log.info("accountId : {}", requestDto.getAccountId());
         log.info("accountPw : {}", requestDto.getAccountPw());
         log.info("name : {}", requestDto.getName());
@@ -76,7 +76,7 @@ public class SignApiController {
     public SingleApiResult<SocialLoginResponseDto> loginBySocial(
             @RequestBody AuthCodeRequestDto requestDto, @PathVariable String provider) {
 
-        log.info("loginBySocial");
+        log.info("**** POST :: /sign/login/social/{provider}");
         log.info("provider : {}", provider);
         log.info("authCode : {}", requestDto.getAuthCode());
 
@@ -95,7 +95,7 @@ public class SignApiController {
     @PatchMapping("/login")
     public SingleApiResult<MemberLoginResponseDto> login(@RequestBody MemberLoginRequestDto requestDto) {
 
-        log.info("login");
+        log.info("**** PATCH :: /sign/login");
         log.info("accountId : {}", requestDto.getAccountId());
         log.info("accountPw : {}", requestDto.getAccountPw());
 
@@ -114,7 +114,7 @@ public class SignApiController {
     @PatchMapping("/reissue")
     public SingleApiResult<TokenResponseDto> reIssue(@RequestBody TokenRequestDto tokenRequestDto) {
 
-        log.info("reissue");
+        log.info("**** PATCH :: /sign/reissue");
         log.info("refreshToken : {}", tokenRequestDto.getRefreshToken());
         log.info("accessToken : {}", tokenRequestDto.getAccessToken());
 
@@ -133,7 +133,7 @@ public class SignApiController {
     @PostMapping("/auth-email")
     public SingleApiResult<Boolean> authEmail(@RequestBody CreateEmailRequestDto requestDto) {
 
-        log.info("authEmail");
+        log.info("**** POST :: /sign/auth-email");
         log.info("email : {}", requestDto.getEmail());
 
         return getResult(signService.sendEmailForAuth(requestDto.getEmail()));
@@ -151,7 +151,7 @@ public class SignApiController {
     @PatchMapping("/auth-email")
     public SingleApiResult<Boolean> confirmEmail(@RequestBody EmailAuthRequestDto requestDto) {
 
-        log.info("confirmEmail");
+        log.info("**** PATCH :: /sign/auth-email");
         log.info("authToken : {}", requestDto.getAuthToken());
         log.info("email : {}", requestDto.getEmail());
 
@@ -175,12 +175,12 @@ public class SignApiController {
                     dataType = "LinkageEmailRequestDto")
     })
     @PostMapping("/linkage-email/{provider}")
-    public SingleApiResult<String> createLinkageEmail(@LoginMember MemberDetails currentMember,
-                                                @RequestBody LinkageEmailRequestDto requestDto,
-                                                @PathVariable String provider) {
+    public SingleApiResult<String> createLinkageEmail(
+            @LoginMember MemberDetails currentMember,
+            @RequestBody LinkageEmailRequestDto requestDto,
+            @PathVariable String provider) {
 
-        log.info("createLinkageEmail");
-        log.info("memberId : {}", currentMember.getId());
+        log.info("**** POST :: /sign/linkage-email/{provider}");
         log.info("provider : {}", provider);
         log.info("email : {}", requestDto.getEmail());
 
@@ -208,7 +208,7 @@ public class SignApiController {
     @PatchMapping("/linkage-email")
     public SingleApiResult<String> updateLinkageEmail(@RequestBody EmailLinkageCheckRequestDto requestDto) {
 
-        log.info("updateLinkageEmail");
+        log.info("**** PATCH :: /sign/linkage-email");
         log.info("email : {}", requestDto.getEmail());
         log.info("authToken : {}", requestDto.getAuthToken());
         log.info("accountId : {}", requestDto.getAccountId());
@@ -230,7 +230,7 @@ public class SignApiController {
     @GetMapping("/exist/nickname")
     public SingleApiResult<Boolean> checkDuplicateNickname(@RequestParam String nickname) {
 
-        log.info("checkDuplicateNickname");
+        log.info("**** GET :: /sign/exist/nickname");
         log.info("nickname : {}", nickname);
 
         return getResult(signService.checkDuplicateNickname(nickname));
@@ -249,7 +249,7 @@ public class SignApiController {
     @GetMapping("/exist/account-id")
     public SingleApiResult<Boolean> checkDuplicateAccountId(@RequestParam String accountId) {
 
-        log.info("checkDuplicateAccountId");
+        log.info("**** GET :: /sign/exist/account-id");
         log.info("accountId : {}", accountId);
 
         return getResult(signService.checkDuplicateAccountId(accountId));
@@ -268,7 +268,7 @@ public class SignApiController {
     @GetMapping("/forget/account-id")
     public SingleApiResult<Boolean> readForgetAccountId(@RequestParam String email) {
 
-        log.info("readForgetAccountId");
+        log.info("**** GET :: /sign/forget/account-id");
         log.info("email : {}", email);
 
         return getResult(signService.sendEmailForAccountId(email));
@@ -286,7 +286,7 @@ public class SignApiController {
     @PatchMapping("/forget/account-pw")
     public SingleApiResult<Boolean> readForgetAccountPw(@RequestBody AccountIdRequestDto requestDto) {
 
-        log.info("readForgetAccountPw");
+        log.info("**** PATCH :: /sign/forget/account-pw");
         log.info("accountId : {}", requestDto.getAccountId());
 
         return getResult(signService.sendEmailForAccountPw(requestDto.getAccountId()));
