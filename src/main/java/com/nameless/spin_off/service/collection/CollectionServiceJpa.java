@@ -51,29 +51,8 @@ public class CollectionServiceJpa implements CollectionService {
     @Override
     public Long updateCollection(CollectionRequestDto collectionRequestDto, Long collectionId, Long memberId) {
         Collection collection = getCollectionById(collectionId);
-        if (!collection.getMember().getId().equals(memberId)) {
-            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-        }
-        Long cnt = 0L;
-        if (!collectionRequestDto.getTitle().equals(collection.getTitle())) {
-            if (collection.getIsDefault()) {
-                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            }
-            cnt++;
-            collection.updateTitle(collectionRequestDto.getTitle());
-        }
-        if (!collectionRequestDto.getContent().equals(collection.getContent())) {
-            cnt++;
-            collection.updateContent(collectionRequestDto.getContent());
-        }
-        if (!collectionRequestDto.getPublicOfCollectionStatus().equals(collection.getPublicOfCollectionStatus())) {
-            cnt++;
-            collection.updatePublicOfCollectionStatus(collectionRequestDto.getPublicOfCollectionStatus());
-        }
-        if (cnt > 0) {
-            collection.updateLastModifiedDate();
-        }
-        return cnt;
+        hasAuthCollection(memberId, collection);
+        return checkChangeValue(collectionRequestDto, collection);
     }
 
     @Transactional
@@ -86,7 +65,8 @@ public class CollectionServiceJpa implements CollectionService {
 
         return likedCollectionRepository.save(
                 LikedCollection.createLikedCollection(
-                        Member.createMember(memberId), Collection.createCollection(collectionId))).getId();
+                        Member.createMember(memberId),
+                        Collection.createCollection(collectionId))).getId();
     }
 
     @Transactional
@@ -137,8 +117,8 @@ public class CollectionServiceJpa implements CollectionService {
     public Long deleteCollection(MemberDetails currentMember, Long collectionId) {
         Collection collection = getCollectionById(collectionId);
         hasAuthCollection(currentMember, collection.getMember().getId(), collection.getIsDefault());
+        deleteCollectedPosts(collection);
         collectionRepository.delete(collection);
-
         return 1L;
     }
 
@@ -152,6 +132,42 @@ public class CollectionServiceJpa implements CollectionService {
             collection.updatePopularity();
         }
         return collections.size();
+    }
+
+    private Long checkChangeValue(CollectionRequestDto collectionRequestDto, Collection collection) {
+        Long cnt = 0L;
+        if (!collectionRequestDto.getTitle().equals(collection.getTitle())) {
+            if (collection.getIsDefault()) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+            cnt++;
+            collection.updateTitle(collectionRequestDto.getTitle());
+        }
+        if (!collectionRequestDto.getContent().equals(collection.getContent())) {
+            cnt++;
+            collection.updateContent(collectionRequestDto.getContent());
+        }
+        if (!collectionRequestDto.getPublicOfCollectionStatus().equals(collection.getPublicOfCollectionStatus())) {
+            cnt++;
+            collection.updatePublicOfCollectionStatus(collectionRequestDto.getPublicOfCollectionStatus());
+        }
+        if (cnt > 0) {
+            collection.updateLastModifiedDate();
+        }
+        return cnt;
+    }
+
+    private void hasAuthCollection(Long memberId, Collection collection) {
+        if (!collection.getMember().getId().equals(memberId)) {
+            throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+        }
+    }
+
+    private void deleteCollectedPosts(Collection collection) {
+        List<CollectedPost> collectedPosts = collectedPostRepository.findAllByCollection(collection);
+        if (!collectedPosts.isEmpty()) {
+            collectedPostRepository.deleteAll(collectedPosts);
+        }
     }
 
     private void hasAuthCollection(MemberDetails currentMember, Long memberId, boolean isDefault) {

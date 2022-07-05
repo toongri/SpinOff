@@ -924,4 +924,13 @@ class CollectionServiceJpaTest {
         assertThatThrownBy(() -> collectionService.updateCollection(new CollectionRequestDto("abccd", "abcddaa", B),
                 memberCollection1.getId(), mem.getId())).isInstanceOf(DontHaveAuthorityException.class);
     }
+
+    @Test
+    public void 컬렉션_삭제 () throws Exception {
+        //given
+
+        //when
+
+        //then
+    }
 }
