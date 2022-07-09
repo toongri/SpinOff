@@ -1,36 +1,37 @@
-package com.nameless.spin_off.config.AccessDeniedHandler;
+package com.nameless.spin_off.controller.exhandler.advice;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nameless.spin_off.controller.exhandler.ErrorResult;
 import com.nameless.spin_off.enums.ErrorEnum;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Slf4j
+@Aspect
 @RequiredArgsConstructor
 @Component
-public class CustomAccessDeniedHandler implements AccessDeniedHandler {
-    HttpStatus httpStatus = HttpStatus.FORBIDDEN;
-    private final String errorMessage = ErrorEnum.ACCESS_DENIED.getMessage();
-    private final String errorCode = ErrorEnum.ACCESS_DENIED.getCode();
+public class FilterChainProxyAdvice {
+    HttpStatus httpStatus = HttpStatus.BAD_REQUEST;
+    private final String errorMessage = ErrorEnum.REQUEST_REJECTED.getMessage();
+    private final String errorCode = ErrorEnum.REQUEST_REJECTED.getCode();
     private final ObjectMapper objectMapper;
 
-    //권한초과
-    @Override
-    public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException accessDeniedException) throws IOException {
 
-        log.info("exception code : {}", errorMessage);
-        log.info("exception message : {}", errorCode);
-        writeTokenResponse(response);
+    @Around("execution(public void org.springframework.security.web.FilterChainProxy.doFilter(..))")
+    public void handleRequestRejectedException (ProceedingJoinPoint pjp) throws Throwable {
+        try {
+            pjp.proceed();
+        } catch (RequestRejectedException exception) {
+            HttpServletResponse response = (HttpServletResponse) pjp.getArgs()[1];
+            writeTokenResponse(response);
+        }
     }
 
     private void writeTokenResponse(HttpServletResponse response) throws IOException {

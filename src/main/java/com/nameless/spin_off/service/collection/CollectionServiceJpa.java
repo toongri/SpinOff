@@ -104,12 +104,7 @@ public class CollectionServiceJpa implements CollectionService {
         isExistCollection(currentMemberId, collectionId);
         isAlreadyCollectedPost(collectionId);
 
-        List<CollectedPost> collectedPosts = postIds.stream()
-                .map(p ->
-                        CollectedPost.createCollectedPost(Collection.createCollection(collectionId), Post.createPost(p)))
-                .collect(Collectors.toList());
-
-        return collectedPostRepository.saveAll(collectedPosts).size();
+        return collectedPostRepository.saveAll(getCollectedPostsByCollectionIdAndPostIds(collectionId, postIds)).size();
     }
 
     @Transactional
@@ -134,8 +129,14 @@ public class CollectionServiceJpa implements CollectionService {
         return collections.size();
     }
 
+    private List<CollectedPost> getCollectedPostsByCollectionIdAndPostIds(Long collectionId, List<Long> postIds) {
+        return postIds.stream()
+                .map(p -> CollectedPost.createCollectedPost(Collection.createCollection(collectionId), Post.createPost(p)))
+                .collect(Collectors.toList());
+    }
+
     private Long checkChangeValue(CollectionRequestDto collectionRequestDto, Collection collection) {
-        Long cnt = 0L;
+        long cnt = 0L;
         if (!collectionRequestDto.getTitle().equals(collection.getTitle())) {
             if (collection.getIsDefault()) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);

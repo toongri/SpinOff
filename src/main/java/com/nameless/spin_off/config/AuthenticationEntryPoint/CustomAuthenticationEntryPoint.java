@@ -20,17 +20,15 @@ import java.io.IOException;
 @Component
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
     HttpStatus httpStatus = HttpStatus.UNAUTHORIZED;
-    private String errorMessage = null;
-    private String errorCode = null;
+    private final String errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
+    private final String errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
     private final ObjectMapper objectMapper;
 
     //인증요청
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException)
-            throws IOException, ServletException {
+            throws IOException {
 
-        errorMessage = ErrorEnum.AUTHENTICATION_ENTRY.getMessage();
-        errorCode = ErrorEnum.AUTHENTICATION_ENTRY.getCode();
         log.info("exception code : {}", errorMessage);
         log.info("exception message : {}", errorCode);
 
