@@ -167,7 +167,7 @@ public class HashtagQueryRepository extends Querydsl4RepositorySupport {
 
     public List<Hashtag> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
-                .selectFrom(hashtag)
+                .selectFrom(hashtag).distinct()
                 .join(hashtag.viewedHashtagByIps, viewedHashtagByIp).fetchJoin()
                 .where(
                         viewedHashtagByIp.createdDate.after(time))

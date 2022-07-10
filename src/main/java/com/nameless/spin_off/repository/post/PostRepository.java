@@ -21,7 +21,7 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "WHERE post.id = :id")
     Optional<Post> findOneByIdWithPostedMedia(@Param("id") Long id);
 
-    @Query("SELECT p FROM Post p " +
+    @Query("SELECT DISTINCT p FROM Post p " +
             "JOIN FETCH p.viewedPostByIps view " +
             "WHERE (view.createdDate > :time)")
     List<Post> findAllByViewAfterTime(@Param("time") LocalDateTime time);

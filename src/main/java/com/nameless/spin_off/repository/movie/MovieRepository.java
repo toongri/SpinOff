@@ -20,7 +20,7 @@ public interface MovieRepository extends JpaRepository<Movie, Long> {
             "WHERE followedMovie.member.id = :id")
     List<Long> findAllIdByFollowingMemberId(@Param("id")Long id);
 
-    @Query("SELECT m FROM Movie m " +
+    @Query("SELECT DISTINCT m FROM Movie m " +
             "JOIN FETCH m.viewedMovieByIps view " +
             "WHERE view.createdDate > :time")
     List<Movie> findAllByViewAfterTime(@Param("time") LocalDateTime time);

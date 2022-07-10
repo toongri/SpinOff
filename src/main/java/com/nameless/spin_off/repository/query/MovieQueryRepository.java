@@ -165,7 +165,7 @@ public class MovieQueryRepository extends Querydsl4RepositorySupport {
 
     public List<Movie> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
-                .selectFrom(movie)
+                .selectFrom(movie).distinct()
                 .join(movie.viewedMovieByIps, viewedMovieByIp).fetchJoin()
                 .where(
                         viewedMovieByIp.createdDate.after(time))

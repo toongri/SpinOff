@@ -165,8 +165,8 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
-    public Slice<MyPageCollectionDto> findAllByMemberIdSliced(Long memberId, Pageable pageable,
-                                                              boolean isFollowing, boolean isAdmin) {
+    public Slice<MyPageCollectionDto> findAllByMemberIdSliced(
+            Long memberId, Pageable pageable, boolean isFollowing, boolean isAdmin) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QCollectionDto_MyPageCollectionDto(
                         collection.id, collection.title, collection.firstThumbnail, collection.secondThumbnail,
@@ -268,41 +268,6 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isBlockMembersCollection(Long memberId, Long collectionId) {
-        QBlockedMember blockingMember = new QBlockedMember("blockingMember");
-
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(collection)
-                .join(collection.member, member)
-                .leftJoin(member.blockedMembers, blockedMember)
-                .leftJoin(member.blockingMembers, blockingMember)
-                .where(
-                        collection.id.eq(collectionId).and(
-                                ((blockedMember.member.id.eq(memberId).and(
-                                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A))).or(
-                                        blockingMember.blockingMember.id.eq(memberId).and(
-                                                blockingMember.blockedMemberStatus.eq(BlockedMemberStatus.A))))))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
-    public Boolean isFollowMembersOrOwnerCollection(Long memberId, Long collectionId) {
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(collection)
-                .join(collection.member, member)
-                .leftJoin(member.followingMembers, followedMember)
-                .where(
-                        collection.id.eq(collectionId).and(
-                                followedMember.followingMember.id.eq(memberId).or(
-                                        member.id.eq(memberId))))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
     public Optional<Long> findOwnerIdByCollectionId(Long collectionId) {
         return Optional.ofNullable(getQueryFactory()
                 .select(collection.member.id)
@@ -394,7 +359,7 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
 
     public List<Collection> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
-                .selectFrom(collection)
+                .selectFrom(collection).distinct()
                 .join(collection.viewedCollectionByIps, viewedCollectionByIp).fetchJoin()
                 .where(
                         viewedCollectionByIp.createdDate.after(time))

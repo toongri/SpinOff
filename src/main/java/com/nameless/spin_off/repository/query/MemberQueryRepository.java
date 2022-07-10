@@ -144,7 +144,7 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
 
     public List<Member> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
-                .selectFrom(member)
+                .selectFrom(member).distinct()
                 .join(member.followingMembers, followedMember).fetchJoin()
                 .leftJoin(member.blockingMembers, blockedMember).fetchJoin()
                 .leftJoin(member.complains, complain).fetchJoin()

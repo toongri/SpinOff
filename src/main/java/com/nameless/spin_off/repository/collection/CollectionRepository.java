@@ -26,7 +26,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
             "WHERE post.id = :postId")
     List<Collection> findAllByPostIdWithPost(@Param("postId") Long postId);
 
-    @Query("SELECT c FROM Collection c " +
+    @Query("SELECT DISTINCT c FROM Collection c " +
             "JOIN FETCH c.viewedCollectionByIps view " +
             "WHERE (view.createdDate > :time)")
     List<Collection> findAllByViewAfterTime(@Param("time") LocalDateTime time);

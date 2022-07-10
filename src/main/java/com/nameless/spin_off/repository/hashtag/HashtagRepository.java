@@ -20,7 +20,7 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
             "WHERE followedHashtag.member.id = :id")
     List<Long> findAllIdByFollowingMemberId(@Param("id")Long id);
 
-    @Query("SELECT h FROM Hashtag h " +
+    @Query("SELECT DISTINCT h FROM Hashtag h " +
             "JOIN FETCH h.viewedHashtagByIps view " +
             "WHERE (view.createdDate > :time)")
     List<Hashtag> findAllByViewAfterTime(@Param("time") LocalDateTime time);

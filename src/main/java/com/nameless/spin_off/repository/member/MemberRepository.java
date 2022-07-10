@@ -18,7 +18,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     Optional<Member> findOneByNaverEmail(String naverEmail);
     Optional<Member> findOneByKakaoEmail(String kakaoEmail);
 
-    @Query("SELECT m FROM Member m " +
+    @Query("SELECT DISTINCT m FROM Member m " +
             "LEFT JOIN FETCH m.roles role " +
             "WHERE m.accountId = :accountId")
     Optional<Member> findByAccountIdWithRoles(@Param("accountId") String accountId);
@@ -48,8 +48,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT blockedMember.blockingMember.id FROM BlockedMember blockedMember " +
             "WHERE blockedMember.member.id = :id AND blockedMember.blockedMemberStatus = :status")
-    List<Long> findAllIdByBlockedMemberId(@Param("id")Long id,
-                                           @Param("status") BlockedMemberStatus status);
+    List<Long> findAllIdByBlockedMemberId(
+            @Param("id")Long id,
+            @Param("status") BlockedMemberStatus status);
 
     @Query("SELECT DISTINCT m.id FROM Member m " +
             "LEFT JOIN m.blockingMembers blockingM " +
@@ -59,7 +60,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     List<Long> findBlockingAllAndBlockedAllByIdAndBlockStatus(@Param("id") Long id,
                                                               @Param("status") BlockedMemberStatus status);
 
-    @Query("SELECT m FROM Member m " +
+    @Query("SELECT DISTINCT m FROM Member m " +
             "JOIN FETCH m.followingMembers followingM " +
             "LEFT JOIN FETCH m.blockingMembers blockingM " +
             "LEFT JOIN FETCH m.complains complainM " +

@@ -66,9 +66,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
-    public Slice<CollectedPostDto> findAllCollectedPostByCollectionId(Pageable pageable, Long collectionId,
-                                                                      List<Long> blockedMemberIds, boolean isFollowing,
-                                                                      boolean isAdmin) {
+    public Slice<CollectedPostDto> findAllCollectedPostByCollectionId(
+            Pageable pageable, Long collectionId, List<Long> blockedMemberIds, boolean isFollowing, boolean isAdmin) {
         return applySlicing(pageable, contentQuery -> contentQuery
                 .select(new QPostDto_CollectedPostDto(
                         post.id, post.title, member.id, member.nickname, member.profileImg, post.thumbnailUrl))
@@ -141,50 +140,6 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .from(post)
                 .where(post.id.eq(postId))
                 .fetchFirst());
-    }
-
-    public List<PostIdAndOwnerIdAndPublicPostDto> findAllPublicAndOwnerIdById(List<Long> postIds) {
-        return getQueryFactory()
-                .select(new QPostDto_PostIdAndOwnerIdAndPublicPostDto(
-                        post.id, post.member.id, post.publicOfPostStatus))
-                .from(post)
-                .where(post.id.in(postIds))
-                .fetch();
-    }
-
-    public Boolean isBlockMembersPost(Long memberId, Long postId) {
-        QBlockedMember blockingMember = new QBlockedMember("blockingMember");
-
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(post)
-                .join(post.member, member)
-                .leftJoin(member.blockedMembers, blockedMember)
-                .leftJoin(member.blockingMembers, blockingMember)
-                .where(
-                        post.id.eq(postId).and(
-                                ((blockedMember.member.id.eq(memberId).and(
-                                        blockedMember.blockedMemberStatus.eq(BlockedMemberStatus.A))).or(
-                                        blockingMember.blockingMember.id.eq(memberId).and(
-                                                blockingMember.blockedMemberStatus.eq(BlockedMemberStatus.A))))))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
-    public Boolean isFollowMembersOrOwnerPost(Long memberId, Long postId) {
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(post)
-                .join(post.member, member)
-                .leftJoin(member.followingMembers, followedMember)
-                .where(
-                        post.id.eq(postId).and(
-                                followedMember.followingMember.id.eq(memberId).or(
-                                        member.id.eq(memberId))))
-                .fetchFirst();
-
-        return fetchOne != null;
     }
 
     public Optional<Long> findOwnerIdByPostId(Long postId) {
@@ -293,8 +248,8 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                         memberNotIn(blockedMemberIds)));
     }
 
-    public Slice<RelatedPostDto> findAllRelatedPostByPostId(Pageable pageable,
-                                                             List<Long> blockedMemberIds, Long postId) {
+    public Slice<RelatedPostDto> findAllRelatedPostByPostId(
+            Pageable pageable, List<Long> blockedMemberIds, Long postId) {
         QPostedHashtag relatedPostHashtag = new QPostedHashtag("relatedPostHashtag");
 
         return applySlicing(pageable, contentQuery -> contentQuery
@@ -422,7 +377,7 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
 
     public List<Post> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
-                .selectFrom(post)
+                .selectFrom(post).distinct()
                 .join(post.viewedPostByIps, viewedPostByIp).fetchJoin()
                 .where(
                         viewedPostByIp.createdDate.after(time))
