@@ -157,17 +157,16 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     public Slice<CollectedPostDto> getCollectedPostsSliced(MemberDetails currentMember, Long collectionId, Pageable pageable) {
 
         Long currentMemberId = getCurrentMemberId(currentMember);
-        OwnerIdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
+        OwnerIdAndPublicCollectionDto collectionInfo = getPublicAndMemberIdByCollectionId(collectionId);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(currentMemberId);
-        hasAuthCollection(currentMemberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
-                publicAndMemberIdByCollectionId.getCollectionOwnerId());
+        hasAuthCollection(currentMemberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
         if (currentMember != null) {
             return postQueryRepository.findAllCollectedPostByCollectionId(
                     pageable,
                     collectionId,
                     blockedMemberIds,
                     isExistFollowedCollection(currentMemberId, collectionId),
-                    hasAdminOfContent(currentMember, publicAndMemberIdByCollectionId.getCollectionOwnerId()));
+                    hasAdminOfContent(currentMember, collectionInfo.getCollectionOwnerId()));
         } else {
             return postQueryRepository.findAllCollectedPostByCollectionId(
                     pageable, collectionId, Collections.emptyList(), false, false);
@@ -177,9 +176,8 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     @Override
     public List<MembersByContentDto> getLikeCollectionMembers(Long memberId, Long collectionId) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        OwnerIdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
-        hasAuthCollection(memberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
-                publicAndMemberIdByCollectionId.getCollectionOwnerId());
+        OwnerIdAndPublicCollectionDto collectionInfo = getPublicAndMemberIdByCollectionId(collectionId);
+        hasAuthCollection(memberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
 
         return getMembersByContentDtos(getLikeMembersByCollectionId(collectionId), memberId);
     }
@@ -187,9 +185,8 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     @Override
     public List<MembersByContentDto> getFollowCollectionMembers(Long memberId, Long collectionId) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        OwnerIdAndPublicCollectionDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByCollectionId(collectionId);
-        hasAuthCollection(memberId, collectionId, publicAndMemberIdByCollectionId.getPublicOfCollectionStatus(),
-                publicAndMemberIdByCollectionId.getCollectionOwnerId());
+        OwnerIdAndPublicCollectionDto collectionInfo = getPublicAndMemberIdByCollectionId(collectionId);
+        hasAuthCollection(memberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
 
         return getMembersByContentDtos(getFollowMembersByCollectionId(collectionId), memberId);
     }
@@ -228,8 +225,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
     private ReadCollectionDto getReadCollectionDto(Long collectionId, Long memberId, boolean isAdmin) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         ReadCollectionDto collection = getOneByCollectionId(collectionId);
-        hasAuthCollection(memberId, collectionId, collection.getPublicOfCollectionStatus(),
-                collection.getMember().getMemberId());
+        hasAuthCollection(memberId, collection.getPublicOfCollectionStatus(), collection.getMember().getMemberId());
 
         if (memberId != null) {
             collection.setAuth(memberId, isAdmin);
@@ -300,8 +296,7 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         return currentMember.isAdmin() || currentMember.getId().equals(targetMemberId);
     }
 
-    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus,
-                                   Long collectionOwnerId) {
+    private void hasAuthCollection(Long memberId, PublicOfCollectionStatus publicOfCollectionStatus, Long collectionOwnerId) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (memberId != null) {
                 if (blockedMemberIds.contains(collectionOwnerId)) {
@@ -311,13 +306,13 @@ public class CollectionQueryServiceJpa implements CollectionQueryService {
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
+            } else if (!(memberId.equals(collectionOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, collectionOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
+            } else if (!memberId.equals(collectionOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }

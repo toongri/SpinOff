@@ -142,19 +142,6 @@ public class MemberQueryRepository extends Querydsl4RepositorySupport {
         return fetchOne != null;
     }
 
-    public Boolean isExistBlockedMemberAndStatus(Long blockingMemberId, Long blockedMemberId, BlockedMemberStatus status) {
-        Integer fetchOne = getQueryFactory()
-                .selectOne()
-                .from(blockedMember)
-                .where(
-                        blockedMember.blockingMember.id.eq(blockingMemberId),
-                        blockedMember.member.id.eq(blockedMemberId),
-                        blockedMember.blockedMemberStatus.eq(status))
-                .fetchFirst();
-
-        return fetchOne != null;
-    }
-
     public List<Member> findAllByViewAfterTime(LocalDateTime time) {
         return getQueryFactory()
                 .selectFrom(member)

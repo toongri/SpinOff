@@ -2,7 +2,9 @@ package com.nameless.spin_off.service.post;
 
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.PostThumbnailsCollectionDto;
+import com.nameless.spin_off.dto.PostDto;
 import com.nameless.spin_off.dto.PostDto.CreatePostVO;
+import com.nameless.spin_off.dto.PostDto.PostOwnerIdAndPublicPostDto;
 import com.nameless.spin_off.dto.PostDto.ThumbnailAndPublicPostDto;
 import com.nameless.spin_off.entity.collection.CollectedPost;
 import com.nameless.spin_off.entity.collection.Collection;
@@ -14,6 +16,7 @@ import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.entity.post.PostedMedia;
 import com.nameless.spin_off.entity.post.ViewedPostByIp;
 import com.nameless.spin_off.enums.ErrorEnum;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.AlreadyCollectedPostException;
 import com.nameless.spin_off.exception.collection.NotMatchCollectionException;
@@ -30,6 +33,7 @@ import com.nameless.spin_off.repository.post.LikedPostRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
 import com.nameless.spin_off.repository.post.ViewedPostByIpRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import com.nameless.spin_off.service.support.AwsS3Service;
 import lombok.RequiredArgsConstructor;
@@ -55,6 +59,7 @@ public class PostServiceJpa implements PostService{
     private final MovieRepository movieRepository;
     private final HashtagRepository hashtagRepository;
     private final CollectionRepository collectionRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private final PostQueryRepository postQueryRepository;
     private final LikedPostRepository likedPostRepository;
     private final ViewedPostByIpRepository viewedPostByIpRepository;
@@ -101,7 +106,8 @@ public class PostServiceJpa implements PostService{
     public Long insertLikedPostByMemberId(Long memberId, Long postId)
             throws NotExistMemberException, NotExistPostException, AlreadyLikedPostException {
 
-        hasAuthPost(memberId, postId, getPublicOfPost(postId));
+        PostOwnerIdAndPublicPostDto publicAndOwnerIdByPostId = getPublicAndOwnerIdByPostId(postId);
+        hasAuthPost(memberId, publicAndOwnerIdByPostId.getPublicOfPostStatus(), publicAndOwnerIdByPostId.getPostOwnerId());
         isExistLikedPost(memberId, postId);
         return likedPostRepository.save(
                 LikedPost.createLikedPost(Member.createMember(memberId), Post.createPost(postId))).getId();
@@ -110,11 +116,10 @@ public class PostServiceJpa implements PostService{
     @Transactional
     @Override
     public List<Long> updateCollectedPosts(Long memberId, Long postId, List<Long> collectionIds)
-            throws NotMatchCollectionException,
-            NotExistPostException, AlreadyCollectedPostException {
+            throws NotMatchCollectionException, NotExistPostException, AlreadyCollectedPostException {
 
         ThumbnailAndPublicPostDto publicAndThumbnailOfPost = getPublicAndThumbnailOfPost(postId);
-        hasAuthPost(memberId, postId, publicAndThumbnailOfPost.getPublicOfPostStatus());
+        hasAuthPost(memberId, publicAndThumbnailOfPost.getPublicOfPostStatus(), publicAndThumbnailOfPost.getPostOwnerId());
         isCorrectCollectionIds(collectionIds, memberId);
 
         List<CollectedPost> collectedPosts = collectionQueryRepository.findAllIdByPostIdAndMemberId(postId, memberId);
@@ -159,7 +164,9 @@ public class PostServiceJpa implements PostService{
     @Transactional
     @Override
     public Long insertCollectedPost(Long memberId, Long postId, Long collectionId) {
-        hasAuthPost(memberId, postId, getPublicOfPost(postId));
+        PostOwnerIdAndPublicPostDto publicAndOwnerIdByPostId = getPublicAndOwnerIdByPostId(postId);
+
+        hasAuthPost(memberId, publicAndOwnerIdByPostId.getPublicOfPostStatus(), publicAndOwnerIdByPostId.getPostOwnerId());
         isCorrectCollectionId(memberId, collectionId);
         isExistCollectedPost(postId, collectionId);
 
@@ -202,6 +209,11 @@ public class PostServiceJpa implements PostService{
             post.updatePopularity();
         }
         return posts.size();
+    }
+
+    private PostOwnerIdAndPublicPostDto getPublicAndOwnerIdByPostId(Long postId) {
+        return postQueryRepository.findOwnerIdAndPublicByPostId(postId)
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
     private Post getPostWithPostedMedia(Long postId) {
@@ -276,17 +288,17 @@ public class PostServiceJpa implements PostService{
         return postQueryRepository.isExistIp(postId, ip, VIEWED_BY_IP_MINUTE.getDateTimeMinusMinutes());
     }
 
-    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus) {
+    private void hasAuthPost(Long memberId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
-            if (postQueryRepository.isBlockMembersPost(memberId, postId)) {
+            if (memberQueryRepository.isBlockedOrBlockingAndStatus(memberId, postOwnerId, BlockedMemberStatus.A)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
-            if (!postQueryRepository.isFollowMembersOrOwnerPost(memberId, postId)) {
+            if (!(memberId.equals(postOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, postOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
-            if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
+            if (!memberId.equals(postOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }

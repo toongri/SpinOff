@@ -1,23 +1,34 @@
 package com.nameless.spin_off.service.collection;
 
+import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CollectionRequestDto;
+import com.nameless.spin_off.dto.CommentDto;
 import com.nameless.spin_off.entity.collection.Collection;
+import com.nameless.spin_off.entity.comment.CommentInCollection;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
+import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.AuthorityOfMemberStatus;
 import com.nameless.spin_off.enums.member.BlockedMemberStatus;
 import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
+import com.nameless.spin_off.repository.collection.CollectedPostRepository;
 import com.nameless.spin_off.repository.collection.CollectionRepository;
+import com.nameless.spin_off.repository.comment.CommentInCollectionRepository;
+import com.nameless.spin_off.repository.comment.LikedCommentInCollectionRepository;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.post.PostRepository;
+import com.nameless.spin_off.service.comment.CommentInCollectionService;
+import com.nameless.spin_off.service.comment.CommentInPostService;
 import com.nameless.spin_off.service.member.MemberService;
 import com.nameless.spin_off.service.post.PostService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
@@ -43,10 +54,14 @@ class CollectionServiceJpaTest {
     @Autowired PostService postService;
     @Autowired PostRepository postRepository;
     @Autowired CollectionRepository collectionRepository;
+    @Autowired CommentInCollectionRepository commentInCollectionRepository;
+    @Autowired LikedCommentInCollectionRepository likedCommentInCollectionRepository;
+    @Autowired CommentInCollectionService commentInCollectionService;
     @Autowired MemberRepository memberRepository;
     @Autowired EntityManager em;
     @Autowired CollectionService collectionService;
     @Autowired MemberService memberService;
+    @Autowired CollectedPostRepository collectedPostRepository;
 
     @Test
     public void 컬렉션_생성_테스트() throws Exception{
@@ -861,8 +876,6 @@ class CollectionServiceJpaTest {
 
         assertThatThrownBy(() -> collectionService.insertCollectedPost(mem.getId(), memberCollection.getId(), postList.stream()
                 .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(AlreadyCollectedPostException.class);
-        assertThatThrownBy(() -> collectionService.insertCollectedPost(mem2.getId(), collectionList.get(0).getId(), postList.stream()
-                .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistPostException.class);
         assertThatThrownBy(() -> collectionService.insertCollectedPost(mem.getId(), collectionList.get(0).getId(), postList.stream()
                 .map(Post::getId).collect(Collectors.toList()))).isInstanceOf(NotExistCollectionException.class);
     }
@@ -926,11 +939,135 @@ class CollectionServiceJpaTest {
     }
 
     @Test
-    public void 컬렉션_삭제 () throws Exception {
+    public void 컬렉션_삭제_테스트() throws Exception{
         //given
+        Member member = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        memberRepository.save(member);
+        Member member2 = Member.buildMember()
+                .setEmail("jhkimkkk0923@naver.com")
+                .setAccountId("memberAccId2")
+                .setName("memberName")
+                .setBirth(LocalDate.now())
+                .setPhoneNumber("01011111111")
+                .setAccountPw("memberAccountPw")
+                .setNickname("memcname").build();
+        member2.addRole(AuthorityOfMemberStatus.A);
+        memberRepository.save(member2);
+        List<Member> memberList = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            memberList.add(memberRepository.save(Member.buildMember()
+                    .setEmail("jhkimkkk0923@naver.com")
+                    .setAccountId("memberAccId2")
+                    .setName("memberName")
+                    .setBirth(LocalDate.now())
+                    .setPhoneNumber("01011111111")
+                    .setAccountPw("memberAccountPw")
+                    .setNickname("memcname").build()));
+        }
+        Collection collection = collectionRepository.save(Collection.createCollection(member, "aaa", "", A));
+
+
+        List<Post> postList = new ArrayList<>();
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.B)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member).setPostPublicStatus(PublicOfPostStatus.C)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        postList.add(postRepository.save(Post.buildPost().setMember(member2).setPostPublicStatus(PublicOfPostStatus.A)
+                .setTitle("aaa").setContent("").setUrls(List.of())
+                .setThumbnailUrl(member.getId() + "1")
+                .setHashTags(List.of()).build()));
+
+        em.flush();
+        collectionService.insertCollectedPost(
+                member.getId(), collection.getId(), postList.stream().map(Post::getId).collect(Collectors.toList()));
+
+        em.flush();
+        List<Long> commentIds = new ArrayList<>();
+
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                null, "ddd"), member.getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                null, "ddd"), memberList.get(0).getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                null, "ddd"), memberList.get(1).getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                null, "ddd"), memberList.get(2).getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                null, "ddd"), memberList.get(3).getId(), collection.getId()));
+
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(0), "ddd"), member.getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(0), "ddd"), memberList.get(0).getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(0), "ddd"), memberList.get(1).getId(), collection.getId()));
+
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(2), "ddd"), member.getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(2), "ddd"), memberList.get(0).getId(), collection.getId()));
+        commentIds.add(commentInCollectionService.insertCommentInCollectionByCommentVO(new CommentDto.CommentInCollectionRequestDto(
+                commentIds.get(2), "ddd"), memberList.get(1).getId(), collection.getId()));
+
+        commentInCollectionService.insertLikedCommentByMemberId(memberList.get(1).getId(), commentIds.get(1));
+        commentInCollectionService.insertLikedCommentByMemberId(member.getId(), commentIds.get(0));
+        commentInCollectionService.insertLikedCommentByMemberId(memberList.get(2).getId(), commentIds.get(0));
+        commentInCollectionService.insertLikedCommentByMemberId(member.getId(), commentIds.get(7));
+
+        em.flush();
+        em.clear();
 
         //when
+        System.out.println("서비스함수");
+        collectionService.deleteCollection(MemberDetails.builder()
+                .id(member.getId())
+                .accountId(member.getAccountId())
+                .accountPw(member.getAccountPw())
+                .authorities(member.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), collection.getId());
+        em.flush();
+        System.out.println("서비스함수끝");
 
         //then
+        assertThatThrownBy(() -> collectionRepository.findById(collection.getId())
+                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST)))
+                .isInstanceOf(NotExistPostException.class);
+        assertThat(commentInCollectionRepository.findAll().size()).isEqualTo(0);
+        assertThat(likedCommentInCollectionRepository.findAll().size()).isEqualTo(0);
+        assertThat(collectedPostRepository.findAll().size()).isEqualTo(0);
+
+        Collection collection2 = collectionRepository.save(Collection.createCollection(member, "aaa", "", A));
+
+        collectionService.deleteCollection(MemberDetails.builder()
+                .id(member2.getId())
+                .accountId(member2.getAccountId())
+                .accountPw(member2.getAccountPw())
+                .authorities(member2.getRoles()
+                        .stream()
+                        .map(auth -> new SimpleGrantedAuthority(auth.getKey()))
+                        .collect(Collectors.toSet()))
+                .build(), collection2.getId());
     }
 }

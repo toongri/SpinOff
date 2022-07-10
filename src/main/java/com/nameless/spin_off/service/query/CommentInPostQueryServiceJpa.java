@@ -13,6 +13,7 @@ import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CommentInPostQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class CommentInPostQueryServiceJpa implements CommentInPostQueryService{
     private final CommentInPostQueryRepository commentInPostQueryRepository;
     private final PostQueryRepository postQueryRepository;
     private final MemberRepository memberRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private List<Long> blockedMemberIds;
     private Map<Long, List<ContentCommentDto>> children;
     private List<Long> likedCommentIds;
@@ -41,9 +43,8 @@ public class CommentInPostQueryServiceJpa implements CommentInPostQueryService{
         Long memberId = getCurrentMemberId(currentMember);
         boolean hasAuth = isAdmin(currentMember);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        PostOwnerIdAndPublicPostDto publicAndMemberIdByPostId = getPublicAndMemberIdByPostId(postId);
-        hasAuthPost(memberId, postId, publicAndMemberIdByPostId.getPublicOfPostStatus(),
-                publicAndMemberIdByPostId.getPostOwnerId());
+        PostOwnerIdAndPublicPostDto publicAndOwnerIdByPostId = getPublicAndOwnerIdByPostId(postId);
+        hasAuthPost(memberId, publicAndOwnerIdByPostId.getPublicOfPostStatus(), publicAndOwnerIdByPostId.getPostOwnerId());
         likedCommentIds = getAllLikedCommentIdByMemberId(memberId);
 
         List<ContentCommentDto> comments = commentInPostQueryRepository.findAllByCollectionId(postId, blockedMemberIds);
@@ -70,8 +71,7 @@ public class CommentInPostQueryServiceJpa implements CommentInPostQueryService{
     public List<MembersByContentDto> getLikeCommentMembers(Long memberId, Long commentId) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         PostIdAndOwnerIdAndPublicPostDto postInfo = getPostIdAndOwnerIdAndPublicPostDto(commentId);
-        hasAuthPost(memberId, postInfo.getPostId(), postInfo.getPublicOfPostStatus(),
-                postInfo.getPostOwnerId());
+        hasAuthPost(memberId, postInfo.getPublicOfPostStatus(), postInfo.getPostOwnerId());
 
         return getMembersByContentDtos(getLikeMembersByCommentId(commentId), memberId);
     }
@@ -132,12 +132,12 @@ public class CommentInPostQueryServiceJpa implements CommentInPostQueryService{
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_POST));
     }
 
-    private PostOwnerIdAndPublicPostDto getPublicAndMemberIdByPostId(Long postId) {
+    private PostOwnerIdAndPublicPostDto getPublicAndOwnerIdByPostId(Long postId) {
         return postQueryRepository.findOwnerIdAndPublicByPostId(postId)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
 
-    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
+    private void hasAuthPost(Long memberId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (memberId != null) {
                 if (blockedMemberIds.contains(postOwnerId)) {
@@ -147,23 +147,17 @@ public class CommentInPostQueryServiceJpa implements CommentInPostQueryService{
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!postQueryRepository.isFollowMembersOrOwnerPost(memberId, postId)) {
+            } else if (!(memberId.equals(postOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, postOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
+            } else if (!memberId.equals(postOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
     }
-
-    private PublicOfPostStatus getPublicOfPost(Long postId) {
-        return postQueryRepository.findPublicByPostId(postId)
-                .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
-    }
-
 
     private List<Long> getAllLikedCommentIdByMemberId(Long memberId) {
         if (memberId != null) {

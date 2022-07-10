@@ -180,10 +180,11 @@ public class PostDto {
         }
 
         @QueryProjection
-        public ReadPostDto(Long postId, Long memberId, String profile, String nickname, String accountId,
-                           String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
-                           String postContent, String movieThumbnail, String movieTitle, String directorName,
-                           PublicOfPostStatus publicOfPostStatus) {
+        public ReadPostDto(
+                Long postId, Long memberId, String profile, String nickname, String accountId,
+                String postTitle, LocalDateTime createTime, LocalDateTime getLastModifiedDate,
+                String postContent, String movieThumbnail, String movieTitle, String directorName,
+                PublicOfPostStatus publicOfPostStatus) {
 
             this.postId = postId;
             this.member = new ContentMemberDto(memberId, profile, nickname, accountId);
@@ -233,8 +234,9 @@ public class PostDto {
         private String thumbnailUrl;
 
         @QueryProjection
-        public SearchPageAtHashtagPostDto(Long postId, String title, Long memberId, String memberNickname,
-                                      String memberProfileImgUrl, String thumbnailUrl) {
+        public SearchPageAtHashtagPostDto(
+                Long postId, String title, Long memberId, String memberNickname,
+                String memberProfileImgUrl, String thumbnailUrl) {
             this.postId = postId;
             this.postTitle = title;
             this.memberId = memberId;
@@ -255,26 +257,6 @@ public class PostDto {
                                                             PublicOfPostStatus publicOfPostStatus) {
             this.postId = postId;
             this.postOwnerId = postOwnerId;
-            this.publicOfPostStatus = publicOfPostStatus;
-        }
-    }
-
-    @Data
-    public static class PostIdAndPublicPostDto {
-
-        @ApiModelProperty(
-                value = "글 id",
-                example = "123")
-        private Long postId;
-
-        @ApiModelProperty(
-                value = "글 공개범위",
-                example = "A")
-        private PublicOfPostStatus publicOfPostStatus;
-
-        @QueryProjection
-        public PostIdAndPublicPostDto(Long postId, PublicOfPostStatus publicOfPostStatus) {
-            this.postId = postId;
             this.publicOfPostStatus = publicOfPostStatus;
         }
     }
@@ -303,6 +285,10 @@ public class PostDto {
     public static class ThumbnailAndPublicPostDto {
 
         @ApiModelProperty(
+                value = "글 멤버 id",
+                example = "123")
+        private Long postOwnerId;
+        @ApiModelProperty(
                 value = "글 썸네일",
                 example = "dlkfhjdkld")
         private String thumbnail;
@@ -316,6 +302,13 @@ public class PostDto {
         public ThumbnailAndPublicPostDto(String thumbnail, PublicOfPostStatus publicOfPostStatus) {
             this.thumbnail = thumbnail;
             this.publicOfPostStatus = publicOfPostStatus;
+        }
+
+        @QueryProjection
+        public ThumbnailAndPublicPostDto(String thumbnail, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
+            this.thumbnail = thumbnail;
+            this.publicOfPostStatus = publicOfPostStatus;
+            this.postOwnerId = postOwnerId;
         }
     }
 
@@ -421,8 +414,9 @@ public class PostDto {
         private String thumbnailUrl;
 
         @QueryProjection
-        public MainPagePostDto(Long postId, String title, Long memberId, String memberNickname,
-                               String memberProfileImgUrl, String thumbnailUrl) {
+        public MainPagePostDto(
+                Long postId, String title, Long memberId, String memberNickname,
+                String memberProfileImgUrl, String thumbnailUrl) {
             this.postId = postId;
             this.postTitle = title;
             this.memberId = memberId;

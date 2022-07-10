@@ -144,9 +144,8 @@ public class PostQueryServiceJpa implements PostQueryService{
     @Override
     public List<MembersByContentDto> getLikePostMembers(Long memberId, Long postId) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
-        PostOwnerIdAndPublicPostDto publicAndMemberIdByCollectionId = getPublicAndMemberIdByPostId(postId);
-        hasAuthPost(memberId, postId, publicAndMemberIdByCollectionId.getPublicOfPostStatus(),
-                publicAndMemberIdByCollectionId.getPostOwnerId());
+        PostOwnerIdAndPublicPostDto publicAndOwnerIdByPostId = getPublicAndOwnerIdByPostId(postId);
+        hasAuthPost(memberId, publicAndOwnerIdByPostId.getPublicOfPostStatus(), publicAndOwnerIdByPostId.getPostOwnerId());
 
         return getMembersByContentDtos(getLikeMembersByPostId(postId), memberId);
     }
@@ -174,7 +173,7 @@ public class PostQueryServiceJpa implements PostQueryService{
     private ReadPostDto getReadPostDto(Long postId, Long memberId, boolean isAdmin) {
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         ReadPostDto post = getOneByPostId(postId);
-        hasAuthPost(memberId, postId, post.getPublicOfPostStatus(), post.getMember().getMemberId());
+        hasAuthPost(memberId, post.getPublicOfPostStatus(), post.getMember().getMemberId());
         post.setHashtags(hashtagQueryRepository.findAllByPostId(postId));
         post.setPostedMedias(postQueryRepository.findAllPostedMediaByPostId(postId));
 
@@ -186,7 +185,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         return post;
     }
 
-    private PostOwnerIdAndPublicPostDto getPublicAndMemberIdByPostId(Long postId) {
+    private PostOwnerIdAndPublicPostDto getPublicAndOwnerIdByPostId(Long postId) {
         return postQueryRepository.findOwnerIdAndPublicByPostId(postId)
                 .orElseThrow(() -> new NotExistPostException(ErrorEnum.NOT_EXIST_POST));
     }
@@ -249,7 +248,7 @@ public class PostQueryServiceJpa implements PostQueryService{
         return postQueryRepository.isExistLikedPost(memberId, postId);
     }
 
-    private void hasAuthPost(Long memberId, Long postId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
+    private void hasAuthPost(Long memberId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
         if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
             if (memberId != null) {
                 if (blockedMemberIds.contains(postOwnerId)) {
@@ -259,13 +258,13 @@ public class PostQueryServiceJpa implements PostQueryService{
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!postQueryRepository.isFollowMembersOrOwnerPost(memberId, postId)) {
+            } else if (!(memberId.equals(postOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, postOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!memberId.equals(postQueryRepository.findOwnerIdByPostId(postId).orElseGet(() -> null))) {
+            } else if (!memberId.equals(postOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }

@@ -100,9 +100,17 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
+    public List<PublicOfPostStatus> findAllPublicByPostIds(List<Long> postIds) {
+        return getQueryFactory()
+                .select(post.publicOfPostStatus)
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetch();
+    }
+
     public Optional<ThumbnailAndPublicPostDto> findThumbnailAndPublicByPostId(Long postId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QPostDto_ThumbnailAndPublicPostDto(post.thumbnailUrl, post.publicOfPostStatus))
+                .select(new QPostDto_ThumbnailAndPublicPostDto(post.thumbnailUrl, post.publicOfPostStatus, post.member.id))
                 .from(post)
                 .where(post.id.eq(postId))
                 .fetchFirst());
@@ -117,6 +125,15 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetch();
     }
 
+    public List<PostOwnerIdAndPublicPostDto> findAllOwnerIdAndPublicByPostIds(List<Long> postIds) {
+        return getQueryFactory()
+                .select(new QPostDto_PostOwnerIdAndPublicPostDto(
+                        post.member.id, post.publicOfPostStatus))
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetch();
+    }
+
     public Optional<PostOwnerIdAndPublicPostDto> findOwnerIdAndPublicByPostId(Long postId) {
         return Optional.ofNullable(getQueryFactory()
                 .select(new QPostDto_PostOwnerIdAndPublicPostDto(
@@ -126,14 +143,13 @@ public class PostQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<PostIdAndPublicPostDto> findPostIdAndPublicByCommentId(Long commentId) {
-        return Optional.ofNullable(getQueryFactory()
-                .select(new QPostDto_PostIdAndPublicPostDto(
-                        post.id, post.publicOfPostStatus))
-                .from(commentInPost)
-                .join(commentInPost.post, post)
-                .where(commentInPost.id.eq(commentId))
-                .fetchFirst());
+    public List<PostIdAndOwnerIdAndPublicPostDto> findAllPublicAndOwnerIdById(List<Long> postIds) {
+        return getQueryFactory()
+                .select(new QPostDto_PostIdAndOwnerIdAndPublicPostDto(
+                        post.id, post.member.id, post.publicOfPostStatus))
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetch();
     }
 
     public Boolean isBlockMembersPost(Long memberId, Long postId) {

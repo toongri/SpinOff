@@ -3,20 +3,27 @@ package com.nameless.spin_off.service.collection;
 import com.nameless.spin_off.config.member.MemberDetails;
 import com.nameless.spin_off.dto.CollectionDto.CollectionRequestDto;
 import com.nameless.spin_off.dto.CollectionDto.OwnerIdAndPublicCollectionDto;
+import com.nameless.spin_off.dto.PostDto;
+import com.nameless.spin_off.dto.PostDto.PostIdAndOwnerIdAndPublicPostDto;
+import com.nameless.spin_off.dto.PostDto.PostOwnerIdAndPublicPostDto;
 import com.nameless.spin_off.entity.collection.*;
 import com.nameless.spin_off.entity.member.Member;
 import com.nameless.spin_off.entity.post.Post;
 import com.nameless.spin_off.enums.ErrorEnum;
 import com.nameless.spin_off.enums.collection.CollectionScoreEnum;
 import com.nameless.spin_off.enums.collection.PublicOfCollectionStatus;
+import com.nameless.spin_off.enums.member.BlockedMemberStatus;
+import com.nameless.spin_off.enums.post.PublicOfPostStatus;
 import com.nameless.spin_off.exception.collection.*;
 import com.nameless.spin_off.exception.member.NotExistMemberException;
 import com.nameless.spin_off.exception.post.NotExistPostException;
 import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.collection.*;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import com.nameless.spin_off.repository.query.PostQueryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +33,7 @@ import java.util.stream.Collectors;
 import static com.nameless.spin_off.enums.ContentsTimeEnum.VIEWED_BY_IP_MINUTE;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class CollectionServiceJpa implements CollectionService {
@@ -36,6 +44,7 @@ public class CollectionServiceJpa implements CollectionService {
     private final ViewedCollectionByIpRepository viewedCollectionByIpRepository;
     private final FollowedCollectionRepository followedCollectionRepository;
     private final CollectedPostRepository collectedPostRepository;
+    private final MemberQueryRepository memberQueryRepository;
 
     @Transactional
     @Override
@@ -59,8 +68,8 @@ public class CollectionServiceJpa implements CollectionService {
     @Override
     public Long insertLikedCollectionByMemberId(Long memberId, Long collectionId)
             throws NotExistMemberException, NotExistCollectionException, AlreadyLikedCollectionException {
-
-        hasAuthCollection(memberId, collectionId, getPublicOfCollection(collectionId));
+        OwnerIdAndPublicCollectionDto collectionInfo = getCollectionInfo(collectionId);
+        hasAuthCollection(memberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
         isExistLikedCollection(memberId, collectionId);
 
         return likedCollectionRepository.save(
@@ -85,11 +94,12 @@ public class CollectionServiceJpa implements CollectionService {
 
     @Transactional
     @Override
-    public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId)
-            throws NotExistMemberException, NotExistCollectionException,
-            AlreadyFollowedCollectionException, CantFollowOwnCollectionException {
+    public Long insertFollowedCollectionByMemberId(Long memberId, Long collectionId) {
+        OwnerIdAndPublicCollectionDto collectionInfo = getCollectionInfo(collectionId);
 
-        hasAuthCollection(memberId, collectionId, isCorrectIdAndGetPublic(memberId, collectionId));
+        isCanFollowCollection(memberId, collectionInfo);
+
+        hasAuthCollection(memberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
         isExistFollowedCollection(memberId, collectionId);
 
         return followedCollectionRepository.save(
@@ -129,6 +139,11 @@ public class CollectionServiceJpa implements CollectionService {
         return collections.size();
     }
 
+    private void isCanFollowCollection(Long memberId, OwnerIdAndPublicCollectionDto collectionInfo) {
+        if (memberId.equals(collectionInfo.getCollectionOwnerId())) {
+            throw new CantFollowOwnCollectionException(ErrorEnum.CANT_FOLLOW_OWN_COLLECTION);
+        }
+    }
     private List<CollectedPost> getCollectedPostsByCollectionIdAndPostIds(Long collectionId, List<Long> postIds) {
         return postIds.stream()
                 .map(p -> CollectedPost.createCollectedPost(Collection.createCollection(collectionId), Post.createPost(p)))
@@ -164,6 +179,11 @@ public class CollectionServiceJpa implements CollectionService {
         }
     }
 
+    private OwnerIdAndPublicCollectionDto getCollectionInfo(Long collectionId) {
+        return collectionQueryRepository.findCollectionOwnerIdAndPublic(collectionId)
+                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
+    }
+
     private void deleteCollectedPosts(Collection collection) {
         List<CollectedPost> collectedPosts = collectedPostRepository.findAllByCollection(collection);
         if (!collectedPosts.isEmpty()) {
@@ -194,31 +214,24 @@ public class CollectionServiceJpa implements CollectionService {
     }
 
     private void isExistPosts(Long currentMemberId, List<Long> postIds) {
-        if (postIds.size() != getCountExistPost(currentMemberId, postIds)) {
+
+        List<PostOwnerIdAndPublicPostDto> posts = postQueryRepository.findAllOwnerIdAndPublicByPostIds(postIds);
+        if (postIds.size() != posts.size()) {
             throw new NotExistPostException(ErrorEnum.NOT_EXIST_POST);
         }
+        posts.forEach(p -> hasAuthPost(currentMemberId, p.getPublicOfPostStatus(), p.getPostOwnerId()));
     }
-
-    private Long getCountExistPost(Long currentMemberId, List<Long> postIds) {
-        return postQueryRepository.countExistPostByPostIdAndMemberId(currentMemberId, postIds);
-    }
-
-    private PublicOfCollectionStatus getPublicOfCollection(Long collectionId) {
-        return collectionQueryRepository.findPublicByCollectionId(collectionId)
-                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.DONT_HAVE_AUTHORITY));
-    }
-
-    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus) {
+    private void hasAuthCollection(Long memberId, PublicOfCollectionStatus publicOfCollectionStatus, Long collectionOwnerId) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
-            if (collectionQueryRepository.isBlockMembersCollection(memberId, collectionId)) {
+            if (memberQueryRepository.isBlockedOrBlockingAndStatus(memberId, collectionOwnerId, BlockedMemberStatus.A)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
-            if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
+            if (!(memberId.equals(collectionOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, collectionOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
-            if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
+            if (!memberId.equals(collectionOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }
@@ -236,15 +249,19 @@ public class CollectionServiceJpa implements CollectionService {
         }
     }
 
-    private PublicOfCollectionStatus isCorrectIdAndGetPublic(Long memberId, Long collectionId) {
-        OwnerIdAndPublicCollectionDto idAndPublic = collectionQueryRepository
-                .findCollectionOwnerIdAndPublic(collectionId)
-                .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
-
-        if (idAndPublic.getCollectionOwnerId().equals(memberId)) {
-            throw new CantFollowOwnCollectionException(ErrorEnum.CANT_FOLLOW_OWN_COLLECTION);
-        } else {
-            return idAndPublic.getPublicOfCollectionStatus();
+    private void hasAuthPost(Long memberId, PublicOfPostStatus publicOfPostStatus, Long postOwnerId) {
+        if (publicOfPostStatus.equals(PublicOfPostStatus.A)) {
+            if (memberQueryRepository.isBlockedOrBlockingAndStatus(memberId, postOwnerId, BlockedMemberStatus.A)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.C)){
+            if (!(memberId.equals(postOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, postOwnerId))) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
+        } else if (publicOfPostStatus.equals(PublicOfPostStatus.B)){
+            if (!memberId.equals(postOwnerId)) {
+                throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
+            }
         }
     }
 

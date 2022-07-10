@@ -13,6 +13,7 @@ import com.nameless.spin_off.exception.security.DontHaveAuthorityException;
 import com.nameless.spin_off.repository.member.MemberRepository;
 import com.nameless.spin_off.repository.query.CollectionQueryRepository;
 import com.nameless.spin_off.repository.query.CommentInCollectionQueryRepository;
+import com.nameless.spin_off.repository.query.MemberQueryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,7 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
 
     private final CommentInCollectionQueryRepository commentInCollectionQueryRepository;
     private final CollectionQueryRepository collectionQueryRepository;
+    private final MemberQueryRepository memberQueryRepository;
     private final MemberRepository memberRepository;
     private List<Long> blockedMemberIds;
     private Map<Long, List<ContentCommentDto>> children;
@@ -42,7 +44,7 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         boolean hasAuth = isAdmin(currentMember);
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         OwnerIdAndPublicCollectionDto publicAndId = getPublicAndMemberIdByCollectionId(collectionId);
-        hasAuthCollection(memberId, collectionId, publicAndId.getPublicOfCollectionStatus(), publicAndId.getCollectionOwnerId());
+        hasAuthCollection(memberId, publicAndId.getPublicOfCollectionStatus(), publicAndId.getCollectionOwnerId());
         likedCommentIds = getAllLikedCommentIdByMemberId(memberId);
 
         List<ContentCommentDto> comments = commentInCollectionQueryRepository
@@ -71,8 +73,7 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         blockedMemberIds = getBlockingAllAndBlockedAllByIdAndBlockStatusA(memberId);
         CollectionIdAndOwnerIdAndPublicCollectionDto collectionInfo =
                 getCollectionIdAndOwnerIdAndPublicCollectionDto(commentId);
-        hasAuthCollection(memberId, collectionInfo.getCollectionId(), collectionInfo.getPublicOfCollectionStatus(),
-                collectionInfo.getCollectionOwnerId());
+        hasAuthCollection(memberId, collectionInfo.getPublicOfCollectionStatus(), collectionInfo.getCollectionOwnerId());
 
         return getMembersByContentDtos(getLikeMembersByCommentId(commentId), memberId);
     }
@@ -142,8 +143,7 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
                 .orElseThrow(() -> new NotExistCollectionException(ErrorEnum.NOT_EXIST_COLLECTION));
     }
 
-    private void hasAuthCollection(Long memberId, Long collectionId, PublicOfCollectionStatus publicOfCollectionStatus,
-                                   Long collectionOwnerId) {
+    private void hasAuthCollection(Long memberId, PublicOfCollectionStatus publicOfCollectionStatus, Long collectionOwnerId) {
         if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.A)) {
             if (memberId != null) {
                 if (blockedMemberIds.contains(collectionOwnerId)) {
@@ -153,13 +153,13 @@ public class CommentInCollectionQueryServiceJpa implements CommentInCollectionQu
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.C)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!collectionQueryRepository.isFollowMembersOrOwnerCollection(memberId, collectionId)) {
+            } else if (!(memberId.equals(collectionOwnerId) || memberQueryRepository.isExistFollowedMember(memberId, collectionOwnerId))) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         } else if (publicOfCollectionStatus.equals(PublicOfCollectionStatus.B)){
             if (memberId == null) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
-            } else if (!memberId.equals(collectionQueryRepository.findOwnerIdByCollectionId(collectionId).orElseGet(() -> null))) {
+            } else if (!memberId.equals(collectionOwnerId)) {
                 throw new DontHaveAuthorityException(ErrorEnum.DONT_HAVE_AUTHORITY);
             }
         }

@@ -196,10 +196,10 @@ public class CollectionQueryRepository extends Querydsl4RepositorySupport {
                 .fetchFirst());
     }
 
-    public Optional<CollectionIdAndPublicCollectionDto> findPublicAndIdByCommentId(Long commentId) {
+    public Optional<CollectionIdAndOwnerIdAndPublicCollectionDto> findPublicAndOwnerIdByCommentId(Long commentId) {
         return Optional.ofNullable(getQueryFactory()
-                .select(new QCollectionDto_CollectionIdAndPublicCollectionDto(
-                        collection.id, collection.publicOfCollectionStatus))
+                .select(new QCollectionDto_CollectionIdAndOwnerIdAndPublicCollectionDto(
+                        collection.id, collection.member.id, collection.publicOfCollectionStatus))
                 .from(commentInCollection)
                 .join(commentInCollection.collection, collection)
                 .where(commentInCollection.id.eq(commentId))
