@@ -27,7 +27,6 @@ public class Movie implements Persistable<Long> {
     @Id
     @Column(name="movie_id")
     private Long id;
-
     private String title;
     private String thumbnail;
     private String directorName;

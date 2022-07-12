@@ -3,6 +3,7 @@ package com.nameless.spin_off.config.movie;
 import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto;
 import com.nameless.spin_off.dto.MovieDto.NaverMoviesResponseDto.NaverMovie;
 import com.nameless.spin_off.entity.movie.Movie;
+import com.nameless.spin_off.enums.ContentsBanKeywordEnum;
 import com.nameless.spin_off.exception.movie.CantFindMovieUrlException;
 import com.nameless.spin_off.exception.movie.OverKobisMovieApiLimitException;
 import com.nameless.spin_off.exception.movie.UnKnownKobisException;
@@ -68,7 +69,7 @@ public class MovieApiService {
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-                log.debug("resultMap : {}", resultMap.toString());
+                log.debug("resultMap : {}", resultMap);
                 if (resultMap.getBody().containsKey("faultInfo")) {
                     LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("faultInfo");
                     if (String.valueOf(lm.get("errorCode")).equals("320099")) {
@@ -94,7 +95,16 @@ public class MovieApiService {
 
                         log.debug("movie id : {}", movie.getId());
                         log.debug("movie title : {}", movie.getTitle());
+                        String genreAlt = String.valueOf(obj.get("genreAlt"));
+                        if (genreAlt.isEmpty()) {
+                            continue;
+                        }
+
                         List<String> genres = Arrays.asList(String.valueOf(obj.get("genreAlt")).split(","));
+                        log.debug("movie genre : {}", genres);
+                        if (genres.stream().anyMatch(ContentsBanKeywordEnum.MOVIE::isIn)) {
+                            continue;
+                        }
 
                         movie.updateGenres(genres);
                         newPartMovieList.add(movie);
@@ -109,20 +119,17 @@ public class MovieApiService {
                 }
 
                 List<Long> movieIds = newPartMovieList.stream().map(Movie::getId).collect(Collectors.toList());
-                log.debug("movieIds : {}", movieIds.toString());
+                log.debug("movieIds : {}", movieIds.stream().toString());
 
                 List<Long> alreadyMovieIds = movieRepository.findAllIdsById(movieIds);
-                log.debug("alreadyMovieIds : {}", alreadyMovieIds.toString());
+                log.debug("alreadyMovieIds : {}", alreadyMovieIds.stream().toString());
 
                 List<Movie> resultMovieList = newPartMovieList
                         .stream()
                         .filter(m -> m.getDirectorName() != null && !alreadyMovieIds.contains(m.getId()))
                         .collect(Collectors.toList());
-                log.debug("resultMovieList : {}", resultMovieList.toString());
+                log.debug("resultMovieList : {}", resultMovieList.stream().toString());
 
-//                if (resultMovieList.isEmpty()) {
-//                    break;
-//                }
                 if (!resultMovieList.isEmpty()) {
                     newMovieList.addAll(resultMovieList);
                 }
@@ -171,7 +178,7 @@ public class MovieApiService {
 
                 //이 한줄의 코드로 API를 호출해 MAP타입으로 전달 받는다.
                 ResponseEntity<Map> resultMap = restTemplate.exchange(uri.toString(), HttpMethod.GET, entity, Map.class);
-                log.debug("resultMap {}", resultMap.toString());
+                log.debug("actor resultMap : {}", resultMap);
                 if (resultMap.getBody().containsKey("faultInfo")) {
 
                     LinkedHashMap lm = (LinkedHashMap) resultMap.getBody().get("faultInfo");
@@ -332,7 +339,7 @@ public class MovieApiService {
             StringBuilder stringBuilder = new StringBuilder();
             int cnt = 0;
             for (Map map : actors) {
-                stringBuilder.append(String.valueOf(map.get("peopleNm")));
+                stringBuilder.append(map.get("peopleNm"));
                 String cast = String.valueOf(map.get("cast"));
                 if (!cast.equals("")) {
                     stringBuilder.append(" - ");
@@ -364,7 +371,7 @@ public class MovieApiService {
         if (!directors.isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (Map map : directors) {
-                stringBuilder.append(String.valueOf(map.get("peopleNm")));
+                stringBuilder.append(map.get("peopleNm"));
                 stringBuilder.append("/");
             }
             stringBuilder.setLength(stringBuilder.length() - 1);
